@@ -1,0 +1,15 @@
+[
+  {
+    "listing": "/blog.html",
+    "items": [
+      "/posts/lagrange-cobb-douglas/index.html",
+      "/posts/minima-3d/index.html",
+      "/posts/linear-approximation-3d/index.html",
+      "/posts/iterated-expectations/index.html",
+      "/posts/newtons-method/index.html",
+      "/posts/simple-constrained-optimization/index.html",
+      "/posts/rent-vs-buy/index.html",
+      "/posts/pdf-scraping/index.html"
+    ]
+  }
+]
