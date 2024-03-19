@@ -123,6 +123,15 @@ div.csl-indent {
     "search-label": "Search"
   }
 }</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-V95HGLKTEB"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
+</script>
 
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -818,7 +827,7 @@ Converged in 6 steps.</code></pre>
 <p>However, many functions do not have have readily available methods for finding the root. For example, if <span class="math inline">\(f(x)\)</span> is a polynomial of degree 5 or greater, it is known that no formula for finding its roots exist <span class="citation" data-cites="strang_calculus_2016">(<a href="#ref-strang_calculus_2016" role="doc-biblioref">Strang and Herman 2016</a>)</span>. Consider the following polynomial of degree 5: <span class="math display">\[
 f(x) =x^{5} + 8 x^{4} + 4 x^{3} - 2 x - 7
 \]</span> What if we are asked to solve the following: <span class="math display">\[
-f(x)=0 \quad \text{where} -5\leq x \leq 0 \\
+f(x)=0 \quad \text{where} -5\leq x \leq 0
 \]</span> There is no formula that solves this. Even plugging the polynomial into <code>sympy</code> and running its solver, <code>sympy.solveset</code>, doesn’t give a clear answer.</p>
 <div id="cell-37" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>x, y <span class="op">=</span> sympy.symbols(<span class="st">'x y'</span>)</span>
