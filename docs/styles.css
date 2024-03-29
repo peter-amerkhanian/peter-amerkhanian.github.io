@@ -30,7 +30,7 @@ nav .nav-item {
 }
 
 .cell-output-markdown {
-    overflow-y: clip;
+    overflow-y: clip !important;
 }
 
 @media (min-width: 992px) {

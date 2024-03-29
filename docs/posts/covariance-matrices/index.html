@@ -9,7 +9,7 @@
 <meta name="author" content="Peter Amerkhanian">
 <meta name="dcterms.date" content="2024-03-25">
 
-<title>Home - Multivariate Covariance Matrices</title>
+<title>Home - Covariance Matrices</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -208,7 +208,7 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <div class="quarto-title-block"><div><h1 class="title">Multivariate Covariance Matrices</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
+      <div class="quarto-title-block"><div><h1 class="title">Covariance Matrices</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
                                 <div class="quarto-categories">
                 <div class="quarto-category">Python</div>
                 <div class="quarto-category">Linear Algebra</div>
@@ -242,7 +242,7 @@ window.Quarto = {
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-        <h2 id="toc-title"><a href="#" class="nav-link">Multivariate Covariance Matrices</a></h2>
+        <h2 id="toc-title"><a href="#" class="nav-link">Covariance Matrices</a></h2>
      
     <ul>
     <li><a href="#question-and-data" id="toc-question-and-data" class="nav-link active" data-scroll-target="#question-and-data">Question and Data</a>
@@ -593,12 +593,12 @@ y: [0.33 0.16 0.42 0.77 0.55] mean(y)= 0.446</code></pre>
 </div>
 </div>
 <p>First we’ll define those two mean centered vectors as follows: <span class="math display">\[
-\tilde{\mathbf {x}} = \left[\begin{matrix}0.19\\0\\0\\0.04\\0.01\end{matrix}\right] - 0.048), \quad \tilde{\mathbf {y}} = (\left[\begin{matrix}0.33\\0.16\\0.42\\0.77\\0.55\end{matrix}\right] - 0.446) \\
+\tilde{\mathbf {x}} = (\left[\begin{matrix}0.19\\0\\0\\0.04\\0.01\end{matrix}\right] - 0.048), \quad \tilde{\mathbf {y}} = (\left[\begin{matrix}0.33\\0.16\\0.42\\0.77\\0.55\end{matrix}\right] - 0.446) \\
 \]</span> then we’ll plug those into the vector covariance formula</p>
 <p><span class="math display">\[
 \begin{align*}
 c_{x,y} &amp;= \frac{1}{4} (\left[\begin{matrix}0.142\\-0.048\\-0.048\\-0.008\\-0.038\end{matrix}\right]^\intercal \left[\begin{matrix}-0.116\\-0.286\\-0.026\\0.324\\0.104\end{matrix}\right]) \\
-&amp;= \frac{1}{4} \left[\begin{matrix}0.142 &amp; -0.048 &amp; -0.048 &amp; -0.008 &amp; -0.038\end{matrix}\right] \left[\begin{matrix}-0.116\\-0.286\\-0.026\\0.324\\0.104\end{matrix}\right]) \\
+&amp;= \frac{1}{4} (\left[\begin{matrix}0.142 &amp; -0.048 &amp; -0.048 &amp; -0.008 &amp; -0.038\end{matrix}\right] \left[\begin{matrix}-0.116\\-0.286\\-0.026\\0.324\\0.104\end{matrix}\right]) \\
 &amp;\approx \frac{1}{4} (-0.00804) \\
 &amp;\approx -0.00201
 \end{align*}
