@@ -15,6 +15,7 @@ div.quarto-about-trestles .about-entity .about-link {
     color: #5e5e5e;
 }
 
+
 .navbar-logo {
     max-height: 26px;
     width: auto;
@@ -26,6 +27,10 @@ nav .nav-item {
     padding-top: 1px;
     padding: 0px 5px 0px 5px;
     font-weight: 550;
+}
+
+.cell-output-markdown {
+    overflow-y: clip;
 }
 
 @media (min-width: 992px) {
@@ -46,5 +51,26 @@ nav .nav-item {
 
     div.quarto-about-trestles {
         padding-top: 1em !important;
+    }
+
+    
+    /* Fix Math Mobile */
+    mjx-container {
+        overflow-x: auto;
+        overflow-y: hidden;
+        min-width: 10em !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    /* Fix Plotly Mobile */
+    /* When you lost TOC, you lose plotly legend */
+    /* .infolayer {
+        display: none;
+    } */
+    #scene {
+        /* width: 100% !important; */
+        left: 0px !important;
+        top: 10px !important;
     }
 }
