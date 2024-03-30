@@ -838,6 +838,8 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 <p>When we examine the relationship between polynomial degree and <span class="math inline">\(R^2\)</span>, we now seek the argument that maximizeds <span class="math inline">\(R^2_{test}\)</span>, rather than <span class="math inline">\(R^2_{train}\)</span>.</p>
 <p>Here we’ll also note that, typically, <span class="math inline">\(R^2_{test} &lt; R^2_{train}\)</span>.</p>
 <div id="cell-47" class="cell" data-execution_count="143">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>r2s_test <span class="op">=</span> []</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>r2s_train <span class="op">=</span> []</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>max_root <span class="op">=</span> <span class="dv">50</span></span>
@@ -855,6 +857,7 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 <span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>  r2s_train.append(r2_train)</span>
 <span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>r2s_test <span class="op">=</span> np.array(r2s_test)</span>
 <span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>r2s_train <span class="op">=</span> np.array(r2s_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 <div id="cell-48" class="cell" data-outputid="3968621a-abea-49ab-96ba-5abe2a130c74" data-execution_count="144">
 <details class="code-fold">
@@ -981,7 +984,7 @@ income = 33000 + 6000 \times education + \mathcal{N}(0, 9000)
 </div>
 <p>Indeed, it even seems visually that,<br>
 <span class="math display">\[
-\lim_{J \rightarrow \infty} R^2 \approx 1.0
+\lim_{J \rightarrow \infty} R_{train}^2 \approx 1.0
 \]</span> Being able to perfectly model a DGP that is in itself random is a worrying sign, and this condition creates especial danger of over-fitting and creating overly-confident models when using decision trees.</p>
 <div id="cell-56" class="cell" data-outputid="02c9e6bd-9687-4167-b614-7e9f2dc857ab" data-execution_count="147">
 <details class="code-fold">
