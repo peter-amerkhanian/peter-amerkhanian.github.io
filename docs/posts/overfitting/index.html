@@ -303,7 +303,7 @@ window.Quarto = {
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">49</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'Income'</span>] <span class="op">=</span> <span class="dv">33000</span> <span class="op">+</span> <span class="dv">6000</span> <span class="op">*</span> education</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Individuals’ income is dependent on their years of education. The relationship is governed by the deterministic function above, our “DGP”: <span class="math display">\[
+<p>Individuals’ income is dependent on their years of education. The relationship is governed by the deterministic function, our “DGP”: <span class="math display">\[
 income = 33000 + 6000 \times education
 \]</span></p>
 <div id="cell-8" class="cell" data-outputid="8f75ca7c-7403-44b5-cf8d-3ff38f6a81a1" data-execution_count="125">
@@ -601,8 +601,8 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 </div>
 </div>
 </div>
-<p>This is clearly a bad model. What’s worrying is that it <em>seemed</em> like the best model when we simply examined model accuracy. This raises the possibility that we might be duped into selecting models like this in practice, which is worrying.</p>
-<p>Out of curiousity, let’s see how an extremely simply model, a linear regression with <span class="math inline">\(p=1\)</span> compares on this new data.</p>
+<p>This is clearly a bad model. What’s worrying is that it <em>seemed</em> like the best model when we simply examined model accuracy. This raises the possibility that we might be duped into selecting models like this in practice.</p>
+<p>Out of curiosity, let’s see how an extremely simply model, a linear regression with <span class="math inline">\(p=1\)</span> compares on this new data.</p>
 <div id="cell-34" class="cell" data-outputid="3168df13-bbb7-4424-eb1f-7078bf97e3d7" data-execution_count="137">
 <details class="code-fold">
 <summary>Code</summary>
@@ -674,7 +674,7 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 </div>
 </div>
 </div>
-<p>We have the benefit of already knowing that <span class="math inline">\(p=1\)</span> matches the functional form of the true DGP, but if we didn’t know that in advance, this method of comparing out-of-sample performance between models seems to be a better way to compare model accuracy.</p>
+<p>We have the benefit of already knowing that <span class="math inline">\(p=1\)</span> matches the functional form of the true DGP, but if we didn’t know that in advance, this method of comparing out-of-sample performance between models seems to be a better way to compare model accuracy and pick a model that may match the DGP.</p>
 </section>
 </section>
 <section id="the-train-test-split" class="level1">
@@ -835,9 +835,8 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 </div>
 </div>
 </div>
-<p>When we examine the relationship between polynomial degree and <span class="math inline">\(R^2\)</span>, we now seek the argument that maximized <span class="math inline">\(R^2_{test}\)</span>, rather than <span class="math inline">\(R^2_{train}\)</span>.</p>
+<p>When we examine the relationship between polynomial degree and <span class="math inline">\(R^2\)</span>, we now seek the argument that maximizeds <span class="math inline">\(R^2_{test}\)</span>, rather than <span class="math inline">\(R^2_{train}\)</span>.</p>
 <p>Here we’ll also note that, typically, <span class="math inline">\(R^2_{test} &lt; R^2_{train}\)</span>.</p>
-<p>We’ll now do another grid search to find the optimal model, but this time we optimize for <span class="math inline">\(R^2_{test}\)</span>:</p>
 <div id="cell-47" class="cell" data-execution_count="143">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>r2s_test <span class="op">=</span> []</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>r2s_train <span class="op">=</span> []</span>
@@ -893,7 +892,7 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 </div>
 </div>
 </div>
-<p>In conclusion, were we using only a training dataset, we may naively optimize our model at <span class="math inline">\(p=16\)</span>. However, by using a test dataset for model evaluation, our empirically optimized model is at <span class="math inline">\(p=1\)</span>, thus correctly identifying the true functional form of the underlying data generating process, a linear function of the form:</p>
+<p>Here we see the benefit of the train-test split. Were we using only a training dataset, we may naively optimize our model at <span class="math inline">\(p=16\)</span>. However, by using a test dataset for model evaluation, our empirically optimized model is at <span class="math inline">\(p=1\)</span>, thus matching the true functional form of the underlying data generating process, a linear function of the form:</p>
 <p><span class="math display">\[
 income = 33000 + 6000 \times education + \mathcal{N}(0, 9000)
 \]</span> Indeed, we can see the exact functional form that our optimal model takes:</p>
@@ -982,7 +981,7 @@ income = 33000 + 6000 \times education + \mathcal{N}(0, 9000)
 </div>
 <p>Indeed, it even seems visually that,<br>
 <span class="math display">\[
-\lim_{J \rightarrow \infty} R^2 = 1.0
+\lim_{J \rightarrow \infty} R^2 \approx 1.0
 \]</span> Being able to perfectly model a DGP that is in itself random is a worrying sign, and this condition creates especial danger of over-fitting and creating overly-confident models when using decision trees.</p>
 <div id="cell-56" class="cell" data-outputid="02c9e6bd-9687-4167-b614-7e9f2dc857ab" data-execution_count="147">
 <details class="code-fold">
