@@ -287,7 +287,7 @@ window.Quarto = {
 <section id="some-notes-on-modeling-data-and-resampling-methods" class="level2">
 <h2 class="anchored" data-anchor-id="some-notes-on-modeling-data-and-resampling-methods">Some Notes on Modeling Data and Resampling Methods</h2>
 <p>The following is an exercise with synthetic data to memorialize some thoughts on models and resampling methods for my future reference. I won’t reference a lot of specific books here, but generally this is highly influenced by introduction to statistical learning and elements of statistical learning.</p>
-<p>To begin, say we are aware of a data-generating-process (DGP) as follows:</p>
+<p>To begin, say we are examining the relationship between income and years of education.</p>
 <p>We have an input, years of eductions, defined below:</p>
 <div id="cell-4" class="cell" data-execution_count="123">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame()</span>
@@ -835,9 +835,9 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 </div>
 </div>
 </div>
-<p>When we examine the relationship between polynomial degree and <span class="math inline">\(R^2\)</span>, we now seek the argument that maximizeds <span class="math inline">\(R^2_{test}\)</span>, rather than <span class="math inline">\(R^2_{train}\)</span>.</p>
+<p>When we examine the relationship between polynomial degree and <span class="math inline">\(R^2\)</span>, we now seek the argument that maximizes <span class="math inline">\(R^2_{test}\)</span>, rather than <span class="math inline">\(R^2_{train}\)</span>.</p>
 <p>Here we’ll also note that, typically, <span class="math inline">\(R^2_{test} &lt; R^2_{train}\)</span>.</p>
-<div id="cell-47" class="cell" data-execution_count="143">
+<div id="cell-47" class="cell" data-outputid="3968621a-abea-49ab-96ba-5abe2a130c74" data-execution_count="144">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>r2s_test <span class="op">=</span> []</span>
@@ -856,41 +856,37 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 <span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>  r2s_test.append(r2_test)</span>
 <span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>  r2s_train.append(r2_train)</span>
 <span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>r2s_test <span class="op">=</span> np.array(r2s_test)</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>r2s_train <span class="op">=</span> np.array(r2s_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div id="cell-48" class="cell" data-outputid="3968621a-abea-49ab-96ba-5abe2a130c74" data-execution_count="144">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>ax.plot(roots[<span class="dv">1</span>:], r2s_test[<span class="dv">1</span>:], <span class="st">".-"</span>, alpha<span class="op">=</span><span class="fl">.8</span>, label<span class="op">=</span><span class="st">"Test"</span>)</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"$R^2_</span><span class="sc">{test}</span><span class="st">$ ~ $p$"</span>)</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>ax.plot(np.argmax(r2s_test), np.<span class="bu">max</span>(r2s_test), <span class="st">"D"</span>,</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span><span class="st">"tab:blue"</span>,</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>        alpha<span class="op">=</span><span class="fl">.6</span>,</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="vs">r"$ \underset</span><span class="sc">{d}</span><span class="vs">{\arg\max} \; R^2_</span><span class="sc">{test}</span><span class="vs">=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>argmax(r2s_test)<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">.1</span>)</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax)</span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="dv">1</span>)</span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>ax.plot(roots[<span class="dv">1</span>:], r2s_train[<span class="dv">1</span>:], <span class="st">".-"</span>, alpha<span class="op">=</span><span class="fl">.8</span>, label<span class="op">=</span><span class="st">"Train"</span>)</span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"$R^2$ ~ $d$"</span>)</span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>ax.plot(np.argmax(r2s_train), np.<span class="bu">max</span>(r2s_train), <span class="st">"s"</span>,</span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span><span class="st">"tab:orange"</span>,</span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>        alpha<span class="op">=</span><span class="fl">.6</span>,</span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="vs">r"$ \underset</span><span class="sc">{d}</span><span class="vs">{\arg\max} \; R^2_</span><span class="sc">{train}</span><span class="vs">=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>argmax(r2s_train)<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"Polynomial Degree"</span>, ylabel<span class="op">=</span><span class="st">"$R^2$"</span>)</span>
-<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
-<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">.1</span>)</span>
-<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>r2s_train <span class="op">=</span> np.array(r2s_train)</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>ax.plot(roots[<span class="dv">1</span>:], r2s_test[<span class="dv">1</span>:], <span class="st">".-"</span>, alpha<span class="op">=</span><span class="fl">.8</span>, label<span class="op">=</span><span class="st">"Test"</span>)</span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"$R^2_</span><span class="sc">{test}</span><span class="st">$ ~ $p$"</span>)</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>ax.plot(np.argmax(r2s_test), np.<span class="bu">max</span>(r2s_test), <span class="st">"D"</span>,</span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span><span class="st">"tab:blue"</span>,</span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>        alpha<span class="op">=</span><span class="fl">.6</span>,</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="vs">r"$ \underset</span><span class="sc">{d}</span><span class="vs">{\arg\max} \; R^2_</span><span class="sc">{test}</span><span class="vs">=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>argmax(r2s_test)<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">.1</span>)</span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax)</span>
+<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>ax.plot(roots[<span class="dv">1</span>:], r2s_train[<span class="dv">1</span>:], <span class="st">".-"</span>, alpha<span class="op">=</span><span class="fl">.8</span>, label<span class="op">=</span><span class="st">"Train"</span>)</span>
+<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"$R^2$ ~ $d$"</span>)</span>
+<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a>ax.plot(np.argmax(r2s_train), np.<span class="bu">max</span>(r2s_train), <span class="st">"s"</span>,</span>
+<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span><span class="st">"tab:orange"</span>,</span>
+<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a>        alpha<span class="op">=</span><span class="fl">.6</span>,</span>
+<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="vs">r"$ \underset</span><span class="sc">{d}</span><span class="vs">{\arg\max} \; R^2_</span><span class="sc">{train}</span><span class="vs">=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>argmax(r2s_train)<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb22-38"><a href="#cb22-38" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb22-39"><a href="#cb22-39" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"Polynomial Degree"</span>, ylabel<span class="op">=</span><span class="st">"$R^2$"</span>)</span>
+<span id="cb22-40"><a href="#cb22-40" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb22-41"><a href="#cb22-41" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">.1</span>)</span>
+<span id="cb22-42"><a href="#cb22-42" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-24-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-23-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -899,11 +895,11 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 <p><span class="math display">\[
 income = 33000 + 6000 \times education + \mathcal{N}(0, 9000)
 \]</span> Indeed, we can see the exact functional form that our optimal model takes:</p>
-<div id="cell-51" class="cell" data-outputid="9c57d3eb-b00d-4a58-c87a-6030d919a101" data-execution_count="145">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>resid <span class="op">=</span> (correct_income <span class="op">-</span> sub_optimal_model.predict(education.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)))</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"income = </span><span class="sc">{</span><span class="bu">round</span>(sub_optimal_model[<span class="dv">1</span>].intercept_, <span class="dv">2</span>)<span class="sc">}</span><span class="ss">"</span> <span class="op">+</span></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f" + </span><span class="sc">{</span><span class="bu">round</span>(sub_optimal_model[<span class="dv">1</span>].coef_[<span class="op">-</span><span class="dv">1</span>], <span class="dv">2</span>)<span class="sc">}</span><span class="ss">*education"</span> <span class="op">+</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f" + N(</span><span class="sc">{</span><span class="bu">round</span>(resid.mean(), <span class="dv">2</span>)<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span><span class="bu">round</span>(resid.std(), <span class="dv">2</span>)<span class="sc">}</span><span class="ss">)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-50" class="cell" data-outputid="9c57d3eb-b00d-4a58-c87a-6030d919a101" data-execution_count="145">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>resid <span class="op">=</span> (correct_income <span class="op">-</span> sub_optimal_model.predict(education.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)))</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"income = </span><span class="sc">{</span><span class="bu">round</span>(sub_optimal_model[<span class="dv">1</span>].intercept_, <span class="dv">2</span>)<span class="sc">}</span><span class="ss">"</span> <span class="op">+</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f" + </span><span class="sc">{</span><span class="bu">round</span>(sub_optimal_model[<span class="dv">1</span>].coef_[<span class="op">-</span><span class="dv">1</span>], <span class="dv">2</span>)<span class="sc">}</span><span class="ss">*education"</span> <span class="op">+</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f" + N(</span><span class="sc">{</span><span class="bu">round</span>(resid.mean(), <span class="dv">2</span>)<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span><span class="bu">round</span>(resid.std(), <span class="dv">2</span>)<span class="sc">}</span><span class="ss">)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>income = 34467.82 + 5635.04*education + N(-90.57, 9138.91)</code></pre>
 </div>
@@ -912,72 +908,72 @@ income = 33000 + 6000 \times education + \mathcal{N}(0, 9000)
 <section id="an-aside-about-nonparametric-models" class="level3">
 <h3 class="anchored" data-anchor-id="an-aside-about-nonparametric-models">An Aside about Nonparametric models</h3>
 <p>The issues we just discussed in the context of polynomial regression only compound as we exit the realm of linear regression and consider nonparametric models like tree-based models. For example, when we examine a decision tree model and vary <span class="math inline">\(J\)</span>, the number of partitions of the feature space that the model uses (a measure of complexity), we see extreme divergence between training the testing performance.</p>
-<div id="cell-54" class="cell" data-outputid="6c1e4bbb-45a9-4fa3-b4a0-a31fcba17076" data-execution_count="146">
+<div id="cell-53" class="cell" data-outputid="6c1e4bbb-45a9-4fa3-b4a0-a31fcba17076" data-execution_count="146">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> model_data_cart(degree, df):</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  X <span class="op">=</span> df[[<span class="st">'Education'</span>]].values</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  y <span class="op">=</span> df[<span class="st">'Income'</span>].values</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  model <span class="op">=</span> DecisionTreeRegressor(random_state<span class="op">=</span><span class="dv">1</span>, max_depth<span class="op">=</span>degree)</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  model.fit(X, y)</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  rmse <span class="op">=</span> mean_squared_error(y, model.predict(X))<span class="op">**</span><span class="fl">.5</span></span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  r2 <span class="op">=</span> r2_score(y, model.predict(X))</span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>  X_test <span class="op">=</span> np.linspace(X.<span class="bu">min</span>() <span class="op">-</span> X.std(), X.<span class="bu">max</span>() <span class="op">+</span> X.std(), <span class="dv">100</span>).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>  y_pred <span class="op">=</span> model.predict(X_test)</span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> X_test, y_pred, rmse, r2, model</span>
-<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>x_max <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>y_max <span class="op">=</span> <span class="dv">4</span></span>
-<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(y_max, x_max,</span>
-<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>                       sharey<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>                       sharex<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>                       figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
-<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>degree <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>sub_df <span class="op">=</span> df.query(<span class="st">"Sample == 'Train'"</span>)</span>
-<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>test_df <span class="op">=</span> df.query(<span class="st">"Sample == 'Test'"</span>)</span>
-<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(y_max):</span>
-<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>  X_test, y_pred, rmse, r2, model <span class="op">=</span> model_data_cart(degree, sub_df)</span>
-<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>  r2_test <span class="op">=</span> r2_score(test_df[<span class="st">'Income'</span>].values,</span>
-<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>                  model.predict(test_df[[<span class="st">'Education'</span>]].values)</span>
-<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a>                  )</span>
-<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">1</span>].plot(test_df[<span class="st">'Education'</span>], test_df[<span class="st">'Income'</span>], <span class="st">"."</span>, alpha<span class="op">=</span><span class="fl">.4</span>, color<span class="op">=</span><span class="st">"tab:orange"</span>)</span>
-<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">0</span>].plot(sub_df[<span class="st">'Education'</span>], sub_df[<span class="st">'Income'</span>], <span class="st">"."</span>, alpha<span class="op">=</span><span class="fl">.4</span>, color<span class="op">=</span><span class="st">"tab:blue"</span>)</span>
-<span id="cb26-35"><a href="#cb26-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-36"><a href="#cb26-36" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">1</span>].grid(alpha<span class="op">=</span><span class="fl">.1</span>)</span>
-<span id="cb26-37"><a href="#cb26-37" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">0</span>].grid(alpha<span class="op">=</span><span class="fl">.1</span>)</span>
-<span id="cb26-38"><a href="#cb26-38" aria-hidden="true" tabindex="-1"></a>  sns.despine(ax<span class="op">=</span>ax[j, <span class="dv">1</span>])</span>
-<span id="cb26-39"><a href="#cb26-39" aria-hidden="true" tabindex="-1"></a>  sns.despine(ax<span class="op">=</span>ax[j, <span class="dv">0</span>])</span>
-<span id="cb26-40"><a href="#cb26-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-41"><a href="#cb26-41" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">1</span>].set_ylabel(<span class="vs">r"$\downarrow$"</span>, size<span class="op">=</span><span class="dv">25</span>)</span>
-<span id="cb26-42"><a href="#cb26-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-43"><a href="#cb26-43" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">0</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">'darkred'</span>, alpha<span class="op">=</span><span class="fl">.7</span>)</span>
-<span id="cb26-44"><a href="#cb26-44" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">1</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">'darkred'</span>, alpha<span class="op">=</span><span class="fl">.7</span>)</span>
-<span id="cb26-45"><a href="#cb26-45" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">0</span>].<span class="bu">set</span>(yticklabels<span class="op">=</span>[], xticklabels<span class="op">=</span>[])</span>
-<span id="cb26-46"><a href="#cb26-46" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">0</span>].tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb26-47"><a href="#cb26-47" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">1</span>].<span class="bu">set</span>(yticklabels<span class="op">=</span>[], xticklabels<span class="op">=</span>[])</span>
-<span id="cb26-48"><a href="#cb26-48" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">1</span>].tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb26-49"><a href="#cb26-49" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">0</span>].set_title(</span>
-<span id="cb26-50"><a href="#cb26-50" aria-hidden="true" tabindex="-1"></a>                 <span class="vs">r'$J=</span><span class="sc">{}</span><span class="vs"> \rightarrow$ '</span>.<span class="bu">format</span>(degree) <span class="op">+</span></span>
-<span id="cb26-51"><a href="#cb26-51" aria-hidden="true" tabindex="-1"></a>                 <span class="vs">r"$R^2_</span><span class="sc">{train}</span><span class="vs">=$"</span> <span class="op">+</span></span>
-<span id="cb26-52"><a href="#cb26-52" aria-hidden="true" tabindex="-1"></a>                 <span class="ss">f"</span><span class="sc">{</span><span class="bu">round</span>(r2, <span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>, size<span class="op">=</span><span class="dv">12</span>)<span class="op">;</span></span>
-<span id="cb26-53"><a href="#cb26-53" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">1</span>].set_title(</span>
-<span id="cb26-54"><a href="#cb26-54" aria-hidden="true" tabindex="-1"></a>                 <span class="vs">r"$R_</span><span class="sc">{test}</span><span class="vs">^2=$"</span> <span class="op">+</span></span>
-<span id="cb26-55"><a href="#cb26-55" aria-hidden="true" tabindex="-1"></a>                 <span class="ss">f"</span><span class="sc">{</span><span class="bu">round</span>(r2_test, <span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>, size<span class="op">=</span><span class="dv">12</span>, color<span class="op">=</span><span class="st">"black"</span>)<span class="op">;</span></span>
-<span id="cb26-56"><a href="#cb26-56" aria-hidden="true" tabindex="-1"></a>  degree <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb26-57"><a href="#cb26-57" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
-<span id="cb26-58"><a href="#cb26-58" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="vs">r"Train $\rightarrow$ Test"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> model_data_cart(degree, df):</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  X <span class="op">=</span> df[[<span class="st">'Education'</span>]].values</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  y <span class="op">=</span> df[<span class="st">'Income'</span>].values</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  model <span class="op">=</span> DecisionTreeRegressor(random_state<span class="op">=</span><span class="dv">1</span>, max_depth<span class="op">=</span>degree)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  model.fit(X, y)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  rmse <span class="op">=</span> mean_squared_error(y, model.predict(X))<span class="op">**</span><span class="fl">.5</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  r2 <span class="op">=</span> r2_score(y, model.predict(X))</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  X_test <span class="op">=</span> np.linspace(X.<span class="bu">min</span>() <span class="op">-</span> X.std(), X.<span class="bu">max</span>() <span class="op">+</span> X.std(), <span class="dv">100</span>).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  y_pred <span class="op">=</span> model.predict(X_test)</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> X_test, y_pred, rmse, r2, model</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>x_max <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>y_max <span class="op">=</span> <span class="dv">4</span></span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(y_max, x_max,</span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>                       sharey<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>                       sharex<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>                       figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>degree <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>sub_df <span class="op">=</span> df.query(<span class="st">"Sample == 'Train'"</span>)</span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>test_df <span class="op">=</span> df.query(<span class="st">"Sample == 'Test'"</span>)</span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(y_max):</span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>  X_test, y_pred, rmse, r2, model <span class="op">=</span> model_data_cart(degree, sub_df)</span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>  r2_test <span class="op">=</span> r2_score(test_df[<span class="st">'Income'</span>].values,</span>
+<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>                  model.predict(test_df[[<span class="st">'Education'</span>]].values)</span>
+<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>                  )</span>
+<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">1</span>].plot(test_df[<span class="st">'Education'</span>], test_df[<span class="st">'Income'</span>], <span class="st">"."</span>, alpha<span class="op">=</span><span class="fl">.4</span>, color<span class="op">=</span><span class="st">"tab:orange"</span>)</span>
+<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">0</span>].plot(sub_df[<span class="st">'Education'</span>], sub_df[<span class="st">'Income'</span>], <span class="st">"."</span>, alpha<span class="op">=</span><span class="fl">.4</span>, color<span class="op">=</span><span class="st">"tab:blue"</span>)</span>
+<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">1</span>].grid(alpha<span class="op">=</span><span class="fl">.1</span>)</span>
+<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">0</span>].grid(alpha<span class="op">=</span><span class="fl">.1</span>)</span>
+<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a>  sns.despine(ax<span class="op">=</span>ax[j, <span class="dv">1</span>])</span>
+<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a>  sns.despine(ax<span class="op">=</span>ax[j, <span class="dv">0</span>])</span>
+<span id="cb25-40"><a href="#cb25-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-41"><a href="#cb25-41" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">1</span>].set_ylabel(<span class="vs">r"$\downarrow$"</span>, size<span class="op">=</span><span class="dv">25</span>)</span>
+<span id="cb25-42"><a href="#cb25-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-43"><a href="#cb25-43" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">0</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">'darkred'</span>, alpha<span class="op">=</span><span class="fl">.7</span>)</span>
+<span id="cb25-44"><a href="#cb25-44" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">1</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">'darkred'</span>, alpha<span class="op">=</span><span class="fl">.7</span>)</span>
+<span id="cb25-45"><a href="#cb25-45" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">0</span>].<span class="bu">set</span>(yticklabels<span class="op">=</span>[], xticklabels<span class="op">=</span>[])</span>
+<span id="cb25-46"><a href="#cb25-46" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">0</span>].tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb25-47"><a href="#cb25-47" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">1</span>].<span class="bu">set</span>(yticklabels<span class="op">=</span>[], xticklabels<span class="op">=</span>[])</span>
+<span id="cb25-48"><a href="#cb25-48" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">1</span>].tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb25-49"><a href="#cb25-49" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">0</span>].set_title(</span>
+<span id="cb25-50"><a href="#cb25-50" aria-hidden="true" tabindex="-1"></a>                 <span class="vs">r'$J=</span><span class="sc">{}</span><span class="vs"> \rightarrow$ '</span>.<span class="bu">format</span>(degree) <span class="op">+</span></span>
+<span id="cb25-51"><a href="#cb25-51" aria-hidden="true" tabindex="-1"></a>                 <span class="vs">r"$R^2_</span><span class="sc">{train}</span><span class="vs">=$"</span> <span class="op">+</span></span>
+<span id="cb25-52"><a href="#cb25-52" aria-hidden="true" tabindex="-1"></a>                 <span class="ss">f"</span><span class="sc">{</span><span class="bu">round</span>(r2, <span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>, size<span class="op">=</span><span class="dv">12</span>)<span class="op">;</span></span>
+<span id="cb25-53"><a href="#cb25-53" aria-hidden="true" tabindex="-1"></a>  ax[j, <span class="dv">1</span>].set_title(</span>
+<span id="cb25-54"><a href="#cb25-54" aria-hidden="true" tabindex="-1"></a>                 <span class="vs">r"$R_</span><span class="sc">{test}</span><span class="vs">^2=$"</span> <span class="op">+</span></span>
+<span id="cb25-55"><a href="#cb25-55" aria-hidden="true" tabindex="-1"></a>                 <span class="ss">f"</span><span class="sc">{</span><span class="bu">round</span>(r2_test, <span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>, size<span class="op">=</span><span class="dv">12</span>, color<span class="op">=</span><span class="st">"black"</span>)<span class="op">;</span></span>
+<span id="cb25-56"><a href="#cb25-56" aria-hidden="true" tabindex="-1"></a>  degree <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb25-57"><a href="#cb25-57" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb25-58"><a href="#cb25-58" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="vs">r"Train $\rightarrow$ Test"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-26-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-25-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -986,55 +982,55 @@ income = 33000 + 6000 \times education + \mathcal{N}(0, 9000)
 <span class="math display">\[
 \lim_{J \rightarrow \infty} R_{train}^2 \approx 1.0
 \]</span> Being able to perfectly model a DGP that is in itself random is a worrying sign, and this condition creates especial danger of over-fitting and creating overly-confident models when using decision trees.</p>
-<div id="cell-56" class="cell" data-outputid="02c9e6bd-9687-4167-b614-7e9f2dc857ab" data-execution_count="147">
+<div id="cell-55" class="cell" data-outputid="02c9e6bd-9687-4167-b614-7e9f2dc857ab" data-execution_count="147">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>r2s_test_cart <span class="op">=</span> []</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>r2s_cart <span class="op">=</span> []</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>max_root <span class="op">=</span> <span class="dv">50</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>roots <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, max_root)</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> degree <span class="kw">in</span> roots:</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  X_test, y_pred, rmse, r2, model <span class="op">=</span> model_data_cart(degree, sub_df)</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  r2_test <span class="op">=</span> r2_score(test_df[<span class="st">'Income'</span>].values,</span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>                  model.predict(test_df[[<span class="st">'Education'</span>]].values)</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>                  )</span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  r2s_test_cart.append(r2_test)</span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>  r2 <span class="op">=</span> r2_score(sub_df[<span class="st">'Income'</span>].values,</span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>                  model.predict(sub_df[[<span class="st">'Education'</span>]].values)</span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>                  )</span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>  r2s_cart.append(r2)</span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>r2s_test_cart <span class="op">=</span> np.array(r2s_test_cart)</span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>r2s_cart <span class="op">=</span> np.array(r2s_cart)</span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
-<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>ax.plot(roots, r2s_test_cart, <span class="st">".-"</span>, alpha<span class="op">=</span><span class="fl">.8</span>, label<span class="op">=</span><span class="st">"Test"</span>)</span>
-<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"$R^2_</span><span class="sc">{test}</span><span class="st">$ ~ $J$"</span>)</span>
-<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>ax.plot(np.argmax(r2s_test_cart)<span class="op">+</span><span class="dv">1</span>, np.<span class="bu">max</span>(r2s_test_cart), <span class="st">"D"</span>,</span>
-<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span><span class="st">"tab:blue"</span>,</span>
-<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>        alpha<span class="op">=</span><span class="fl">.6</span>,</span>
-<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="vs">r"$ \underset</span><span class="sc">{J}</span><span class="vs">{\arg\max} \; R^2_</span><span class="sc">{test}</span><span class="vs">=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>argmax(r2s_test_cart)<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
-<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">.1</span>)</span>
-<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax)</span>
-<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="fl">1.1</span>)</span>
-<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a>ax.plot(roots, r2s_cart, <span class="st">".-"</span>, alpha<span class="op">=</span><span class="fl">.8</span>, label<span class="op">=</span><span class="st">"Train"</span>)</span>
-<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a>ax.plot(np.argmax(r2s_cart), np.<span class="bu">max</span>(r2s_cart), <span class="st">"s"</span>,</span>
-<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span><span class="st">"tab:orange"</span>,</span>
-<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a>        alpha<span class="op">=</span><span class="fl">.6</span>,</span>
-<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="vs">r"$ \underset</span><span class="sc">{J}</span><span class="vs">{\arg\max} \; R^2_</span><span class="sc">{train}</span><span class="vs">=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>argmax(r2s_cart)<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"Max Depth"</span>, ylabel<span class="op">=</span><span class="st">"$R^2$"</span>)</span>
-<span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
-<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">.1</span>)</span>
-<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>r2s_test_cart <span class="op">=</span> []</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>r2s_cart <span class="op">=</span> []</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>max_root <span class="op">=</span> <span class="dv">50</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>roots <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, max_root)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> degree <span class="kw">in</span> roots:</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  X_test, y_pred, rmse, r2, model <span class="op">=</span> model_data_cart(degree, sub_df)</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  r2_test <span class="op">=</span> r2_score(test_df[<span class="st">'Income'</span>].values,</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>                  model.predict(test_df[[<span class="st">'Education'</span>]].values)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>                  )</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>  r2s_test_cart.append(r2_test)</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>  r2 <span class="op">=</span> r2_score(sub_df[<span class="st">'Income'</span>].values,</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>                  model.predict(sub_df[[<span class="st">'Education'</span>]].values)</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>                  )</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>  r2s_cart.append(r2)</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>r2s_test_cart <span class="op">=</span> np.array(r2s_test_cart)</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>r2s_cart <span class="op">=</span> np.array(r2s_cart)</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>ax.plot(roots, r2s_test_cart, <span class="st">".-"</span>, alpha<span class="op">=</span><span class="fl">.8</span>, label<span class="op">=</span><span class="st">"Test"</span>)</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"$R^2_</span><span class="sc">{test}</span><span class="st">$ ~ $J$"</span>)</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>ax.plot(np.argmax(r2s_test_cart)<span class="op">+</span><span class="dv">1</span>, np.<span class="bu">max</span>(r2s_test_cart), <span class="st">"D"</span>,</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span><span class="st">"tab:blue"</span>,</span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>        alpha<span class="op">=</span><span class="fl">.6</span>,</span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="vs">r"$ \underset</span><span class="sc">{J}</span><span class="vs">{\arg\max} \; R^2_</span><span class="sc">{test}</span><span class="vs">=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>argmax(r2s_test_cart)<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">.1</span>)</span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax)</span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="fl">1.1</span>)</span>
+<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a>ax.plot(roots, r2s_cart, <span class="st">".-"</span>, alpha<span class="op">=</span><span class="fl">.8</span>, label<span class="op">=</span><span class="st">"Train"</span>)</span>
+<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a>ax.plot(np.argmax(r2s_cart), np.<span class="bu">max</span>(r2s_cart), <span class="st">"s"</span>,</span>
+<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span><span class="st">"tab:orange"</span>,</span>
+<span id="cb26-35"><a href="#cb26-35" aria-hidden="true" tabindex="-1"></a>        alpha<span class="op">=</span><span class="fl">.6</span>,</span>
+<span id="cb26-36"><a href="#cb26-36" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="vs">r"$ \underset</span><span class="sc">{J}</span><span class="vs">{\arg\max} \; R^2_</span><span class="sc">{train}</span><span class="vs">=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>argmax(r2s_cart)<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb26-37"><a href="#cb26-37" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb26-38"><a href="#cb26-38" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"Max Depth"</span>, ylabel<span class="op">=</span><span class="st">"$R^2$"</span>)</span>
+<span id="cb26-39"><a href="#cb26-39" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb26-40"><a href="#cb26-40" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">.1</span>)</span>
+<span id="cb26-41"><a href="#cb26-41" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-27-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-26-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
