@@ -2,6 +2,7 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/posts/dask-data-io/index.html",
       "/posts/covariance-matrices/index.html",
       "/posts/lagrange-cobb-douglas/index.html",
       "/posts/minima-3d/index.html",
