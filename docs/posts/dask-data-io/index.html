@@ -223,9 +223,10 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <ol type="1">
 <li>Use <code>bs4</code> and <code>requests</code> to reverse engineer an API for the data and batch download it.</li>
 <li>Use the <a href="https://parquet.apache.org/">apache parquet</a> to efficiently store the data locally.</li>
-<li>Use <code>dask</code> for efficient read-in of the data.</li>
+<li>Use <code>dask</code> for highly efficient read-in of the data.</li>
 </ol>
-<p>To start, here is the homepage of the portal</p>
+<p>I should note that my adoption of <code>dask</code> and parquet storage is due to the influence of two of my day-job coworkers, B. Hasan and Konrad Franco, after we leveraged them for an internal project with a similar workflow.</p>
+<p>Anyways, to start, here is the homepage of the portal</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="portal.png" class="img-fluid figure-img" style="width:80.0%"></p>
