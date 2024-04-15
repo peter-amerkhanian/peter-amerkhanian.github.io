@@ -2,7 +2,6 @@
   {
     "listing": "/blog.html",
     "items": [
-      "/posts/queuing-problems/index.html",
       "/posts/dask-data-io/index.html",
       "/posts/covariance-matrices/index.html",
       "/posts/lagrange-cobb-douglas/index.html",
