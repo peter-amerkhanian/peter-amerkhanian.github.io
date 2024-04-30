@@ -278,7 +278,7 @@ window.Quarto = {
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>The following is a calculus problem that I think provides a good overview of linear approximation, a method for approximating a general function using a linear function. Common applications of linear approximation exist in optics, oscillation, and electric resistivity problems <span class="citation" data-cites="noauthor_linear_2023">(<a href="#ref-noauthor_linear_2023" role="doc-biblioref"><span>“Linear Approximation”</span> 2023</a>)</span>. The following image from <span class="citation" data-cites="strang_calculus_2016-1">(<a href="#ref-strang_calculus_2016-1" role="doc-biblioref">Strang and Herman 2016, chap. 4.4</a>)</span> provides some good intuition of what this approximation looks like:</p>
+<p>The following is a calculus problem that I think provides a good overview of linear approximation, a method for approximating a general function using a linear function. This is a simple application of taylor series approximation, and is used for optics, oscillation, and electric resistivity problems <span class="citation" data-cites="noauthor_linear_2023">(<a href="#ref-noauthor_linear_2023" role="doc-biblioref"><span>“Linear Approximation”</span> 2023</a>)</span>. The following image from <span class="citation" data-cites="strang_calculus_2016-1">(<a href="#ref-strang_calculus_2016-1" role="doc-biblioref">Strang and Herman 2016, chap. 4.4</a>)</span> provides some good intuition of what this approximation looks like:</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="approx.jpg" class="img-fluid figure-img" width="350"></p>
@@ -375,6 +375,7 @@ window.Quarto = {
    L(x, y) = f\left( {{x_0},{y_0}} \right) + {f_x}\left( {{x_0},{y_0}} \right)\left( {x - {x_0}} \right) + {f_y}\left( {{x_0},{y_0}} \right)\left( {y - {y_0}} \right)
 \end{align}
 \tag{1}\]</span></span></p>
+<p>This is really just the first order taylor polynomial of a given function, which, in <span class="math inline">\(\mathbb{R}^3\)</span>, represents a tangent plane approximation:</p>
 <blockquote class="blockquote">
 <p>[…] This equation […] represents the tangent plane to the surface defined by <span class="math inline">\(z=f(x,y)\)</span> at the point <span class="math inline">\((x_0,y_0)\)</span>. The idea behind using a linear approximation is that, if there is a point <span class="math inline">\((x_0,_0)\)</span> at which the precise value of <span class="math inline">\(f(x,y)\)</span> is known, then for vales of <span class="math inline">\((x,y)\)</span> reasonably close to <span class="math inline">\((x_0,y_0)\)</span>, the linear approximation (i.e., tangent plane) yields a value that is also reasonably close to the exact value of <span class="math inline">\(f(x,y)\)</span>.</p>
 <p>– <span class="citation" data-cites="strang_calculus_2016-1">(<a href="#ref-strang_calculus_2016-1" role="doc-biblioref">Strang and Herman 2016, chap. 4.4</a>)</span></p>
