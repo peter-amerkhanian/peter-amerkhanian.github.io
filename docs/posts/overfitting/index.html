@@ -275,7 +275,7 @@ window.Quarto = {
   }
 });
 </script>
-<div id="cell-1" class="cell" data-execution_count="28">
+<div id="cell-1" class="cell" data-execution_count="32">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -310,7 +310,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="some-notes-on-modeling-data-and-resampling-methods">Some Notes on Modeling Data and Resampling Methods</h2>
 <p>The following is an exercise with synthetic data intended to memorialize some thoughts on models and resampling methods. I won’t reference a lot of specific books here, but generally this post is influenced by <span class="citation" data-cites="james_introduction_2013">James et al. (<a href="#ref-james_introduction_2013" role="doc-biblioref">2013</a>)</span> and <span class="citation" data-cites="hastie_elements_2016">Hastie, Tibshirani, and Friedman (<a href="#ref-hastie_elements_2016" role="doc-biblioref">2016</a>)</span>.</p>
 <p>To begin, say we are examining the relationship between income and years of education.</p>
-<div id="cell-3" class="cell" data-execution_count="29">
+<div id="cell-3" class="cell" data-execution_count="33">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">46</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">200</span></span>
@@ -319,14 +319,14 @@ window.Quarto = {
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"Education"</span>] <span class="op">=</span> education</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Let’s say that income is a function of years of education:</p>
-<div id="cell-5" class="cell" data-execution_count="30">
+<div id="cell-5" class="cell" data-execution_count="34">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">49</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"Income"</span>] <span class="op">=</span> <span class="dv">33000</span> <span class="op">+</span> <span class="dv">6000</span> <span class="op">*</span> education</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The relationship is governed by the deterministic function, which is a data generating process (DGP): <span class="math display">\[
 income = 33000 + 6000 \times education
 \]</span></p>
-<div id="cell-7" class="cell" data-outputid="8f75ca7c-7403-44b5-cf8d-3ff38f6a81a1" data-execution_count="31">
+<div id="cell-7" class="cell" data-outputid="8f75ca7c-7403-44b5-cf8d-3ff38f6a81a1" data-execution_count="35">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> sns.JointGrid(data<span class="op">=</span>df, x<span class="op">=</span><span class="st">"Education"</span>, y<span class="op">=</span><span class="st">"Income"</span>, marginal_ticks<span class="op">=</span><span class="va">False</span>, height<span class="op">=</span><span class="dv">5</span>)</span>
@@ -340,44 +340,50 @@ income = 33000 + 6000 \times education
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>g.ax_marg_y.tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>g.ax_marg_y.<span class="bu">set</span>(xticklabels<span class="op">=</span>[])<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+<div class="cell-output cell-output-stderr">
+<pre><code>c:\Users\peteramerkhanian\anaconda3\lib\site-packages\seaborn\_oldcore.py:1119: FutureWarning: use_inf_as_na option is deprecated and will be removed in a future version. Convert inf values to NaN before operating instead.
+  with pd.option_context('mode.use_inf_as_na', True):
+c:\Users\peteramerkhanian\anaconda3\lib\site-packages\seaborn\_oldcore.py:1119: FutureWarning: use_inf_as_na option is deprecated and will be removed in a future version. Convert inf values to NaN before operating instead.
+  with pd.option_context('mode.use_inf_as_na', True):</code></pre>
+</div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-5-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-5-output-2.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
 <p>Modeling this relationship is trivial. Given that it is a deterministic, linear function, we can use data to solve a linear system of equations and find the exact parameters of the relationship:</p>
-<div id="cell-9" class="cell" data-outputid="fe0adcb8-eb9c-440c-8cb4-30d99f7b21fe" data-execution_count="32">
+<div id="cell-9" class="cell" data-outputid="fe0adcb8-eb9c-440c-8cb4-30d99f7b21fe" data-execution_count="36">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, sharey<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(x<span class="op">=</span><span class="st">"Education"</span>, y<span class="op">=</span><span class="st">"Income"</span>, data<span class="op">=</span>df, alpha<span class="op">=</span><span class="fl">0.6</span>, marker<span class="op">=</span><span class="st">"o"</span>, ax<span class="op">=</span>ax[<span class="dv">0</span>])</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="st">"Income ~ Education"</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].yaxis.set_major_formatter(<span class="st">"$</span><span class="sc">{x:,.0f}</span><span class="st">"</span>)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax[<span class="dv">0</span>])</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].<span class="bu">set</span>(</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    xlim<span class="op">=</span>(<span class="dv">0</span>, df[<span class="st">"Education"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Education"</span>].std()),</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    ylim<span class="op">=</span>(<span class="dv">0</span>, df[<span class="st">"Income"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Income"</span>].std()),</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].<span class="bu">set</span>(</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    xlim<span class="op">=</span>(<span class="dv">0</span>, df[<span class="st">"Education"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Education"</span>].std()),</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    ylim<span class="op">=</span>(<span class="dv">0</span>, df[<span class="st">"Income"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Income"</span>].std()),</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>X_test, y_pred, _, r2, _ <span class="op">=</span> model_data_lm(<span class="dv">1</span>, df)</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(x<span class="op">=</span><span class="st">"Education"</span>, y<span class="op">=</span><span class="st">"Income"</span>, data<span class="op">=</span>df, alpha<span class="op">=</span><span class="fl">0.3</span>, marker<span class="op">=</span><span class="st">"o"</span>, ax<span class="op">=</span>ax[<span class="dv">1</span>])</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].plot(</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    X_test,</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    y_pred,</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"darkred"</span>,</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.7</span>,</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="vs">r"Model $\rightarrow R^2=$"</span> <span class="op">+</span> <span class="bu">str</span>(<span class="bu">round</span>(r2, <span class="dv">2</span>)),</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].legend()</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax[<span class="dv">1</span>])<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, sharey<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(x<span class="op">=</span><span class="st">"Education"</span>, y<span class="op">=</span><span class="st">"Income"</span>, data<span class="op">=</span>df, alpha<span class="op">=</span><span class="fl">0.6</span>, marker<span class="op">=</span><span class="st">"o"</span>, ax<span class="op">=</span>ax[<span class="dv">0</span>])</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="st">"Income ~ Education"</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].yaxis.set_major_formatter(<span class="st">"$</span><span class="sc">{x:,.0f}</span><span class="st">"</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax[<span class="dv">0</span>])</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].<span class="bu">set</span>(</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    xlim<span class="op">=</span>(<span class="dv">0</span>, df[<span class="st">"Education"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Education"</span>].std()),</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    ylim<span class="op">=</span>(<span class="dv">0</span>, df[<span class="st">"Income"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Income"</span>].std()),</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].<span class="bu">set</span>(</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    xlim<span class="op">=</span>(<span class="dv">0</span>, df[<span class="st">"Education"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Education"</span>].std()),</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    ylim<span class="op">=</span>(<span class="dv">0</span>, df[<span class="st">"Income"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Income"</span>].std()),</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>X_test, y_pred, _, r2, _ <span class="op">=</span> model_data_lm(<span class="dv">1</span>, df)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(x<span class="op">=</span><span class="st">"Education"</span>, y<span class="op">=</span><span class="st">"Income"</span>, data<span class="op">=</span>df, alpha<span class="op">=</span><span class="fl">0.3</span>, marker<span class="op">=</span><span class="st">"o"</span>, ax<span class="op">=</span>ax[<span class="dv">1</span>])</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].plot(</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    X_test,</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    y_pred,</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"darkred"</span>,</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.7</span>,</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="vs">r"Model $\rightarrow R^2=$"</span> <span class="op">+</span> <span class="bu">str</span>(<span class="bu">round</span>(r2, <span class="dv">2</span>)),</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].legend()</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax[<span class="dv">1</span>])<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -392,35 +398,41 @@ income = 33000 + 6000 \times education
 <section id="modeling-a-non-deterministic-process" class="level2">
 <h2 class="anchored" data-anchor-id="modeling-a-non-deterministic-process">Modeling a Non-Deterministic Process</h2>
 <p>In policy analysis settings, it’s rare that we would encounter deterministic processes that we have any interest in modeling. Instead, we typically encounter processes with some stochastic element. For example, the following is a new DGP, where income is a linear function of years of education, but with an added random variable, representing noise.</p>
-<div id="cell-12" class="cell" data-execution_count="33">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>noise_std <span class="op">=</span> <span class="dv">9000</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>DGP <span class="op">=</span> <span class="kw">lambda</span> x: <span class="dv">33000</span> <span class="op">+</span> <span class="dv">6000</span> <span class="op">*</span> x <span class="op">+</span> np.random.normal(<span class="dv">0</span>, noise_std, size<span class="op">=</span><span class="bu">len</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-12" class="cell" data-execution_count="37">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>noise_std <span class="op">=</span> <span class="dv">9000</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>DGP <span class="op">=</span> <span class="kw">lambda</span> x: <span class="dv">33000</span> <span class="op">+</span> <span class="dv">6000</span> <span class="op">*</span> x <span class="op">+</span> np.random.normal(<span class="dv">0</span>, noise_std, size<span class="op">=</span><span class="bu">len</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><span class="math display">\[
 income = 33000 + 6000 \times education + \mathcal{N}(0, 9000)
 \]</span></p>
-<div id="cell-14" class="cell" data-execution_count="34">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"Income"</span>] <span class="op">=</span> DGP(education)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-14" class="cell" data-execution_count="38">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"Income"</span>] <span class="op">=</span> DGP(education)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-15" class="cell" data-outputid="2dfb6b64-6ffa-4768-80f5-54359720bf68" data-execution_count="35">
+<div id="cell-15" class="cell" data-outputid="2dfb6b64-6ffa-4768-80f5-54359720bf68" data-execution_count="39">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> sns.JointGrid(data<span class="op">=</span>df, x<span class="op">=</span><span class="st">"Education"</span>, y<span class="op">=</span><span class="st">"Income"</span>, marginal_ticks<span class="op">=</span><span class="va">False</span>, height<span class="op">=</span><span class="dv">5</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>g.plot_joint(sns.scatterplot, alpha<span class="op">=</span><span class="fl">0.6</span>, marker<span class="op">=</span><span class="st">"o"</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>g.plot_marginals(sns.kdeplot, fill<span class="op">=</span><span class="va">True</span>, clip<span class="op">=</span>(<span class="dv">0</span>, np.inf))</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>g.fig.suptitle(<span class="ss">f"Income ~ Education + $\mathcal</span><span class="ch">{{</span><span class="ss">N</span><span class="ch">}}</span><span class="ss">(0, </span><span class="sc">{</span>noise_std<span class="sc">}</span><span class="ss">)$"</span>, y<span class="op">=</span><span class="fl">1.05</span>)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>g.ax_joint.grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Formatting the sides</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>g.ax_joint.yaxis.set_major_formatter(<span class="st">"$</span><span class="sc">{x:,.0f}</span><span class="st">"</span>)</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>g.ax_marg_x.tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>g.ax_marg_y.tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>g.ax_marg_y.<span class="bu">set</span>(xticklabels<span class="op">=</span>[])<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> sns.JointGrid(data<span class="op">=</span>df, x<span class="op">=</span><span class="st">"Education"</span>, y<span class="op">=</span><span class="st">"Income"</span>, marginal_ticks<span class="op">=</span><span class="va">False</span>, height<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>g.plot_joint(sns.scatterplot, alpha<span class="op">=</span><span class="fl">0.6</span>, marker<span class="op">=</span><span class="st">"o"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>g.plot_marginals(sns.kdeplot, fill<span class="op">=</span><span class="va">True</span>, clip<span class="op">=</span>(<span class="dv">0</span>, np.inf))</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>g.fig.suptitle(<span class="ss">f"Income ~ Education + $\mathcal</span><span class="ch">{{</span><span class="ss">N</span><span class="ch">}}</span><span class="ss">(0, </span><span class="sc">{</span>noise_std<span class="sc">}</span><span class="ss">)$"</span>, y<span class="op">=</span><span class="fl">1.05</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>g.ax_joint.grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Formatting the sides</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>g.ax_joint.yaxis.set_major_formatter(<span class="st">"$</span><span class="sc">{x:,.0f}</span><span class="st">"</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>g.ax_marg_x.tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>g.ax_marg_y.tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>g.ax_marg_y.<span class="bu">set</span>(xticklabels<span class="op">=</span>[])<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+<div class="cell-output cell-output-stderr">
+<pre><code>c:\Users\peteramerkhanian\anaconda3\lib\site-packages\seaborn\_oldcore.py:1119: FutureWarning: use_inf_as_na option is deprecated and will be removed in a future version. Convert inf values to NaN before operating instead.
+  with pd.option_context('mode.use_inf_as_na', True):
+c:\Users\peteramerkhanian\anaconda3\lib\site-packages\seaborn\_oldcore.py:1119: FutureWarning: use_inf_as_na option is deprecated and will be removed in a future version. Convert inf values to NaN before operating instead.
+  with pd.option_context('mode.use_inf_as_na', True):</code></pre>
+</div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-9-output-2.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -431,37 +443,37 @@ income = 33000 + 6000 \times education + \mathcal{N}(0, 9000)
 <p>We will model this DGP using a linear regression fit via the ordinary least squares algorithm. We face a number of choices in using linear regression – for example, we can freely use polynomial transformations to make our model flexible to non-linear relationships. Here we’ll examine the behavior of a polynomial regression by setting up an infinite series as follows: <span class="math display">\[
 y_p=\sum_{p=0}^{\infty} \beta_p x^p
 \]</span> As this series expands, it represents a polynomial regression of degree <span class="math inline">\(p\)</span>. When we expand, we can examine how this model performs as the degree increases.</p>
-<div id="cell-19" class="cell" data-outputid="01f349b5-33b6-4494-ca23-70338e6a266e" data-execution_count="36">
+<div id="cell-19" class="cell" data-outputid="01f349b5-33b6-4494-ca23-70338e6a266e" data-execution_count="40">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>y_max <span class="op">=</span> <span class="dv">3</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>x_max <span class="op">=</span> <span class="dv">3</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(x_max, y_max, sharey<span class="op">=</span><span class="va">True</span>, sharex<span class="op">=</span><span class="va">True</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>degree <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(x_max):</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(y_max):</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>        X_test, y_pred, _, r2, _ <span class="op">=</span> model_data_lm(degree, df)</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>        ax[i, j].set_ylim(</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>            df[<span class="st">"Income"</span>].<span class="bu">min</span>() <span class="op">-</span> df[<span class="st">"Income"</span>].std(),</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>            df[<span class="st">"Income"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Income"</span>].std(),</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>        ax[i, j].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>        sns.despine(ax<span class="op">=</span>ax[i, j])</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>        ax[i, j].plot(df[<span class="st">"Education"</span>], df[<span class="st">"Income"</span>], <span class="st">"."</span>, alpha<span class="op">=</span><span class="fl">0.4</span>, color<span class="op">=</span><span class="st">"tab:blue"</span>)</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>        ax[i, j].plot(X_test, y_pred, color<span class="op">=</span><span class="st">"darkred"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>        ax[i, j].<span class="bu">set</span>(yticklabels<span class="op">=</span>[], xticklabels<span class="op">=</span>[])</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>        ax[i, j].tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        ax[i, j].set_title(</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>            <span class="vs">r"$y_</span><span class="sc">{{</span><span class="vs">p=</span><span class="sc">{}}}</span><span class="vs">=\sum_</span><span class="sc">{{</span><span class="vs">p=0</span><span class="sc">}}</span><span class="vs">^</span><span class="sc">{}</span><span class="vs"> \beta_p x^p \rightarrow$ "</span>.<span class="bu">format</span>(</span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>                degree, degree</span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> <span class="vs">r"$R^2=$"</span></span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span><span class="bu">round</span>(r2, <span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>,</span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>            size<span class="op">=</span><span class="dv">12</span>,</span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>        degree <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>y_max <span class="op">=</span> <span class="dv">3</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>x_max <span class="op">=</span> <span class="dv">3</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(x_max, y_max, sharey<span class="op">=</span><span class="va">True</span>, sharex<span class="op">=</span><span class="va">True</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>degree <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(x_max):</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(y_max):</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        X_test, y_pred, _, r2, _ <span class="op">=</span> model_data_lm(degree, df)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        ax[i, j].set_ylim(</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>            df[<span class="st">"Income"</span>].<span class="bu">min</span>() <span class="op">-</span> df[<span class="st">"Income"</span>].std(),</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>            df[<span class="st">"Income"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Income"</span>].std(),</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        ax[i, j].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>        sns.despine(ax<span class="op">=</span>ax[i, j])</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>        ax[i, j].plot(df[<span class="st">"Education"</span>], df[<span class="st">"Income"</span>], <span class="st">"."</span>, alpha<span class="op">=</span><span class="fl">0.4</span>, color<span class="op">=</span><span class="st">"tab:blue"</span>)</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>        ax[i, j].plot(X_test, y_pred, color<span class="op">=</span><span class="st">"darkred"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>        ax[i, j].<span class="bu">set</span>(yticklabels<span class="op">=</span>[], xticklabels<span class="op">=</span>[])</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>        ax[i, j].tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>        ax[i, j].set_title(</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>            <span class="vs">r"$y_</span><span class="sc">{{</span><span class="vs">p=</span><span class="sc">{}}}</span><span class="vs">=\sum_</span><span class="sc">{{</span><span class="vs">p=0</span><span class="sc">}}</span><span class="vs">^</span><span class="sc">{}</span><span class="vs"> \beta_p x^p \rightarrow$ "</span>.<span class="bu">format</span>(</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>                degree, degree</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> <span class="vs">r"$R^2=$"</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span><span class="bu">round</span>(r2, <span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>            size<span class="op">=</span><span class="dv">12</span>,</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>        degree <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -475,52 +487,52 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 <section id="an-optimal-model" class="level4">
 <h4 class="anchored" data-anchor-id="an-optimal-model">An “Optimal” Model</h4>
 <p>We expand the series, or, in more typical language, we conduct a “grid-search,” to find the optimal model as defined by the maximum <span class="math inline">\(R^2\)</span> score:</p>
-<div id="cell-22" class="cell" data-execution_count="37">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>r2s <span class="op">=</span> []</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>max_root <span class="op">=</span> <span class="dv">25</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>roots <span class="op">=</span> <span class="bu">range</span>(max_root)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> degree <span class="kw">in</span> roots:</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    _, _, _, r2, _ <span class="op">=</span> model_data_lm(degree, df)</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    r2s.append(r2)</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>r2s <span class="op">=</span> np.array(r2s)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-22" class="cell" data-execution_count="41">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>r2s <span class="op">=</span> []</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>max_root <span class="op">=</span> <span class="dv">25</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>roots <span class="op">=</span> <span class="bu">range</span>(max_root)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> degree <span class="kw">in</span> roots:</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    _, _, _, r2, _ <span class="op">=</span> model_data_lm(degree, df)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    r2s.append(r2)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>r2s <span class="op">=</span> np.array(r2s)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-23" class="cell" data-outputid="f1a1c088-82dc-462d-cb0c-9774d8c7883f" data-execution_count="38">
+<div id="cell-23" class="cell" data-outputid="f1a1c088-82dc-462d-cb0c-9774d8c7883f" data-execution_count="42">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].plot(roots[<span class="dv">1</span>:], r2s[<span class="dv">1</span>:], <span class="st">".-"</span>, alpha<span class="op">=</span><span class="fl">0.8</span>)</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].set_title(<span class="st">"$R^2$ ~ $d$"</span>)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].plot(</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    np.argmax(r2s),</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    np.<span class="bu">max</span>(r2s),</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"o"</span>,</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"tab:red"</span>,</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.6</span>,</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="ss">f"$\max \; (R^2)=$</span><span class="sc">{</span><span class="bu">round</span>(np.<span class="bu">max</span>(r2s), <span class="dv">3</span>)<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> <span class="vs">r"$ \underset</span><span class="sc">{d}</span><span class="vs">{\arg\max} \; (R^2)=$"</span></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>argmax(r2s)<span class="sc">}</span><span class="ss">"</span>,</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"Polynomial Degree"</span>, ylabel<span class="op">=</span><span class="st">"$R^2$"</span>)</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].legend()</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax[<span class="dv">0</span>])</span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>degree <span class="op">=</span> np.argmax(r2s)</span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>X_test, y_pred, _, r2, optimal_model <span class="op">=</span> model_data_lm(degree, df)</span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_ylabel(<span class="vs">r"$\downarrow$"</span>, size<span class="op">=</span><span class="dv">25</span>)</span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_ylim(</span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"Income"</span>].<span class="bu">min</span>() <span class="op">-</span> df[<span class="st">"Income"</span>].std(), df[<span class="st">"Income"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Income"</span>].std()</span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax[<span class="dv">1</span>])</span>
-<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].plot(df[<span class="st">"Education"</span>], df[<span class="st">"Income"</span>], <span class="st">"."</span>, alpha<span class="op">=</span><span class="fl">0.4</span>, color<span class="op">=</span><span class="st">"tab:blue"</span>)</span>
-<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">"darkred"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
-<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_xlabel(<span class="st">'"Optimal" Model'</span>)</span>
-<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_title(</span>
-<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>    <span class="vs">r"$y^*_</span><span class="sc">{{</span><span class="vs">p=</span><span class="sc">{}}}</span><span class="vs">=\sum_</span><span class="sc">{{</span><span class="vs">p=0</span><span class="sc">}}</span><span class="vs">^</span><span class="sc">{{{}}}</span><span class="vs"> \beta_p x^p$ "</span>.<span class="bu">format</span>(degree, degree)</span>
-<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].plot(roots[<span class="dv">1</span>:], r2s[<span class="dv">1</span>:], <span class="st">".-"</span>, alpha<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].set_title(<span class="st">"$R^2$ ~ $d$"</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].plot(</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    np.argmax(r2s),</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    np.<span class="bu">max</span>(r2s),</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"o"</span>,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"tab:red"</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.6</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="ss">f"$\max \; (R^2)=$</span><span class="sc">{</span><span class="bu">round</span>(np.<span class="bu">max</span>(r2s), <span class="dv">3</span>)<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> <span class="vs">r"$ \underset</span><span class="sc">{d}</span><span class="vs">{\arg\max} \; (R^2)=$"</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>argmax(r2s)<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"Polynomial Degree"</span>, ylabel<span class="op">=</span><span class="st">"$R^2$"</span>)</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].legend()</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax[<span class="dv">0</span>])</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>degree <span class="op">=</span> np.argmax(r2s)</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>X_test, y_pred, _, r2, optimal_model <span class="op">=</span> model_data_lm(degree, df)</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_ylabel(<span class="vs">r"$\downarrow$"</span>, size<span class="op">=</span><span class="dv">25</span>)</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_ylim(</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"Income"</span>].<span class="bu">min</span>() <span class="op">-</span> df[<span class="st">"Income"</span>].std(), df[<span class="st">"Income"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Income"</span>].std()</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax[<span class="dv">1</span>])</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].plot(df[<span class="st">"Education"</span>], df[<span class="st">"Income"</span>], <span class="st">"."</span>, alpha<span class="op">=</span><span class="fl">0.4</span>, color<span class="op">=</span><span class="st">"tab:blue"</span>)</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">"darkred"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_xlabel(<span class="st">'"Optimal" Model'</span>)</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_title(</span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>    <span class="vs">r"$y^*_</span><span class="sc">{{</span><span class="vs">p=</span><span class="sc">{}}}</span><span class="vs">=\sum_</span><span class="sc">{{</span><span class="vs">p=0</span><span class="sc">}}</span><span class="vs">^</span><span class="sc">{{{}}}</span><span class="vs"> \beta_p x^p$ "</span>.<span class="bu">format</span>(degree, degree)</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -537,49 +549,49 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 <section id="out-of-sample-performance-or-what-happens-when-we-collect-new-data" class="level3">
 <h3 class="anchored" data-anchor-id="out-of-sample-performance-or-what-happens-when-we-collect-new-data">Out of sample performance, or, what happens when we collect new data?</h3>
 <p>One simple way to further evaluate this model is to collect new data (from outside of our original sample) and then evaluate whether the model can describe variation in that new data. Given that we are working with synthetic data, it’s straightforward to simulate new observations from the underlying DGP, and thus “collect” new data. In the following plot, the right-hand pane is a fresh sample of individuals with observed education and income values:</p>
-<div id="cell-26" class="cell" data-execution_count="39">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>education <span class="op">=</span> education_dgp(<span class="dv">1000</span>)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>correct_income <span class="op">=</span> DGP(education)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-26" class="cell" data-execution_count="43">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>education <span class="op">=</span> education_dgp(<span class="dv">1000</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>correct_income <span class="op">=</span> DGP(education)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-27" class="cell" data-outputid="0009e7f3-42fd-40c7-e2f1-937ea41e41e6" data-execution_count="40">
+<div id="cell-27" class="cell" data-outputid="0009e7f3-42fd-40c7-e2f1-937ea41e41e6" data-execution_count="44">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>om_residuals <span class="op">=</span> np.<span class="bu">abs</span>(optimal_model.predict(education.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)) <span class="op">-</span> correct_income)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>new_data_df <span class="op">=</span> pd.DataFrame()</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>new_data_df[<span class="st">"Education"</span>] <span class="op">=</span> education</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>new_data_df[<span class="st">"Residuals"</span>] <span class="op">=</span> om_residuals</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>new_data_df[<span class="st">"Income"</span>] <span class="op">=</span> correct_income</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>new_data_df[<span class="st">"Data"</span>] <span class="op">=</span> <span class="st">"New"</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>new_data_df <span class="op">=</span> pd.concat(</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    [</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>        df.assign(</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>            Residuals<span class="op">=</span>np.<span class="bu">abs</span>(</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>                optimal_model.predict(df[[<span class="st">"Education"</span>]].values) <span class="op">-</span> df[<span class="st">"Income"</span>]</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>        ).assign(Data<span class="op">=</span><span class="st">"Original"</span>),</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>        new_data_df,</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    ],</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    axis<span class="op">=</span><span class="dv">0</span>,</span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> sns.relplot(</span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    height<span class="op">=</span><span class="dv">4</span>,</span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>new_data_df,</span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">"Education"</span>,</span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">"Income"</span>,</span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>    col<span class="op">=</span><span class="st">"Data"</span>,</span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>    kind<span class="op">=</span><span class="st">"scatter"</span>,</span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].yaxis.set_major_formatter(<span class="st">"$</span><span class="sc">{x:,.0f}</span><span class="st">"</span>)</span>
-<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.axes[0][0].plot(X_test, y_pred, color='darkred', alpha=.7)</span></span>
-<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].set_ylim(</span>
-<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"Income"</span>].<span class="bu">min</span>() <span class="op">-</span> df[<span class="st">"Income"</span>].std(), df[<span class="st">"Income"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Income"</span>].std()</span>
-<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].set_ylim(</span>
-<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"Income"</span>].<span class="bu">min</span>() <span class="op">-</span> df[<span class="st">"Income"</span>].std(), df[<span class="st">"Income"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Income"</span>].std()</span>
-<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>ax.tight_layout()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>om_residuals <span class="op">=</span> np.<span class="bu">abs</span>(optimal_model.predict(education.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)) <span class="op">-</span> correct_income)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>new_data_df <span class="op">=</span> pd.DataFrame()</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>new_data_df[<span class="st">"Education"</span>] <span class="op">=</span> education</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>new_data_df[<span class="st">"Residuals"</span>] <span class="op">=</span> om_residuals</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>new_data_df[<span class="st">"Income"</span>] <span class="op">=</span> correct_income</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>new_data_df[<span class="st">"Data"</span>] <span class="op">=</span> <span class="st">"New"</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>new_data_df <span class="op">=</span> pd.concat(</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    [</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>        df.assign(</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>            Residuals<span class="op">=</span>np.<span class="bu">abs</span>(</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>                optimal_model.predict(df[[<span class="st">"Education"</span>]].values) <span class="op">-</span> df[<span class="st">"Income"</span>]</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>        ).assign(Data<span class="op">=</span><span class="st">"Original"</span>),</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>        new_data_df,</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    axis<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> sns.relplot(</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    height<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>new_data_df,</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">"Education"</span>,</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">"Income"</span>,</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>    col<span class="op">=</span><span class="st">"Data"</span>,</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>    kind<span class="op">=</span><span class="st">"scatter"</span>,</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].yaxis.set_major_formatter(<span class="st">"$</span><span class="sc">{x:,.0f}</span><span class="st">"</span>)</span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.axes[0][0].plot(X_test, y_pred, color='darkred', alpha=.7)</span></span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].set_ylim(</span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"Income"</span>].<span class="bu">min</span>() <span class="op">-</span> df[<span class="st">"Income"</span>].std(), df[<span class="st">"Income"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Income"</span>].std()</span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].set_ylim(</span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"Income"</span>].<span class="bu">min</span>() <span class="op">-</span> df[<span class="st">"Income"</span>].std(), df[<span class="st">"Income"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Income"</span>].std()</span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>ax.tight_layout()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -590,38 +602,38 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 </div>
 </div>
 <p>Here we can see that, when exposed to a new sample from the same DGP, the model produces extreme error.</p>
-<div id="cell-29" class="cell" data-outputid="5b198912-78c0-413c-8c9b-9ee0ff9a3d29" data-execution_count="41">
+<div id="cell-29" class="cell" data-outputid="5b198912-78c0-413c-8c9b-9ee0ff9a3d29" data-execution_count="45">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>norm <span class="op">=</span> (<span class="dv">0</span>, <span class="dv">1000000</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>norm <span class="op">=</span> plt.Normalize(<span class="op">*</span>norm)</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>sm <span class="op">=</span> plt.cm.ScalarMappable(cmap<span class="op">=</span><span class="st">"coolwarm"</span>, norm<span class="op">=</span>norm)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> sns.relplot(</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    height<span class="op">=</span><span class="dv">4</span>,</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>new_data_df,</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">"Education"</span>,</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">"Income"</span>,</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    col<span class="op">=</span><span class="st">"Data"</span>,</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    hue<span class="op">=</span><span class="st">"Residuals"</span>,</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    kind<span class="op">=</span><span class="st">"scatter"</span>,</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    palette<span class="op">=</span><span class="st">"coolwarm"</span>,</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    hue_norm<span class="op">=</span>norm,</span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].yaxis.set_major_formatter(<span class="st">"$</span><span class="sc">{x:,.0f}</span><span class="st">"</span>)</span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">1</span>].figure.colorbar(sm, ax<span class="op">=</span>ax.axes[<span class="dv">0</span>][<span class="dv">1</span>], <span class="bu">format</span><span class="op">=</span><span class="st">"$</span><span class="sc">{x:,.0f}</span><span class="st">"</span>).set_label(</span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    <span class="vs">r"$\hat</span><span class="sc">{y}</span><span class="vs">-y$"</span></span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">1</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">"darkred"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">"darkred"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
-<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].set_ylim(</span>
-<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"Income"</span>].<span class="bu">min</span>() <span class="op">-</span> df[<span class="st">"Income"</span>].std(), df[<span class="st">"Income"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Income"</span>].std()</span>
-<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].set_ylim(</span>
-<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"Income"</span>].<span class="bu">min</span>() <span class="op">-</span> df[<span class="st">"Income"</span>].std(), df[<span class="st">"Income"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Income"</span>].std()</span>
-<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>ax.tight_layout()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>norm <span class="op">=</span> (<span class="dv">0</span>, <span class="dv">1000000</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>norm <span class="op">=</span> plt.Normalize(<span class="op">*</span>norm)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>sm <span class="op">=</span> plt.cm.ScalarMappable(cmap<span class="op">=</span><span class="st">"coolwarm"</span>, norm<span class="op">=</span>norm)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> sns.relplot(</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    height<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>new_data_df,</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">"Education"</span>,</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">"Income"</span>,</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    col<span class="op">=</span><span class="st">"Data"</span>,</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    hue<span class="op">=</span><span class="st">"Residuals"</span>,</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    kind<span class="op">=</span><span class="st">"scatter"</span>,</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    palette<span class="op">=</span><span class="st">"coolwarm"</span>,</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    hue_norm<span class="op">=</span>norm,</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].yaxis.set_major_formatter(<span class="st">"$</span><span class="sc">{x:,.0f}</span><span class="st">"</span>)</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">1</span>].figure.colorbar(sm, ax<span class="op">=</span>ax.axes[<span class="dv">0</span>][<span class="dv">1</span>], <span class="bu">format</span><span class="op">=</span><span class="st">"$</span><span class="sc">{x:,.0f}</span><span class="st">"</span>).set_label(</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    <span class="vs">r"$\hat</span><span class="sc">{y}</span><span class="vs">-y$"</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">1</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">"darkred"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">"darkred"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].set_ylim(</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"Income"</span>].<span class="bu">min</span>() <span class="op">-</span> df[<span class="st">"Income"</span>].std(), df[<span class="st">"Income"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Income"</span>].std()</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].set_ylim(</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"Income"</span>].<span class="bu">min</span>() <span class="op">-</span> df[<span class="st">"Income"</span>].std(), df[<span class="st">"Income"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Income"</span>].std()</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>ax.tight_layout()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -632,22 +644,22 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 </div>
 </div>
 <p>We quantify this error as follows:</p>
-<div id="cell-31" class="cell" data-outputid="c621e93b-d48e-4762-c487-a3628fa6ef76" data-execution_count="42">
+<div id="cell-31" class="cell" data-outputid="c621e93b-d48e-4762-c487-a3628fa6ef76" data-execution_count="46">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>rmse <span class="op">=</span> <span class="kw">lambda</span> y, y_hat: np.sqrt(np.mean((y_hat <span class="op">-</span> y) <span class="op">**</span> <span class="dv">2</span>))</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>output_1 <span class="op">=</span> pd.DataFrame(</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"r2"</span>: [</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>            r2_score(correct_income, optimal_model.predict(education.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)))</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>        ],</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"rmse"</span>: [rmse(optimal_model.predict(education.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)), correct_income)],</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>[<span class="st">"p=14"</span>],</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="bu">round</span>(output_1, <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>rmse <span class="op">=</span> <span class="kw">lambda</span> y, y_hat: np.sqrt(np.mean((y_hat <span class="op">-</span> y) <span class="op">**</span> <span class="dv">2</span>))</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>output_1 <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"r2"</span>: [</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>            r2_score(correct_income, optimal_model.predict(education.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)))</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>        ],</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"rmse"</span>: [rmse(optimal_model.predict(education.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)), correct_income)],</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>[<span class="st">"p=14"</span>],</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="bu">round</span>(output_1, <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="42">
+<div class="cell-output cell-output-display" data-execution_count="46">
 <div>
 <div>
 
@@ -675,43 +687,43 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 </div>
 <p>This is clearly a bad model. What’s worrying is that it <em>seemed</em> like the best model when we simply examined model accuracy on one dataset. This raises the possibility that we might be duped into selecting models like this in practice.</p>
 <p>Out of curiosity, let’s see how an extremely simply model, a linear regression with <span class="math inline">\(p=1\)</span> compares on this new data.</p>
-<div id="cell-33" class="cell" data-outputid="3168df13-bbb7-4424-eb1f-7078bf97e3d7" data-execution_count="43">
+<div id="cell-33" class="cell" data-outputid="3168df13-bbb7-4424-eb1f-7078bf97e3d7" data-execution_count="47">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>X_test, y_pred, _, r2, sub_optimal_model <span class="op">=</span> model_data_lm(<span class="dv">1</span>, df)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>new_data_df.loc[new_data_df[<span class="st">"Data"</span>] <span class="op">==</span> <span class="st">"New"</span>, <span class="st">"Degree 1 Residuals"</span>] <span class="op">=</span> np.<span class="bu">abs</span>(</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    sub_optimal_model.predict(education.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)) <span class="op">-</span> correct_income</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>new_data_df.loc[new_data_df[<span class="st">"Data"</span>] <span class="op">==</span> <span class="st">"Original"</span>, <span class="st">"Degree 1 Residuals"</span>] <span class="op">=</span> np.<span class="bu">abs</span>(</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    sub_optimal_model.predict(df[[<span class="st">"Education"</span>]].values) <span class="op">-</span> df[<span class="st">"Income"</span>]</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>sm <span class="op">=</span> plt.cm.ScalarMappable(cmap<span class="op">=</span><span class="st">"coolwarm"</span>, norm<span class="op">=</span>norm)</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> sns.relplot(</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    height<span class="op">=</span><span class="dv">4</span>,</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>new_data_df,</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">"Education"</span>,</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">"Income"</span>,</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    col<span class="op">=</span><span class="st">"Data"</span>,</span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    hue<span class="op">=</span><span class="st">"Degree 1 Residuals"</span>,</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>    kind<span class="op">=</span><span class="st">"scatter"</span>,</span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>    palette<span class="op">=</span><span class="st">"coolwarm"</span>,</span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    hue_norm<span class="op">=</span>norm,</span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].yaxis.set_major_formatter(<span class="st">"$</span><span class="sc">{x:,.0f}</span><span class="st">"</span>)</span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">1</span>].figure.colorbar(sm, ax<span class="op">=</span>ax.axes[<span class="dv">0</span>][<span class="dv">1</span>], <span class="bu">format</span><span class="op">=</span><span class="st">"$</span><span class="sc">{x:,.0f}</span><span class="st">"</span>)</span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">1</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">"darkred"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">"darkred"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
-<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].set_ylim(</span>
-<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"Income"</span>].<span class="bu">min</span>() <span class="op">-</span> df[<span class="st">"Income"</span>].std(), df[<span class="st">"Income"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Income"</span>].std()</span>
-<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].set_ylim(</span>
-<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"Income"</span>].<span class="bu">min</span>() <span class="op">-</span> df[<span class="st">"Income"</span>].std(), df[<span class="st">"Income"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Income"</span>].std()</span>
-<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>ax.tight_layout()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>X_test, y_pred, _, r2, sub_optimal_model <span class="op">=</span> model_data_lm(<span class="dv">1</span>, df)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>new_data_df.loc[new_data_df[<span class="st">"Data"</span>] <span class="op">==</span> <span class="st">"New"</span>, <span class="st">"Degree 1 Residuals"</span>] <span class="op">=</span> np.<span class="bu">abs</span>(</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    sub_optimal_model.predict(education.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)) <span class="op">-</span> correct_income</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>new_data_df.loc[new_data_df[<span class="st">"Data"</span>] <span class="op">==</span> <span class="st">"Original"</span>, <span class="st">"Degree 1 Residuals"</span>] <span class="op">=</span> np.<span class="bu">abs</span>(</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    sub_optimal_model.predict(df[[<span class="st">"Education"</span>]].values) <span class="op">-</span> df[<span class="st">"Income"</span>]</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>sm <span class="op">=</span> plt.cm.ScalarMappable(cmap<span class="op">=</span><span class="st">"coolwarm"</span>, norm<span class="op">=</span>norm)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> sns.relplot(</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    height<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>new_data_df,</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">"Education"</span>,</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">"Income"</span>,</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>    col<span class="op">=</span><span class="st">"Data"</span>,</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>    hue<span class="op">=</span><span class="st">"Degree 1 Residuals"</span>,</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>    kind<span class="op">=</span><span class="st">"scatter"</span>,</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>    palette<span class="op">=</span><span class="st">"coolwarm"</span>,</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>    hue_norm<span class="op">=</span>norm,</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].yaxis.set_major_formatter(<span class="st">"$</span><span class="sc">{x:,.0f}</span><span class="st">"</span>)</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">1</span>].figure.colorbar(sm, ax<span class="op">=</span>ax.axes[<span class="dv">0</span>][<span class="dv">1</span>], <span class="bu">format</span><span class="op">=</span><span class="st">"$</span><span class="sc">{x:,.0f}</span><span class="st">"</span>)</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">1</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">"darkred"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">"darkred"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].set_ylim(</span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"Income"</span>].<span class="bu">min</span>() <span class="op">-</span> df[<span class="st">"Income"</span>].std(), df[<span class="st">"Income"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Income"</span>].std()</span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>ax.axes[<span class="dv">0</span>][<span class="dv">0</span>].set_ylim(</span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"Income"</span>].<span class="bu">min</span>() <span class="op">-</span> df[<span class="st">"Income"</span>].std(), df[<span class="st">"Income"</span>].<span class="bu">max</span>() <span class="op">+</span> df[<span class="st">"Income"</span>].std()</span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>ax.tight_layout()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -722,25 +734,25 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 </div>
 </div>
 <p>This is a very good fit, even though our previous empirical fitting process told us that the high <span class="math inline">\(p\)</span> model was optimal.</p>
-<div id="cell-35" class="cell" data-outputid="914a0d4b-f152-4990-dd36-be73bdc9bbb9" data-execution_count="44">
+<div id="cell-35" class="cell" data-outputid="914a0d4b-f152-4990-dd36-be73bdc9bbb9" data-execution_count="48">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>output_2 <span class="op">=</span> pd.DataFrame(</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"r2"</span>: [</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>            r2_score(</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                correct_income, sub_optimal_model.predict(education.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>        ],</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"rmse"</span>: [</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>            rmse(sub_optimal_model.predict(education.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)), correct_income)</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>        ],</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>[<span class="st">"p=1"</span>],</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="bu">round</span>(output_2, <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>output_2 <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"r2"</span>: [</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>            r2_score(</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>                correct_income, sub_optimal_model.predict(education.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>        ],</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"rmse"</span>: [</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>            rmse(sub_optimal_model.predict(education.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)), correct_income)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>        ],</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>[<span class="st">"p=1"</span>],</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="bu">round</span>(output_2, <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="44">
+<div class="cell-output cell-output-display" data-execution_count="48">
 <div>
 <div>
 
@@ -773,19 +785,19 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 <h1>The Train-Test Split</h1>
 <p>The process we just went through is analogous to a resampling method called the train-test split.</p>
 <p>In the real world, we rarely can just collect more data. However, it is straightforward to simulate the data collection process using resampling methods. Specifically, we can split our original dataset into two parts – a training dataset, wherein we will train and intially evaluate our model, and a “test” dataset, which we will use just as we used the newly collected data in the previous example, for more objective, empirical model evaluation.</p>
-<div id="cell-38" class="cell" data-execution_count="45">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">40</span>)</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>train_stop <span class="op">=</span> <span class="bu">int</span>(<span class="fl">0.6</span> <span class="op">*</span> n)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>indices <span class="op">=</span> df.sample(frac<span class="op">=</span><span class="dv">1</span>, replace<span class="op">=</span><span class="va">False</span>).index</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>train_ind <span class="op">=</span> indices[:train_stop]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-38" class="cell" data-execution_count="49">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">40</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>train_stop <span class="op">=</span> <span class="bu">int</span>(<span class="fl">0.6</span> <span class="op">*</span> n)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>indices <span class="op">=</span> df.sample(frac<span class="op">=</span><span class="dv">1</span>, replace<span class="op">=</span><span class="va">False</span>).index</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>train_ind <span class="op">=</span> indices[:train_stop]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Here we designate 60% of our data as training and 40% as test:</p>
-<div id="cell-40" class="cell" data-outputid="4dc19a4c-129b-47fe-ba91-98546da3127a" data-execution_count="46">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>df.loc[:, <span class="st">"Sample"</span>] <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>df.loc[train_ind, <span class="st">"Sample"</span>] <span class="op">=</span> <span class="st">"Train"</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>df.loc[df[<span class="st">"Sample"</span>] <span class="op">!=</span> <span class="st">"Train"</span>, <span class="st">"Sample"</span>] <span class="op">=</span> <span class="st">"Test"</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="46">
+<div id="cell-40" class="cell" data-outputid="4dc19a4c-129b-47fe-ba91-98546da3127a" data-execution_count="50">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>df.loc[:, <span class="st">"Sample"</span>] <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>df.loc[train_ind, <span class="st">"Sample"</span>] <span class="op">=</span> <span class="st">"Train"</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>df.loc[df[<span class="st">"Sample"</span>] <span class="op">!=</span> <span class="st">"Train"</span>, <span class="st">"Sample"</span>] <span class="op">=</span> <span class="st">"Test"</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="50">
 <div>
 <div>
 
@@ -838,43 +850,46 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 </div>
 </div>
 <p>Next, we hold the test data aside and only examine the training dataset.</p>
-<div id="cell-42" class="cell" data-outputid="92e9b4a8-7b81-4072-9e88-f9d7d1a87183" data-execution_count="47">
+<div id="cell-42" class="cell" data-outputid="92e9b4a8-7b81-4072-9e88-f9d7d1a87183" data-execution_count="51">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(x<span class="op">=</span><span class="st">"Education"</span>, y<span class="op">=</span><span class="st">"Income"</span>, data<span class="op">=</span>df, alpha<span class="op">=</span><span class="fl">0.8</span>, marker<span class="op">=</span><span class="st">"o"</span>, ax<span class="op">=</span>ax[<span class="dv">0</span>])</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].set_title(<span class="st">"$n=$"</span> <span class="op">+</span> <span class="bu">str</span>(n))</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].yaxis.set_major_formatter(<span class="st">"$</span><span class="sc">{x:,.0f}</span><span class="st">"</span>)</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax[<span class="dv">0</span>])</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">"Education"</span>, y<span class="op">=</span><span class="st">"Income"</span>, hue<span class="op">=</span><span class="st">"Sample"</span>, data<span class="op">=</span>df, alpha<span class="op">=</span><span class="fl">0.8</span>, marker<span class="op">=</span><span class="st">"o"</span>, ax<span class="op">=</span>ax[<span class="dv">1</span>]</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_title(</span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"$n_</span><span class="sc">{train}</span><span class="st">=$"</span> <span class="op">+</span> <span class="bu">str</span>(train_stop) <span class="op">+</span> <span class="st">", $n_</span><span class="sc">{test}</span><span class="st">=$"</span> <span class="op">+</span> <span class="bu">str</span>(n <span class="op">-</span> train_stop)</span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_ylabel(<span class="vs">r"$\downarrow$"</span>, size<span class="op">=</span><span class="dv">25</span>)</span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_yticks([])</span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax[<span class="dv">1</span>])</span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(</span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">"Education"</span>,</span>
-<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">"Income"</span>,</span>
-<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>    hue<span class="op">=</span><span class="st">"Sample"</span>,</span>
-<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df.query(<span class="st">"Sample == 'Train'"</span>),</span>
-<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.8</span>,</span>
-<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>    marker<span class="op">=</span><span class="st">"o"</span>,</span>
-<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>ax[<span class="dv">2</span>],</span>
-<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">2</span>].set_title(<span class="st">"$n_</span><span class="sc">{train}</span><span class="st">=$"</span> <span class="op">+</span> <span class="bu">str</span>(train_stop))</span>
-<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">2</span>].set_ylabel(<span class="vs">r"$\downarrow$"</span>, size<span class="op">=</span><span class="dv">25</span>)</span>
-<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">2</span>].set_yticks([])</span>
-<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">2</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax[<span class="dv">2</span>])</span>
-<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(x<span class="op">=</span><span class="st">"Education"</span>, y<span class="op">=</span><span class="st">"Income"</span>, data<span class="op">=</span>df, alpha<span class="op">=</span><span class="fl">0.8</span>, marker<span class="op">=</span><span class="st">"o"</span>, ax<span class="op">=</span>ax[<span class="dv">0</span>])</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].set_title(<span class="st">"$n=$"</span> <span class="op">+</span> <span class="bu">str</span>(n))</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].yaxis.set_major_formatter(<span class="st">"$</span><span class="sc">{x:,.0f}</span><span class="st">"</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].set_xlim(<span class="dv">0</span>, <span class="dv">15</span>)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax[<span class="dv">0</span>])</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">"Education"</span>, y<span class="op">=</span><span class="st">"Income"</span>, hue<span class="op">=</span><span class="st">"Sample"</span>, data<span class="op">=</span>df, alpha<span class="op">=</span><span class="fl">0.8</span>, marker<span class="op">=</span><span class="st">"o"</span>, ax<span class="op">=</span>ax[<span class="dv">1</span>]</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_title(</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"$n_</span><span class="sc">{train}</span><span class="st">=$"</span> <span class="op">+</span> <span class="bu">str</span>(train_stop) <span class="op">+</span> <span class="st">", $n_</span><span class="sc">{test}</span><span class="st">=$"</span> <span class="op">+</span> <span class="bu">str</span>(n <span class="op">-</span> train_stop)</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_ylabel(<span class="vs">r"$\downarrow$"</span>, size<span class="op">=</span><span class="dv">25</span>)</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_yticks([])</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_xlim(<span class="dv">0</span>, <span class="dv">15</span>)</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax[<span class="dv">1</span>])</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">"Education"</span>,</span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">"Income"</span>,</span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>    hue<span class="op">=</span><span class="st">"Sample"</span>,</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df.query(<span class="st">"Sample == 'Train'"</span>),</span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.8</span>,</span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>    marker<span class="op">=</span><span class="st">"o"</span>,</span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>ax[<span class="dv">2</span>],</span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">2</span>].set_title(<span class="st">"$n_</span><span class="sc">{train}</span><span class="st">=$"</span> <span class="op">+</span> <span class="bu">str</span>(train_stop))</span>
+<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">2</span>].set_ylabel(<span class="vs">r"$\downarrow$"</span>, size<span class="op">=</span><span class="dv">25</span>)</span>
+<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">2</span>].set_yticks([])</span>
+<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">2</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">2</span>].set_xlim(<span class="dv">0</span>, <span class="dv">15</span>)</span>
+<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax[<span class="dv">2</span>])</span>
+<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -885,55 +900,55 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 </div>
 </div>
 <p>We proceed to train models on the training data, and evaluate each model on the test dataset. We do that process for each degree polynomial regression.</p>
-<div id="cell-44" class="cell" data-outputid="33d16cb4-444b-4dcb-86fe-ea9c5a09fa4e" data-execution_count="48">
+<div id="cell-44" class="cell" data-outputid="33d16cb4-444b-4dcb-86fe-ea9c5a09fa4e" data-execution_count="52">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>x_max <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>y_max <span class="op">=</span> <span class="dv">4</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(y_max, x_max, sharey<span class="op">=</span><span class="va">True</span>, sharex<span class="op">=</span><span class="va">True</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>degree <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>sub_df <span class="op">=</span> df.query(<span class="st">"Sample == 'Train'"</span>)</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>test_df <span class="op">=</span> df.query(<span class="st">"Sample == 'Test'"</span>)</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(y_max):</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    X_test, y_pred, rmse, r2, model <span class="op">=</span> model_data_lm(degree, sub_df)</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    r2_test <span class="op">=</span> r2_score(</span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>        test_df[<span class="st">"Income"</span>].values, model.predict(test_df[[<span class="st">"Education"</span>]].values)</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].plot(</span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>        test_df[<span class="st">"Education"</span>], test_df[<span class="st">"Income"</span>], <span class="st">"."</span>, alpha<span class="op">=</span><span class="fl">0.4</span>, color<span class="op">=</span><span class="st">"tab:orange"</span></span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].plot(</span>
-<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>        sub_df[<span class="st">"Education"</span>], sub_df[<span class="st">"Income"</span>], <span class="st">"."</span>, alpha<span class="op">=</span><span class="fl">0.4</span>, color<span class="op">=</span><span class="st">"tab:blue"</span></span>
-<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>    sns.despine(ax<span class="op">=</span>ax[j, <span class="dv">1</span>])</span>
-<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>    sns.despine(ax<span class="op">=</span>ax[j, <span class="dv">0</span>])</span>
-<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].set_ylabel(<span class="vs">r"$\downarrow$"</span>, size<span class="op">=</span><span class="dv">25</span>)</span>
-<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">"darkred"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
-<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">"darkred"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
-<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].<span class="bu">set</span>(yticklabels<span class="op">=</span>[], xticklabels<span class="op">=</span>[])</span>
-<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].<span class="bu">set</span>(yticklabels<span class="op">=</span>[], xticklabels<span class="op">=</span>[])</span>
-<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].set_title(</span>
-<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>        <span class="vs">r"$y_</span><span class="sc">{}</span><span class="vs">=\sum_</span><span class="sc">{{</span><span class="vs">p=0</span><span class="sc">}}</span><span class="vs">^</span><span class="sc">{}</span><span class="vs"> \beta_p x^p \rightarrow$ "</span>.<span class="bu">format</span>(degree, degree)</span>
-<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a>        <span class="op">+</span> <span class="vs">r"$R_</span><span class="sc">{train}</span><span class="vs">^2=$"</span></span>
-<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a>        <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span><span class="bu">round</span>(r2, <span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>,</span>
-<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>        size<span class="op">=</span><span class="dv">12</span>,</span>
-<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb21-41"><a href="#cb21-41" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].set_title(</span>
-<span id="cb21-42"><a href="#cb21-42" aria-hidden="true" tabindex="-1"></a>        <span class="vs">r"$R_</span><span class="sc">{test}</span><span class="vs">^2=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span><span class="bu">round</span>(r2_test, <span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>, size<span class="op">=</span><span class="dv">12</span>, color<span class="op">=</span><span class="st">"black"</span></span>
-<span id="cb21-43"><a href="#cb21-43" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb21-44"><a href="#cb21-44" aria-hidden="true" tabindex="-1"></a>    degree <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb21-45"><a href="#cb21-45" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
-<span id="cb21-46"><a href="#cb21-46" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="vs">r"Train $\rightarrow$ Test"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>x_max <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>y_max <span class="op">=</span> <span class="dv">4</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(y_max, x_max, sharey<span class="op">=</span><span class="va">True</span>, sharex<span class="op">=</span><span class="va">True</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>degree <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>sub_df <span class="op">=</span> df.query(<span class="st">"Sample == 'Train'"</span>)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>test_df <span class="op">=</span> df.query(<span class="st">"Sample == 'Test'"</span>)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(y_max):</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>    X_test, y_pred, rmse, r2, model <span class="op">=</span> model_data_lm(degree, sub_df)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    r2_test <span class="op">=</span> r2_score(</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>        test_df[<span class="st">"Income"</span>].values, model.predict(test_df[[<span class="st">"Education"</span>]].values)</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].plot(</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>        test_df[<span class="st">"Education"</span>], test_df[<span class="st">"Income"</span>], <span class="st">"."</span>, alpha<span class="op">=</span><span class="fl">0.4</span>, color<span class="op">=</span><span class="st">"tab:orange"</span></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].plot(</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>        sub_df[<span class="st">"Education"</span>], sub_df[<span class="st">"Income"</span>], <span class="st">"."</span>, alpha<span class="op">=</span><span class="fl">0.4</span>, color<span class="op">=</span><span class="st">"tab:blue"</span></span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>    sns.despine(ax<span class="op">=</span>ax[j, <span class="dv">1</span>])</span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>    sns.despine(ax<span class="op">=</span>ax[j, <span class="dv">0</span>])</span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].set_ylabel(<span class="vs">r"$\downarrow$"</span>, size<span class="op">=</span><span class="dv">25</span>)</span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">"darkred"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">"darkred"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].<span class="bu">set</span>(yticklabels<span class="op">=</span>[], xticklabels<span class="op">=</span>[])</span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].<span class="bu">set</span>(yticklabels<span class="op">=</span>[], xticklabels<span class="op">=</span>[])</span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].set_title(</span>
+<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a>        <span class="vs">r"$y_</span><span class="sc">{}</span><span class="vs">=\sum_</span><span class="sc">{{</span><span class="vs">p=0</span><span class="sc">}}</span><span class="vs">^</span><span class="sc">{}</span><span class="vs"> \beta_p x^p \rightarrow$ "</span>.<span class="bu">format</span>(degree, degree)</span>
+<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a>        <span class="op">+</span> <span class="vs">r"$R_</span><span class="sc">{train}</span><span class="vs">^2=$"</span></span>
+<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a>        <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span><span class="bu">round</span>(r2, <span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb23-39"><a href="#cb23-39" aria-hidden="true" tabindex="-1"></a>        size<span class="op">=</span><span class="dv">12</span>,</span>
+<span id="cb23-40"><a href="#cb23-40" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb23-41"><a href="#cb23-41" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].set_title(</span>
+<span id="cb23-42"><a href="#cb23-42" aria-hidden="true" tabindex="-1"></a>        <span class="vs">r"$R_</span><span class="sc">{test}</span><span class="vs">^2=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span><span class="bu">round</span>(r2_test, <span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>, size<span class="op">=</span><span class="dv">12</span>, color<span class="op">=</span><span class="st">"black"</span></span>
+<span id="cb23-43"><a href="#cb23-43" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb23-44"><a href="#cb23-44" aria-hidden="true" tabindex="-1"></a>    degree <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb23-45"><a href="#cb23-45" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb23-46"><a href="#cb23-46" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="vs">r"Train $\rightarrow$ Test"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -945,57 +960,57 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 </div>
 <p>When we examine the relationship between polynomial degree and <span class="math inline">\(R^2\)</span>, we now seek the argument that maximizes <span class="math inline">\(R^2_{test}\)</span>, rather than <span class="math inline">\(R^2_{train}\)</span>.</p>
 <p>Here we’ll also note that, typically, <span class="math inline">\(R^2_{test} &lt; R^2_{train}\)</span>.</p>
-<div id="cell-46" class="cell" data-outputid="3968621a-abea-49ab-96ba-5abe2a130c74" data-execution_count="49">
+<div id="cell-46" class="cell" data-outputid="3968621a-abea-49ab-96ba-5abe2a130c74" data-execution_count="53">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>r2s_test <span class="op">=</span> []</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>r2s_train <span class="op">=</span> []</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>max_root <span class="op">=</span> <span class="dv">50</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>roots <span class="op">=</span> <span class="bu">range</span>(max_root)</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> degree <span class="kw">in</span> roots:</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    X_test, y_pred, _, _, model <span class="op">=</span> model_data_lm(degree, sub_df)</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    r2_test <span class="op">=</span> r2_score(</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>        test_df[<span class="st">"Income"</span>].values, model.predict(test_df[[<span class="st">"Education"</span>]].values)</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    r2_train <span class="op">=</span> r2_score(</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>        sub_df[<span class="st">"Income"</span>].values, model.predict(sub_df[[<span class="st">"Education"</span>]].values)</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    r2s_test.append(r2_test)</span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>    r2s_train.append(r2_train)</span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>r2s_test <span class="op">=</span> np.array(r2s_test)</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>r2s_train <span class="op">=</span> np.array(r2s_train)</span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>ax.plot(roots[<span class="dv">1</span>:], r2s_test[<span class="dv">1</span>:], <span class="st">".-"</span>, alpha<span class="op">=</span><span class="fl">0.8</span>, label<span class="op">=</span><span class="st">"Test"</span>)</span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"$R^2_</span><span class="sc">{test}</span><span class="st">$ ~ $p$"</span>)</span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>ax.plot(</span>
-<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>    np.argmax(r2s_test),</span>
-<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>    np.<span class="bu">max</span>(r2s_test),</span>
-<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"D"</span>,</span>
-<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"tab:blue"</span>,</span>
-<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.6</span>,</span>
-<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="vs">r"$ \underset</span><span class="sc">{d}</span><span class="vs">{\arg\max} \; R^2_</span><span class="sc">{test}</span><span class="vs">=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>argmax(r2s_test)<span class="sc">}</span><span class="ss">"</span>,</span>
-<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
-<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax)</span>
-<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="dv">1</span>)</span>
-<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a>ax.plot(roots[<span class="dv">1</span>:], r2s_train[<span class="dv">1</span>:], <span class="st">".-"</span>, alpha<span class="op">=</span><span class="fl">0.8</span>, label<span class="op">=</span><span class="st">"Train"</span>)</span>
-<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"$R^2$ ~ $d$"</span>)</span>
-<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a>ax.plot(</span>
-<span id="cb22-38"><a href="#cb22-38" aria-hidden="true" tabindex="-1"></a>    np.argmax(r2s_train),</span>
-<span id="cb22-39"><a href="#cb22-39" aria-hidden="true" tabindex="-1"></a>    np.<span class="bu">max</span>(r2s_train),</span>
-<span id="cb22-40"><a href="#cb22-40" aria-hidden="true" tabindex="-1"></a>    <span class="st">"s"</span>,</span>
-<span id="cb22-41"><a href="#cb22-41" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"tab:orange"</span>,</span>
-<span id="cb22-42"><a href="#cb22-42" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.6</span>,</span>
-<span id="cb22-43"><a href="#cb22-43" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="vs">r"$ \underset</span><span class="sc">{d}</span><span class="vs">{\arg\max} \; R^2_</span><span class="sc">{train}</span><span class="vs">=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>argmax(r2s_train)<span class="sc">}</span><span class="ss">"</span>,</span>
-<span id="cb22-44"><a href="#cb22-44" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb22-45"><a href="#cb22-45" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"Polynomial Degree"</span>, ylabel<span class="op">=</span><span class="st">"$R^2$"</span>)</span>
-<span id="cb22-46"><a href="#cb22-46" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
-<span id="cb22-47"><a href="#cb22-47" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb22-48"><a href="#cb22-48" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>r2s_test <span class="op">=</span> []</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>r2s_train <span class="op">=</span> []</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>max_root <span class="op">=</span> <span class="dv">50</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>roots <span class="op">=</span> <span class="bu">range</span>(max_root)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> degree <span class="kw">in</span> roots:</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    X_test, y_pred, _, _, model <span class="op">=</span> model_data_lm(degree, sub_df)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    r2_test <span class="op">=</span> r2_score(</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>        test_df[<span class="st">"Income"</span>].values, model.predict(test_df[[<span class="st">"Education"</span>]].values)</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    r2_train <span class="op">=</span> r2_score(</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>        sub_df[<span class="st">"Income"</span>].values, model.predict(sub_df[[<span class="st">"Education"</span>]].values)</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    r2s_test.append(r2_test)</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    r2s_train.append(r2_train)</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>r2s_test <span class="op">=</span> np.array(r2s_test)</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>r2s_train <span class="op">=</span> np.array(r2s_train)</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>ax.plot(roots[<span class="dv">1</span>:], r2s_test[<span class="dv">1</span>:], <span class="st">".-"</span>, alpha<span class="op">=</span><span class="fl">0.8</span>, label<span class="op">=</span><span class="st">"Test"</span>, c<span class="op">=</span><span class="st">"tab:orange"</span>)</span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"$R^2_</span><span class="sc">{test}</span><span class="st">$ ~ $p$"</span>)</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>ax.plot(</span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>    np.argmax(r2s_test),</span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>    np.<span class="bu">max</span>(r2s_test),</span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"D"</span>,</span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"tab:orange"</span>,</span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.6</span>,</span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="vs">r"$ \underset</span><span class="sc">{d}</span><span class="vs">{\arg\max} \; R^2_</span><span class="sc">{test}</span><span class="vs">=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>argmax(r2s_test)<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax)</span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a>ax.plot(roots[<span class="dv">1</span>:], r2s_train[<span class="dv">1</span>:], <span class="st">".-"</span>, alpha<span class="op">=</span><span class="fl">0.8</span>, label<span class="op">=</span><span class="st">"Train"</span>, c<span class="op">=</span><span class="st">"tab:blue"</span>)</span>
+<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"$R^2$ ~ $d$"</span>)</span>
+<span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a>ax.plot(</span>
+<span id="cb24-38"><a href="#cb24-38" aria-hidden="true" tabindex="-1"></a>    np.argmax(r2s_train),</span>
+<span id="cb24-39"><a href="#cb24-39" aria-hidden="true" tabindex="-1"></a>    np.<span class="bu">max</span>(r2s_train),</span>
+<span id="cb24-40"><a href="#cb24-40" aria-hidden="true" tabindex="-1"></a>    <span class="st">"s"</span>,</span>
+<span id="cb24-41"><a href="#cb24-41" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"tab:blue"</span>,</span>
+<span id="cb24-42"><a href="#cb24-42" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.6</span>,</span>
+<span id="cb24-43"><a href="#cb24-43" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="vs">r"$ \underset</span><span class="sc">{d}</span><span class="vs">{\arg\max} \; R^2_</span><span class="sc">{train}</span><span class="vs">=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>argmax(r2s_train)<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb24-44"><a href="#cb24-44" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-45"><a href="#cb24-45" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"Polynomial Degree"</span>, ylabel<span class="op">=</span><span class="st">"$R^2$"</span>)</span>
+<span id="cb24-46"><a href="#cb24-46" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb24-47"><a href="#cb24-47" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb24-48"><a href="#cb24-48" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -1009,13 +1024,13 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 <p><span class="math display">\[
 income = 33000 + 6000 \times education + \mathcal{N}(0, 9000)
 \]</span> Indeed, we can see the exact functional form that our optimal model takes:</p>
-<div id="cell-49" class="cell" data-outputid="9c57d3eb-b00d-4a58-c87a-6030d919a101" data-execution_count="50">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>resid <span class="op">=</span> correct_income <span class="op">-</span> sub_optimal_model.predict(education.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"income = </span><span class="sc">{</span><span class="bu">round</span>(sub_optimal_model[<span class="dv">1</span>].intercept_, <span class="dv">2</span>)<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> <span class="ss">f" + </span><span class="sc">{</span><span class="bu">round</span>(sub_optimal_model[<span class="dv">1</span>].coef_[<span class="op">-</span><span class="dv">1</span>], <span class="dv">2</span>)<span class="sc">}</span><span class="ss">*education"</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> <span class="ss">f" + N(</span><span class="sc">{</span><span class="bu">round</span>(resid.mean(), <span class="dv">2</span>)<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span><span class="bu">round</span>(resid.std(), <span class="dv">2</span>)<span class="sc">}</span><span class="ss">)"</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-49" class="cell" data-outputid="9c57d3eb-b00d-4a58-c87a-6030d919a101" data-execution_count="54">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>resid <span class="op">=</span> correct_income <span class="op">-</span> sub_optimal_model.predict(education.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"income = </span><span class="sc">{</span><span class="bu">round</span>(sub_optimal_model[<span class="dv">1</span>].intercept_, <span class="dv">2</span>)<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> <span class="ss">f" + </span><span class="sc">{</span><span class="bu">round</span>(sub_optimal_model[<span class="dv">1</span>].coef_[<span class="op">-</span><span class="dv">1</span>], <span class="dv">2</span>)<span class="sc">}</span><span class="ss">*education"</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> <span class="ss">f" + N(</span><span class="sc">{</span><span class="bu">round</span>(resid.mean(), <span class="dv">2</span>)<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span><span class="bu">round</span>(resid.std(), <span class="dv">2</span>)<span class="sc">}</span><span class="ss">)"</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>income = 34467.82 + 5635.04*education + N(-90.57, 9138.91)</code></pre>
 </div>
@@ -1023,70 +1038,70 @@ income = 33000 + 6000 \times education + \mathcal{N}(0, 9000)
 <p>This is very close to the data generating process!</p>
 <section id="an-aside-about-nonparametric-models" class="level3">
 <h3 class="anchored" data-anchor-id="an-aside-about-nonparametric-models">An Aside about Nonparametric models</h3>
-<p>The issues we just discussed in the context of polynomial regression only compound as we exit the realm of linear regression and consider nonparametric models like tree-based models. For example, when we examine a decision tree model and vary <span class="math inline">\(M\)</span>, the number of partitions of the feature space that the model uses (a measure of complexity), we see extreme divergence between training the testing performance.</p>
-<div id="cell-52" class="cell" data-outputid="6c1e4bbb-45a9-4fa3-b4a0-a31fcba17076" data-execution_count="51">
+<p>The issues we just discussed in the context of polynomial regression only compound as we exit the realm of linear regression and consider nonparametric models like decision trees. For example, when we examine a decision tree model and vary <span class="math inline">\(M\)</span>, the number of partitions of the feature space that the model uses (a measure of complexity), we see extreme divergence between training the testing performance.</p>
+<div id="cell-52" class="cell" data-outputid="6c1e4bbb-45a9-4fa3-b4a0-a31fcba17076" data-execution_count="55">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> model_data_cart(degree, df):</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> df[[<span class="st">"Education"</span>]].values</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> df[<span class="st">"Income"</span>].values</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    model <span class="op">=</span> DecisionTreeRegressor(random_state<span class="op">=</span><span class="dv">1</span>, max_depth<span class="op">=</span>degree)</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    model.fit(X, y)</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    rmse <span class="op">=</span> mean_squared_error(y, model.predict(X)) <span class="op">**</span> <span class="fl">0.5</span></span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    r2 <span class="op">=</span> r2_score(y, model.predict(X))</span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>    X_test <span class="op">=</span> np.linspace(X.<span class="bu">min</span>() <span class="op">-</span> X.std(), X.<span class="bu">max</span>() <span class="op">+</span> X.std(), <span class="dv">100</span>).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>    y_pred <span class="op">=</span> model.predict(X_test)</span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> X_test, y_pred, rmse, r2, model</span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>x_max <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>y_max <span class="op">=</span> <span class="dv">4</span></span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(y_max, x_max, sharey<span class="op">=</span><span class="va">True</span>, sharex<span class="op">=</span><span class="va">True</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
-<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>degree <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>sub_df <span class="op">=</span> df.query(<span class="st">"Sample == 'Train'"</span>)</span>
-<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>test_df <span class="op">=</span> df.query(<span class="st">"Sample == 'Test'"</span>)</span>
-<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(y_max):</span>
-<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>    X_test, y_pred, rmse, r2, model <span class="op">=</span> model_data_cart(degree, sub_df)</span>
-<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>    r2_test <span class="op">=</span> r2_score(</span>
-<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>        test_df[<span class="st">"Income"</span>].values, model.predict(test_df[[<span class="st">"Education"</span>]].values)</span>
-<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].plot(</span>
-<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a>        test_df[<span class="st">"Education"</span>], test_df[<span class="st">"Income"</span>], <span class="st">"."</span>, alpha<span class="op">=</span><span class="fl">0.4</span>, color<span class="op">=</span><span class="st">"tab:orange"</span></span>
-<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].plot(</span>
-<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a>        sub_df[<span class="st">"Education"</span>], sub_df[<span class="st">"Income"</span>], <span class="st">"."</span>, alpha<span class="op">=</span><span class="fl">0.4</span>, color<span class="op">=</span><span class="st">"tab:blue"</span></span>
-<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb25-40"><a href="#cb25-40" aria-hidden="true" tabindex="-1"></a>    sns.despine(ax<span class="op">=</span>ax[j, <span class="dv">1</span>])</span>
-<span id="cb25-41"><a href="#cb25-41" aria-hidden="true" tabindex="-1"></a>    sns.despine(ax<span class="op">=</span>ax[j, <span class="dv">0</span>])</span>
-<span id="cb25-42"><a href="#cb25-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-43"><a href="#cb25-43" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].set_ylabel(<span class="vs">r"$\downarrow$"</span>, size<span class="op">=</span><span class="dv">25</span>)</span>
-<span id="cb25-44"><a href="#cb25-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-45"><a href="#cb25-45" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">"darkred"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
-<span id="cb25-46"><a href="#cb25-46" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">"darkred"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
-<span id="cb25-47"><a href="#cb25-47" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].<span class="bu">set</span>(yticklabels<span class="op">=</span>[], xticklabels<span class="op">=</span>[])</span>
-<span id="cb25-48"><a href="#cb25-48" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb25-49"><a href="#cb25-49" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].<span class="bu">set</span>(yticklabels<span class="op">=</span>[], xticklabels<span class="op">=</span>[])</span>
-<span id="cb25-50"><a href="#cb25-50" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb25-51"><a href="#cb25-51" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].set_title(</span>
-<span id="cb25-52"><a href="#cb25-52" aria-hidden="true" tabindex="-1"></a>        <span class="vs">r"$M=</span><span class="sc">{}</span><span class="vs"> \rightarrow$ "</span>.<span class="bu">format</span>(degree) <span class="op">+</span> <span class="vs">r"$R^2_</span><span class="sc">{train}</span><span class="vs">=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span><span class="bu">round</span>(r2, <span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>,</span>
-<span id="cb25-53"><a href="#cb25-53" aria-hidden="true" tabindex="-1"></a>        size<span class="op">=</span><span class="dv">12</span>,</span>
-<span id="cb25-54"><a href="#cb25-54" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb25-55"><a href="#cb25-55" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].set_title(</span>
-<span id="cb25-56"><a href="#cb25-56" aria-hidden="true" tabindex="-1"></a>        <span class="vs">r"$R_</span><span class="sc">{test}</span><span class="vs">^2=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span><span class="bu">round</span>(r2_test, <span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>, size<span class="op">=</span><span class="dv">12</span>, color<span class="op">=</span><span class="st">"black"</span></span>
-<span id="cb25-57"><a href="#cb25-57" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb25-58"><a href="#cb25-58" aria-hidden="true" tabindex="-1"></a>    degree <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb25-59"><a href="#cb25-59" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
-<span id="cb25-60"><a href="#cb25-60" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="vs">r"Train $\rightarrow$ Test"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> model_data_cart(degree, df):</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> df[[<span class="st">"Education"</span>]].values</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> df[<span class="st">"Income"</span>].values</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    model <span class="op">=</span> DecisionTreeRegressor(random_state<span class="op">=</span><span class="dv">1</span>, max_depth<span class="op">=</span>degree)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    model.fit(X, y)</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    rmse <span class="op">=</span> mean_squared_error(y, model.predict(X)) <span class="op">**</span> <span class="fl">0.5</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>    r2 <span class="op">=</span> r2_score(y, model.predict(X))</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>    X_test <span class="op">=</span> np.linspace(X.<span class="bu">min</span>() <span class="op">-</span> X.std(), X.<span class="bu">max</span>() <span class="op">+</span> X.std(), <span class="dv">100</span>).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>    y_pred <span class="op">=</span> model.predict(X_test)</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> X_test, y_pred, rmse, r2, model</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>x_max <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>y_max <span class="op">=</span> <span class="dv">4</span></span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(y_max, x_max, sharey<span class="op">=</span><span class="va">True</span>, sharex<span class="op">=</span><span class="va">True</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>degree <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>sub_df <span class="op">=</span> df.query(<span class="st">"Sample == 'Train'"</span>)</span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>test_df <span class="op">=</span> df.query(<span class="st">"Sample == 'Test'"</span>)</span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(y_max):</span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>    X_test, y_pred, rmse, r2, model <span class="op">=</span> model_data_cart(degree, sub_df)</span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>    r2_test <span class="op">=</span> r2_score(</span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>        test_df[<span class="st">"Income"</span>].values, model.predict(test_df[[<span class="st">"Education"</span>]].values)</span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].plot(</span>
+<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a>        test_df[<span class="st">"Education"</span>], test_df[<span class="st">"Income"</span>], <span class="st">"."</span>, alpha<span class="op">=</span><span class="fl">0.4</span>, color<span class="op">=</span><span class="st">"tab:orange"</span></span>
+<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].plot(</span>
+<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a>        sub_df[<span class="st">"Education"</span>], sub_df[<span class="st">"Income"</span>], <span class="st">"."</span>, alpha<span class="op">=</span><span class="fl">0.4</span>, color<span class="op">=</span><span class="st">"tab:blue"</span></span>
+<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a>    sns.despine(ax<span class="op">=</span>ax[j, <span class="dv">1</span>])</span>
+<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a>    sns.despine(ax<span class="op">=</span>ax[j, <span class="dv">0</span>])</span>
+<span id="cb27-42"><a href="#cb27-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-43"><a href="#cb27-43" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].set_ylabel(<span class="vs">r"$\downarrow$"</span>, size<span class="op">=</span><span class="dv">25</span>)</span>
+<span id="cb27-44"><a href="#cb27-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-45"><a href="#cb27-45" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">"darkred"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb27-46"><a href="#cb27-46" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].plot(X_test, y_pred, color<span class="op">=</span><span class="st">"darkred"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb27-47"><a href="#cb27-47" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].<span class="bu">set</span>(yticklabels<span class="op">=</span>[], xticklabels<span class="op">=</span>[])</span>
+<span id="cb27-48"><a href="#cb27-48" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb27-49"><a href="#cb27-49" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].<span class="bu">set</span>(yticklabels<span class="op">=</span>[], xticklabels<span class="op">=</span>[])</span>
+<span id="cb27-50"><a href="#cb27-50" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].tick_params(left<span class="op">=</span><span class="va">False</span>, bottom<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb27-51"><a href="#cb27-51" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">0</span>].set_title(</span>
+<span id="cb27-52"><a href="#cb27-52" aria-hidden="true" tabindex="-1"></a>        <span class="vs">r"$M=</span><span class="sc">{}</span><span class="vs"> \rightarrow$ "</span>.<span class="bu">format</span>(degree) <span class="op">+</span> <span class="vs">r"$R^2_</span><span class="sc">{train}</span><span class="vs">=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span><span class="bu">round</span>(r2, <span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb27-53"><a href="#cb27-53" aria-hidden="true" tabindex="-1"></a>        size<span class="op">=</span><span class="dv">12</span>,</span>
+<span id="cb27-54"><a href="#cb27-54" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb27-55"><a href="#cb27-55" aria-hidden="true" tabindex="-1"></a>    ax[j, <span class="dv">1</span>].set_title(</span>
+<span id="cb27-56"><a href="#cb27-56" aria-hidden="true" tabindex="-1"></a>        <span class="vs">r"$R_</span><span class="sc">{test}</span><span class="vs">^2=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span><span class="bu">round</span>(r2_test, <span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>, size<span class="op">=</span><span class="dv">12</span>, color<span class="op">=</span><span class="st">"black"</span></span>
+<span id="cb27-57"><a href="#cb27-57" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb27-58"><a href="#cb27-58" aria-hidden="true" tabindex="-1"></a>    degree <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb27-59"><a href="#cb27-59" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb27-60"><a href="#cb27-60" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="vs">r"Train $\rightarrow$ Test"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -1100,54 +1115,54 @@ income = 33000 + 6000 \times education + \mathcal{N}(0, 9000)
 <span class="math display">\[
 \lim_{M \rightarrow \infty} R_{train}^2 \approx 1.0
 \]</span> Being able to perfectly model a DGP that is in itself random is a worrying sign, and this condition creates especial danger of over-fitting and creating overly-confident models when using decision trees.</p>
-<div id="cell-54" class="cell" data-outputid="02c9e6bd-9687-4167-b614-7e9f2dc857ab" data-execution_count="52">
+<div id="cell-54" class="cell" data-outputid="02c9e6bd-9687-4167-b614-7e9f2dc857ab" data-execution_count="56">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>r2s_test_cart <span class="op">=</span> []</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>r2s_cart <span class="op">=</span> []</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>max_root <span class="op">=</span> <span class="dv">50</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>roots <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, max_root)</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> degree <span class="kw">in</span> roots:</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    X_test, y_pred, rmse, r2, model <span class="op">=</span> model_data_cart(degree, sub_df)</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    r2_test <span class="op">=</span> r2_score(</span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>        test_df[<span class="st">"Income"</span>].values, model.predict(test_df[[<span class="st">"Education"</span>]].values)</span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    r2s_test_cart.append(r2_test)</span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>    r2 <span class="op">=</span> r2_score(sub_df[<span class="st">"Income"</span>].values, model.predict(sub_df[[<span class="st">"Education"</span>]].values))</span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    r2s_cart.append(r2)</span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>r2s_test_cart <span class="op">=</span> np.array(r2s_test_cart)</span>
-<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>r2s_cart <span class="op">=</span> np.array(r2s_cart)</span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
-<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>ax.plot(roots, r2s_test_cart, <span class="st">".-"</span>, alpha<span class="op">=</span><span class="fl">0.8</span>, label<span class="op">=</span><span class="st">"Test"</span>)</span>
-<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"$R^2_</span><span class="sc">{test}</span><span class="st">$ ~ $J$"</span>)</span>
-<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>ax.plot(</span>
-<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>    np.argmax(r2s_test_cart) <span class="op">+</span> <span class="dv">1</span>,</span>
-<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>    np.<span class="bu">max</span>(r2s_test_cart),</span>
-<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"D"</span>,</span>
-<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"tab:blue"</span>,</span>
-<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.6</span>,</span>
-<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="vs">r"$ \underset</span><span class="sc">{J}</span><span class="vs">{\arg\max} \; R^2_</span><span class="sc">{test}</span><span class="vs">=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>argmax(r2s_test_cart)<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">"</span>,</span>
-<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
-<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax)</span>
-<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="fl">1.1</span>)</span>
-<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a>ax.plot(roots, r2s_cart, <span class="st">".-"</span>, alpha<span class="op">=</span><span class="fl">0.8</span>, label<span class="op">=</span><span class="st">"Train"</span>)</span>
-<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>ax.plot(</span>
-<span id="cb26-35"><a href="#cb26-35" aria-hidden="true" tabindex="-1"></a>    np.argmax(r2s_cart),</span>
-<span id="cb26-36"><a href="#cb26-36" aria-hidden="true" tabindex="-1"></a>    np.<span class="bu">max</span>(r2s_cart),</span>
-<span id="cb26-37"><a href="#cb26-37" aria-hidden="true" tabindex="-1"></a>    <span class="st">"s"</span>,</span>
-<span id="cb26-38"><a href="#cb26-38" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"tab:orange"</span>,</span>
-<span id="cb26-39"><a href="#cb26-39" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.6</span>,</span>
-<span id="cb26-40"><a href="#cb26-40" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="vs">r"$ \underset</span><span class="sc">{J}</span><span class="vs">{\arg\max} \; R^2_</span><span class="sc">{train}</span><span class="vs">=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>argmax(r2s_cart)<span class="sc">}</span><span class="ss">"</span>,</span>
-<span id="cb26-41"><a href="#cb26-41" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb26-42"><a href="#cb26-42" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"Max Depth"</span>, ylabel<span class="op">=</span><span class="st">"$R^2$"</span>)</span>
-<span id="cb26-43"><a href="#cb26-43" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
-<span id="cb26-44"><a href="#cb26-44" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
-<span id="cb26-45"><a href="#cb26-45" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>r2s_test_cart <span class="op">=</span> []</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>r2s_cart <span class="op">=</span> []</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>max_root <span class="op">=</span> <span class="dv">50</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>roots <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, max_root)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> degree <span class="kw">in</span> roots:</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    X_test, y_pred, rmse, r2, model <span class="op">=</span> model_data_cart(degree, sub_df)</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    r2_test <span class="op">=</span> r2_score(</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>        test_df[<span class="st">"Income"</span>].values, model.predict(test_df[[<span class="st">"Education"</span>]].values)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    r2s_test_cart.append(r2_test)</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    r2 <span class="op">=</span> r2_score(sub_df[<span class="st">"Income"</span>].values, model.predict(sub_df[[<span class="st">"Education"</span>]].values))</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    r2s_cart.append(r2)</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>r2s_test_cart <span class="op">=</span> np.array(r2s_test_cart)</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>r2s_cart <span class="op">=</span> np.array(r2s_cart)</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>ax.plot(roots, r2s_test_cart, <span class="st">".-"</span>, alpha<span class="op">=</span><span class="fl">0.8</span>, label<span class="op">=</span><span class="st">"Test"</span>, c<span class="op">=</span><span class="st">"tab:orange"</span>)</span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"$R^2_</span><span class="sc">{test}</span><span class="st">$ ~ $J$"</span>)</span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>ax.plot(</span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>    np.argmax(r2s_test_cart) <span class="op">+</span> <span class="dv">1</span>,</span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>    np.<span class="bu">max</span>(r2s_test_cart),</span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"D"</span>,</span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"tab:orange"</span>,</span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.6</span>,</span>
+<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="vs">r"$ \underset</span><span class="sc">{J}</span><span class="vs">{\arg\max} \; R^2_</span><span class="sc">{test}</span><span class="vs">=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>argmax(r2s_test_cart)<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax)</span>
+<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="fl">1.1</span>)</span>
+<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a>ax.plot(roots, r2s_cart, <span class="st">".-"</span>, alpha<span class="op">=</span><span class="fl">0.8</span>, label<span class="op">=</span><span class="st">"Train"</span>, c<span class="op">=</span><span class="st">"tab:blue"</span>)</span>
+<span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a>ax.plot(</span>
+<span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a>    np.argmax(r2s_cart),</span>
+<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a>    np.<span class="bu">max</span>(r2s_cart),</span>
+<span id="cb28-37"><a href="#cb28-37" aria-hidden="true" tabindex="-1"></a>    <span class="st">"s"</span>,</span>
+<span id="cb28-38"><a href="#cb28-38" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"tab:blue"</span>,</span>
+<span id="cb28-39"><a href="#cb28-39" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.6</span>,</span>
+<span id="cb28-40"><a href="#cb28-40" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="vs">r"$ \underset</span><span class="sc">{J}</span><span class="vs">{\arg\max} \; R^2_</span><span class="sc">{train}</span><span class="vs">=$"</span> <span class="op">+</span> <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>argmax(r2s_cart)<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb28-41"><a href="#cb28-41" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb28-42"><a href="#cb28-42" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"Max Depth"</span>, ylabel<span class="op">=</span><span class="st">"$R^2$"</span>)</span>
+<span id="cb28-43"><a href="#cb28-43" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb28-44"><a href="#cb28-44" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb28-45"><a href="#cb28-45" aria-hidden="true" tabindex="-1"></a>sns.despine(ax<span class="op">=</span>ax)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -1303,7 +1318,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/peter-amerkhanian\.com");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

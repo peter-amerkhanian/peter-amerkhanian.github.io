@@ -139,7 +139,7 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="styles.css">
-</head>
+<link rel="alternate" type="application/rss+xml" title="Home" href="blog.xml" data-external="1"></head>
 
 <body class="nav-fixed">
 
@@ -206,7 +206,7 @@ window.Quarto = {
 
 
 
-<p>The following are a collection of my informal notes on topics in programming, math, statistics, and policy analysis. If you find errors or else find them helpful, I’d love to hear from you at peteramerkhanian[at]berkeley.edu.</p>
+<p>The following are a collection of my informal notes on topics in programming, math, statistics, and policy analysis. If you find errors or else find them helpful, I’d love to hear from you. You can subscribe to the <a href="blog.xml">RSS feed</a> if you’d like updates as I write new posts.</p>
 
 
 
@@ -314,7 +314,7 @@ Time
 <span class="listing-reading-time">3 min</span>
 </td>
 </tr>
-<tr data-index="6" data-categories="Python,Statistics" data-listing-date-sort="1702022400000" data-listing-file-modified-sort="1714252050783" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6" data-listing-word-count-sort="1080" data-listing-title-sort="Overfitting and The Train-Test Split" data-listing-filename-sort="index.ipynb">
+<tr data-index="6" data-categories="Python,Statistics" data-listing-date-sort="1702022400000" data-listing-file-modified-sort="1715384663050" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6" data-listing-word-count-sort="1080" data-listing-title-sort="Overfitting and The Train-Test Split" data-listing-filename-sort="index.ipynb">
 <td>
 <span class="listing-date">Dec 8, 2023</span>
 </td>
@@ -485,7 +485,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/peter-amerkhanian\.com");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
