@@ -203,7 +203,13 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
     </ul></li>
     <li><a href="#using-the-data" id="toc-using-the-data" class="nav-link" data-scroll-target="#using-the-data">Using the Data</a>
     <ul class="collapse">
-    <li><a href="#benchmarking-read-in-time" id="toc-benchmarking-read-in-time" class="nav-link" data-scroll-target="#benchmarking-read-in-time">Benchmarking Read-In Time</a></li>
+    <li><a href="#dask-with-parquet" id="toc-dask-with-parquet" class="nav-link" data-scroll-target="#dask-with-parquet"><code>dask</code> with parquet</a></li>
+    </ul></li>
+    <li><a href="#benchmarking" id="toc-benchmarking" class="nav-link" data-scroll-target="#benchmarking">Benchmarking</a>
+    <ul class="collapse">
+    <li><a href="#dask-with-.csv.gz" id="toc-dask-with-.csv.gz" class="nav-link" data-scroll-target="#dask-with-.csv.gz"><code>dask</code> with .csv.gz</a></li>
+    <li><a href="#pandas-with-.csv.gz" id="toc-pandas-with-.csv.gz" class="nav-link" data-scroll-target="#pandas-with-.csv.gz"><code>pandas</code> with .csv.gz</a></li>
+    <li><a href="#pandas-with-parquet" id="toc-pandas-with-parquet" class="nav-link" data-scroll-target="#pandas-with-parquet"><code>pandas</code> with parquet</a></li>
     <li><a href="#some-reflection" id="toc-some-reflection" class="nav-link" data-scroll-target="#some-reflection">Some reflection</a></li>
     </ul></li>
     </ul>
@@ -546,8 +552,8 @@ Figure&nbsp;1: Storage Comparison: .csv.gz versus parquet
 <section id="using-the-data" class="level2">
 <h2 class="anchored" data-anchor-id="using-the-data">Using the Data</h2>
 <p>With the data in parquet, it’s now very easy to read in and analyze all of this ridership data, and we’ll see that it’s much faster that working with <code>.csv.gz</code> data (see <a href="#fig-2" class="quarto-xref">Figure&nbsp;2</a> for the efficiency conclusions).</p>
-<section id="dask-with-parquet" class="level4">
-<h4 class="anchored" data-anchor-id="dask-with-parquet"><code>dask</code> with parquet</h4>
+<section id="dask-with-parquet" class="level3">
+<h3 class="anchored" data-anchor-id="dask-with-parquet"><code>dask</code> with parquet</h3>
 <p>Here I’ll use <code>dask</code> to read in about 52 million rows of data in well under 30 seconds, in a single line of code.</p>
 <p>Note that the code for reading in the data, <code>dd.read_parquet('data/parquet_data')</code> executes lazily – it’s not reading data into memory yet! I’ve seen some guides online that benchmark <code>dask</code> and <code>pandas</code> based on un-computed <code>dask</code> commands, which completely misses how <code>dask</code> works. Here, I’m going to explicitly call the <code>compute()</code> method at the end of the code, which prompts the actual reading in of the data from local file to memory.</p>
 <div id="cell-37" class="cell" data-execution_count="80">
@@ -637,17 +643,24 @@ Figure&nbsp;1: Storage Comparison: .csv.gz versus parquet
 </div>
 </div>
 </div>
-<p>But before we celebrate too much, lets compare that performance to our other possible cases:</p>
 </section>
-<section id="benchmarking-read-in-time" class="level3">
-<h3 class="anchored" data-anchor-id="benchmarking-read-in-time">Benchmarking Read-In Time</h3>
+</section>
+<section id="benchmarking" class="level2">
+<h2 class="anchored" data-anchor-id="benchmarking">Benchmarking</h2>
+<p>Before we celebrate too much, lets compare that performance to our other possible cases. We’ll compare how the following read-in setups compare:</p>
+<ul>
+<li><code>dask</code> + parquet</li>
+<li><code>dask</code> + <code>.csv.gz</code></li>
+<li><code>pandas</code> + parquet</li>
+<li><code>pandas</code> + <code>.csv.gz</code></li>
+</ul>
 <p>Before I start doing these benchmarks, I’ll need to do some memory cleaning so that I can repeatedly read these files in:</p>
 <div id="cell-48" class="cell" data-execution_count="71">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">del</span> df</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>gc.collect()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="dask-with-.csv.gz" class="level4">
-<h4 class="anchored" data-anchor-id="dask-with-.csv.gz"><code>dask</code> with .csv.gz</h4>
+<section id="dask-with-.csv.gz" class="level3">
+<h3 class="anchored" data-anchor-id="dask-with-.csv.gz"><code>dask</code> with .csv.gz</h3>
 <p>Here we simply use the <code>.csv.gz</code> files with <code>dask</code> – does the parallel processing in <code>dask</code> make the conversion from <code>.csv.gz</code> to parquet not worth it?</p>
 <div id="cell-51" class="cell" data-execution_count="72">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"times.csv"</span>):</span>
@@ -660,8 +673,8 @@ Figure&nbsp;1: Storage Comparison: .csv.gz versus parquet
 <span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    gc.collect()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="pandas-with-.csv.gz" class="level4">
-<h4 class="anchored" data-anchor-id="pandas-with-.csv.gz"><code>pandas</code> with .csv.gz</h4>
+<section id="pandas-with-.csv.gz" class="level3">
+<h3 class="anchored" data-anchor-id="pandas-with-.csv.gz"><code>pandas</code> with .csv.gz</h3>
 <p>Here we simply use the <code>.csv.gz</code> files with <code>pandas</code> for read-in – how do things look if we use no new libraries and do no file conversions?</p>
 <div id="cell-54" class="cell" data-execution_count="73">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"times.csv"</span>):</span>
@@ -675,8 +688,8 @@ Figure&nbsp;1: Storage Comparison: .csv.gz versus parquet
 <span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>    gc.collect()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="pandas-with-parquet" class="level4">
-<h4 class="anchored" data-anchor-id="pandas-with-parquet"><code>pandas</code> with parquet</h4>
+<section id="pandas-with-parquet" class="level3">
+<h3 class="anchored" data-anchor-id="pandas-with-parquet"><code>pandas</code> with parquet</h3>
 <p>Finally, we’ll take advantage of the fact that <code>pandas</code> also supports the read-in of directories of parquet data and try the parquet files with <code>pandas</code> for read-in – can we avoid using <code>dask</code>?</p>
 <div id="cell-57" class="cell" data-execution_count="74">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"times.csv"</span>):</span>
@@ -722,7 +735,6 @@ Figure&nbsp;2: Storage Comparison: .csv.gz versus parquet
 </div>
 </div>
 <p>Again, parquet, and especially parquet with <code>dask</code>, looks pretty good here.</p>
-</section>
 </section>
 <section id="some-reflection" class="level3">
 <h3 class="anchored" data-anchor-id="some-reflection">Some reflection</h3>
