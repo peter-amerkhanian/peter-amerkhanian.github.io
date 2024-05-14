@@ -561,7 +561,7 @@ Total size of data: 196.52453 mega-bytes</code></pre>
 <span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>                         <span class="cf">if</span> os.path.isfile(f)]</span>
 <span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">sum</span>(os.path.getsize(f) <span class="cf">for</span> f <span class="kw">in</span> files_not_folders)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-fig-1" class="cell" data-execution_count="112">
+<div id="cell-fig-1" class="cell" data-execution_count="123">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
@@ -574,7 +574,8 @@ Total size of data: 196.52453 mega-bytes</code></pre>
 <span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>ax.bar_label(ax.containers[<span class="dv">0</span>], fmt<span class="op">=</span><span class="st">"</span><span class="sc">%g</span><span class="st"> megabytes"</span>)</span>
 <span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(ylabel<span class="op">=</span><span class="st">'Megabytes'</span>, xlabel<span class="op">=</span><span class="st">'File Type'</span>)</span>
 <span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>ax.tick_params(axis<span class="op">=</span><span class="st">'x'</span>, rotation<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>fig.savefig(<span class="st">'fig1.png'</span>, dpi<span class="op">=</span><span class="dv">300</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>fig.savefig(<span class="st">'fig1.png'</span>, dpi<span class="op">=</span><span class="dv">300</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div id="fig-1" class="quarto-figure quarto-figure-center quarto-float anchored">
