@@ -240,11 +240,11 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </ol>
 <p>This walkthrough largely serves to highlight the efficiency and the ease of use of <code>dask</code> and parquet. I find that:<br>
 <strong>1.) Parquet is a relatively efficient format for storage</strong> (<a href="#fig-1" class="quarto-xref">Figure&nbsp;3</a>)<br>
-<img src="fig1.png" id="fig-storage" class="img-fluid" style="width:60.0%" alt="Storage Efficiency"><br>
+<img src="fig1.png" id="fig-storage" class="img-fluid" style="width:70.0%" alt="Storage Efficiency"><br>
 <strong>2.) <code>dask</code>+parquet is a relatively fast for data IO</strong> (<a href="#fig-2" class="quarto-xref">Figure&nbsp;4</a>)<br>
-<img src="fig2.png" id="fig-readin" class="img-fluid" style="width:60.0%" alt="Read-in Efficiency"></p>
+<img src="fig2.png" id="fig-readin" class="img-fluid" style="width:70.0%" alt="Read-in Efficiency"></p>
 <p>I should note that my adoption of <code>dask</code> and parquet storage is due to the influence of two of my day-job coworkers, Batool Hasan and Konrad Franco, after we leveraged them for an internal project with a similar workflow.</p>
-<p>As an aside, I highly recommend watching the <a href="https://www.youtube.com/watch?v=wKH0-zs2g_U&amp;t=118s">“Background” section of this talk</a> for some basic information on <code>dask</code> and how it differs from Spark, DuckDB, and <code>polars</code>.</p>
+<p>As an aside, I highly recommend watching the <a href="https://www.youtube.com/watch?v=wKH0-zs2g_U&amp;t=118s">“Background” section of this talk</a> for some basic information on <code>dask</code> and how it differs from Spark, DuckDB, and <code>polars</code>. The talk also features some comprehensive benchmarks of <code>dask</code> and establishes the core differences between [<code>dask</code> and Spark] in one group, and [<code>polars</code> and DuckDB] in the other.</p>
 <div id="cell-2" class="cell" data-execution_count="97">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
