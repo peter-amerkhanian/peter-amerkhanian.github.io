@@ -196,16 +196,16 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
         <h2 id="toc-title"><a href="#" class="nav-link">Scraping with <code>bs4</code>, parquet, and <code>dask</code></a></h2>
      
     <ul>
-    <li><a href="#data-retrieval" id="toc-data-retrieval" class="nav-link active" data-scroll-target="#data-retrieval">Data Retrieval</a></li>
-    <li><a href="#efficient-storage-with-parquet" id="toc-efficient-storage-with-parquet" class="nav-link" data-scroll-target="#efficient-storage-with-parquet">Efficient Storage with Parquet</a>
+    <li><a href="#scraping-our-data" id="toc-scraping-our-data" class="nav-link active" data-scroll-target="#scraping-our-data">Scraping our data</a></li>
+    <li><a href="#storage-with-parquet" id="toc-storage-with-parquet" class="nav-link" data-scroll-target="#storage-with-parquet">Storage with parquet</a>
     <ul class="collapse">
     <li><a href="#storage-comparison" id="toc-storage-comparison" class="nav-link" data-scroll-target="#storage-comparison">Storage Comparison</a></li>
     </ul></li>
-    <li><a href="#using-the-data" id="toc-using-the-data" class="nav-link" data-scroll-target="#using-the-data">Using the Data</a>
+    <li><a href="#reading-parquet" id="toc-reading-parquet" class="nav-link" data-scroll-target="#reading-parquet">Reading parquet</a>
     <ul class="collapse">
     <li><a href="#dask-with-parquet" id="toc-dask-with-parquet" class="nav-link" data-scroll-target="#dask-with-parquet"><code>dask</code> with parquet</a></li>
     </ul></li>
-    <li><a href="#benchmarking" id="toc-benchmarking" class="nav-link" data-scroll-target="#benchmarking">Benchmarking</a>
+    <li><a href="#benchmarking-the-read-in-task" id="toc-benchmarking-the-read-in-task" class="nav-link" data-scroll-target="#benchmarking-the-read-in-task">Benchmarking the read-in task</a>
     <ul class="collapse">
     <li><a href="#dask-with-.csv.gz" id="toc-dask-with-.csv.gz" class="nav-link" data-scroll-target="#dask-with-.csv.gz"><code>dask</code> with .csv.gz</a></li>
     <li><a href="#pandas-with-.csv.gz" id="toc-pandas-with-.csv.gz" class="nav-link" data-scroll-target="#pandas-with-.csv.gz"><code>pandas</code> with .csv.gz</a></li>
@@ -236,14 +236,15 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <ol type="1">
 <li>Use <code>bs4</code> and <code>requests</code> to reverse engineer an API for the data and batch download it.</li>
 <li>Use the <a href="https://parquet.apache.org/">apache parquet</a> to efficiently store the data locally.</li>
-<li>Use <a href="https://docs.dask.org/en/stable/"><code>dask</code></a> for highly efficient read-in of the data.</li>
+<li>Use <a href="https://docs.dask.org/en/stable/"><code>dask</code></a> for efficient read-in of the data.</li>
 </ol>
-<p>This walkthrough largely serves to highlight the efficiency of the <code>dask</code>+parquet approach for storing and reading in medium data.</p>
-<ul>
-<li>Parquet is a relatively efficient format for storage (<a href="#fig-1" class="quarto-xref">Figure&nbsp;2</a>) <img src="fig1.png" id="fig-storage" class="img-fluid" style="width:80.0%" alt="Storage Efficiency"></li>
-<li><code>dask</code>+parquet is a relatively fast for data IO (<a href="#fig-2" class="quarto-xref">Figure&nbsp;3</a>) <img src="fig2.png" id="fig-readin" class="img-fluid" style="width:80.0%" alt="Read-in Efficiency"></li>
-</ul>
+<p>This walkthrough largely serves to highlight the efficiency and the ease of use of <code>dask</code> and parquet. I find that:<br>
+<strong>1.) Parquet is a relatively efficient format for storage</strong> (<a href="#fig-1" class="quarto-xref">Figure&nbsp;3</a>)<br>
+<img src="fig1.png" id="fig-storage" class="img-fluid" style="width:60.0%" alt="Storage Efficiency"><br>
+<strong>2.) <code>dask</code>+parquet is a relatively fast for data IO</strong> (<a href="#fig-2" class="quarto-xref">Figure&nbsp;4</a>)<br>
+<img src="fig2.png" id="fig-readin" class="img-fluid" style="width:60.0%" alt="Read-in Efficiency"></p>
 <p>I should note that my adoption of <code>dask</code> and parquet storage is due to the influence of two of my day-job coworkers, Batool Hasan and Konrad Franco, after we leveraged them for an internal project with a similar workflow.</p>
+<p>As an aside, I highly recommend watching the <a href="https://www.youtube.com/watch?v=wKH0-zs2g_U&amp;t=118s">“Background” section of this talk</a> for some basic information on <code>dask</code> and how it differs from Spark, DuckDB, and <code>polars</code>.</p>
 <div id="cell-2" class="cell" data-execution_count="97">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -265,10 +266,19 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Display</span></span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="data-retrieval" class="level2">
-<h2 class="anchored" data-anchor-id="data-retrieval">Data Retrieval</h2>
-<p>Anyways, to start, here is the homepage of the portal:<br>
-<img src="portal.png" id="fig-zero" class="img-fluid" style="width:80.0%" alt="BART data portal"></p>
+<section id="scraping-our-data" class="level2">
+<h2 class="anchored" data-anchor-id="scraping-our-data">Scraping our data</h2>
+<p>Anyways, to start, here is the homepage of the BART data portal:</p>
+<div id="fig-zero" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-zero-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: BART data portal
+</figcaption>
+<div aria-describedby="fig-zero-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="portal.png" class="img-fluid figure-img" style="width:80.0%">
+</div>
+</figure>
+</div>
 <p>I’ll set up a scraping script using <code>requests</code> and <code>BeautifulSoup</code> to build access to the BART hourly ridership data.</p>
 <div id="cell-4" class="cell" data-execution_count="98">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># URL of the webpage to scrape</span></span>
@@ -292,7 +302,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <div id="fig-pointfive" class="quarto-figure quarto-figure-center quarto-float anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-pointfive-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Origin-destination pairing data
+Figure&nbsp;2: Origin-destination pairing data
 </figcaption>
 <div aria-describedby="fig-pointfive-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="pairings.png" class="img-fluid figure-img" style="width:80.0%">
@@ -366,7 +376,7 @@ Total size of data: 196.52453 mega-bytes</code></pre>
 <li>make sure that the ingest doesn’t re-read files that I already store locally.</li>
 <li>UNLESS, it the data is from the current year, in which case it likely contains more data than the present file for that year.</li>
 </ul>
-<div id="cell-15" class="cell" data-execution_count="104">
+<div id="cell-15" class="cell" data-execution_count="125">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>current_year: <span class="bu">str</span> <span class="op">=</span> <span class="bu">str</span>(datetime.today().year)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the "data" folder if it doesn't exist</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">'data'</span>):</span>
@@ -386,7 +396,7 @@ Total size of data: 196.52453 mega-bytes</code></pre>
 <span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
 <span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"Failed to download: </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>  0%|          | 0/7 [00:00&lt;?, ?it/s]100%|██████████| 7/7 [00:01&lt;00:00,  3.97it/s]</code></pre>
+<pre><code>100%|██████████| 7/7 [00:01&lt;00:00,  5.17it/s]</code></pre>
 </div>
 </div>
 <p>Since we are storing a large amount of data in the project directory, we will also set up a <code>.gitignore</code> to make sure that it doesn’t end up being tracked in version control.</p>
@@ -411,12 +421,12 @@ Total size of data: 196.52453 mega-bytes</code></pre>
 </div>
 </div>
 </section>
-<section id="efficient-storage-with-parquet" class="level2">
-<h2 class="anchored" data-anchor-id="efficient-storage-with-parquet">Efficient Storage with Parquet</h2>
+<section id="storage-with-parquet" class="level2">
+<h2 class="anchored" data-anchor-id="storage-with-parquet">Storage with parquet</h2>
 <p>Since these are in a usable form now, I decided against implementing any other processing steps to the data and preserve a raw form in storage, but I’ll proceed to batch convert this directory and set of files into a directory of parquet files for more efficient data I/O.</p>
 <p>When we convert to parquet we’ll get two core benefits:</p>
 <ol type="1">
-<li>The files will be smaller (see <a href="#fig-1" class="quarto-xref">Figure&nbsp;2</a> ).</li>
+<li>The files will be smaller (see <a href="#fig-1" class="quarto-xref">Figure&nbsp;3</a> ).</li>
 <li>The files can be read into memory much faster.</li>
 </ol>
 <p>To do the batch transfer from <code>.csv.gz</code> into parquet, I’ll lazily read in the full directory of <code>.csv.gz</code> files using <code>dask</code>:</p>
@@ -541,7 +551,7 @@ Total size of data: 196.52453 mega-bytes</code></pre>
 <div id="fig-1" class="quarto-figure quarto-figure-center quarto-float anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Storage Comparison: .csv.gz versus parquet
+Figure&nbsp;3: Storage Comparison: .csv.gz versus parquet
 </figcaption>
 <div aria-describedby="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="index_files/figure-html/fig-1-output-1.png" class="img-fluid figure-img">
@@ -553,9 +563,9 @@ Figure&nbsp;2: Storage Comparison: .csv.gz versus parquet
 <p><code>parquet</code> is pretty good here.</p>
 </section>
 </section>
-<section id="using-the-data" class="level2">
-<h2 class="anchored" data-anchor-id="using-the-data">Using the Data</h2>
-<p>With the data in parquet, it’s now very easy to read in and analyze all of this ridership data, and we’ll see that it’s much faster that working with <code>.csv.gz</code> data (see <a href="#fig-2" class="quarto-xref">Figure&nbsp;3</a> for the efficiency conclusions).</p>
+<section id="reading-parquet" class="level2">
+<h2 class="anchored" data-anchor-id="reading-parquet">Reading parquet</h2>
+<p>With the data in parquet, it’s now very easy to read in and analyze all of this ridership data, and we’ll see that it’s much faster that working with <code>.csv.gz</code> data (see <a href="#fig-2" class="quarto-xref">Figure&nbsp;4</a> for the efficiency conclusions).</p>
 <section id="dask-with-parquet" class="level3">
 <h3 class="anchored" data-anchor-id="dask-with-parquet"><code>dask</code> with parquet</h3>
 <p>Here I’ll use <code>dask</code> to read in about 52 million rows of data in well under 30 seconds, in a single line of code.</p>
@@ -649,8 +659,8 @@ Figure&nbsp;2: Storage Comparison: .csv.gz versus parquet
 </div>
 </section>
 </section>
-<section id="benchmarking" class="level2">
-<h2 class="anchored" data-anchor-id="benchmarking">Benchmarking</h2>
+<section id="benchmarking-the-read-in-task" class="level2">
+<h2 class="anchored" data-anchor-id="benchmarking-the-read-in-task">Benchmarking the read-in task</h2>
 <p>Before we celebrate too much, lets compare that performance to our other possible cases. We’ll compare how the following read-in setups compare:</p>
 <ul>
 <li><code>dask</code> + parquet</li>
@@ -731,7 +741,7 @@ Figure&nbsp;2: Storage Comparison: .csv.gz versus parquet
 <div id="fig-2" class="quarto-figure quarto-figure-center quarto-float anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: Storage Comparison: .csv.gz versus parquet
+Figure&nbsp;4: Storage Comparison: .csv.gz versus parquet
 </figcaption>
 <div aria-describedby="fig-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="index_files/figure-html/fig-2-output-1.png" class="img-fluid figure-img">
