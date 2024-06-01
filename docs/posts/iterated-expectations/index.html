@@ -272,15 +272,15 @@ window.Quarto = {
 });
 </script>
 <div id="cell-1" class="cell" data-execution_count="44">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span></code></pre></div>
 </div>
 <p>I recently came across a list of <a href="https://twitter.com/causalinf/status/1259448663270658050">10 theorems/proofs</a> that you “need to know” if you do econometrics. These were compiled by <a href="https://econ.msu.edu/faculty/wooldridge/">Jeffrey Wooldridge</a>, an economist and textbook author whose introductory textbook has been fundamental to my interest in econometrics. As an exercise, I’m working through these 10 items, compiling resources, textbook passages, and data exercises that I think can make them easier to understand. The first item I’m trying to write my notes on is the Law of Iterated Expectations, but I’ll be prefacing/augmenting the notes with some discussion of basic probability for completeness.</p>
 <p>My core reference is <a href="https://projects.iq.harvard.edu/stat110/home"><em>Introduction to Probability, Second Edition</em></a> By Joseph K. Blitzstein, Jessica Hwang.</p>
 <hr>
 <p>To start, I’ll simulate some data.</p>
 <div id="cell-3" class="cell" data-outputid="a97c9460-71a2-48e9-d54c-84f0b982d33b" data-execution_count="45">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set a random seed for reproducability</span></span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set a random seed for reproducability</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the number of people in the dataset</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>num_people <span class="op">=</span> <span class="dv">100</span></span>
@@ -290,7 +290,7 @@ window.Quarto = {
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> {<span class="st">'Person_ID'</span>: <span class="bu">range</span>(<span class="dv">1</span>, num_people <span class="op">+</span> <span class="dv">1</span>), <span class="st">'Age'</span>: ages}</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>people_df <span class="op">=</span> pd.DataFrame(data).set_index(<span class="st">"Person_ID"</span>)</span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>people_df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>people_df.head()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="45">
 <div>
 <div>
@@ -337,7 +337,7 @@ window.Quarto = {
 </div>
 <p>Let’s say that these data represent life spans, thus <span class="math inline">\(\text{age}_i\)</span> is an individual’s lifespan, e.g.&nbsp;<span class="math inline">\(\text{age}_2=\)</span></p>
 <div id="cell-5" class="cell" data-outputid="3f549aa3-4243-4b22-be31-98d8d4177cc8" data-execution_count="46">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>people_df.loc[<span class="dv">2</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>people_df.loc[<span class="dv">2</span>]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="46">
 <pre><code>Age    74
 Name: 2, dtype: int32</code></pre>
@@ -347,7 +347,7 @@ Name: 2, dtype: int32</code></pre>
 <h2 class="anchored" data-anchor-id="expectation">Expectation</h2>
 <p>The mean of a random variable, like age above, is also referred to as its “expected value,” denoted <span class="math inline">\(E(\text{age})\)</span>.</p>
 <div id="cell-7" class="cell" data-outputid="4726c13d-4ee9-4090-b66b-439f5ba7f946" data-execution_count="47">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>people_df[<span class="st">'Age'</span>].mean()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>people_df[<span class="st">'Age'</span>].mean()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="47">
 <pre><code>74.6</code></pre>
 </div>
@@ -355,7 +355,7 @@ Name: 2, dtype: int32</code></pre>
 <p>The mean above is specifically called an <em>arithmetic mean</em>, defined as follows:<br>
 <span class="math display">\[ \bar{x} = \frac{1}{n} \sum_i^n x_i\]</span></p>
 <div id="cell-9" class="cell" data-outputid="6e499402-2a79-4a86-ae02-e1fc9feedc9b" data-execution_count="48">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">1</span><span class="op">/</span><span class="bu">len</span>(people_df)) <span class="op">*</span> people_df[<span class="st">'Age'</span>].<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">1</span><span class="op">/</span><span class="bu">len</span>(people_df)) <span class="op">*</span> people_df[<span class="st">'Age'</span>].<span class="bu">sum</span>()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="48">
 <pre><code>74.60000000000001</code></pre>
 </div>
@@ -384,9 +384,9 @@ E(X) = &amp; x_1P(X = x_1) + \\
 \end{align*}\]</span></p>
 <p>Now we’ll demonstrate this formula on our data. It’s useful here to move from our individual-level dataset, where each row is a person, to the following, where each row is a lifespan, which the probability that an individual has that lifespan.</p>
 <div id="cell-13" class="cell" data-outputid="2d777fad-8a65-4652-c2fc-80599a5182f2" data-execution_count="49">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>prob_table <span class="op">=</span> people_df[<span class="st">'Age'</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>)</span>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>prob_table <span class="op">=</span> people_df[<span class="st">'Age'</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>prob_table <span class="op">=</span> prob_table.sort_index()</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>prob_table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>prob_table</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="49">
 <pre><code>71    0.08
 72    0.13
@@ -408,10 +408,10 @@ E(\text{Age}) = &amp;\text{Age}_1P(\text{Age}=\text{Age}_1) + \\
 \end{align*}\]</span></p>
 <p>Which we can do transparently using a for-loop:</p>
 <div id="cell-15" class="cell" data-outputid="0e906bdb-3826-4e70-9c9a-58299d1a6b35" data-execution_count="50">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>summation <span class="op">=</span> <span class="dv">0</span></span>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>summation <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(prob_table)):</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  summation <span class="op">+=</span> prob_table.index[i] <span class="op">*</span> prob_table.values[i]</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>summation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>summation</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="50">
 <pre><code>74.60000000000001</code></pre>
 </div>
@@ -425,7 +425,7 @@ E(\text{Age}) = &amp;\text{Age}_1P(\text{Age}=\text{Age}_1) + \\
 \end{align*}
 \]</span></p>
 <div id="cell-17" class="cell" data-outputid="b40101c9-86c6-4833-c5f8-b90739434835" data-execution_count="51">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>prob_table.index.values <span class="op">@</span> prob_table.values</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>prob_table.index.values <span class="op">@</span> prob_table.values</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="51">
 <pre><code>74.6</code></pre>
 </div>
@@ -436,9 +436,9 @@ E(\text{Age}) = &amp;\text{Age}_1P(\text{Age}=\text{Age}_1) + \\
 <h2 class="anchored" data-anchor-id="conditional-expectation">Conditional Expectation</h2>
 <p>We often have more than one variable available to us in an analysis. Below I simulate the variable gender:</p>
 <div id="cell-21" class="cell" data-outputid="6ed72f41-d50c-46ef-c586-dd1182715f6b" data-execution_count="52">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">45</span>)</span>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">45</span>)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>people_df[<span class="st">'Gender'</span>] <span class="op">=</span> np.random.choice([<span class="st">'Female'</span>, <span class="st">'Male'</span>], <span class="bu">len</span>(people_df))</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>people_df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>people_df.head()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="52">
 <div>
 <div>
@@ -492,7 +492,7 @@ E(\text{Age}) = &amp;\text{Age}_1P(\text{Age}=\text{Age}_1) + \\
 </div>
 <p>Each row in our dataset represents an individual person, and we now have access to both their gender and their life-span. It follows that we may be interested in how life-span varies across gender. In code, this entails a groupby operation, grouping on gender before calculting the mean age:</p>
 <div id="cell-23" class="cell" data-outputid="138ae177-ffb1-4c05-af42-5a63cf34eeee" data-execution_count="53">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>people_df.groupby(<span class="st">'Gender'</span>)[<span class="st">'Age'</span>].mean()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>people_df.groupby(<span class="st">'Gender'</span>)[<span class="st">'Age'</span>].mean()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="53">
 <pre><code>Gender
 Female    74.672727
@@ -504,7 +504,7 @@ Name: Age, dtype: float64</code></pre>
 <p>If we are interested specifically in the mean life-span given the event that gender is equal to male (a roundabout way of saying the average life-span for males in the data), we could calculate the following</p>
 <p><span class="math inline">\(E(\text{Age} \mid \text{Gender}=\text{Male})\)</span></p>
 <div id="cell-26" class="cell" data-outputid="d8029a54-97aa-42f5-8179-46efcf0260f1" data-execution_count="54">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>people_df.groupby(<span class="st">'Gender'</span>)[<span class="st">'Age'</span>].mean()[<span class="st">'Male'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>people_df.groupby(<span class="st">'Gender'</span>)[<span class="st">'Age'</span>].mean()[<span class="st">'Male'</span>]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="54">
 <pre><code>74.5111111111111</code></pre>
 </div>
@@ -545,10 +545,10 @@ E(\text{Age} \mid \text{Gender}=\text{Male}) &amp;= \sum_{i=1}^n \text{Age}_iP(\
 </ol>
 <p>Where 1.) is the following:</p>
 <div id="cell-30" class="cell" data-outputid="2c3a9573-c3e0-4c22-a447-daa6f48cf39c" data-execution_count="55">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>P_Age_Gender <span class="op">=</span> pd.crosstab(people_df[<span class="st">'Age'</span>],</span>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>P_Age_Gender <span class="op">=</span> pd.crosstab(people_df[<span class="st">'Age'</span>],</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>                           people_df[<span class="st">'Gender'</span>],</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>                           normalize<span class="op">=</span><span class="st">'all'</span>)</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>P_Age_Gender[<span class="st">'Male'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>P_Age_Gender[<span class="st">'Male'</span>]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="55">
 <pre><code>Age
 71    0.03
@@ -564,8 +564,8 @@ Name: Male, dtype: float64</code></pre>
 </div>
 <p>and 2.) is:</p>
 <div id="cell-32" class="cell" data-outputid="0c11a04f-b918-40ea-dfdf-1a7b2912ca45" data-execution_count="56">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>P_Gender <span class="op">=</span> people_df[<span class="st">'Gender'</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>P_Gender.loc[<span class="st">'Male'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>P_Gender <span class="op">=</span> people_df[<span class="st">'Gender'</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>P_Gender.loc[<span class="st">'Male'</span>]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="56">
 <pre><code>0.45</code></pre>
 </div>
@@ -574,19 +574,19 @@ Name: Male, dtype: float64</code></pre>
 \sum_{i=1}^n \text{Age}_i \frac{P(\text{Age}=\text{Age}_i, \text{Gender}=\text{Male})}{P(\text{Gender}=\text{Male})}
 \]</span></p>
 <div id="cell-34" class="cell" data-outputid="af0ae79b-a683-4c40-ecdc-35e25359838f" data-execution_count="57">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>E_age_male <span class="op">=</span> <span class="dv">0</span></span>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>E_age_male <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="bu">len</span>(P_Age_Gender[<span class="st">'Male'</span>])</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):</span>
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  weight <span class="op">=</span> P_Age_Gender[<span class="st">'Male'</span>].values[i] <span class="op">/</span> P_Gender.loc[<span class="st">'Male'</span>]</span>
 <span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  E_age_male <span class="op">+=</span> P_Age_Gender[<span class="st">'Male'</span>].index[i] <span class="op">*</span> weight</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>E_age_male</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>E_age_male</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="57">
 <pre><code>74.51111111111112</code></pre>
 </div>
 </div>
 <p>We confirm that this is equal to the result of the more direct groupby:</p>
 <div id="cell-36" class="cell" data-outputid="1d8a66e6-b7c5-4dfe-acfe-732e860eff9f" data-execution_count="58">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>people_df.groupby(<span class="st">'Gender'</span>)[<span class="st">'Age'</span>].mean()[<span class="st">'Male'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>people_df.groupby(<span class="st">'Gender'</span>)[<span class="st">'Age'</span>].mean()[<span class="st">'Male'</span>]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="58">
 <pre><code>74.5111111111111</code></pre>
 </div>
@@ -625,7 +625,7 @@ E(\text{Age}) &amp;=E( \underbrace{E(\text{Age} \mid \text{Gender}=\text{Gender}
 \end{align*}\]</span></p>
 <p>Here I’ll pause, because the next steps can be clarified with code. <span class="math inline">\(P(\text{Age}=\text{Age}_i, \text{Gender}=\text{Gender}_j)\)</span> is the joint probability distribution of age and gender, and it helps to take a look at exactly what it is in pandas:</p>
 <div id="cell-39" class="cell" data-outputid="318093ff-ee73-4a5d-efb4-57a4978d535f" data-execution_count="59">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>P_Age_Gender</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>P_Age_Gender</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="59">
 <div>
 <div>
@@ -694,7 +694,7 @@ E(\text{Age}) &amp;=E( \underbrace{E(\text{Age} \mid \text{Gender}=\text{Gender}
 </div>
 <p>Let’s compute the summation of <span class="math inline">\(P(\text{Age}=\text{Age}_i, \text{Gender}=\text{Gender}_j)\)</span> over <span class="math inline">\(\text{Gender}_j\)</span> and see what we get.</p>
 <div id="cell-41" class="cell" data-outputid="c058acd8-f0aa-4362-81ea-edb5b16b6b50" data-execution_count="60">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>P_Age_Gender[<span class="st">"Male"</span>] <span class="op">+</span> P_Age_Gender[<span class="st">"Female"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>P_Age_Gender[<span class="st">"Male"</span>] <span class="op">+</span> P_Age_Gender[<span class="st">"Female"</span>]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="60">
 <pre><code>Age
 71    0.08
@@ -710,7 +710,7 @@ dtype: float64</code></pre>
 </div>
 <p>Interestingly, that is the exact same thing we get if we simply compute the probability of each age, <span class="math inline">\(P(\text{Age}=\text{Age}_i)\)</span></p>
 <div id="cell-43" class="cell" data-outputid="9d0cdcc8-be0b-422d-e6da-798afe426af1" data-execution_count="61">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>people_df[<span class="st">'Age'</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>).sort_index()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>people_df[<span class="st">'Age'</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>).sort_index()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="61">
 <pre><code>71    0.08
 72    0.13
@@ -737,7 +737,7 @@ E(\text{Age})  &amp;= \sum_{i} \text{Age}_i \sum_j P(\text{Age}=\text{Age}_i, \t
 \]</span></p>
 <p>We can directly show the last bit, <span class="math inline">\(E(\text{Age}) = \sum_j \sum_{i} \text{Age}_i P(\text{Age}=\text{Age}_i, \text{Gender}=\text{Gender}_j)\)</span> using the joint probability distribution object from before:</p>
 <div id="cell-46" class="cell" data-outputid="1efa5e04-fe40-424d-bf11-5c915bbebf2c" data-execution_count="62">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>P_Age_Gender.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>P_Age_Gender.head()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="62">
 <div>
 <div>
@@ -790,18 +790,18 @@ E(\text{Age})  &amp;= \sum_{i} \text{Age}_i \sum_j P(\text{Age}=\text{Age}_i, \t
 </div>
 </div>
 <div id="cell-47" class="cell" data-outputid="61eb2712-1780-4b89-9c07-8040c54512c2" data-execution_count="63">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>(P_Age_Gender</span>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>(P_Age_Gender</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a> .<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>) <span class="co"># sum over j</span></span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a> .reset_index() <span class="co"># bring out Age_i</span></span>
 <span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a> .product(axis<span class="op">=</span><span class="dv">1</span>) <span class="co"># Age_i * P(Age=Age_i)</span></span>
 <span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a> .<span class="bu">sum</span>() <span class="co"># sum over i</span></span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a> )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a> )</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="63">
 <pre><code>74.6</code></pre>
 </div>
 </div>
 <div id="cell-48" class="cell" data-outputid="a3e2cad5-d6d4-40c2-9ead-5174c7bad086" data-execution_count="64">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>people_df[<span class="st">'Age'</span>].mean()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>people_df[<span class="st">'Age'</span>].mean()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="64">
 <pre><code>74.6</code></pre>
 </div>
@@ -843,58 +843,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
-  const isCodeAnnotation = (el) => {
-    for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {                     
-        return true;
-      }
-    }
-    return false;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
-    // button target
-    const button = e.trigger;
-    // don't keep focus
-    button.blur();
-    // flash "checked"
-    button.classList.add('code-copy-button-checked');
-    var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
-    setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
-      }
-      button.setAttribute("title", currentTitle);
-      button.classList.remove('code-copy-button-checked');
-    }, 1000);
-    // clear code selection
-    e.clearSelection();
-  });
   const viewSource = window.document.getElementById('quarto-view-source') ||
                      window.document.getElementById('quarto-code-tools-source');
   if (viewSource) {

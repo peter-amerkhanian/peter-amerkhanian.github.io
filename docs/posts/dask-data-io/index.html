@@ -246,7 +246,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <p>I should note that my adoption of <code>dask</code> and parquet storage is due to the influence of two of my day-job coworkers, Batool Hasan and Konrad Franco, after we leveraged them for an internal project with a similar workflow.</p>
 <p>As an aside, I highly recommend watching the <a href="https://www.youtube.com/watch?v=wKH0-zs2g_U&amp;t=118s">“Background” section of this talk</a> for some basic information on <code>dask</code> and how it differs from Spark, DuckDB, and <code>polars</code>. The talk also features some comprehensive benchmarks of <code>dask</code> and establishes the core differences between [<code>dask</code> and Spark] in one group, and [<code>polars</code> and DuckDB] in the other.</p>
 <div id="cell-2" class="cell" data-execution_count="97">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> dask.dataframe <span class="im">as</span> dd</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -264,7 +264,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> gc</span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Display</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code></pre></div>
 </div>
 <section id="scraping-our-data" class="level2">
 <h2 class="anchored" data-anchor-id="scraping-our-data">Scraping our data</h2>
@@ -281,22 +281,22 @@ Figure&nbsp;1: BART data portal
 </div>
 <p>I’ll set up a scraping script using <code>requests</code> and <code>BeautifulSoup</code> to build access to the BART hourly ridership data.</p>
 <div id="cell-4" class="cell" data-execution_count="98">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># URL of the webpage to scrape</span></span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># URL of the webpage to scrape</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">'https://afcweb.bart.gov/ridership/origin-destination/'</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>url</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>url</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="98">
 <pre><code>'https://afcweb.bart.gov/ridership/origin-destination/'</code></pre>
 </div>
 </div>
 <div id="cell-5" class="cell" data-execution_count="99">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Send an HTTP GET request to the webpage</span></span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Send an HTTP GET request to the webpage</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> requests.get(url)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if the request was successful</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> response.status_code <span class="op">==</span> <span class="dv">200</span>:</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Parse the content of the webpage with Beautiful Soup</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">'html.parser'</span>)</span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Failed to retrieve the webpage"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Failed to retrieve the webpage"</span>)</span></code></pre></div>
 </div>
 <p>The page is laid out as follows:</p>
 <div id="fig-pointfive" class="quarto-figure quarto-figure-center quarto-float anchored">
@@ -311,31 +311,31 @@ Figure&nbsp;2: Origin-destination pairing data
 </div>
 <p>My target here is the set of .csv.gz (compressed .csv files) that contain hourly ridership totals between each station pairing. These are all links, thus are in <code>&lt;a&gt; &lt;/a&gt;</code> tags, and have an <code>href</code> that ends in <code>.csv.gz</code>. The following captures links to that specification:</p>
 <div id="cell-7" class="cell" data-execution_count="100">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>links <span class="op">=</span> soup.find_all(</span>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>links <span class="op">=</span> soup.find_all(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># final all &lt;a&gt;&lt;/a&gt; content</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'a'</span>,</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># filter to only those links with href ending in .csv.gz</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    href<span class="op">=</span><span class="kw">lambda</span> x: x <span class="kw">and</span> x.endswith(<span class="st">".csv.gz"</span>)</span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># example output</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>links[<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>links[<span class="dv">0</span>]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="100">
 <pre><code>&lt;a href="date-hour-soo-dest-2018.csv.gz"&gt; date-hour-soo-dest-2018.csv.gz&lt;/a&gt;</code></pre>
 </div>
 </div>
 <p>I’m specifically interested in the file that this piece of html links to, which is contained in the <code>href</code> tag. I can capture the <code>href</code> for each of these pieces of html as follows</p>
 <div id="cell-9" class="cell" data-execution_count="101">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>files <span class="op">=</span> [l.get(<span class="st">'href'</span>) <span class="cf">for</span> l <span class="kw">in</span> links]</span>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>files <span class="op">=</span> [l.get(<span class="st">'href'</span>) <span class="cf">for</span> l <span class="kw">in</span> links]</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># example output</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>files[<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>files[<span class="dv">0</span>]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="101">
 <pre><code>'date-hour-soo-dest-2018.csv.gz'</code></pre>
 </div>
 </div>
 <p>I’ve now captured the filename, which is a relative url. To download this, I’ll need to convert this to a full url, by concatenating the base url to each of the files’ relative urls. This leaves us with direct links that each prompt the download of one year’s worth of hourly trip totals between the station pairings in the system:</p>
 <div id="cell-11" class="cell" data-execution_count="102">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>file_urls <span class="op">=</span> [url <span class="op">+</span> f <span class="cf">for</span> f <span class="kw">in</span> files]</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>file_urls</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>file_urls <span class="op">=</span> [url <span class="op">+</span> f <span class="cf">for</span> f <span class="kw">in</span> files]</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>file_urls</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="102">
 <pre><code>['https://afcweb.bart.gov/ridership/origin-destination/date-hour-soo-dest-2018.csv.gz',
  'https://afcweb.bart.gov/ridership/origin-destination/date-hour-soo-dest-2019.csv.gz',
@@ -348,7 +348,7 @@ Figure&nbsp;2: Origin-destination pairing data
 </div>
 <p>This is our target data, so before proceeding to download all of it for local storage, we’ll profile the sizes of each file and the total download:</p>
 <div id="cell-13" class="cell" data-execution_count="103">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>counter <span class="op">=</span> <span class="dv">1</span></span>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>counter <span class="op">=</span> <span class="dv">1</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>total <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> f <span class="kw">in</span> file_urls:</span>
@@ -359,7 +359,7 @@ Figure&nbsp;2: Origin-destination pairing data
 <span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    total <span class="op">+=</span> file_size</span>
 <span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"File </span><span class="sc">{</span>counter<span class="sc">}</span><span class="ss"> size: </span><span class="sc">{</span>file_size<span class="sc">}</span><span class="ss"> bytes (</span><span class="sc">{</span><span class="bu">round</span>(file_size<span class="op">*</span><span class="fl">10e-7</span>, <span class="dv">2</span>)<span class="sc">}</span><span class="ss"> mega-bytes)"</span>)</span>
 <span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    counter <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total size of data: </span><span class="sc">{</span>total<span class="op">*</span><span class="fl">10e-7</span><span class="sc">}</span><span class="ss"> mega-bytes"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total size of data: </span><span class="sc">{</span>total<span class="op">*</span><span class="fl">10e-7</span><span class="sc">}</span><span class="ss"> mega-bytes"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>File 1 size: 38627139 bytes (38.63 mega-bytes)
 File 2 size: 38177159 bytes (38.18 mega-bytes)
@@ -377,7 +377,7 @@ Total size of data: 196.52453 mega-bytes</code></pre>
 <li>UNLESS, it the data is from the current year, in which case it likely contains more data than the present file for that year.</li>
 </ul>
 <div id="cell-15" class="cell" data-execution_count="125">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>current_year: <span class="bu">str</span> <span class="op">=</span> <span class="bu">str</span>(datetime.today().year)</span>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>current_year: <span class="bu">str</span> <span class="op">=</span> <span class="bu">str</span>(datetime.today().year)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the "data" folder if it doesn't exist</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">'data'</span>):</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    os.makedirs(<span class="st">'data'</span>)</span>
@@ -394,22 +394,22 @@ Total size of data: 196.52453 mega-bytes</code></pre>
 <span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">with</span> <span class="bu">open</span>(filename, <span class="st">'wb'</span>) <span class="im">as</span> <span class="bu">file</span>:</span>
 <span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>                <span class="bu">file</span>.write(response.content)</span>
 <span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"Failed to download: </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"Failed to download: </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>100%|██████████| 7/7 [00:01&lt;00:00,  5.17it/s]</code></pre>
 </div>
 </div>
 <p>Since we are storing a large amount of data in the project directory, we will also set up a <code>.gitignore</code> to make sure that it doesn’t end up being tracked in version control.</p>
 <div id="cell-17" class="cell" data-execution_count="105">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a .gitignore file</span></span>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a .gitignore file</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>gitignore_content <span class="op">=</span> <span class="st">"data/</span><span class="ch">\n</span><span class="st">"</span>  <span class="co"># Content to exclude the "data" folder</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'.gitignore'</span>, <span class="st">'w'</span>) <span class="im">as</span> gitignore_file:</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    gitignore_file.write(gitignore_content)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    gitignore_file.write(gitignore_content)</span></code></pre></div>
 </div>
 <p>I now have the raw data stored locally in the following paths.</p>
 <div id="cell-19" class="cell" data-execution_count="106">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>data_paths <span class="op">=</span> [<span class="st">"data/"</span> <span class="op">+</span> f <span class="cf">for</span> f <span class="kw">in</span> files]</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>data_paths</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>data_paths <span class="op">=</span> [<span class="st">"data/"</span> <span class="op">+</span> f <span class="cf">for</span> f <span class="kw">in</span> files]</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>data_paths</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="106">
 <pre><code>['data/date-hour-soo-dest-2018.csv.gz',
  'data/date-hour-soo-dest-2019.csv.gz',
@@ -431,9 +431,9 @@ Total size of data: 196.52453 mega-bytes</code></pre>
 </ol>
 <p>To do the batch transfer from <code>.csv.gz</code> into parquet, I’ll lazily read in the full directory of <code>.csv.gz</code> files using <code>dask</code>:</p>
 <div id="cell-23" class="cell" data-execution_count="107">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> dd.read_csv(data_paths, blocksize<span class="op">=</span><span class="va">None</span>, compression<span class="op">=</span><span class="st">'gzip'</span>)</span>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> dd.read_csv(data_paths, blocksize<span class="op">=</span><span class="va">None</span>, compression<span class="op">=</span><span class="st">'gzip'</span>)</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>data.columns <span class="op">=</span> [<span class="st">'Date'</span>, <span class="st">'Hour'</span>, <span class="st">'Start'</span>, <span class="st">'End'</span>, <span class="st">'Riders'</span>]</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>data</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="107">
 <div>
 <div><strong>Dask DataFrame Structure:</strong></div>
@@ -508,33 +508,33 @@ Total size of data: 196.52453 mega-bytes</code></pre>
 <p>…</p>
 <p>Now I’ll establish a subdirectory in <code>data</code> that’s just for the parquet directory</p>
 <div id="cell-25" class="cell" data-execution_count="108">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">'data/parquet_data'</span>):</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    os.makedirs(<span class="st">'data/parquet_data'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">'data/parquet_data'</span>):</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    os.makedirs(<span class="st">'data/parquet_data'</span>)</span></code></pre></div>
 </div>
 <p>and I’ll write out to that folder using <code>dask</code>, with a progress bar to monitor how long this takes (note that these progress bars may not be visible in this document).</p>
 <div id="cell-27" class="cell" data-execution_count="109">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>pbar <span class="op">=</span> ProgressBar()</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>pbar.register()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>pbar <span class="op">=</span> ProgressBar()</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>pbar.register()</span></code></pre></div>
 </div>
 <p>For data of this size, the one-time conversion takes under two minutes</p>
 <div id="cell-29" class="cell" data-execution_count="110">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>data.to_parquet(<span class="st">'data/parquet_data'</span>, write_index<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>data.to_parquet(<span class="st">'data/parquet_data'</span>, write_index<span class="op">=</span><span class="va">False</span>)</span></code></pre></div>
 </div>
 <section id="storage-comparison" class="level3">
 <h3 class="anchored" data-anchor-id="storage-comparison">Storage Comparison</h3>
 <p>Now that we have the files saved, we can conduct a quick check on how storage size differs. I’ll write a helper function to calculate the total bytes of all the files in a given directory.</p>
 <div id="cell-31" class="cell" data-execution_count="111">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_local_bytes(directory: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">int</span>:</span>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_local_bytes(directory: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">int</span>:</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    contents: <span class="bu">list</span>[<span class="bu">str</span>] <span class="op">=</span> os.listdir(directory)</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    contents_w_path: <span class="bu">list</span>[<span class="bu">str</span>] <span class="op">=</span> [os.path.join(directory, f) <span class="cf">for</span> f <span class="kw">in</span> contents]</span>
 <span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    files_not_folders: <span class="bu">list</span>[<span class="bu">str</span>] <span class="op">=</span> [f <span class="cf">for</span> f <span class="kw">in</span> contents_w_path</span>
 <span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>                         <span class="cf">if</span> os.path.isfile(f)]</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">sum</span>(os.path.getsize(f) <span class="cf">for</span> f <span class="kw">in</span> files_not_folders)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">sum</span>(os.path.getsize(f) <span class="cf">for</span> f <span class="kw">in</span> files_not_folders)</span></code></pre></div>
 </div>
 <div id="cell-fig-1" class="cell" data-execution_count="123">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">'.csv.gz'</span>: [<span class="bu">round</span>(get_local_bytes(<span class="st">'data'</span>)<span class="op">*</span><span class="fl">10e-7</span>, <span class="dv">2</span>)],</span>
@@ -545,7 +545,7 @@ Total size of data: 196.52453 mega-bytes</code></pre>
 <span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(ylabel<span class="op">=</span><span class="st">'Megabytes'</span>, xlabel<span class="op">=</span><span class="st">'File Type'</span>)</span>
 <span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>ax.tick_params(axis<span class="op">=</span><span class="st">'x'</span>, rotation<span class="op">=</span><span class="dv">0</span>)</span>
 <span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>fig.savefig(<span class="st">'fig1.png'</span>, dpi<span class="op">=</span><span class="dv">300</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>fig.savefig(<span class="st">'fig1.png'</span>, dpi<span class="op">=</span><span class="dv">300</span>)</span></code></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div id="fig-1" class="quarto-figure quarto-figure-center quarto-float anchored">
@@ -571,28 +571,28 @@ Figure&nbsp;3: Storage Comparison: .csv.gz versus parquet
 <p>Here I’ll use <code>dask</code> to read in about 52 million rows of data in well under 30 seconds, in a single line of code.</p>
 <p>Note that the code for reading in the data, <code>dd.read_parquet('data/parquet_data')</code> executes lazily – it’s not reading data into memory yet! I’ve seen some guides online that benchmark <code>dask</code> and <code>pandas</code> based on un-computed <code>dask</code> commands, which completely misses how <code>dask</code> works. Here, I’m going to explicitly call the <code>compute()</code> method at the end of the code, which prompts the actual reading in of the data from local file to memory.</p>
 <div id="cell-36" class="cell" data-execution_count="113">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>start <span class="op">=</span> time.time()</span>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>start <span class="op">=</span> time.time()</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> dd.read_parquet(<span class="st">'data/parquet_data'</span>).compute()</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>dask_parquet_end <span class="op">=</span> time.time() <span class="op">-</span> start</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>dask_parquet_end <span class="op">=</span> time.time() <span class="op">-</span> start</span></code></pre></div>
 </div>
 <p>Note that I called <code>start = time.time()</code> and <code>dask_parquet_endtime = time.time()</code> to store the time that it takes to complete this task.</p>
 <p>Anyways, we just loaded in fairly large data:</p>
 <div id="cell-39" class="cell" data-execution_count="114">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>df.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>df.shape</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="114">
 <pre><code>(52704297, 5)</code></pre>
 </div>
 </div>
 <p>In what seems like a short amount of time:</p>
 <div id="cell-41" class="cell" data-execution_count="115">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">round</span>(dask_parquet_end, <span class="dv">2</span>), <span class="st">"seconds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">round</span>(dask_parquet_end, <span class="dv">2</span>), <span class="st">"seconds"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>36.57 seconds</code></pre>
 </div>
 </div>
 <p>and this data is now all in memory as a <code>pandas</code> dataframe, ready for typical use.</p>
 <div id="cell-43" class="cell" data-execution_count="116">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>df.head()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="116">
 <div>
 <div>
@@ -670,28 +670,28 @@ Figure&nbsp;3: Storage Comparison: .csv.gz versus parquet
 </ul>
 <p>Before I start doing these benchmarks, I’ll need to do some memory cleaning so that I can repeatedly read these files in:</p>
 <div id="cell-47" class="cell" data-execution_count="117">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">del</span> df</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>gc.collect()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">del</span> df</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>gc.collect()</span></code></pre></div>
 </div>
 <section id="dask-with-.csv.gz" class="level3">
 <h3 class="anchored" data-anchor-id="dask-with-.csv.gz"><code>dask</code> with .csv.gz</h3>
 <p>Here we simply use the <code>.csv.gz</code> files with <code>dask</code> – does the parallel processing in <code>dask</code> make the conversion from <code>.csv.gz</code> to parquet not worth it?</p>
 <div id="cell-50" class="cell" data-execution_count="118">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"times.csv"</span>):</span>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"times.csv"</span>):</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    start <span class="op">=</span> time.time()</span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    df_dask_csv <span class="op">=</span> dd.read_csv(data_paths,</span>
 <span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>                              blocksize<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>                              compression<span class="op">=</span><span class="st">'gzip'</span>).compute()</span>
 <span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    dask_csv_end <span class="op">=</span> time.time() <span class="op">-</span> start</span>
 <span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">del</span> df_dask_csv</span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    gc.collect()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    gc.collect()</span></code></pre></div>
 </div>
 </section>
 <section id="pandas-with-.csv.gz" class="level3">
 <h3 class="anchored" data-anchor-id="pandas-with-.csv.gz"><code>pandas</code> with .csv.gz</h3>
 <p>Here we simply use the <code>.csv.gz</code> files with <code>pandas</code> for read-in – how do things look if we use no new libraries and do no file conversions?</p>
 <div id="cell-53" class="cell" data-execution_count="119">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"times.csv"</span>):</span>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"times.csv"</span>):</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    dfs <span class="op">=</span> []</span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    start <span class="op">=</span> time.time()</span>
 <span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> csv_path <span class="kw">in</span> tqdm(data_paths):</span>
@@ -699,25 +699,25 @@ Figure&nbsp;3: Storage Comparison: .csv.gz versus parquet
 <span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    df_pandas <span class="op">=</span> pd.concat(dfs)</span>
 <span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    pandas_csv_end <span class="op">=</span> time.time() <span class="op">-</span> start</span>
 <span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">del</span> df_pandas</span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    gc.collect()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    gc.collect()</span></code></pre></div>
 </div>
 </section>
 <section id="pandas-with-parquet" class="level3">
 <h3 class="anchored" data-anchor-id="pandas-with-parquet"><code>pandas</code> with parquet</h3>
 <p>Finally, we’ll take advantage of the fact that <code>pandas</code> also supports the read-in of directories of parquet data and try the parquet files with <code>pandas</code> for read-in – can we avoid using <code>dask</code>?</p>
 <div id="cell-56" class="cell" data-execution_count="120">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"times.csv"</span>):</span>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"times.csv"</span>):</span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>    start <span class="op">=</span> time.time()</span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    df_pandas_parquet <span class="op">=</span> pd.read_parquet(<span class="st">'data/parquet_data'</span>)</span>
 <span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    pandas_parquet_end <span class="op">=</span> time.time() <span class="op">-</span> start</span>
 <span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">del</span> df_pandas_parquet</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>    gc.collect()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>    gc.collect()</span></code></pre></div>
 </div>
 <p>We’ll answer all of those questions at once with a plot:</p>
 <div id="cell-fig-2" class="cell" data-execution_count="122">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"times.csv"</span>):</span>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"times.csv"</span>):</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    times <span class="op">=</span> pd.DataFrame(</span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>        {</span>
 <span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>            <span class="st">'dask + parquet'</span>: [<span class="bu">round</span>(dask_parquet_end, <span class="dv">2</span>)],</span>
@@ -735,7 +735,7 @@ Figure&nbsp;3: Storage Comparison: .csv.gz versus parquet
 <span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">'Seconds'</span>, ylabel<span class="op">=</span><span class="st">'Package + Storage Method'</span>, xlim<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">85</span>))</span>
 <span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>ax.tick_params(axis<span class="op">=</span><span class="st">'x'</span>, rotation<span class="op">=</span><span class="dv">0</span>)</span>
 <span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
-<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>fig.savefig(<span class="st">'fig2.png'</span>, dpi<span class="op">=</span><span class="dv">300</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>fig.savefig(<span class="st">'fig2.png'</span>, dpi<span class="op">=</span><span class="dv">300</span>)</span></code></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div id="fig-2" class="quarto-figure quarto-figure-center quarto-float anchored">
@@ -790,58 +790,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
-  const isCodeAnnotation = (el) => {
-    for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {                     
-        return true;
-      }
-    }
-    return false;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
-    // button target
-    const button = e.trigger;
-    // don't keep focus
-    button.blur();
-    // flash "checked"
-    button.classList.add('code-copy-button-checked');
-    var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
-    setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
-      }
-      button.setAttribute("title", currentTitle);
-      button.classList.remove('code-copy-button-checked');
-    }, 1000);
-    // clear code selection
-    e.clearSelection();
-  });
   const viewSource = window.document.getElementById('quarto-view-source') ||
                      window.document.getElementById('quarto-code-tools-source');
   if (viewSource) {

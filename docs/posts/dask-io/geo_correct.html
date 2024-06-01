@@ -227,7 +227,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </script>
 <p>The following example involves a situation where I want to read in historical data on Bay Area Rapid Transit (BART) ridership at the station/hour level. BART kindly makes such ridership information publicly available on their webpage.</p>
 <div id="cell-2" class="cell" data-execution_count="31">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> dask.dataframe <span class="im">as</span> dd</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -249,13 +249,13 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> display, HTML</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> Callable</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> Callable</span></code></pre></div>
 </div>
 <section id="data-retrieval" class="level2">
 <h2 class="anchored" data-anchor-id="data-retrieval">Data Retrieval</h2>
 <p>To start, I’ll set up a scraping script using <code>requests</code> and <code>BeautifulSoup</code> to build access to the BART hourly ridership data.</p>
 <div id="cell-4" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># URL of the webpage to scrape</span></span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># URL of the webpage to scrape</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">'https://afcweb.bart.gov/ridership/origin-destination/'</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Send an HTTP GET request to the webpage</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> requests.get(url)</span>
@@ -264,11 +264,11 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Parse the content of the webpage with Beautiful Soup</span></span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">'html.parser'</span>)</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Failed to retrieve the webpage"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Failed to retrieve the webpage"</span>)</span></code></pre></div>
 </div>
 <p>I can take a quick look at this webpage by rendering it directly into the jupyter notebook via <code>display(HTML(_))</code> from <code>IPython.display</code>. Note that I’m rendering the full page here because I know it’s very small. If this were a larger, more complex webpage, then I would only render some piece of interest (e.g.&nbsp;a table) in a notebook.</p>
 <div id="cell-6" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>display(HTML(<span class="bu">str</span>(soup)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>display(HTML(<span class="bu">str</span>(soup)))</span></code></pre></div>
 <div class="cell-output cell-output-display">
 
 
@@ -291,38 +291,38 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </div>
 <p>My target here is the set of .csv.gz (compressed .csv files) that contain hourly ridership totals between each station pairing. These are all links, thus are in <code>&lt;a&gt; &lt;/a&gt;</code> tags, and have an <code>href</code> that ends in <code>.csv.gz</code>. The following captures links to that specification:</p>
 <div id="cell-8" class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>links <span class="op">=</span> soup.find_all(</span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>links <span class="op">=</span> soup.find_all(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># final all &lt;a&gt;&lt;/a&gt; content</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'a'</span>,</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># filter to only those links with href ending in .csv.gz</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    href<span class="op">=</span><span class="kw">lambda</span> x: x <span class="kw">and</span> x.endswith(<span class="st">".csv.gz"</span>)</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># example output</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>links[<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>links[<span class="dv">0</span>]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="13">
 <pre><code>&lt;a href="date-hour-soo-dest-2018.csv.gz"&gt; date-hour-soo-dest-2018.csv.gz&lt;/a&gt;</code></pre>
 </div>
 </div>
 <p>I’m specifically interested in the file that this piece of html links to, which is contained in the <code>href</code> tag. I can capture the <code>href</code> for each of these pieces of html as follows</p>
 <div id="cell-10" class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>files <span class="op">=</span> [l.get(<span class="st">'href'</span>) <span class="cf">for</span> l <span class="kw">in</span> links]</span>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>files <span class="op">=</span> [l.get(<span class="st">'href'</span>) <span class="cf">for</span> l <span class="kw">in</span> links]</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># example output</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>files[<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>files[<span class="dv">0</span>]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="15">
 <pre><code>'date-hour-soo-dest-2018.csv.gz'</code></pre>
 </div>
 </div>
 <p>I’ve now captured the filename, which is a relative url. To download this, I’ll need to convert this to a full url, by concatenating the base url:</p>
 <div id="cell-12" class="cell" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>url</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>url</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="16">
 <pre><code>'https://afcweb.bart.gov/ridership/origin-destination/'</code></pre>
 </div>
 </div>
 <p>to each of the files’ relative urls. This leaves us with direct links that each prompt the download of one year’s worth of hourly trip totals between the station pairings in the system:</p>
 <div id="cell-14" class="cell" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>file_urls <span class="op">=</span> [url <span class="op">+</span> f <span class="cf">for</span> f <span class="kw">in</span> files]</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>file_urls</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>file_urls <span class="op">=</span> [url <span class="op">+</span> f <span class="cf">for</span> f <span class="kw">in</span> files]</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>file_urls</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="18">
 <pre><code>['https://afcweb.bart.gov/ridership/origin-destination/date-hour-soo-dest-2018.csv.gz',
  'https://afcweb.bart.gov/ridership/origin-destination/date-hour-soo-dest-2019.csv.gz',
@@ -335,7 +335,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </div>
 <p>This is our target data, so before proceeding to download all of it for local storage, we’ll profile the sizes of each file and the total download:</p>
 <div id="cell-16" class="cell" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>counter <span class="op">=</span> <span class="dv">1</span></span>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>counter <span class="op">=</span> <span class="dv">1</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>total <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> f <span class="kw">in</span> file_urls:</span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    response <span class="op">=</span> requests.head(f)</span>
@@ -345,7 +345,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    total <span class="op">+=</span> file_size</span>
 <span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"File </span><span class="sc">{</span>counter<span class="sc">}</span><span class="ss"> size: </span><span class="sc">{</span>file_size<span class="sc">}</span><span class="ss"> bytes (</span><span class="sc">{</span><span class="bu">round</span>(file_size<span class="op">*</span><span class="fl">10e-7</span>, <span class="dv">2</span>)<span class="sc">}</span><span class="ss"> mega-bytes)"</span>)</span>
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    counter <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total size of data: </span><span class="sc">{</span>total<span class="op">*</span><span class="fl">10e-7</span><span class="sc">}</span><span class="ss"> mega-bytes"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total size of data: </span><span class="sc">{</span>total<span class="op">*</span><span class="fl">10e-7</span><span class="sc">}</span><span class="ss"> mega-bytes"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>File 1 size: 38627139 bytes (38.63 mega-bytes)
 File 2 size: 38177159 bytes (38.18 mega-bytes)
@@ -360,7 +360,7 @@ Total size of data: 194.150072 mega-bytes</code></pre>
 <p>We’ll proceed to download all of this into a folder, <code>data</code>. Here I take advantage of <code>tqdm</code>’s progress bar so that I can track the potentially large job’s progress. I also add logic for two conditions:<br>
 - make sure that the ingest doesn’t re-read files that I already store locally. - UNLESS, it the data is from the current year, in which case it likely contains more data than the present file for that year.</p>
 <div id="cell-18" class="cell" data-execution_count="36">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>current_year: <span class="bu">str</span> <span class="op">=</span> <span class="bu">str</span>(datetime.today().year)</span>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>current_year: <span class="bu">str</span> <span class="op">=</span> <span class="bu">str</span>(datetime.today().year)</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the "data" folder if it doesn't exist</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">'data'</span>):</span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    os.makedirs(<span class="st">'data'</span>)</span>
@@ -377,22 +377,22 @@ Total size of data: 194.150072 mega-bytes</code></pre>
 <span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">with</span> <span class="bu">open</span>(filename, <span class="st">'wb'</span>) <span class="im">as</span> <span class="bu">file</span>:</span>
 <span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>                <span class="bu">file</span>.write(response.content)</span>
 <span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"Failed to download: </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"Failed to download: </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>100%|██████████| 7/7 [00:02&lt;00:00,  2.41it/s]</code></pre>
 </div>
 </div>
 <p>Since we are storing a large amount of data in the project directory, we will also set up a <code>.gitignore</code> to make sure that it doesn’t end up being tracked in version control.</p>
 <div id="cell-20" class="cell" data-execution_count="37">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a .gitignore file</span></span>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a .gitignore file</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>gitignore_content <span class="op">=</span> <span class="st">"data/</span><span class="ch">\n</span><span class="st">"</span>  <span class="co"># Content to exclude the "data" folder</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'.gitignore'</span>, <span class="st">'w'</span>) <span class="im">as</span> gitignore_file:</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    gitignore_file.write(gitignore_content)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    gitignore_file.write(gitignore_content)</span></code></pre></div>
 </div>
 <p>I now have the raw data stored locally in the following paths</p>
 <div id="cell-22" class="cell" data-execution_count="38">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>data_paths <span class="op">=</span> [<span class="st">"data/"</span> <span class="op">+</span> f <span class="cf">for</span> f <span class="kw">in</span> files]</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>data_paths</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>data_paths <span class="op">=</span> [<span class="st">"data/"</span> <span class="op">+</span> f <span class="cf">for</span> f <span class="kw">in</span> files]</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>data_paths</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="38">
 <pre><code>['data/date-hour-soo-dest-2018.csv.gz',
  'data/date-hour-soo-dest-2019.csv.gz',
@@ -406,7 +406,7 @@ Total size of data: 194.150072 mega-bytes</code></pre>
 <section id="writing-a-program" class="level3">
 <h3 class="anchored" data-anchor-id="writing-a-program">Writing a Program</h3>
 <div id="cell-24" class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> find_datasets() <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">str</span>]:</span>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> find_datasets() <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">str</span>]:</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> <span class="st">'http://64.111.127.166/origin-destination/'</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    response <span class="op">=</span> requests.get(url)</span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> response.status_code <span class="op">==</span> <span class="dv">200</span>:</span>
@@ -436,7 +436,7 @@ Total size of data: 194.150072 mega-bytes</code></pre>
 <span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>                <span class="cf">with</span> <span class="bu">open</span>(filename, <span class="st">'wb'</span>) <span class="im">as</span> <span class="bu">file</span>:</span>
 <span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>                    <span class="bu">file</span>.write(response.content)</span>
 <span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
-<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"Failed to download: </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"Failed to download: </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
 </div>
 </section>
 </section>
@@ -444,19 +444,19 @@ Total size of data: 194.150072 mega-bytes</code></pre>
 <h2 class="anchored" data-anchor-id="read-data">Read Data</h2>
 <p>The following is an example data retrieval workflow that relies on <a href="https://www.dask.org/">dask</a>, a library for parallelizing Python code.</p>
 <div id="cell-27" class="cell" data-execution_count="28">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> dd.read_csv(data_paths, blocksize<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> dd.read_csv(data_paths, blocksize<span class="op">=</span><span class="va">None</span>)</span></code></pre></div>
 </div>
 <div id="cell-28" class="cell" data-execution_count="29">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>sys.getsizeof(df)<span class="op">*</span><span class="fl">10e-7</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>sys.getsizeof(df)<span class="op">*</span><span class="fl">10e-7</span></span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="29">
 <pre><code>4.8e-05</code></pre>
 </div>
 </div>
 <div id="cell-29" class="cell" data-execution_count="30">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>df.columns <span class="op">=</span> [<span class="st">'Date'</span>, <span class="st">'Hour'</span>, <span class="st">'Start'</span>, <span class="st">'End'</span>, <span class="st">'Riders'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>df.columns <span class="op">=</span> [<span class="st">'Date'</span>, <span class="st">'Hour'</span>, <span class="st">'Start'</span>, <span class="st">'End'</span>, <span class="st">'Riders'</span>]</span></code></pre></div>
 </div>
 <div id="cell-30" class="cell" data-execution_count="31">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>df</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="31">
 <div>
 <div><strong>Dask DataFrame Structure:</strong></div>
@@ -532,10 +532,10 @@ Total size of data: 194.150072 mega-bytes</code></pre>
 </div>
 </div>
 <div id="cell-31" class="cell" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>ProgressBar().register()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>ProgressBar().register()</span></code></pre></div>
 </div>
 <div id="cell-32" class="cell" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>df.shape[<span class="dv">0</span>].compute()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>df.shape[<span class="dv">0</span>].compute()</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[########################################] | 100% Completed |  1min 24.8s</code></pre>
 </div>
@@ -544,7 +544,7 @@ Total size of data: 194.150072 mega-bytes</code></pre>
 </div>
 </div>
 <div id="cell-33" class="cell" data-execution_count="24">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>df.head()</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[########################################] | 100% Completed |  4.7s</code></pre>
 </div>
@@ -615,33 +615,33 @@ Total size of data: 194.150072 mega-bytes</code></pre>
 <section id="subsets-for-in-memory-analysis" class="level3">
 <h3 class="anchored" data-anchor-id="subsets-for-in-memory-analysis">Subsets for In-Memory Analysis</h3>
 <div id="cell-35" class="cell" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>df_stations <span class="op">=</span> df.groupby([<span class="st">'Date'</span>, <span class="st">'Start'</span>, <span class="st">'End'</span>])[<span class="st">'Riders'</span>].<span class="bu">sum</span>().compute()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>df_stations <span class="op">=</span> df.groupby([<span class="st">'Date'</span>, <span class="st">'Start'</span>, <span class="st">'End'</span>])[<span class="st">'Riders'</span>].<span class="bu">sum</span>().compute()</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[                                        ] | 0% Completed |  0.0s[########################################] | 100% Completed |  1min 31.9s</code></pre>
 </div>
 </div>
 <div id="cell-36" class="cell" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>sys.getsizeof(df_stations)<span class="op">*</span><span class="fl">10e-7</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>sys.getsizeof(df_stations)<span class="op">*</span><span class="fl">10e-7</span></span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="21">
 <pre><code>120.622036</code></pre>
 </div>
 </div>
 <p>Condensing via grouping</p>
 <div id="cell-38" class="cell" data-execution_count="22">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>df_rph <span class="op">=</span> df.groupby([<span class="st">'Date'</span>, <span class="st">'Hour'</span>])[<span class="st">'Riders'</span>].<span class="bu">sum</span>().compute()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>df_rph <span class="op">=</span> df.groupby([<span class="st">'Date'</span>, <span class="st">'Hour'</span>])[<span class="st">'Riders'</span>].<span class="bu">sum</span>().compute()</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[                                        ] | 0% Completed |  0.0s[########################################] | 100% Completed |  1min 22.1s</code></pre>
 </div>
 </div>
 <div id="cell-39" class="cell" data-execution_count="23">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>sys.getsizeof(df_rph)<span class="op">*</span><span class="fl">10e-7</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>sys.getsizeof(df_rph)<span class="op">*</span><span class="fl">10e-7</span></span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="23">
 <pre><code>1.619478</code></pre>
 </div>
 </div>
 <div id="cell-40" class="cell" data-execution_count="29">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>df_rph <span class="op">=</span> df_rph.reset_index()</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>df_rph.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>df_rph <span class="op">=</span> df_rph.reset_index()</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>df_rph.head()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="29">
 <div>
 <div>
@@ -699,15 +699,15 @@ Total size of data: 194.150072 mega-bytes</code></pre>
 <section id="comparing-dask-and-pandas-performance" class="level2">
 <h2 class="anchored" data-anchor-id="comparing-dask-and-pandas-performance">Comparing Dask and Pandas Performance</h2>
 <div id="cell-42" class="cell" data-execution_count="26">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> timer(func):</span>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> timer(func):</span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> wrapper(<span class="op">*</span>args, <span class="op">**</span>kwargs):</span>
 <span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>        start <span class="op">=</span> time.time()</span>
 <span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>        func(<span class="op">*</span>args, <span class="op">**</span>kwargs)</span>
 <span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'The function ran for'</span>, time.time() <span class="op">-</span> start)</span>
-<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> wrapper</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> wrapper</span></code></pre></div>
 </div>
 <div id="cell-43" class="cell" data-execution_count="37">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="at">@timer</span></span>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="at">@timer</span></span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> dask_test():</span>
 <span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> dd.read_csv(data_paths, blocksize<span class="op">=</span><span class="va">None</span>)</span>
 <span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>    df.columns <span class="op">=</span> [<span class="st">'Date'</span>, <span class="st">'Hour'</span>, <span class="st">'Start'</span>, <span class="st">'End'</span>, <span class="st">'Riders'</span>]</span>
@@ -720,30 +720,30 @@ Total size of data: 194.150072 mega-bytes</code></pre>
 <span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>           <span class="cf">for</span> filename <span class="kw">in</span> data_paths]</span>
 <span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> pd.concat(df_, axis<span class="op">=</span><span class="dv">0</span>)</span>
 <span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>    df_stations <span class="op">=</span> df.groupby([<span class="st">'Date'</span>, <span class="st">'Start'</span>, <span class="st">'End'</span>])[<span class="st">'Riders'</span>].<span class="bu">sum</span>()</span>
-<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df_stations</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df_stations</span></code></pre></div>
 </div>
 <div id="cell-44" class="cell" data-execution_count="33">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>dask_test()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>dask_test()</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[########################################] | 100% Completed |  1min 27.1s
 The function ran for 87.17222499847412</code></pre>
 </div>
 </div>
 <div id="cell-45" class="cell" data-execution_count="38">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>pd_test()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>pd_test()</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>The function ran for 114.49213647842407</code></pre>
 </div>
 </div>
 <div id="cell-47" class="cell" data-execution_count="31">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'Date'</span>] <span class="op">=</span> pd.to_datetime(df_rph[<span class="st">'Date'</span>], <span class="bu">format</span><span class="op">=</span><span class="st">"%Y-%m-</span><span class="sc">%d</span><span class="st">"</span>)</span>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'Date'</span>] <span class="op">=</span> pd.to_datetime(df_rph[<span class="st">'Date'</span>], <span class="bu">format</span><span class="op">=</span><span class="st">"%Y-%m-</span><span class="sc">%d</span><span class="st">"</span>)</span>
 <span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'Hour_12'</span>] <span class="op">=</span> pd.to_datetime(df_rph[<span class="st">'Hour'</span>], <span class="bu">format</span><span class="op">=</span><span class="st">'%H'</span>).dt.strftime(<span class="st">'%I:%M %p'</span>)</span>
 <span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'Hour_12'</span>] <span class="op">=</span> df_rph[<span class="st">'Hour_12'</span>].<span class="bu">str</span>.replace(<span class="st">":00 "</span>, <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>).<span class="bu">str</span>.strip(<span class="st">"0"</span>)</span>
 <span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'day_of_week'</span>] <span class="op">=</span> df_rph[<span class="st">'Date'</span>].dt.day_name()</span>
-<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'Weekend'</span>] <span class="op">=</span> df_rph[<span class="st">'day_of_week'</span>].isin([<span class="st">'Saturday'</span>, <span class="st">'Sunday'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'Weekend'</span>] <span class="op">=</span> df_rph[<span class="st">'day_of_week'</span>].isin([<span class="st">'Saturday'</span>, <span class="st">'Sunday'</span>])</span></code></pre></div>
 </div>
 <div id="cell-48" class="cell" data-execution_count="32">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>df_rph.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>df_rph.head()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="32">
 <div>
 <div>
@@ -815,7 +815,7 @@ The function ran for 87.17222499847412</code></pre>
 </div>
 </div>
 <div id="cell-49" class="cell" data-execution_count="33">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>df_rph_d <span class="op">=</span> df_rph.set_index(<span class="st">"Date"</span>)</span>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>df_rph_d <span class="op">=</span> df_rph.set_index(<span class="st">"Date"</span>)</span>
 <span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>))</span>
 <span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>every_two <span class="op">=</span> df_rph_d.index.year.unique()[::<span class="dv">2</span>][:<span class="op">-</span><span class="dv">1</span>]</span>
@@ -839,7 +839,7 @@ The function ran for 87.17222499847412</code></pre>
 <span id="cb48-22"><a href="#cb48-22" aria-hidden="true" tabindex="-1"></a>           color<span class="op">=</span><span class="st">"black"</span>,</span>
 <span id="cb48-23"><a href="#cb48-23" aria-hidden="true" tabindex="-1"></a>           linewidth<span class="op">=</span><span class="dv">3</span>,</span>
 <span id="cb48-24"><a href="#cb48-24" aria-hidden="true" tabindex="-1"></a>           alpha<span class="op">=</span><span class="fl">.4</span>)</span>
-<span id="cb48-25"><a href="#cb48-25" aria-hidden="true" tabindex="-1"></a>ax.legend()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb48-25"><a href="#cb48-25" aria-hidden="true" tabindex="-1"></a>ax.legend()<span class="op">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -849,14 +849,14 @@ The function ran for 87.17222499847412</code></pre>
 </div>
 </div>
 <div id="cell-50" class="cell" data-execution_count="34">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>days <span class="op">=</span> df_rph[<span class="st">'day_of_week'</span>].unique()</span>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>days <span class="op">=</span> df_rph[<span class="st">'day_of_week'</span>].unique()</span>
 <span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> sns.color_palette(<span class="st">"tab10"</span>)</span>
 <span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>colormap <span class="op">=</span> {}</span>
 <span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> d, c <span class="kw">in</span> <span class="bu">zip</span>(days, colors[:<span class="bu">len</span>(days)]):</span>
-<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>    colormap[d] <span class="op">=</span> c</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>    colormap[d] <span class="op">=</span> c</span></code></pre></div>
 </div>
 <div id="cell-51" class="cell" data-execution_count="35">
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>colormap</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>colormap</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="35">
 <pre><code>{'Saturday': (0.12156862745098039, 0.4666666666666667, 0.7058823529411765),
  'Sunday': (1.0, 0.4980392156862745, 0.054901960784313725),
@@ -868,7 +868,7 @@ The function ran for 87.17222499847412</code></pre>
 </div>
 </div>
 <div id="cell-52" class="cell" data-execution_count="36">
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>))</span>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>))</span>
 <span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>sns.despine(top<span class="op">=</span><span class="va">True</span>, ax<span class="op">=</span>ax)</span>
 <span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>sns.set_palette(<span class="st">"PuBuGn_d"</span>)</span>
 <span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> sns.lineplot(</span>
@@ -890,7 +890,7 @@ The function ran for 87.17222499847412</code></pre>
 <span id="cb52-20"><a href="#cb52-20" aria-hidden="true" tabindex="-1"></a>    line.set_linewidth(<span class="fl">4.0</span>)</span>
 <span id="cb52-21"><a href="#cb52-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb52-22"><a href="#cb52-22" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">.6</span>)</span>
-<span id="cb52-23"><a href="#cb52-23" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb52-23"><a href="#cb52-23" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -900,7 +900,7 @@ The function ran for 87.17222499847412</code></pre>
 </div>
 </div>
 <div id="cell-53" class="cell" data-execution_count="37">
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>years <span class="op">=</span> df_rph[<span class="st">'Date'</span>].dt.year.unique()[<span class="dv">1</span>:]</span>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>years <span class="op">=</span> df_rph[<span class="st">'Date'</span>].dt.year.unique()[<span class="dv">1</span>:]</span>
 <span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>years <span class="op">=</span> years.reshape(<span class="dv">4</span>, <span class="dv">3</span>)</span>
 <span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">4</span>, <span class="dv">3</span>, sharex<span class="op">=</span><span class="va">True</span>, sharey<span class="op">=</span><span class="va">True</span>, figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">7</span>))</span>
 <span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -923,7 +923,7 @@ The function ran for 87.17222499847412</code></pre>
 <span id="cb53-21"><a href="#cb53-21" aria-hidden="true" tabindex="-1"></a>        </span>
 <span id="cb53-22"><a href="#cb53-22" aria-hidden="true" tabindex="-1"></a>fig.supxlabel(<span class="st">"Hour"</span>)</span>
 <span id="cb53-23"><a href="#cb53-23" aria-hidden="true" tabindex="-1"></a>fig.supylabel(<span class="st">"Average Riders (1,000s)"</span>)      </span>
-<span id="cb53-24"><a href="#cb53-24" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb53-24"><a href="#cb53-24" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -933,7 +933,7 @@ The function ran for 87.17222499847412</code></pre>
 </div>
 </div>
 <div id="cell-54" class="cell" data-execution_count="38">
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>weekday_load <span class="op">=</span> (df_rph</span>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>weekday_load <span class="op">=</span> (df_rph</span>
 <span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>                .groupby([</span>
 <span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>                    df_rph[<span class="st">'Date'</span>].dt.year,</span>
 <span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>                    df_rph[<span class="st">'Date'</span>].dt.month,</span>
@@ -945,10 +945,10 @@ The function ran for 87.17222499847412</code></pre>
 <span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>                .unstack()</span>
 <span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a>                .dropna(axis<span class="op">=</span><span class="dv">0</span>)</span>
 <span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a>                .<span class="bu">apply</span>(<span class="kw">lambda</span> x: x[<span class="va">True</span>]<span class="op">/</span>(x[<span class="va">True</span>]<span class="op">+</span>x[<span class="va">False</span>]), axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb54-13"><a href="#cb54-13" aria-hidden="true" tabindex="-1"></a>                .rename_axis(index<span class="op">=</span>[<span class="st">'Year'</span>, <span class="st">'Month'</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb54-13"><a href="#cb54-13" aria-hidden="true" tabindex="-1"></a>                .rename_axis(index<span class="op">=</span>[<span class="st">'Year'</span>, <span class="st">'Month'</span>]))</span></code></pre></div>
 </div>
 <div id="cell-55" class="cell" data-execution_count="39">
-<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>weekday_load_vec <span class="op">=</span> (</span>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>weekday_load_vec <span class="op">=</span> (</span>
 <span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>    weekday_load</span>
 <span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>    .reset_index()</span>
 <span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>    .set_index(</span>
@@ -958,15 +958,15 @@ The function ran for 87.17222499847412</code></pre>
 <span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>                       )) <span class="co"># Build a new Year-Month index</span></span>
 <span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">0</span>].rename(<span class="st">"Percent"</span>) <span class="co"># The series was, by default, named `0`. Here we rename to Percent</span></span>
 <span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a>    .iloc[:<span class="op">-</span><span class="dv">1</span>] <span class="co"># Remove the most recent month, as it is typically unfinished</span></span>
-<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 </div>
 <div id="cell-56" class="cell" data-execution_count="40">
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>))</span>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>))</span>
 <span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>weekday_load_vec.plot(alpha<span class="op">=</span><span class="fl">.4</span>, ax<span class="op">=</span>ax, label<span class="op">=</span><span class="st">"Monthly Trend"</span>)</span>
 <span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>weekday_load_vec.rolling(<span class="dv">3</span>).mean().plot(ax<span class="op">=</span>ax, label<span class="op">=</span><span class="st">"Quarterly Trend"</span>)</span>
 <span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="st">"2020-03-04"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, label<span class="op">=</span><span class="st">"CA State of Emergency"</span>,  color<span class="op">=</span><span class="st">"grey"</span>, linewidth<span class="op">=</span><span class="dv">3</span>, alpha<span class="op">=</span><span class="fl">.4</span>)</span>
 <span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Proportion of rides that occur during </span><span class="ch">\"</span><span class="st">Peak Commute</span><span class="ch">\"</span><span class="st"> times"</span>)</span>
-<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>ax.legend()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>ax.legend()<span class="op">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -1007,58 +1007,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
-  const isCodeAnnotation = (el) => {
-    for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {                     
-        return true;
-      }
-    }
-    return false;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
-    // button target
-    const button = e.trigger;
-    // don't keep focus
-    button.blur();
-    // flash "checked"
-    button.classList.add('code-copy-button-checked');
-    var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
-    setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
-      }
-      button.setAttribute("title", currentTitle);
-      button.classList.remove('code-copy-button-checked');
-    }, 1000);
-    // clear code selection
-    e.clearSelection();
-  });
   const viewSource = window.document.getElementById('quarto-view-source') ||
                      window.document.getElementById('quarto-code-tools-source');
   if (viewSource) {

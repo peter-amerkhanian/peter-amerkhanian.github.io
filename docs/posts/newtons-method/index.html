@@ -272,14 +272,14 @@ window.Quarto = {
 <div id="cell-1" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sympy</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> imageio</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> Callable</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span></code></pre></div>
 </details>
 </div>
 <section id="newtons-method-for-finding-roots-what-how-and-why" class="level2">
@@ -305,9 +305,9 @@ window.Quarto = {
 <p>Say we are given the function <span class="math inline">\(4\sin(x)\)</span> and we want to find the x-intercept of the function with the domain <span class="math inline">\(-5\leq x \leq -1\)</span>.</p>
 <p>We’ll first set this function up in <code>sympy</code>, a python library for symbolic computation.</p>
 <div id="cell-3" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>x, y <span class="op">=</span> sympy.symbols(<span class="st">'x y'</span>)</span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>x, y <span class="op">=</span> sympy.symbols(<span class="st">'x y'</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="dv">4</span><span class="op">*</span>sympy.sin(x)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>y</span></code></pre></div>
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="2">
 <p><span class="math inline">\(\displaystyle 4 \sin{\left(x \right)}\)</span></p>
 </div>
@@ -323,7 +323,7 @@ x &amp;= -\pi
 <div id="cell-5" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_f(</span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_f(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>        f: Callable[[<span class="bu">float</span>], <span class="bu">float</span>],</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        x_low: <span class="bu">int</span>,</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        x_high: <span class="bu">int</span>,</span>
@@ -438,12 +438,12 @@ x &amp;= -\pi
 <span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a>            label<span class="op">=</span>label, color<span class="op">=</span><span class="st">"black"</span>)</span>
 <span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> euclidean_dist_to_truth(x): <span class="cf">return</span> np.sqrt((<span class="op">-</span>np.pi <span class="op">-</span> <span class="bu">float</span>(x))<span class="op">**</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> euclidean_dist_to_truth(x): <span class="cf">return</span> np.sqrt((<span class="op">-</span>np.pi <span class="op">-</span> <span class="bu">float</span>(x))<span class="op">**</span><span class="dv">2</span>)</span></code></pre></div>
 </details>
 </div>
 <p>Now we’ll begin the process of using Newton’s Method to arrive at that same answer of <span class="math inline">\(x=-\pi\)</span>. #### Step 1: Make a first guess and evaluate its (x, y) coordinates For a first guess, it’s typical to start close to 0. In our case, we’ll try -2.</p>
 <div id="cell-7" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>x_0 <span class="op">=</span> <span class="op">-</span><span class="dv">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>x_0 <span class="op">=</span> <span class="op">-</span><span class="dv">2</span></span></code></pre></div>
 </div>
 <p>Let’s get a sense of how good of a guess this is by plotting it</p>
 <p><span class="math display">\[
@@ -455,11 +455,11 @@ f(x_0) &amp;\approx −3.6371897 \\\
 \end{align*}
 \]</span></p>
 <div id="cell-9" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> base_plot(y, x, x_low<span class="op">=-</span><span class="dv">5</span>, x_high<span class="op">=-</span><span class="dv">1</span>)</span>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> base_plot(y, x, x_low<span class="op">=-</span><span class="dv">5</span>, x_high<span class="op">=-</span><span class="dv">1</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>plot_truth(ax)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>plot_guess(ax, x_0, <span class="st">"$x_0$ (initial guess)"</span>)</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>plot_guess_coords(ax, x_0, <span class="st">"$(x_0, f(x_0))$"</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>ax.legend()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>ax.legend()<span class="op">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -470,7 +470,7 @@ f(x_0) &amp;\approx −3.6371897 \\\
 </div>
 <p>We can assess the quality of that guess by calculating the distance from the guess to the right answer (<span class="math inline">\(-\pi\)</span>):</p>
 <div id="cell-11" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"error for guess x_0:"</span>, euclidean_dist_to_truth(x_0))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"error for guess x_0:"</span>, euclidean_dist_to_truth(x_0))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>error for guess x_0: 1.1415926535897931</code></pre>
 </div>
@@ -489,11 +489,11 @@ f'(x_0) &amp;\approx −1.6645873
 \]</span></p>
 <p>I’ll note that <code>sympy</code> is capable of doing all of these routine calculations as well:</p>
 <div id="cell-13" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"   f(x) = "</span>, y)</span>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"   f(x) = "</span>, y)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"  f'(x) = "</span>, y.diff())</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"f'(x_0) = "</span>, y.diff().subs(x, <span class="op">-</span><span class="dv">2</span>))</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"[note: sympy converted x_0=-2 to x_0=2 because cos(-x)=cos(x)]"</span>)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"f'(x_0) = "</span>, y.diff().subs(x, x_0).evalf())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"f'(x_0) = "</span>, y.diff().subs(x, x_0).evalf())</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   f(x) =  4*sin(x)
   f'(x) =  4*cos(x)
@@ -540,10 +540,10 @@ y &amp;\approx −1.66459x - 6.966364 \\
 \]</span></p>
 <p>We’ll save that into a python function and plot it to make sure it does look like the tangent.</p>
 <div id="cell-15" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> f_1(x): <span class="cf">return</span> <span class="op">-</span><span class="fl">1.6645873</span><span class="op">*</span>x <span class="op">-</span> <span class="fl">6.9663643</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> f_1(x): <span class="cf">return</span> <span class="op">-</span><span class="fl">1.6645873</span><span class="op">*</span>x <span class="op">-</span> <span class="fl">6.9663643</span></span></code></pre></div>
 </div>
 <div id="cell-16" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> base_plot(y, x, x_low<span class="op">=-</span><span class="dv">5</span>, x_high<span class="op">=-</span><span class="dv">1</span>)</span>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> base_plot(y, x, x_low<span class="op">=-</span><span class="dv">5</span>, x_high<span class="op">=-</span><span class="dv">1</span>)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>plot_truth(ax)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>plot_f(f_1, x_low<span class="op">=-</span><span class="dv">5</span>, x_high<span class="op">=-</span><span class="dv">1</span>, ax<span class="op">=</span>ax)</span>
@@ -551,7 +551,7 @@ y &amp;\approx −1.66459x - 6.966364 \\
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>plot_guess(ax, x_0, <span class="st">"$x_0$ (initial guess)"</span>)</span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>plot_guess_coords(ax, x_0, <span class="st">"$(x_0, f(x_0))$"</span>)</span>
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>ax.legend()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>ax.legend()<span class="op">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -572,15 +572,15 @@ x_1 &amp;\approx -4.1850
 \end{align*}
 \]</span></p>
 <div id="cell-18" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>x_1 <span class="op">=</span> <span class="op">-</span><span class="fl">4.1850</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>x_1 <span class="op">=</span> <span class="op">-</span><span class="fl">4.1850</span></span></code></pre></div>
 </div>
 <div id="cell-19" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> base_plot(y, x, x_low<span class="op">=-</span><span class="dv">5</span>, x_high<span class="op">=-</span><span class="dv">1</span>)</span>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> base_plot(y, x, x_low<span class="op">=-</span><span class="dv">5</span>, x_high<span class="op">=-</span><span class="dv">1</span>)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>plot_truth(ax)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>plot_guess(ax, x_0, <span class="st">"$x_0$ (initial guess)"</span>)</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>plot_f(f_1, x_low<span class="op">=-</span><span class="dv">5</span>, x_high<span class="op">=-</span><span class="dv">1</span>, ax<span class="op">=</span>ax)</span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>plot_guess(ax, x_1, <span class="st">"$x_1$ (next guess)"</span>)</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>ax.legend()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>ax.legend()<span class="op">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -591,8 +591,8 @@ x_1 &amp;\approx -4.1850
 </div>
 <p>While this guess still isn’t particularly great, we can see that we have actually reduced the “error” of our guess:</p>
 <div id="cell-21" class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, x_n <span class="kw">in</span> <span class="bu">enumerate</span>([x_0, x_1]):</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"error for guess x_</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">:"</span>, euclidean_dist_to_truth(x_n))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, x_n <span class="kw">in</span> <span class="bu">enumerate</span>([x_0, x_1]):</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"error for guess x_</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">:"</span>, euclidean_dist_to_truth(x_n))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>error for guess x_0: 1.1415926535897931
 error for guess x_1: 1.0434073464102065</code></pre>
@@ -606,27 +606,27 @@ error for guess x_1: 1.0434073464102065</code></pre>
 y = f'(x_n)(x - x_n) + f(x_n)
 \]</span> This allows us to generate the tangent line at any given guess, <span class="math inline">\(x_n\)</span>. The following code leverages <code>sympy</code> to write that equation as a python function.</p>
 <div id="cell-24" class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> y_n(x_n): <span class="cf">return</span> (</span>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> y_n(x_n): <span class="cf">return</span> (</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    y.diff().subs(x, x_n) <span class="op">*</span> (x <span class="op">-</span> x_n) <span class="op">+</span>  <span class="co"># f_1(x_1)(x-x_1) +</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    y.subs(x, x_n)  <span class="co"># f(x_1)</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="cell-25" class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>y_n(x_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>y_n(x_1)</span></code></pre></div>
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="14">
 <p><span class="math inline">\(\displaystyle - 2.01311525745113 x - 4.96839101072835\)</span></p>
 </div>
 </div>
 <p>We’ll also use <code>sympy</code> to easily solve for the new tangent line’s x-intercept, <span class="math inline">\(x_2\)</span></p>
 <div id="cell-27" class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>x_2 <span class="op">=</span> sympy.solve(y_n(x_1), x)[<span class="dv">0</span>]</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>x_2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>x_2 <span class="op">=</span> sympy.solve(y_n(x_1), x)[<span class="dv">0</span>]</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>x_2</span></code></pre></div>
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="15">
 <p><span class="math inline">\(\displaystyle -2.46801120419652\)</span></p>
 </div>
 </div>
 <div id="cell-28" class="cell" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> base_plot(y, x, x_low<span class="op">=-</span><span class="dv">5</span>, x_high<span class="op">=-</span><span class="dv">1</span>)</span>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> base_plot(y, x, x_low<span class="op">=-</span><span class="dv">5</span>, x_high<span class="op">=-</span><span class="dv">1</span>)</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>plot_truth(ax)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>plot_f(sympy.lambdify(x, y_n(x_1)), x_low<span class="op">=-</span><span class="dv">5</span>, x_high<span class="op">=-</span><span class="dv">1</span>, ax<span class="op">=</span>ax)</span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -636,7 +636,7 @@ y = f'(x_n)(x - x_n) + f(x_n)
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>plot_guess(ax, x_1, <span class="st">"$x_1$ (previous guess)"</span>)</span>
 <span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>plot_guess(ax, x_2, <span class="st">"$x_2$ (next guess)"</span>)</span>
 <span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>ax.legend()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>ax.legend()<span class="op">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -647,8 +647,8 @@ y = f'(x_n)(x - x_n) + f(x_n)
 </div>
 <p>We can verify that this new guess again reduces our “error,” which should encourage us to continue this process.</p>
 <div id="cell-30" class="cell" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, x_n <span class="kw">in</span> <span class="bu">enumerate</span>([x_0, x_1, x_2]):</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"error for guess x_</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">:"</span>, euclidean_dist_to_truth(x_n))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, x_n <span class="kw">in</span> <span class="bu">enumerate</span>([x_0, x_1, x_2]):</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"error for guess x_</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">:"</span>, euclidean_dist_to_truth(x_n))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>error for guess x_0: 1.1415926535897931
 error for guess x_1: 1.0434073464102065
@@ -703,7 +703,7 @@ x_{n+1} = \begin{cases}
 \]</span></p>
 <p>However, now that we are moving into the realm of algorithms, I think it’s clearer to write this as code:</p>
 <div id="cell-32" class="cell" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>x_n <span class="op">=</span> <span class="op">-</span><span class="dv">2</span></span>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>x_n <span class="op">=</span> <span class="op">-</span><span class="dv">2</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># We'll use this to count which guess we are on</span></span>
 <span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>counter <span class="op">=</span> <span class="dv">1</span></span>
@@ -734,7 +734,7 @@ x_{n+1} = \begin{cases}
 <span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>    <span class="co">################################################</span></span>
 <span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Update the counter</span></span>
-<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>    counter <span class="op">+=</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>    counter <span class="op">+=</span> <span class="dv">1</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Guess 1: -2.00000  --- Error: 1.1415926535897931
 Guess 2: -4.18504  --- Error: 1.0434472096717258
@@ -749,7 +749,7 @@ Converged in 6 steps.</code></pre>
 <div id="cell-34" class="cell" data-execution_count="19">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>capture</span>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>capture</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>x_n <span class="op">=</span> <span class="op">-</span><span class="dv">2</span></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>max_iter <span class="op">=</span> <span class="dv">10</span></span>
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>tolerance <span class="op">=</span> <span class="fl">1e-6</span></span>
@@ -814,7 +814,7 @@ Converged in 6 steps.</code></pre>
 <span id="cb24-63"><a href="#cb24-63" aria-hidden="true" tabindex="-1"></a>files <span class="op">=</span> os.listdir(wd)</span>
 <span id="cb24-64"><a href="#cb24-64" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> item <span class="kw">in</span> files:</span>
 <span id="cb24-65"><a href="#cb24-65" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> item.endswith(<span class="st">".png"</span>):</span>
-<span id="cb24-66"><a href="#cb24-66" aria-hidden="true" tabindex="-1"></a>        os.remove(os.path.join(wd, item))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-66"><a href="#cb24-66" aria-hidden="true" tabindex="-1"></a>        os.remove(os.path.join(wd, item))</span></code></pre></div>
 </details>
 </div>
 <p><img src="newton_iterations.gif" class="img-fluid"></p>
@@ -830,15 +830,15 @@ f(x) =x^{5} + 8 x^{4} + 4 x^{3} - 2 x - 7
 f(x)=0 \quad \text{where} -5\leq x \leq 0
 \]</span> There is no formula that solves this. Even plugging the polynomial into <code>sympy</code> and running its solver, <code>sympy.solveset</code>, doesn’t give a clear answer.</p>
 <div id="cell-37" class="cell" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>x, y <span class="op">=</span> sympy.symbols(<span class="st">'x y'</span>)</span>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>x, y <span class="op">=</span> sympy.symbols(<span class="st">'x y'</span>)</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> x<span class="op">**</span><span class="dv">5</span> <span class="op">+</span> <span class="dv">8</span><span class="op">*</span>x<span class="op">**</span><span class="dv">4</span> <span class="op">+</span> <span class="dv">4</span><span class="op">*</span>x<span class="op">**</span><span class="dv">3</span> <span class="op">-</span> <span class="dv">2</span><span class="op">*</span>x<span class="op">-</span><span class="dv">7</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>y</span></code></pre></div>
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="20">
 <p><span class="math inline">\(\displaystyle x^{5} + 8 x^{4} + 4 x^{3} - 2 x - 7\)</span></p>
 </div>
 </div>
 <div id="cell-38" class="cell" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sympy.solveset(y, x, sympy.Interval(<span class="op">-</span><span class="dv">5</span>, <span class="dv">0</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sympy.solveset(y, x, sympy.Interval(<span class="op">-</span><span class="dv">5</span>, <span class="dv">0</span>)))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>{CRootOf(x**5 + 8*x**4 + 4*x**3 - 2*x - 7, 1)}</code></pre>
 </div>
@@ -846,11 +846,11 @@ f(x)=0 \quad \text{where} -5\leq x \leq 0
 <p>(where <code>CRootOf</code> is an indexed complex root of the polynomial – not an analytical solution)</p>
 <p>We might proceed to visually inspect the function on this domain – but it’s even pretty hard to visually spot a root here!</p>
 <div id="cell-41" class="cell" data-execution_count="22">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>x_vec <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">5</span>, <span class="dv">0</span>, <span class="dv">1000000</span>)</span>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>x_vec <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">5</span>, <span class="dv">0</span>, <span class="dv">1000000</span>)</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">.5</span>)</span>
 <span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>ax.plot(x_vec, sympy.lambdify(x, y)(x_vec))</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="ss">f"$y=</span><span class="sc">{</span>sympy<span class="sc">.</span>latex(y)<span class="sc">}</span><span class="ss">$"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="ss">f"$y=</span><span class="sc">{</span>sympy<span class="sc">.</span>latex(y)<span class="sc">}</span><span class="ss">$"</span>)<span class="op">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -862,7 +862,7 @@ f(x)=0 \quad \text{where} -5\leq x \leq 0
 <p>Here’s a good use-case for Newton’s Method. I set up the algorithm with <span class="math inline">\(x_0=0\)</span> and a stopping condition that <span class="math inline">\(|x_{n+1} - x_{n}| \leq 10^{-12}\)</span>.<br>
 I quickly converge at an answer:</p>
 <div id="cell-43" class="cell" data-execution_count="23">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>x_n <span class="op">=</span> <span class="dv">0</span></span>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>x_n <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>tolerance <span class="op">=</span> <span class="fl">1e-12</span></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>counter <span class="op">=</span> <span class="dv">1</span></span>
 <span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -894,7 +894,7 @@ I quickly converge at an answer:</p>
 <span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>        sympy.lambdify(x, y.diff())(x_n)</span>
 <span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a>    <span class="co">################################################</span></span>
-<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a>    counter <span class="op">+=</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a>    counter <span class="op">+=</span> <span class="dv">1</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Guess   1: 0.000000  --- Change: inf
 Guess   2: -3.50000  --- Change: 3.5
@@ -911,7 +911,7 @@ Converged in 10 steps.</code></pre>
 </div>
 <p>When we plot our best guess, <span class="math inline">\(x_n\)</span>, we see that it is indeed the root of the function.</p>
 <div id="cell-45" class="cell" data-execution_count="24">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>ax.axvline(x_n, linestyle<span class="op">=</span><span class="st">"--"</span>, color<span class="op">=</span><span class="st">"tab:red"</span>,</span>
 <span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>           linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Final Guess"</span>)</span>
@@ -922,7 +922,7 @@ Converged in 10 steps.</code></pre>
 <span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">.5</span>)</span>
 <span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>ax.plot(x_vec, sympy.lambdify(x, y)(x_vec))</span>
 <span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="ss">f"$y=</span><span class="sc">{</span>sympy<span class="sc">.</span>latex(y)<span class="sc">}</span><span class="ss">$"</span>)</span>
-<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>ax.axhline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">"black"</span>, alpha<span class="op">=</span><span class="fl">.5</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>ax.axhline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">"black"</span>, alpha<span class="op">=</span><span class="fl">.5</span>)<span class="op">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -933,13 +933,13 @@ Converged in 10 steps.</code></pre>
 </div>
 <p>We can also compare our answer to what <code>sympy</code> gets from numerically solving for the function’s root:</p>
 <div id="cell-47" class="cell" data-execution_count="25">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Newton's Method:"</span>, x_n)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Newton's Method:"</span>, x_n)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Newton's Method: -1.1009529619409872</code></pre>
 </div>
 </div>
 <div id="cell-48" class="cell" data-execution_count="26">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Sympy's answer:"</span>, sympy.solveset(y, x, sympy.Interval(<span class="op">-</span><span class="dv">5</span>, <span class="dv">0</span>)).evalf())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Sympy's answer:"</span>, sympy.solveset(y, x, sympy.Interval(<span class="op">-</span><span class="dv">5</span>, <span class="dv">0</span>)).evalf())</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Sympy's answer: {-1.10095296194099}</code></pre>
 </div>
@@ -952,7 +952,7 @@ Converged in 10 steps.</code></pre>
 <p>Recall that the derivative of a function is 0 at a critical point – its maximum or minimum. We have been using Newton’s Method to find the root of a function, but in the process <strong>we’ve also implicitly been finding the critical point of the anti-derivative, or, integral of that function</strong>.</p>
 <p>For visual intuition of this fact, consider the following plot, in which we visualize the integral of our function, <span class="math inline">\(\int f(x) dx\)</span>, and plot the root of <span class="math inline">\(f(x)\)</span> that we just found using Newton’s Method:</p>
 <div id="cell-51" class="cell" data-execution_count="27">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>ax.axvline(x_n, linestyle<span class="op">=</span><span class="st">"--"</span>, color<span class="op">=</span><span class="st">"tab:red"</span>,</span>
 <span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>           linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Final Guess"</span>)</span>
@@ -962,7 +962,7 @@ Converged in 10 steps.</code></pre>
 <span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>ax.plot(x_vec, sympy.lambdify(x, y.integrate())(x_vec), label<span class="op">=</span><span class="st">"$\int f(x) dx$"</span>)</span>
 <span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
 <span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="op">-</span><span class="dv">5</span>, <span class="dv">7</span>)</span>
-<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="ss">f"$\int (</span><span class="sc">{</span>sympy<span class="sc">.</span>latex(y)<span class="sc">}</span><span class="ss">)dx$"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="ss">f"$\int (</span><span class="sc">{</span>sympy<span class="sc">.</span>latex(y)<span class="sc">}</span><span class="ss">)dx$"</span>)<span class="op">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -1023,58 +1023,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
-  const isCodeAnnotation = (el) => {
-    for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {                     
-        return true;
-      }
-    }
-    return false;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
-    // button target
-    const button = e.trigger;
-    // don't keep focus
-    button.blur();
-    // flash "checked"
-    button.classList.add('code-copy-button-checked');
-    var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
-    setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
-      }
-      button.setAttribute("title", currentTitle);
-      button.classList.remove('code-copy-button-checked');
-    }, 1000);
-    // clear code selection
-    e.clearSelection();
-  });
   const viewSource = window.document.getElementById('quarto-view-source') ||
                      window.document.getElementById('quarto-code-tools-source');
   if (viewSource) {

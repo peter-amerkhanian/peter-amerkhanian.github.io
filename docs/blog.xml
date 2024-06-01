@@ -10,7 +10,17 @@
 <atom:link href="https://peter-amerkhanian.com/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Peter Amerkhanian&#39;s Blog</description>
 <generator>quarto-1.4.551</generator>
-<lastBuildDate>Sun, 14 Apr 2024 07:00:00 GMT</lastBuildDate>
+<lastBuildDate>Fri, 31 May 2024 07:00:00 GMT</lastBuildDate>
+<item>
+  <title>The Covariance Matrix</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
+  <link>https://peter-amerkhanian.com/posts/covariance-matrices/</link>
+  <description><![CDATA[ The following is largely based on exercises in <span class="citation" data-cites="cohen_practical_2022">(Cohen 2022)</span>, an excellent overview of applied, numerical linear algebra in python. This exercise is an overview of how to compute the covariance matrix of a dataset, and contains enough fundamental linear algebra topics – matrix multiplication, matrices as functions, etc. – that I wanted to commit it to a blog for my future reference. ]]></description>
+  <category>Python</category>
+  <category>Linear Algebra</category>
+  <guid>https://peter-amerkhanian.com/posts/covariance-matrices/</guid>
+  <pubDate>Fri, 31 May 2024 07:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Double Integrals in Probability</title>
   <dc:creator>Peter Amerkhanian</dc:creator>
@@ -31,16 +41,6 @@
   <category>Data Management</category>
   <guid>https://peter-amerkhanian.com/posts/dask-data-io/</guid>
   <pubDate>Fri, 12 Apr 2024 07:00:00 GMT</pubDate>
-</item>
-<item>
-  <title>Covariance Matrices</title>
-  <dc:creator>Peter Amerkhanian</dc:creator>
-  <link>https://peter-amerkhanian.com/posts/covariance-matrices/</link>
-  <description><![CDATA[ The following is largely based on exercises in <span class="citation" data-cites="cohen_practical_2022">(Cohen 2022)</span>, an excellent overview of applied, numerical linear algebra in python. This exercise is an overview of how to compute the covariance matrix of a dataset, and contains enough fundamental linear algebra and statistics topics – matrix multiplication, the definitions of variance and covariance, etc. – that I wanted to commit it to a blog for my future reference. ]]></description>
-  <category>Python</category>
-  <category>Linear Algebra</category>
-  <guid>https://peter-amerkhanian.com/posts/covariance-matrices/</guid>
-  <pubDate>Mon, 25 Mar 2024 07:00:00 GMT</pubDate>
 </item>
 <item>
   <title>Production Maximization with Lagrange Mutlipliers</title>

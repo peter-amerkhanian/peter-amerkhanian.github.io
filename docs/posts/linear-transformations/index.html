@@ -228,8 +228,8 @@ window.Quarto = {
 
 
 <div id="cell-1" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sympy <span class="im">as</span> sp</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sympy <span class="im">as</span> sp</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span></code></pre></div>
 </div>
 <p>A linear transformation <span class="math inline">\(T: \R^2 \rightarrow \R^2\)</span> is defined by:<br>
 <span class="math display">\[
@@ -265,45 +265,45 @@ T(\vec{x}) &amp;= A \vec{x}
 \end{align*}
 \]</span></p>
 <div id="cell-4" class="cell" data-execution_count="235">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> write_equation(left: <span class="bu">str</span>, right: sp.UnevaluatedExpr) <span class="op">-&gt;</span> sp.UnevaluatedExpr:</span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> write_equation(left: <span class="bu">str</span>, right: sp.UnevaluatedExpr) <span class="op">-&gt;</span> sp.UnevaluatedExpr:</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        sp.UnevaluatedExpr(</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>            sp.Eq(</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        sp.symbols(left), </span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">*</span>right </span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        ))</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 </div>
 <p><span class="math inline">\(A\)</span> defines the matrix transformation, so we’ll define that here:</p>
 <div id="cell-6" class="cell" data-execution_count="237">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> sp.Matrix([</span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> sp.Matrix([</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    [<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>],</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">3</span>, <span class="op">-</span><span class="dv">1</span>]</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>])</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>write_equation(<span class="st">"A"</span>, [sp.UnevaluatedExpr(A)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>write_equation(<span class="st">"A"</span>, [sp.UnevaluatedExpr(A)])</span></code></pre></div>
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="237">
 <p><span class="math inline">\(\displaystyle A = \left[\begin{matrix}-1 &amp; 2\\3 &amp; -1\end{matrix}\right]\)</span></p>
 </div>
 </div>
 <p>We can test out this linear transformation with some arbitrary input, <span class="math inline">\(\vec{x} = [1, 2]^\intercal\)</span></p>
 <div id="cell-8" class="cell" data-execution_count="238">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> sp.Matrix([[<span class="dv">1</span>, <span class="dv">2</span>]]).T</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> sp.Matrix([[<span class="dv">1</span>, <span class="dv">2</span>]]).T</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div>
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="238">
 <p><span class="math inline">\(\displaystyle \left[\begin{matrix}1\\2\end{matrix}\right]\)</span></p>
 </div>
 </div>
 <p><span class="math inline">\(T(\vec{x}) = A \vec{x}\)</span></p>
 <div id="cell-10" class="cell" data-execution_count="239">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>write_equation(<span class="vs">r'T(\vec</span><span class="sc">{x}</span><span class="vs">)'</span>,</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>               [sp.UnevaluatedExpr(A) <span class="op">*</span> sp.UnevaluatedExpr(x)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>write_equation(<span class="vs">r'T(\vec</span><span class="sc">{x}</span><span class="vs">)'</span>,</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>               [sp.UnevaluatedExpr(A) <span class="op">*</span> sp.UnevaluatedExpr(x)])</span></code></pre></div>
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="239">
 <p><span class="math inline">\(\displaystyle T(\vec{x}) = \left[\begin{matrix}-1 &amp; 2\\3 &amp; -1\end{matrix}\right] \left[\begin{matrix}1\\2\end{matrix}\right]\)</span></p>
 </div>
 </div>
 <div id="cell-11" class="cell" data-execution_count="240">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>write_equation(<span class="vs">r'T(\vec</span><span class="sc">{x}</span><span class="vs">)'</span>,</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>               [sp.UnevaluatedExpr(A) <span class="op">*</span> sp.UnevaluatedExpr(x), sp.UnevaluatedExpr(A <span class="op">@</span> x)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>write_equation(<span class="vs">r'T(\vec</span><span class="sc">{x}</span><span class="vs">)'</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>               [sp.UnevaluatedExpr(A) <span class="op">*</span> sp.UnevaluatedExpr(x), sp.UnevaluatedExpr(A <span class="op">@</span> x)])</span></code></pre></div>
 <div class="cell-output cell-output-error">
 <pre><code>TypeError: __new__() takes from 2 to 3 positional arguments but 4 were given</code></pre>
 </div>
@@ -318,41 +318,41 @@ T(\vec{x}) &amp;= A \vec{x}
 <p>We are in <span class="math inline">\(\R^2\)</span>, so the standard basis will be the collection <span class="math inline">\(\{\vec{e}_1, \vec{e}_2\}\)</span>. <span class="math inline">\(\vec{e}_1\)</span> will have a <span class="math inline">\(1\)</span> in the first entry and zeros elsewhere, so <span class="math inline">\(\vec{e}_1 = [1, 0]^\intercal\)</span> and <span class="math inline">\(\vec{e}_2\)</span> will have a <span class="math inline">\(1\)</span> in the second entry, so <span class="math inline">\(\vec{e}_2 = [0, 1]^\intercal\)</span>.<br>
 So our basis currently defined: <span class="math inline">\(\mathcal{B} = \{(1, 0), (0, 1)\}\)</span> in <span class="math inline">\(\R^2\)</span>.</p>
 <div id="cell-15" class="cell" data-execution_count="197">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>B_old <span class="op">=</span> sp.Matrix([</span>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>B_old <span class="op">=</span> sp.Matrix([</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">1</span>, <span class="dv">0</span>],</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">0</span>, <span class="dv">1</span>]</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>])</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>B_old</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>B_old</span></code></pre></div>
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="197">
 <p><span class="math inline">\(\displaystyle \left[\begin{matrix}1 &amp; 0\\0 &amp; 1\end{matrix}\right]\)</span></p>
 </div>
 </div>
 <div id="cell-16" class="cell" data-execution_count="198">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>X_old <span class="op">=</span> A</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>X_old</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>X_old <span class="op">=</span> A</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>X_old</span></code></pre></div>
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="198">
 <p><span class="math inline">\(\displaystyle \left[\begin{matrix}-1 &amp; 2\\3 &amp; -1\end{matrix}\right]\)</span></p>
 </div>
 </div>
 <div id="cell-17" class="cell" data-execution_count="231">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>B_old.inv() <span class="op">@</span> X_old <span class="op">@</span> B_old</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>B_old.inv() <span class="op">@</span> X_old <span class="op">@</span> B_old</span></code></pre></div>
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="231">
 <p><span class="math inline">\(\displaystyle \left[\begin{matrix}-1 &amp; 2\\3 &amp; -1\end{matrix}\right]\)</span></p>
 </div>
 </div>
 <p>We’ll now change basis into <span class="math inline">\(\mathcal{B} = \{(2, 1), (1, 1)\}\)</span> in <span class="math inline">\(\R^2\)</span>.</p>
 <div id="cell-19" class="cell" data-execution_count="152">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>B_new <span class="op">=</span> sp.Matrix([</span>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>B_new <span class="op">=</span> sp.Matrix([</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">2</span>, <span class="dv">1</span>],</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">1</span>, <span class="dv">1</span>]</span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>])</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>B_new</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>B_new</span></code></pre></div>
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="152">
 <p><span class="math inline">\(\displaystyle \left[\begin{matrix}2 &amp; 1\\1 &amp; 1\end{matrix}\right]\)</span></p>
 </div>
 </div>
 <div id="cell-20" class="cell" data-execution_count="232">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>B_new.inv() <span class="op">@</span> X_old <span class="op">@</span> B_new</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>B_new.inv() <span class="op">@</span> X_old <span class="op">@</span> B_new</span></code></pre></div>
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="232">
 <p><span class="math inline">\(\displaystyle \left[\begin{matrix}-5 &amp; -1\\10 &amp; 3\end{matrix}\right]\)</span></p>
 </div>
@@ -388,58 +388,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
-  const isCodeAnnotation = (el) => {
-    for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {                     
-        return true;
-      }
-    }
-    return false;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
-    // button target
-    const button = e.trigger;
-    // don't keep focus
-    button.blur();
-    // flash "checked"
-    button.classList.add('code-copy-button-checked');
-    var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
-    setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
-      }
-      button.setAttribute("title", currentTitle);
-      button.classList.remove('code-copy-button-checked');
-    }, 1000);
-    // clear code selection
-    e.clearSelection();
-  });
   const viewSource = window.document.getElementById('quarto-view-source') ||
                      window.document.getElementById('quarto-code-tools-source');
   if (viewSource) {
