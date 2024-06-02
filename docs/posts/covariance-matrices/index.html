@@ -9,7 +9,7 @@
 <meta name="author" content="Peter Amerkhanian">
 <meta name="dcterms.date" content="2024-05-31">
 
-<title>The Covariance Matrix</title>
+<title>The Covariance Matrix from Scratch</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -208,7 +208,7 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <div class="quarto-title-block"><div><h1 class="title">The Covariance Matrix</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
+      <div class="quarto-title-block"><div><h1 class="title">The Covariance Matrix from Scratch</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
                                 <div class="quarto-categories">
                 <div class="quarto-category">Python</div>
                 <div class="quarto-category">Linear Algebra</div>
@@ -242,7 +242,7 @@ window.Quarto = {
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-        <h2 id="toc-title"><a href="#" class="nav-link">The Covariance Matrix</a></h2>
+        <h2 id="toc-title"><a href="#" class="nav-link">The Covariance Matrix from Scratch</a></h2>
      
     <ul>
     <li><a href="#question-and-data" id="toc-question-and-data" class="nav-link active" data-scroll-target="#question-and-data">Question and Data</a>
@@ -252,7 +252,7 @@ window.Quarto = {
     <li><a href="#deriving-the-matrix-formulation" id="toc-deriving-the-matrix-formulation" class="nav-link" data-scroll-target="#deriving-the-matrix-formulation">Deriving the matrix formulation</a>
     <ul class="collapse">
     <li><a href="#building-the-centering-matrix" id="toc-building-the-centering-matrix" class="nav-link" data-scroll-target="#building-the-centering-matrix">Building the centering matrix</a></li>
-    <li><a href="#covariance-as-a-matrix-transformation" id="toc-covariance-as-a-matrix-transformation" class="nav-link" data-scroll-target="#covariance-as-a-matrix-transformation">Covariance as a matrix transformation</a></li>
+    <li><a href="#a-note-on-broadcasting-and-numerical-methods" id="toc-a-note-on-broadcasting-and-numerical-methods" class="nav-link" data-scroll-target="#a-note-on-broadcasting-and-numerical-methods">A note on broadcasting and numerical methods</a></li>
     </ul></li>
     <li><a href="#the-matrix-formulation" id="toc-the-matrix-formulation" class="nav-link" data-scroll-target="#the-matrix-formulation">The matrix formulation</a>
     <ul class="collapse">
@@ -289,15 +289,15 @@ window.Quarto = {
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code></pre></div>
 </details>
 </div>
-<p>The following is largely based on exercises in <span class="citation" data-cites="cohen_practical_2022">(<a href="#ref-cohen_practical_2022" role="doc-biblioref">Cohen 2022</a>)</span>, an excellent overview of applied, numerical linear algebra in python. This exercise is an overview of how to compute the covariance matrix of a dataset, and contains enough fundamental linear algebra topics – matrix multiplication, matrices as functions, etc. – that I wanted to commit it to a blog for my future reference.</p>
-<p>This will be a long post with almost no computational value. Almost all of the methods and objects I cover come up in analytical, not numerical, linear algebra. Either way, I think that it’s useful to go through these to get some understanding of how to combine matrix operations to get interesting output.</p>
+<p>The following is an overview of how to construct a covariance matrix. The post is largely based on exercises in <span class="citation" data-cites="cohen_practical_2022">(<a href="#ref-cohen_practical_2022" role="doc-biblioref">Cohen 2022</a>)</span>, an excellent overview of applied, numerical linear algebra in python. I overview how to construct a covariance matrix, but in the process I try to touch on a lot of important concepts in fundamental linear algebra: matrix multiplication, matrix transformations, the centering matrix, and getting from the idea of a matrix operation to the formal notation.</p>
+<p>I want to stress that the methods and procedures that I overview here are examples of <em>analytical</em> linear algebra. I’m looking at a lot of pen and paper methods for defining operations. In <em>numerical</em> linear algebra, where we actually compute this stuff on data, methodology is different. If you look into how <code>numpy</code> computes covariance, it’s not going to look anything like this. However, learning these analytical fundamentals has value – both in making it easier to read linear algebra heavy textbooks, and in being able to write out operations and ideas in parsimonious mathematical statements.</p>
 <section id="question-and-data" class="level1">
 <h1>Question and Data</h1>
-<p>The exercise dataset used in the textbook is <a href="https://archive.ics.uci.edu/dataset/183/communities+and+crime">“Communities and Crime,” from the UC Irvine Machine Learning Repository</a>, which includes data on</p>
+<p>In <span class="citation" data-cites="cohen_practical_2022">(<a href="#ref-cohen_practical_2022" role="doc-biblioref">Cohen 2022</a>)</span>, the covariance exercises are based on the <a href="https://archive.ics.uci.edu/dataset/183/communities+and+crime">“Communities and Crime,” dataset from the UC Irvine Machine Learning Repository</a>, which includes data on:</p>
 <blockquote class="blockquote">
 <p>Communities within the United States. The data combines socio-economic data from the 1990 US Census, law enforcement data from the 1990 US LEMAS survey, and crime data from the 1995 FBI UCR.</p>
 </blockquote>
-<p>In the exercise, we are tasked with creating a covariance matrix of the data.</p>
+<p>I’ll use the same data.</p>
 <div id="cell-3" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
@@ -311,11 +311,11 @@ window.Quarto = {
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>df_num <span class="op">=</span> df_num.iloc[:, <span class="dv">2</span>:]</span></code></pre></div>
 </details>
 </div>
-<p>To make the operations as clear as possible, I’m going to overview the process using only the first five rows before computing the full covariance matrix.</p>
-<div id="cell-5" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>example <span class="op">=</span> df_num.head()</span>
+<p>To make the operations as clear as possible, I’m going to focus on the first five rows and first two columns for the majority of this post.</p>
+<div id="cell-5" class="cell" data-execution_count="39">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>example <span class="op">=</span> df_num.head()[[<span class="st">'population'</span>, <span class="st">'householdsize'</span>]]</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>example</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
+<div class="cell-output cell-output-display" data-execution_count="39">
 <div>
 <div>
 
@@ -326,25 +326,6 @@ window.Quarto = {
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th">population</th>
 <th data-quarto-table-cell-role="th">householdsize</th>
-<th data-quarto-table-cell-role="th">racepctblack</th>
-<th data-quarto-table-cell-role="th">racePctWhite</th>
-<th data-quarto-table-cell-role="th">racePctAsian</th>
-<th data-quarto-table-cell-role="th">racePctHisp</th>
-<th data-quarto-table-cell-role="th">agePct12t21</th>
-<th data-quarto-table-cell-role="th">agePct12t29</th>
-<th data-quarto-table-cell-role="th">agePct16t24</th>
-<th data-quarto-table-cell-role="th">agePct65up</th>
-<th data-quarto-table-cell-role="th">...</th>
-<th data-quarto-table-cell-role="th">NumStreet</th>
-<th data-quarto-table-cell-role="th">PctForeignBorn</th>
-<th data-quarto-table-cell-role="th">PctBornSameState</th>
-<th data-quarto-table-cell-role="th">PctSameHouse85</th>
-<th data-quarto-table-cell-role="th">PctSameCity85</th>
-<th data-quarto-table-cell-role="th">PctSameState85</th>
-<th data-quarto-table-cell-role="th">LandArea</th>
-<th data-quarto-table-cell-role="th">PopDens</th>
-<th data-quarto-table-cell-role="th">PctUsePubTrans</th>
-<th data-quarto-table-cell-role="th">LemasPctOfficDrugUn</th>
 </tr>
 </thead>
 <tbody>
@@ -352,189 +333,47 @@ window.Quarto = {
 <td data-quarto-table-cell-role="th">0</td>
 <td>0.19</td>
 <td>0.33</td>
-<td>0.02</td>
-<td>0.90</td>
-<td>0.12</td>
-<td>0.17</td>
-<td>0.34</td>
-<td>0.47</td>
-<td>0.29</td>
-<td>0.32</td>
-<td>...</td>
-<td>0.0</td>
-<td>0.12</td>
-<td>0.42</td>
-<td>0.50</td>
-<td>0.51</td>
-<td>0.64</td>
-<td>0.12</td>
-<td>0.26</td>
-<td>0.20</td>
-<td>0.32</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
 <td>0.00</td>
 <td>0.16</td>
-<td>0.12</td>
-<td>0.74</td>
-<td>0.45</td>
-<td>0.07</td>
-<td>0.26</td>
-<td>0.59</td>
-<td>0.35</td>
-<td>0.27</td>
-<td>...</td>
-<td>0.0</td>
-<td>0.21</td>
-<td>0.50</td>
-<td>0.34</td>
-<td>0.60</td>
-<td>0.52</td>
-<td>0.02</td>
-<td>0.12</td>
-<td>0.45</td>
-<td>0.00</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>0.00</td>
 <td>0.42</td>
-<td>0.49</td>
-<td>0.56</td>
-<td>0.17</td>
-<td>0.04</td>
-<td>0.39</td>
-<td>0.47</td>
-<td>0.28</td>
-<td>0.32</td>
-<td>...</td>
-<td>0.0</td>
-<td>0.14</td>
-<td>0.49</td>
-<td>0.54</td>
-<td>0.67</td>
-<td>0.56</td>
-<td>0.01</td>
-<td>0.21</td>
-<td>0.02</td>
-<td>0.00</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
 <td>0.04</td>
 <td>0.77</td>
-<td>1.00</td>
-<td>0.08</td>
-<td>0.12</td>
-<td>0.10</td>
-<td>0.51</td>
-<td>0.50</td>
-<td>0.34</td>
-<td>0.21</td>
-<td>...</td>
-<td>0.0</td>
-<td>0.19</td>
-<td>0.30</td>
-<td>0.73</td>
-<td>0.64</td>
-<td>0.65</td>
-<td>0.02</td>
-<td>0.39</td>
-<td>0.28</td>
-<td>0.00</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
 <td>0.01</td>
 <td>0.55</td>
-<td>0.02</td>
-<td>0.95</td>
-<td>0.09</td>
-<td>0.05</td>
-<td>0.38</td>
-<td>0.38</td>
-<td>0.23</td>
-<td>0.36</td>
-<td>...</td>
-<td>0.0</td>
-<td>0.11</td>
-<td>0.72</td>
-<td>0.64</td>
-<td>0.61</td>
-<td>0.53</td>
-<td>0.04</td>
-<td>0.09</td>
-<td>0.02</td>
-<td>0.00</td>
 </tr>
 </tbody>
 </table>
 
-<p>5 rows × 99 columns</p>
 </div>
 </div>
 </div>
 </div>
 <section id="the-summation-formulation" class="level2">
 <h2 class="anchored" data-anchor-id="the-summation-formulation">The summation formulation</h2>
-<p>Say we have two columns, <code>householdsize</code> and <code>population</code>, and we’d like to know to what degree they are associated.</p>
-<div id="cell-7" class="cell" data-execution_count="5">
+<p>Say we have two columns, <code>population</code> and <code>householdsize</code>, and we’d like to know to what degree they are associated. I’ll refer to these as <code>x</code> and <code>y</code>, respectively.</p>
+<div id="cell-7" class="cell" data-execution_count="42">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> example[<span class="st">'population'</span>]</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> example[<span class="st">'householdsize'</span>]</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>example[[<span class="st">'population'</span>, <span class="st">'householdsize'</span>]]</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="5">
-<div>
-<div>
-
-
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">population</th>
-<th data-quarto-table-cell-role="th">householdsize</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">0</td>
-<td>0.19</td>
-<td>0.33</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>0.00</td>
-<td>0.16</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>0.00</td>
-<td>0.42</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>0.04</td>
-<td>0.77</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>0.01</td>
-<td>0.55</td>
-</tr>
-</tbody>
-</table>
-
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> example[<span class="st">'householdsize'</span>]</span></code></pre></div>
 </div>
-</div>
-</div>
-</div>
-<p>I can compute their covariance statistic via the following equation, where <span class="math inline">\(x\)</span> is, say <code>population</code>, and <span class="math inline">\(y\)</span> is <code>householdsize</code></p>
+<p>I can compute their covariance statistic via the following equation, where <span class="math inline">\(x\)</span> is <code>population</code>, and <span class="math inline">\(y\)</span> is <code>householdsize</code></p>
 <p><span id="eq-one"><span class="math display">\[
 c_{x, y} = (n-1)^{-1} \sum_{i=1} ^n (x_i - \bar{x})(y_i - \bar{y})
 \tag{1}\]</span></span> <span class="citation" data-cites="cohen_practical_2022">(<a href="#ref-cohen_practical_2022" role="doc-biblioref">Cohen 2022, chap. 7</a>)</span></p>
-<p>I create a function as follows to flexibly compute this formula for two arrays of data.</p>
-<div id="cell-11" class="cell" data-execution_count="6">
+<p>I’ll create a function that makes the equation operational for any two arrays, <code>x</code> and <code>y</code>:</p>
+<div id="cell-11" class="cell" data-execution_count="43">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> bivariate_cov(x: np.array, y: np.array) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    x_bar: <span class="bu">float</span> <span class="op">=</span> x.mean()</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    y_bar: <span class="bu">float</span> <span class="op">=</span> y.mean()</span>
@@ -544,22 +383,23 @@ c_{x, y} = (n-1)^{-1} \sum_{i=1} ^n (x_i - \bar{x})(y_i - \bar{y})
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        summation <span class="op">+=</span> (x.loc[i] <span class="op">-</span> x_bar) <span class="op">*</span> (y.loc[i] <span class="op">-</span> y_bar)</span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> summation <span class="op">/</span> (n<span class="op">-</span><span class="dv">1</span>)</span></code></pre></div>
 </div>
-<p>For these two variables, we find the covariance as follows:</p>
-<div id="cell-13" class="cell" data-execution_count="7">
+<p>For <code>population</code> and <code>householdsize</code> the covariance statistic is:</p>
+<div id="cell-13" class="cell" data-execution_count="44">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"cov(x, y):"</span>, bivariate_cov(x, y))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>cov(x, y): -0.0020099999999999996</code></pre>
 </div>
 </div>
 <p>I’ll check my answer with a built in function, <code>numpy.cov()</code>:</p>
-<div id="cell-15" class="cell" data-execution_count="8">
+<div id="cell-15" class="cell" data-execution_count="45">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>np.cov(x, y)</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="8">
+<div class="cell-output cell-output-display" data-execution_count="45">
 <pre><code>array([[ 0.00657, -0.00201],
        [-0.00201,  0.05293]])</code></pre>
 </div>
 </div>
 <p>This is clearly different! Rather than a scalar, this function returned a matrix. However, the upper and lower triangles of the matrix are the same as the covariance value we computed. Indeed, what numpy returned for covariance is the following matrix: <span id="eq-cov-matrix"><span class="math display">\[
+C =
 \left[
 \begin{matrix}
     var(x) &amp; cov(x, y) \\
@@ -567,8 +407,8 @@ c_{x, y} = (n-1)^{-1} \sum_{i=1} ^n (x_i - \bar{x})(y_i - \bar{y})
 \end{matrix}
 \right]
 \tag{2}\]</span></span></p>
-<p>We can compute the variances of <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> to confirm this (note that variance is, in a sense, a vector’s covariance with itself)</p>
-<div id="cell-17" class="cell" data-execution_count="9">
+<p>We can compute the variances of <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> to confirm this (note that variance is a special case of covariance where the <code>x</code> and <code>y</code> input are equal)</p>
+<div id="cell-17" class="cell" data-execution_count="46">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"var(x):"</span>, bivariate_cov(x, x))</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"var(y):"</span>, bivariate_cov(y, y))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -576,10 +416,11 @@ c_{x, y} = (n-1)^{-1} \sum_{i=1} ^n (x_i - \bar{x})(y_i - \bar{y})
 var(y): 0.05293000000000001</code></pre>
 </div>
 </div>
+<p>But how do we get the linear algebra formula that <code>numpy</code> used to produce that matrix, <span class="math inline">\(C\)</span>?</p>
 </section>
 <section id="the-vector-formulation" class="level2">
 <h2 class="anchored" data-anchor-id="the-vector-formulation">The vector formulation</h2>
-<p>To get our output to match numpy’s we’ll start by generalizing the covariance equation to input vectors. Recall the summation equation, (<a href="#eq-one" class="quarto-xref">Equation&nbsp;1</a>):</p>
+<p>To get our output to match numpy’s we’ll start by generalizing the covariance equation to input vectors. Recall the summation equation:</p>
 <p><span class="math display">\[
 \begin{align*}
 c_{x, y} &amp;= (n-1)^{-1} \sum_{i=1} ^n (x_i - \bar{x})(y_i - \bar{y}) \\
@@ -602,13 +443,15 @@ c_{x, y} &amp;= (n-1)^{-1}(\mathbf {x}_{n \times 1} - \bar{\mathbf {x}})^\interc
 \]</span></p>
 <p>Rather than overview every rule of linear algebra operations now, I’ll compute the covariance of the two variables in our dataset and we can directly examine how basic vector-scalar and vector-vector operations come out.<br>
 I’ll denote the vectors and their means below:</p>
-<div id="cell-20" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"x:"</span>, x.values, <span class="st">"mean(x)="</span>, x.mean())</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"y:"</span>, y.values,  <span class="st">"mean(y)="</span>, y.mean())</span>
+<div id="cell-21" class="cell" data-execution_count="47">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"x:"</span>, x.values, <span class="st">"</span><span class="ch">\n</span><span class="st">mean(x)="</span>, x.mean())</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"y:"</span>, y.values,  <span class="st">"</span><span class="ch">\n</span><span class="st">mean(y)="</span>, y.mean())</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"n = "</span>, <span class="bu">len</span>(x))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>x: [0.19 0.   0.   0.04 0.01] mean(x)= 0.048
-y: [0.33 0.16 0.42 0.77 0.55] mean(y)= 0.446
+<pre><code>x: [0.19 0.   0.   0.04 0.01] 
+mean(x)= 0.048
+y: [0.33 0.16 0.42 0.77 0.55] 
+mean(y)= 0.446
 n =  5</code></pre>
 </div>
 </div>
@@ -626,7 +469,7 @@ c_{x, y} &amp;= (n-1)^{-1}(\mathbf {x}_{n \times 1} - \bar{\mathbf {x}})^\interc
 \end{align*}
 \]</span></p>
 <p>In python we can confirm our result, where <code>@</code> computes the dot product in python’s <code>numpy</code> library:</p>
-<div id="cell-24" class="cell" data-execution_count="11">
+<div id="cell-25" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>x_bar: <span class="bu">float</span> <span class="op">=</span> x.mean()</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>y_bar: <span class="bu">float</span> <span class="op">=</span> y.mean()</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="bu">len</span>(x)</span>
@@ -635,14 +478,10 @@ c_{x, y} &amp;= (n-1)^{-1}(\mathbf {x}_{n \times 1} - \bar{\mathbf {x}})^\interc
 <pre><code>-0.0020099999999999996</code></pre>
 </div>
 </div>
-<p>and we quickly confirm that this outputs the same value as the summation equation we implemented earlier</p>
-<div id="cell-26" class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span>  bivariate_cov(x, y) <span class="op">==</span> ((x <span class="op">-</span> x_bar).T <span class="op">@</span> (y <span class="op">-</span> y_bar)) <span class="op">/</span> (n <span class="op">-</span> <span class="dv">1</span>)</span></code></pre></div>
-</div>
 </section>
 <section id="deriving-the-matrix-formulation" class="level2">
 <h2 class="anchored" data-anchor-id="deriving-the-matrix-formulation">Deriving the matrix formulation</h2>
-<p>In my view, the vector formulation is not particularly useful, so we will quickly move on to the matrix formulation. In this section, we’ll cover some fundamental topics in linear algebra as we go about constructing a formula that can take in an arbitrary number of variables and compute the covariance between each of them. The resulting function is going to give us the same output as <code>np.cov()</code>.</p>
+<p>The vector formulation is not particularly useful, so we will quickly move on to the matrix formulation, which will produce output equivalent to <code>np.cov()</code>.</p>
 <p>Before we get to the equation, we’ll start by defining a matrix, <span class="math inline">\(X\)</span>, made up of the vectors <span class="math inline">\(\mathbf{x}\)</span> and <span class="math inline">\(\mathbf{y}\)</span>:<br>
 <span class="math display">\[
 X_{n \times 2} =
@@ -662,9 +501,9 @@ X_{n \times 2} =
 \right]_{n \times 2}
 \]</span></p>
 <p>This is really just our full dataset:</p>
-<div id="cell-28" class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> example[[<span class="st">'population'</span>, <span class="st">'householdsize'</span>]]</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>X</span></code></pre></div>
+<div id="cell-27" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> example[[<span class="st">'population'</span>, <span class="st">'householdsize'</span>]]</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>X</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="13">
 <div>
 <div>
@@ -734,8 +573,8 @@ X_{n \times 2} =
 \end{matrix}
 \right] (n-1)^{-1}
 \end{align*}
-\]</span> Set aside the value, <span class="math inline">\((n-1)^{-1}\)</span> for now, and just consider what this matrix of dot products is made of.<br>
-I defer to the <a href="https://en.wikipedia.org/wiki/Matrix_multiplication#Vector_times_matrix">wikipedia entry on matrix-matrix multiplication</a> to define the exact process, but consider that when you multiply two matrices, each entry in the output matrix is the dot product of the <span class="math inline">\(i\)</span> th row of the left matrix and the <span class="math inline">\(j\)</span> th column of the right matrix. Given that definition and the fact that our output above is a matrix of dot products, lets define it as the output of a multiplication operation between some currently unknown left and right matrix. Specifically:</p>
+\]</span> Set aside the value, <span class="math inline">\((n-1)^{-1}\)</span> for now, and just consider what this matrix of dot products is made of.</p>
+<p>I defer to the <a href="https://en.wikipedia.org/wiki/Matrix_multiplication#Vector_times_matrix">wikipedia entry on matrix-matrix multiplication</a> to define the exact process, but consider that when you multiply two matrices, each entry in the output matrix is the dot product of the <span class="math inline">\(i\)</span> th row of the left matrix and the <span class="math inline">\(j\)</span> th column of the right matrix. Given that definition and the fact that our output above is a matrix of dot products, lets define it as the output of a multiplication operation between some currently unknown left and right matrix. Specifically:</p>
 <p><span class="math display">\[
 \begin{align*}
 \left[
@@ -743,7 +582,7 @@ I defer to the <a href="https://en.wikipedia.org/wiki/Matrix_multiplication#Vect
 (\mathbf {x} - \bar{\mathbf {x}})^\intercal (\mathbf {x} - \bar{\mathbf {x}}) &amp; (\mathbf {x} - \bar{\mathbf {x}})^\intercal (\mathbf {y} - \bar{\mathbf {y}}) \\
 (\mathbf {y} - \bar{\mathbf {y}})^\intercal (\mathbf {x} - \bar{\mathbf {x}}) &amp; (\mathbf {y} - \bar{\mathbf {y}})^\intercal (\mathbf {y} - \bar{\mathbf {y}}) \\
 \end{matrix}
-\right] = \\
+\right] &amp;= \\
 \left[
 \begin{matrix}
 (\text{Row 1, Left Matrix}) \cdot (\text{Col 1, Right Matrix}) &amp; (\text{Row 1, Left Matrix}) \cdot (\text{Col 2, Right Matrix})  \\
@@ -752,51 +591,8 @@ I defer to the <a href="https://en.wikipedia.org/wiki/Matrix_multiplication#Vect
 \right]
 \end{align*}
 \]</span></p>
-<p>We can use the equivalence of these two statements to define what the rows and columns are for the left and right matrix:<br>
-<strong>Left Matrix Definition:</strong></p>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Left Matrix Row</th>
-<th>Definition</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Row 1</td>
-<td><span class="math inline">\((\mathbf{x} - \bar{\mathbf{x}})\)</span></td>
-</tr>
-<tr class="even">
-<td>Row 2</td>
-<td><span class="math inline">\((\mathbf{y} - \bar{\mathbf{y}})\)</span></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Right Matrix Definition:</strong></p>
-<table class="table">
-<colgroup>
-<col style="width: 29%">
-<col style="width: 70%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Right Matrix Column</th>
-<th>Definition</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Column 1</td>
-<td><span class="math inline">\((\mathbf{x} - \bar{\mathbf{x}})\)</span></td>
-</tr>
-<tr class="even">
-<td>Column 2</td>
-<td><span class="math inline">\((\mathbf{y} - \bar{\mathbf{y}})\)</span></td>
-</tr>
-</tbody>
-</table>
-<p>Plugging those in gives us the matrices that, when multiplied, produce our covariance matrix.<br>
-<span class="math display">\[
+<p>We can use the equivalence of these two statements to define what the rows and columns are for the left and right matrix:</p>
+<p><span class="math display">\[
 \begin{align*}
 C &amp;= \left[
 \begin{matrix}
@@ -849,21 +645,7 @@ C &amp;= \left[
 <p>When we plug that in, we get the typical formula for covariance.</p>
 <p><span id="eq-cov-mat"><span class="math display">\[
 \begin{align*}
-C &amp;= \left[
-\begin{matrix}
-\vert &amp; \vert \\
-    (\mathbf{x}-\bar{\mathbf{x}})   &amp; (\mathbf{y}-\bar{\mathbf{y}})   \\
-    \vert &amp; \vert
-\end{matrix}
-\right]^\intercal
-\left[
-\begin{matrix}
-\vert &amp; \vert \\
-    (\mathbf{x}-\bar{\mathbf{x}})   &amp; (\mathbf{y}-\bar{\mathbf{y}})   \\
-    \vert &amp; \vert
-\end{matrix}
-\right] (n-1)^{-1} \\
-&amp;=
+C &amp;=
 \left[
 \begin{matrix}
 x_1 - \bar{\mathbf{x}}   &amp; y_1 - \bar{\mathbf{y}}   \\
@@ -882,7 +664,7 @@ x_1 - \bar{\mathbf{x}}   &amp; y_1 - \bar{\mathbf{y}}   \\
 \right]_{n \times 2} (n-1)^{-1}
 \end{align*}
 \tag{3}\]</span></span></p>
-<p>So now we know the matrix operation that will yield the covariance matrix, <span class="math inline">\(C\)</span>, from the matrix, <span class="math inline">\(X\)</span> – we find the mean-centered representation of <span class="math inline">\(X\)</span>, multiply that with itself, and then multiply the result by the scalar, <span class="math inline">\((n-1)^{-1}\)</span>. This is a fairly straightforward operation, but it’s not really an equation yet, and formalizing this into an equation is non-trivial…</p>
+<p>So now we know the matrix operation that will yield the covariance matrix, <span class="math inline">\(C\)</span>, from the matrix, <span class="math inline">\(X\)</span> – we find the mean-centered representation of <span class="math inline">\(X\)</span>, multiply that with itself, and then multiply the result by the scalar, <span class="math inline">\((n-1)^{-1}\)</span>. This is a fairly straightforward operation, but <strong>it’s not really an equation yet.</strong> We will not formalize it into one.</p>
 <section id="building-the-centering-matrix" class="level3">
 <h3 class="anchored" data-anchor-id="building-the-centering-matrix">Building the centering matrix</h3>
 <p>We want to subtract the mean of x from the x elements, and the mean of y from the y elements, all in one matrix. In the vector setting above, we set this up as the difference between a vector and its scalar mean. Vector-scalar operations are intuitive in linear algebra:</p>
@@ -954,7 +736,7 @@ x_1 - \bar{\mathbf{x}}   &amp; y_1 - \bar{\mathbf{y}}   \\
 \]</span></p>
 <p>But how do we produce the <span class="math inline">\(n \times 2\)</span> matrix of column means that this equation requires?<br>
 <span id="eq-mat-means"><span class="math display">\[
-\left[
+??? = \left[
 \begin{matrix}
     \bar{\mathbf{x}}   &amp; \bar{\mathbf{y}}   \\
     \bar{\mathbf{x}}   &amp; \bar{\mathbf{y}}   \\
@@ -963,10 +745,10 @@ x_1 - \bar{\mathbf{x}}   &amp; y_1 - \bar{\mathbf{y}}   \\
 \end{matrix}
 \right]_{n \times 2}
 \tag{4}\]</span></span></p>
-<p>Given that these means are functions of the elements of <span class="math inline">\(\mathbf{x}\)</span> and <span class="math inline">\(\mathbf{y}\)</span> respectively, we are going to try to create a function that takes in the matrix <span class="math inline">\(X\)</span> and outputs the matrix of means above. What’s interesting is that with linear algebra, we can conceive of <em>functions as matrices</em>, so really we are looking for a matrix we can multiply with <span class="math inline">\(X\)</span> to produce (<a href="#eq-mat-means" class="quarto-xref">Equation&nbsp;4</a>).</p>
+<p>Given that these means are functions of the elements of <span class="math inline">\(\mathbf{x}\)</span> and <span class="math inline">\(\mathbf{y}\)</span> respectively, we are going to try to create a function that takes in the matrix <span class="math inline">\(X\)</span> and outputs the matrix of means above, (<a href="#eq-mat-means" class="quarto-xref">Equation&nbsp;4</a>).</p>
 <section id="the-mean-as-a-matrix-transformation" class="level4">
 <h4 class="anchored" data-anchor-id="the-mean-as-a-matrix-transformation">The mean as a matrix transformation</h4>
-<p>To build that function/matrix, lets start by considering a standard definition of the average and translate it into a “matrix transformation”. The simple summation formulation for the mean is as follows:<br>
+<p>To build that function, lets start by considering a standard definition of the average and translate it into a “matrix transformation”. The simple summation formulation for the mean is as follows:<br>
 <span class="math display">\[
 \bar{x} = \frac{1}{n}\sum_{i=1}^n x_i = \sum_{i=1}^n \frac{1}{n}x_i
 \]</span> The summation, <span class="math inline">\(\sum_{i=1}^n \frac{1}{n}x_i\)</span>, maps directly to a simple dot product:<br>
@@ -980,22 +762,22 @@ x_1 - \bar{\mathbf{x}}   &amp; y_1 - \bar{\mathbf{y}}   \\
 \bar{x} = f(\mathbf{x}_{n \times 1}) = \left[\begin{matrix}\frac{1}{n} &amp; \frac{1}{n} &amp; \cdots &amp; \frac{1}{n}\end{matrix}\right]_{1 \times n} \mathbf{x}_{n \times 1}
 \tag{5}\]</span></span></p>
 <p>Lets confirm this behavior with code:</p>
-<div id="cell-33" class="cell" data-execution_count="24">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"n ="</span>, <span class="bu">len</span>(x))</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"[1/n, 1/n, ... 1/n] = "</span>, <span class="dv">1</span><span class="op">/</span><span class="bu">len</span>(x) <span class="op">*</span> np.ones(<span class="bu">len</span>(x)).T)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"x = "</span>, x.values)</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"[1/n, 1/n, ... 1/n] * x = "</span>, <span class="dv">1</span><span class="op">/</span><span class="bu">len</span>(x) <span class="op">*</span> np.ones(<span class="bu">len</span>(x)).T <span class="op">@</span> x</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"mean = "</span>, x.mean())</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"^ these are equal"</span>)</span></code></pre></div>
+<div id="cell-32" class="cell" data-execution_count="50">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"n ="</span>, <span class="bu">len</span>(x))</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"[1/n, 1/n, ... 1/n] = "</span>, <span class="dv">1</span><span class="op">/</span><span class="bu">len</span>(x) <span class="op">*</span> np.ones(<span class="bu">len</span>(x)).T)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"x = "</span>, x.values)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"[1/n, 1/n, ... 1/n] @ x = "</span>, <span class="bu">round</span>(<span class="dv">1</span><span class="op">/</span><span class="bu">len</span>(x) <span class="op">*</span> np.ones(<span class="bu">len</span>(x)).T <span class="op">@</span> x, <span class="dv">5</span>)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"mean = "</span>, x.mean())</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"^ these are equal"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>n = 5
 [1/n, 1/n, ... 1/n] =  [0.2 0.2 0.2 0.2 0.2]
 x =  [0.19 0.   0.   0.04 0.01]
 
-[1/n, 1/n, ... 1/n] * x =  0.04800000000000001
+[1/n, 1/n, ... 1/n] @ x =  0.048
 mean =  0.048
 ^ these are equal</code></pre>
 </div>
@@ -1006,7 +788,7 @@ mean =  0.048
 \]</span> If we mutliply that by <span class="math inline">\(1/n\)</span> and transpose the result, we get the vector from our function, (<a href="#eq-simple-mean" class="quarto-xref">Equation&nbsp;5</a>): <span class="math display">\[
 n^{-1}\mathbf{1}_{n \times 1}^\intercal = \left[\begin{matrix}\frac{1}{n} &amp; \frac{1}{n} &amp; \cdots &amp; \frac{1}{n}\end{matrix}\right]_{1 \times n}
 \]</span></p>
-<p>With that notation, we’ll now redefine the function as the matrix transformation, <span class="math inline">\(T\)</span>, that transforms a <span class="math inline">\(n \times 1\)</span> matrix (this is just a vector) into its scalar mean. <span class="math display">\[
+<p>With that notation, we’ll now redefine the function as the matrix transformation, <span class="math inline">\(T_\text{mean}\)</span>, that transforms a <span class="math inline">\(n \times 1\)</span> matrix (this is just a vector) into its scalar mean. <span class="math display">\[
 T_\text{mean}: \mathbb{R}^n \rightarrow \mathbb{R}^1 \quad \text{defined by} \quad T(\mathbf{x}_{n \times 1}) = n^{-1}\mathbf{1}_{n \times 1}^\intercal \mathbf{x}_{n \times 1}
 \]</span></p>
 <p>Looks weird and potentially useless, but we’ll use this same approach to define notation for the matrix of deviations from the mean.</p>
@@ -1022,21 +804,11 @@ T_\text{mean}: \mathbb{R}^n \rightarrow \mathbb{R}^1 \quad \text{defined by} \qu
     \bar{\mathbf{x}}   &amp; \bar{\mathbf{y}}   \\
 \end{matrix}
 \right]_{n \times 2}
-\]</span> To move towards that output, lets start with defining a function/matrix transformation that can output the first column then generalizing from there: <span class="math display">\[
-\left[
-\begin{matrix}
-    \bar{\mathbf{x}}   \\
-    \bar{\mathbf{x}} \\
-    \vdots    \\
-    \bar{\mathbf{x}}    \\
-\end{matrix}
-\right]_{n \times 1}
-\]</span></p>
+\]</span> To move towards that output, a <span class="math inline">\(n \times 2\)</span> matrix, lets consider some points about matrix multiplication.</p>
 </section>
 <section id="an-aside-about-matrix-multiplication-rules" class="level4">
 <h4 class="anchored" data-anchor-id="an-aside-about-matrix-multiplication-rules">An aside about matrix multiplication rules</h4>
-<p>To get this specified output, an <span class="math inline">\(n \times 1\)</span> vector, lets cover some basics of matrix multiplication.<br>
-In matrix multiplication, the following properties hold with regards to dimensions of the input and output:</p>
+<p>In matrix multiplication, the following properties hold with regards to dimensions of the input and output:</p>
 <ol type="1">
 <li>Operations are only valid if the column dimension of the left input matrix matches the row dimension of the right input matrix.</li>
 <li>The output has the row dimension of the left matrix and the column dimension of the right matrix.</li>
@@ -1049,10 +821,10 @@ In matrix multiplication, the following properties hold with regards to dimensio
 (\fbox{1} \times n)(n \times \fbox{1}) \quad&amp; (1 \times 1) \rightarrow \text{Output is scalar}
 \end{align*}
 \]</span> (Sometimes we had to transpose one of the vectors for this to be the case).</p>
-<p>If we want to produce an <span class="math inline">\(n \times 1\)</span> matrix from a multiplication operation involving an <span class="math inline">\(n \times 1\)</span> input, we would need a matrix with the following, underlined dimensionality:<br>
+<p>If we want to produce an <span class="math inline">\(n \times 2\)</span> matrix from a multiplication operation involving an <span class="math inline">\(n \times 1\)</span> input, we would need a matrix with the following, underlined dimensionality:<br>
 <span class="math display">\[
-\underline{(n \times n)} (n \times 1) \rightarrow \text{Valid operation with output: } (n \times 1)
-\]</span> Upon some reflection, the <span class="math inline">\(n \times n\)</span> matrix must be the matrix where every element is <span class="math inline">\(1/n\)</span>. The following operation gives us the desired column vector with all elements set as the original column mean: <span class="math display">\[
+\underline{(n \times n)} (n \times 2) \rightarrow \text{Valid with output: } (n \times 2)
+\]</span> Upon some reflection, the <span class="math inline">\(n \times n\)</span> matrix must be the matrix where every element is <span class="math inline">\(1/n\)</span>. The following operation gives us the desired matrix with all elements set as the original column mean: <span class="math display">\[
 \left[
 \begin{matrix}
     \frac{1}{n}   &amp; \frac{1}{n}   &amp; \cdots &amp; \frac{1}{n}\\
@@ -1060,22 +832,31 @@ In matrix multiplication, the following properties hold with regards to dimensio
     \vdots   &amp; \vdots   &amp; \cdots &amp; \frac{1}{n}\\
     \frac{1}{n}   &amp; \frac{1}{n}   &amp; \cdots &amp; \frac{1}{n}
 \end{matrix}
-\right]_{n \times n} \left[\begin{matrix}x_1\\x_2\\\vdots\\x_n\end{matrix}\right]_{n \times 1} =
+\right]_{n \times n}
 \left[
 \begin{matrix}
-    \sum_{i=1}^n \frac{x}{n}  \\
-    \sum_{i=1}^n \frac{x}{n} \\
-    \vdots  \\
-    \sum_{i=1}^n \frac{x}{n}  \\
+    x_1   &amp; y_1   \\
+    x_2   &amp; y_2   \\
+    \vdots   &amp; \vdots   \\
+    x_n   &amp; y_n   \\
 \end{matrix}
-\right]_{n \times 1} = \left[
+\right]_{n \times 2} =
+\left[
 \begin{matrix}
-    \bar{\mathbf{x}}   \\
-    \bar{\mathbf{x}} \\
-    \vdots    \\
-    \bar{\mathbf{x}}    \\
+    \sum_{i=1}^n \frac{x}{n}   &amp; \sum_{i=1}^n \frac{y}{n}   \\
+    \sum_{i=1}^n \frac{x}{n}   &amp; \sum_{i=1}^n \frac{y}{n}  \\
+    \vdots   &amp; \vdots   \\
+    \sum_{i=1}^n \frac{x}{n}   &amp; \sum_{i=1}^n \frac{y}{n}   \\
 \end{matrix}
-\right]_{n \times 1}
+\right]_{n \times 2}
+= \left[
+\begin{matrix}
+    \bar{\mathbf{x}}   &amp; \bar{\mathbf{y}}   \\
+    \bar{\mathbf{x}}   &amp; \bar{\mathbf{y}}   \\
+    \vdots   &amp; \vdots   \\
+    \bar{\mathbf{x}}   &amp; \bar{\mathbf{y}}   \\
+\end{matrix}
+\right]_{n \times 2}
 \]</span></p>
 </section>
 <section id="notation-of-the-transformation" class="level4">
@@ -1180,50 +961,27 @@ x_1 - \bar{\mathbf{x}}   &amp; y_1 - \bar{\mathbf{y}}   \\
 <span class="math display">\[
 T_{\text{center}}: \mathbb{R}^n \rightarrow \mathbb{R}^n \quad \text{defined by} \quad T(X) = (I -  n^{-1} \mathbf{1}_{n} \mathbf{1}_{n}^\intercal ) X
 \]</span></p>
-<div id="cell-37" class="cell" data-execution_count="25">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Centering matrix -&gt;"</span>)</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>((np.identity(n) <span class="op">-</span> (<span class="dv">1</span><span class="op">/</span>n) <span class="op">*</span> np.ones(shape<span class="op">=</span>(n, <span class="dv">1</span>)) <span class="op">@</span> np.ones(shape<span class="op">=</span>(n, <span class="dv">1</span>)).T))</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"X -&gt;"</span>)</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(X.values)</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Centering matrix @ X -&gt;"</span>)</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>((np.identity(n) <span class="op">-</span> (<span class="dv">1</span><span class="op">/</span>n) <span class="op">*</span> np.ones(shape<span class="op">=</span>(n, <span class="dv">1</span>)) <span class="op">@</span> np.ones(shape<span class="op">=</span>(n, <span class="dv">1</span>)).T) <span class="op">@</span> X.values)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Centering matrix -&gt;
-[[ 0.8 -0.2 -0.2 -0.2 -0.2]
- [-0.2  0.8 -0.2 -0.2 -0.2]
- [-0.2 -0.2  0.8 -0.2 -0.2]
- [-0.2 -0.2 -0.2  0.8 -0.2]
- [-0.2 -0.2 -0.2 -0.2  0.8]]
-
-X -&gt;
-[[0.19 0.33]
- [0.   0.16]
- [0.   0.42]
- [0.04 0.77]
- [0.01 0.55]]
-
-Centering matrix @ X -&gt;
-[[ 0.142 -0.116]
- [-0.048 -0.286]
- [-0.048 -0.026]
- [-0.008  0.324]
- [-0.038  0.104]]</code></pre>
+<p>In code:</p>
+<div id="cell-37" class="cell" data-execution_count="82">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> T_center(X: np.array) <span class="op">-&gt;</span> np.array:</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> <span class="bu">len</span>(X)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (np.identity(n) <span class="op">-</span> (<span class="dv">1</span><span class="op">/</span>n)<span class="op">*</span>np.ones(shape<span class="op">=</span>(n, n))) <span class="op">@</span> X</span></code></pre></div>
 </div>
-</div>
-<p><strong>Notes:</strong><br>
-<code>numpy</code> and <code>pandas</code> support some invalid linear algebra operations, such as matrix addition/subtraction between different sized matrices (these packages use a method called <a href="https://numpy.org/doc/stable/user/basics.broadcasting.html">broadcasting</a> to make the operations valid):</p>
+</section>
+</section>
+<section id="a-note-on-broadcasting-and-numerical-methods" class="level3">
+<h3 class="anchored" data-anchor-id="a-note-on-broadcasting-and-numerical-methods">A note on broadcasting and numerical methods</h3>
+<p><code>numpy</code> and <code>pandas</code> support some invalid linear algebra operations, such as matrix addition/subtraction between different sized matrices (these packages use a method called <a href="https://numpy.org/doc/stable/user/basics.broadcasting.html">broadcasting</a> to make the operations valid):</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <figcaption>Broadcasting a times b</figcaption>
 <p><img src="broadcasting_1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
-<p>So we can confirm that our function produced the expected centered matrix by simply subtracting the dataframe <code>X</code> from its column means.</p>
-<div id="cell-41" class="cell" data-execution_count="103">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">-</span> X.mean()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="103">
+<p>This makes the sort of centering operation we just covered in depth incredibly simple:</p>
+<div id="cell-41" class="cell" data-execution_count="83">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">-</span> X.mean()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="83">
 <div>
 <div>
 
@@ -1269,11 +1027,56 @@ Centering matrix @ X -&gt;
 </div>
 </div>
 </div>
-</section>
-</section>
-<section id="covariance-as-a-matrix-transformation" class="level3">
-<h3 class="anchored" data-anchor-id="covariance-as-a-matrix-transformation">Covariance as a matrix transformation</h3>
-<p>At this point we will return to the matrix equation for covariance, (<a href="#eq-cov-mat" class="quarto-xref">Equation&nbsp;3</a>) that we defined earlier, and put it into formal notation. <span class="math display">\[
+<p>We can confirm that our function produced that same centered matrix:</p>
+<div id="cell-43" class="cell" data-execution_count="84">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>T_center(X)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="84">
+<div>
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">population</th>
+<th data-quarto-table-cell-role="th">householdsize</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0.142</td>
+<td>-0.116</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>-0.048</td>
+<td>-0.286</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>-0.048</td>
+<td>-0.026</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>-0.008</td>
+<td>0.324</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>-0.038</td>
+<td>0.104</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+<p>At this point we will return to the matrix equation for covariance, (<a href="#eq-cov-mat" class="quarto-xref">Equation&nbsp;3</a>) that we defined earlier: <span class="math display">\[
 \begin{align*}
 C = (n-1)^{-1} \left[
 \begin{matrix}
@@ -1293,14 +1096,15 @@ x_1 - \bar{\mathbf{x}}   &amp; y_1 - \bar{\mathbf{y}}   \\
 \right]_{n \times 2}
 \end{align*}
 \]</span></p>
+<p>We’ll now express it formally.</p>
 </section>
 </section>
 <section id="the-matrix-formulation" class="level2">
 <h2 class="anchored" data-anchor-id="the-matrix-formulation">The matrix formulation</h2>
-<p>Covariance is fairly simple to write out once you have the centering matrix, <span class="math inline">\(T_{center}\)</span>. Our equation is as follows:</p>
+<p>Covariance is fairly simple to write out once you have the centering matrix, <span class="math inline">\(T_{\text{center}}\)</span>. Our equation is as follows:</p>
 <p><span class="math display">\[
 \begin{align*}
-C &amp;= (n - 1)^{-1} T_{center}(X)^\intercal T_{center}(X)  \\
+C &amp;= (n - 1)^{-1} T_{\text{center}}(X)^\intercal T_{\text{center}}(X)  \\
 &amp;= (n - 1)^{-1}\left[ (I -  n^{-1} \mathbf{1}_{n} \mathbf{1}_{n}^\intercal ) X \right]^\intercal \left[ (I -  n^{-1} \mathbf{1}_{n} \mathbf{1}_{n}^\intercal ) X \right]
 \end{align*}
 \]</span> This is pretty verbose, and it’s common in textbooks to see some sort of abbreviated version, like the following, <span id="eq-cov"><span class="math display">\[
@@ -1310,12 +1114,20 @@ C = (n - 1)^{-1} X_c^\intercal X_c \\
 \end{align*}
 \tag{6}\]</span></span></p>
 <p><span class="citation" data-cites="cohen_practical_2022">(<a href="#ref-cohen_practical_2022" role="doc-biblioref">Cohen 2022, chap. 7</a>)</span></p>
+<div id="cell-47" class="cell" data-execution_count="85">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> covariance_matrix(X: np.array) <span class="op">-&gt;</span> np.array:</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> <span class="bu">len</span>(X)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Center matrix</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    X_c <span class="op">=</span> T_center(X)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Compute covariance</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">1</span><span class="op">/</span>(n<span class="op">-</span><span class="dv">1</span>) <span class="op">*</span> X_c.T <span class="op">@</span> X_c</span></code></pre></div>
+</div>
 <section id="applying-it-to-data" class="level3">
 <h3 class="anchored" data-anchor-id="applying-it-to-data">Applying it to data</h3>
 <p>We’ll test this formula out with our data:</p>
-<div id="cell-47" class="cell" data-execution_count="37">
+<div id="cell-50" class="cell" data-execution_count="86">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>X</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="37">
+<div class="cell-output cell-output-display" data-execution_count="86">
 <div>
 <div>
 
@@ -1361,7 +1173,8 @@ C = (n - 1)^{-1} X_c^\intercal X_c \\
 </div>
 </div>
 </div>
-<div id="cell-48" class="cell" data-execution_count="38">
+<p>First we’ll define the centered matrix, <span class="math inline">\(X_c = (I -  n^{-1} \mathbf{1}_{n} \mathbf{1}_{n}^\intercal ) X\)</span>:</p>
+<div id="cell-52" class="cell" data-execution_count="87">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>C, X_c <span class="op">=</span> sp.symbols(<span class="st">"C X_c"</span>)</span>
@@ -1371,24 +1184,24 @@ C = (n - 1)^{-1} X_c^\intercal X_c \\
 <span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    ))</span>
 <span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>sp.Eq(X_c, exp)</span></code></pre></div>
 </details>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="38">
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="87">
 <p><span class="math inline">\(\displaystyle X_{c} = \left(- 0.2 \left[\begin{matrix}1.0 &amp; 1.0 &amp; 1.0 &amp; 1.0 &amp; 1.0\\1.0 &amp; 1.0 &amp; 1.0 &amp; 1.0 &amp; 1.0\\1.0 &amp; 1.0 &amp; 1.0 &amp; 1.0 &amp; 1.0\\1.0 &amp; 1.0 &amp; 1.0 &amp; 1.0 &amp; 1.0\\1.0 &amp; 1.0 &amp; 1.0 &amp; 1.0 &amp; 1.0\end{matrix}\right] + \left[\begin{matrix}1 &amp; 0 &amp; 0 &amp; 0 &amp; 0\\0 &amp; 1 &amp; 0 &amp; 0 &amp; 0\\0 &amp; 0 &amp; 1 &amp; 0 &amp; 0\\0 &amp; 0 &amp; 0 &amp; 1 &amp; 0\\0 &amp; 0 &amp; 0 &amp; 0 &amp; 1\end{matrix}\right]\right) \left[\begin{matrix}0.19 &amp; 0.33\\0 &amp; 0.16\\0 &amp; 0.42\\0.04 &amp; 0.77\\0.01 &amp; 0.55\end{matrix}\right]\)</span></p>
 </div>
 </div>
 <p>Which evaluates to:</p>
-<div id="cell-50" class="cell" data-execution_count="147">
+<div id="cell-54" class="cell" data-execution_count="88">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>sp.Eq(X_c, sp.UnevaluatedExpr(exp_output))</span></code></pre></div>
 </details>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="147">
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="88">
 <p><span class="math inline">\(\displaystyle X_{c} = \left[\begin{matrix}0.142 &amp; -0.116\\-0.048 &amp; -0.286\\-0.048 &amp; -0.026\\-0.008 &amp; 0.324\\-0.038 &amp; 0.104\end{matrix}\right]\)</span></p>
 </div>
 </div>
 <p>And now the main equation: <span class="math display">\[
 C = (n - 1)^{-1} X_c^\intercal X_c
 \]</span></p>
-<div id="cell-52" class="cell" data-execution_count="163">
+<div id="cell-56" class="cell" data-execution_count="89">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>out <span class="op">=</span> (</span>
@@ -1397,12 +1210,12 @@ C = (n - 1)^{-1} X_c^\intercal X_c
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>sp.Eq(C, out)</span></code></pre></div>
 </details>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="163">
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="89">
 <p><span class="math inline">\(\displaystyle C = \left[\begin{matrix}0.142 &amp; -0.048 &amp; -0.048 &amp; -0.008 &amp; -0.038\\-0.116 &amp; -0.286 &amp; -0.026 &amp; 0.324 &amp; 0.104\end{matrix}\right] \left[\begin{matrix}0.142 &amp; -0.116\\-0.048 &amp; -0.286\\-0.048 &amp; -0.026\\-0.008 &amp; 0.324\\-0.038 &amp; 0.104\end{matrix}\right] \left(- 1 + 5\right)^{-1}\)</span></p>
 </div>
 </div>
 <p>Already it should become apparent that this multiplication will be a sequential application of the vector formula for covariance. We can make that abundantly clear by visualizing the multiplication result:</p>
-<div id="cell-54" class="cell" data-execution_count="156">
+<div id="cell-58" class="cell" data-execution_count="90">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>out <span class="op">=</span> sp.Matrix([[sp.UnevaluatedExpr(sp.Matrix(x<span class="op">-</span>x.mean()).T) <span class="op">*</span> sp.UnevaluatedExpr(sp.Matrix(x<span class="op">-</span>x.mean()))</span>
@@ -1416,83 +1229,31 @@ C = (n - 1)^{-1} X_c^\intercal X_c
 <span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>                   ])</span>
 <span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>out</span></code></pre></div>
 </details>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="156">
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="90">
 <p><span class="math inline">\(\displaystyle \left[\begin{matrix}\left[\begin{matrix}0.142 &amp; -0.048 &amp; -0.048 &amp; -0.008 &amp; -0.038\end{matrix}\right] \left[\begin{matrix}0.142\\-0.048\\-0.048\\-0.008\\-0.038\end{matrix}\right] \left(- 1 + 5\right)^{-1} &amp; \left[\begin{matrix}0.142 &amp; -0.048 &amp; -0.048 &amp; -0.008 &amp; -0.038\end{matrix}\right] \left[\begin{matrix}-0.116\\-0.286\\-0.026\\0.324\\0.104\end{matrix}\right] \left(- 1 + 5\right)^{-1}\\\left[\begin{matrix}-0.116 &amp; -0.286 &amp; -0.026 &amp; 0.324 &amp; 0.104\end{matrix}\right] \left[\begin{matrix}0.142\\-0.048\\-0.048\\-0.008\\-0.038\end{matrix}\right] \left(- 1 + 5\right)^{-1} &amp; \left[\begin{matrix}-0.116 &amp; -0.286 &amp; -0.026 &amp; 0.324 &amp; 0.104\end{matrix}\right] \left[\begin{matrix}-0.116\\-0.286\\-0.026\\0.324\\0.104\end{matrix}\right] \left(- 1 + 5\right)^{-1}\end{matrix}\right]\)</span></p>
 </div>
 </div>
-<p><span class="math display">\[
-\begin{align*}
-&amp;= \frac{1}{n-1}
-\left[
-\begin{matrix}
-\sum_{i=1}^{n} (x_i - \bar{\mathbf{x}})(x_i - \bar{\mathbf{x}}) &amp; \sum_{i=1}^{n} (x_i - \bar{\mathbf{x}})(y_i - \bar{\mathbf{y}}) \\
-\sum_{i=1}^{n} (y_i - \bar{\mathbf{y}})(x_i - \bar{\mathbf{x}}) &amp; \sum_{i=1}^{n} (y_i - \bar{\mathbf{y}})(y_i - \bar{\mathbf{y}}) \\
-\end{matrix}
-\right] \\
-&amp;=
-\left[
-\begin{matrix}
-    var(\mathbf{x}) &amp; cov(\mathbf{x}, \mathbf{y}) \\
-    cov(\mathbf{y}, \mathbf{x}) &amp; var(\mathbf{y}) \\
-\end{matrix}
-\right]
-\end{align*}
-\]</span></p>
-<p>For a sanity check, we can compare our results with those in <code>numpy</code> and <code>pandas</code>.<br>
-our results:</p>
-<div id="cell-57" class="cell" data-execution_count="30">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> covariance_matrix(X: np.array) <span class="op">-&gt;</span> np.array:</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> <span class="bu">len</span>(X)</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Center matrix</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    X_c <span class="op">=</span> (np.identity(n) <span class="op">-</span> (<span class="dv">1</span><span class="op">/</span>n)<span class="op">*</span>np.ones(shape<span class="op">=</span>(n, n))) <span class="op">@</span> X</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Compute covariance</span></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">1</span><span class="op">/</span>(n<span class="op">-</span><span class="dv">1</span>) <span class="op">*</span> X_c.T <span class="op">@</span> X_c</span></code></pre></div>
-</div>
-<div id="cell-58" class="cell" data-execution_count="31">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>covariance_matrix(X)</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="31">
-<div>
-<div>
-
-
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">population</th>
-<th data-quarto-table-cell-role="th">householdsize</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">population</td>
-<td>0.00657</td>
-<td>-0.00201</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">householdsize</td>
-<td>-0.00201</td>
-<td>0.05293</td>
-</tr>
-</tbody>
-</table>
-
+<p>The result:</p>
+<div id="cell-60" class="cell" data-execution_count="91">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>covariance_matrix(X.values)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="91">
+<pre><code>array([[ 0.00657, -0.00201],
+       [-0.00201,  0.05293]])</code></pre>
 </div>
 </div>
-</div>
-</div>
+<p>For a sanity check, we can compare our results with those in <code>numpy</code> and <code>pandas</code>.</p>
 <p><code>numpy</code> results:</p>
-<div id="cell-60" class="cell" data-execution_count="32">
+<div id="cell-63" class="cell" data-execution_count="92">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>np.cov(x, y)</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="32">
+<div class="cell-output cell-output-display" data-execution_count="92">
 <pre><code>array([[ 0.00657, -0.00201],
        [-0.00201,  0.05293]])</code></pre>
 </div>
 </div>
 <p><code>pandas</code> results:</p>
-<div id="cell-62" class="cell" data-execution_count="33">
+<div id="cell-65" class="cell" data-execution_count="93">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>X.cov()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="33">
+<div class="cell-output cell-output-display" data-execution_count="93">
 <div>
 <div>
 
@@ -1525,24 +1286,24 @@ our results:</p>
 </div>
 <section id="visualizing-the-covariance-matrix" class="level4">
 <h4 class="anchored" data-anchor-id="visualizing-the-covariance-matrix">Visualizing the Covariance Matrix</h4>
-<p>We’ll now return to our original, full dataset</p>
-<div id="cell-64" class="cell" data-execution_count="34">
+<p>We’ll now return to our original, full dataset from the very start of the exercise.</p>
+<div id="cell-67" class="cell" data-execution_count="94">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>df_num.shape</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="34">
+<div class="cell-output cell-output-display" data-execution_count="94">
 <pre><code>(1994, 99)</code></pre>
 </div>
 </div>
 <p>and we’ll compute the covariance matrix across al 99 features.</p>
-<div id="cell-66" class="cell" data-execution_count="35">
+<div id="cell-69" class="cell" data-execution_count="95">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>cov_matrix <span class="op">=</span> covariance_matrix(df_num)</span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>cov_matrix.shape</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="35">
+<div class="cell-output cell-output-display" data-execution_count="95">
 <pre><code>(99, 99)</code></pre>
 </div>
 </div>
 <p>Looking at a <span class="math inline">\(99 \times 99\)</span> matrix is not particularly useful, so it’s common to use heatmaps to visualize matrices that show association between many variables.</p>
-<div id="cell-68" class="cell" data-execution_count="36">
+<div id="cell-71" class="cell" data-execution_count="96">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>plt.imshow(cov_matrix.values)</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>plt.colorbar()<span class="op">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">

@@ -12,10 +12,10 @@
 <generator>quarto-1.4.551</generator>
 <lastBuildDate>Fri, 31 May 2024 07:00:00 GMT</lastBuildDate>
 <item>
-  <title>The Covariance Matrix</title>
+  <title>The Covariance Matrix from Scratch</title>
   <dc:creator>Peter Amerkhanian</dc:creator>
   <link>https://peter-amerkhanian.com/posts/covariance-matrices/</link>
-  <description><![CDATA[ The following is largely based on exercises in <span class="citation" data-cites="cohen_practical_2022">(Cohen 2022)</span>, an excellent overview of applied, numerical linear algebra in python. This exercise is an overview of how to compute the covariance matrix of a dataset, and contains enough fundamental linear algebra topics – matrix multiplication, matrices as functions, etc. – that I wanted to commit it to a blog for my future reference. ]]></description>
+  <description><![CDATA[ The following is an overview of how to construct a covariance matrix. The post is largely based on exercises in <span class="citation" data-cites="cohen_practical_2022">(Cohen 2022)</span>, an excellent overview of applied, numerical linear algebra in python. I overview how to construct a covariance matrix, but in the process I try to touch on a lot of important concepts in fundamental linear algebra: matrix multiplication, matrix transformations, the centering matrix, and getting from the idea of a matrix operation to the formal notation. ]]></description>
   <category>Python</category>
   <category>Linear Algebra</category>
   <guid>https://peter-amerkhanian.com/posts/covariance-matrices/</guid>
