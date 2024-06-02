@@ -664,7 +664,7 @@ x_1 - \bar{\mathbf{x}}   &amp; y_1 - \bar{\mathbf{y}}   \\
 \right]_{n \times 2} (n-1)^{-1}
 \end{align*}
 \tag{3}\]</span></span></p>
-<p>So now we know the matrix operation that will yield the covariance matrix, <span class="math inline">\(C\)</span>, from the matrix, <span class="math inline">\(X\)</span> – we find the mean-centered representation of <span class="math inline">\(X\)</span>, multiply that with itself, and then multiply the result by the scalar, <span class="math inline">\((n-1)^{-1}\)</span>. This is a fairly straightforward operation, but <strong>it’s not really an equation yet.</strong> We will not formalize it into one.</p>
+<p>So now we know the matrix operation that will yield the covariance matrix, <span class="math inline">\(C\)</span>, from the matrix, <span class="math inline">\(X\)</span> – we find the mean-centered representation of <span class="math inline">\(X\)</span>, multiply that with itself, and then multiply the result by the scalar, <span class="math inline">\((n-1)^{-1}\)</span>. This is a fairly straightforward operation, but <strong>it’s not really an equation yet.</strong> We will now formalize it into one.</p>
 <section id="building-the-centering-matrix" class="level3">
 <h3 class="anchored" data-anchor-id="building-the-centering-matrix">Building the centering matrix</h3>
 <p>We want to subtract the mean of x from the x elements, and the mean of y from the y elements, all in one matrix. In the vector setting above, we set this up as the difference between a vector and its scalar mean. Vector-scalar operations are intuitive in linear algebra:</p>
@@ -791,11 +791,11 @@ n^{-1}\mathbf{1}_{n \times 1}^\intercal = \left[\begin{matrix}\frac{1}{n} &amp; 
 <p>With that notation, we’ll now redefine the function as the matrix transformation, <span class="math inline">\(T_\text{mean}\)</span>, that transforms a <span class="math inline">\(n \times 1\)</span> matrix (this is just a vector) into its scalar mean. <span class="math display">\[
 T_\text{mean}: \mathbb{R}^n \rightarrow \mathbb{R}^1 \quad \text{defined by} \quad T(\mathbf{x}_{n \times 1}) = n^{-1}\mathbf{1}_{n \times 1}^\intercal \mathbf{x}_{n \times 1}
 \]</span></p>
-<p>Looks weird and potentially useless, but we’ll use this same approach to define notation for the matrix of deviations from the mean.</p>
+<p>Looks weird and potentially useless, but we’ll use this same approach to define notation for the matrix of deviations from the mean from (<a href="#eq-cov-mat" class="quarto-xref">Equation&nbsp;3</a>)</p>
 </section>
 <section id="deviation-from-the-mean-as-a-matrix-transformation" class="level4">
 <h4 class="anchored" data-anchor-id="deviation-from-the-mean-as-a-matrix-transformation">Deviation from the mean as a matrix transformation</h4>
-<p><span class="math inline">\(T_\text{mean}\)</span> yields a scalar, <span class="math inline">\(\bar{x}\)</span>, but I want the matrix: <span class="math display">\[
+<p><span class="math inline">\(T_\text{mean}\)</span> yields a scalar, <span class="math inline">\(\bar{x}\)</span>, and it could also easily be used to find <span class="math inline">\(\bar{y}\)</span>, but I want the matrix: <span class="math display">\[
 \left[
 \begin{matrix}
     \bar{\mathbf{x}}   &amp; \bar{\mathbf{y}}   \\
@@ -804,7 +804,7 @@ T_\text{mean}: \mathbb{R}^n \rightarrow \mathbb{R}^1 \quad \text{defined by} \qu
     \bar{\mathbf{x}}   &amp; \bar{\mathbf{y}}   \\
 \end{matrix}
 \right]_{n \times 2}
-\]</span> To move towards that output, a <span class="math inline">\(n \times 2\)</span> matrix, lets consider some points about matrix multiplication.</p>
+\]</span> To move towards that output, an <span class="math inline">\(n \times 2\)</span> matrix, lets consider some points about matrix multiplication.</p>
 </section>
 <section id="an-aside-about-matrix-multiplication-rules" class="level4">
 <h4 class="anchored" data-anchor-id="an-aside-about-matrix-multiplication-rules">An aside about matrix multiplication rules</h4>
@@ -821,7 +821,7 @@ T_\text{mean}: \mathbb{R}^n \rightarrow \mathbb{R}^1 \quad \text{defined by} \qu
 (\fbox{1} \times n)(n \times \fbox{1}) \quad&amp; (1 \times 1) \rightarrow \text{Output is scalar}
 \end{align*}
 \]</span> (Sometimes we had to transpose one of the vectors for this to be the case).</p>
-<p>If we want to produce an <span class="math inline">\(n \times 2\)</span> matrix from a multiplication operation involving an <span class="math inline">\(n \times 1\)</span> input, we would need a matrix with the following, underlined dimensionality:<br>
+<p>If we want to produce an <span class="math inline">\(n \times 2\)</span> matrix from a multiplication operation involving an <span class="math inline">\(n \times 2\)</span> input (our data matrix, <span class="math inline">\(X\)</span>), we would need a matrix with the following, underlined dimensionality:<br>
 <span class="math display">\[
 \underline{(n \times n)} (n \times 2) \rightarrow \text{Valid with output: } (n \times 2)
 \]</span> Upon some reflection, the <span class="math inline">\(n \times n\)</span> matrix must be the matrix where every element is <span class="math inline">\(1/n\)</span>. The following operation gives us the desired matrix with all elements set as the original column mean: <span class="math display">\[
@@ -861,7 +861,7 @@ T_\text{mean}: \mathbb{R}^n \rightarrow \mathbb{R}^1 \quad \text{defined by} \qu
 </section>
 <section id="notation-of-the-transformation" class="level4">
 <h4 class="anchored" data-anchor-id="notation-of-the-transformation">Notation of the transformation</h4>
-<p>Thus that matrix of <span class="math inline">\(1/n\)</span> values is the matrix transformation that we will need in our covariance matrix equation. We’ll now formalize the construction of that matrix so that we can write it in an equation, and show that it generalizes to multiple input columns.</p>
+<p>We will need that matrix of <span class="math inline">\(1/n\)</span> values in our covariance matrix equation. We’ll now formalize the construction of that matrix so that we can write it in an equation, much as we did for the scalar mean in the previous section.</p>
 <p>We can construct a square matrix of 1s by multiplying the 1s vector with its transpose, <span class="math inline">\((n \times 1)(1 \times n) \rightarrow (n \times n)\)</span>. Then we can multiply the matrix by <span class="math inline">\(1/n\)</span>, which will apply to each element in the matrix:</p>
 <p><span class="math display">\[
 \begin{align*}
