@@ -79,9 +79,9 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: ['listing-date','listing-title','listing-categories','listing-reading-time',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-title-sort'] }],
+      valueNames: ['listing-date','listing-title','listing-categories','listing-reading-time',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
       
-      searchColumns: ["listing-date","listing-title","listing-author"],
+      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -211,195 +211,348 @@ window.Quarto = {
 
 
 
-<div class="quarto-listing quarto-listing-container-table" id="listing-listing">
-<table class="quarto-listing-table table">
-<thead>
-<tr>
-<th>
-Date
-</th>
-<th>
-Title
-</th>
-<th>
-Topics
-</th>
-<th>
-Time
-</th>
-</tr>
-</thead>
-<tbody class="list">
-<tr data-index="0" data-categories="Python,Linear Algebra" data-listing-date-sort="1717138800000" data-listing-file-modified-sort="1717360368066" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="22" data-listing-word-count-sort="4259" data-listing-title-sort="The Covariance Matrix from Scratch" data-listing-filename-sort="index.ipynb">
-<td>
-<span class="listing-date">May 31, 2024</span>
-</td>
-<td>
-<a href="./posts/covariance-matrices/index.html" class="title listing-title">The Covariance Matrix from Scratch</a>
-</td>
-<td>
-<span class="listing-categories">Python, Linear Algebra</span>
-</td>
-<td>
-<span class="listing-reading-time">22 min</span>
-</td>
-</tr>
-<tr data-index="1" data-categories="R,Calculus,Probability" data-listing-date-sort="1713078000000" data-listing-file-modified-sort="1714592280665" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2628" data-listing-title-sort="Double Integrals in Probability" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Apr 14, 2024</span>
-</td>
-<td>
-<a href="./posts/multiple-integration/index.html" class="title listing-title">Double Integrals in Probability</a>
-</td>
-<td>
-<span class="listing-categories">R, Calculus, Probability</span>
-</td>
-<td>
-<span class="listing-reading-time">14 min</span>
-</td>
-</tr>
-<tr data-index="2" data-categories="Python,Data Management" data-listing-date-sort="1712905200000" data-listing-file-modified-sort="1715708268040" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1249" data-listing-title-sort="Scraping with `bs4`, parquet, and `dask`" data-listing-filename-sort="index.ipynb">
-<td>
-<span class="listing-date">Apr 12, 2024</span>
-</td>
-<td>
-<a href="./posts/dask-data-io/index.html" class="title listing-title">Scraping with <code>bs4</code>, parquet, and <code>dask</code></a>
-</td>
-<td>
-<span class="listing-categories">Python, Data Management</span>
-</td>
-<td>
-<span class="listing-reading-time">7 min</span>
-</td>
-</tr>
-<tr data-index="3" data-categories="R,Calculus" data-listing-date-sort="1710658800000" data-listing-file-modified-sort="1712512260154" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="929" data-listing-title-sort="Production Maximization with Lagrange Mutlipliers" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Mar 17, 2024</span>
-</td>
-<td>
-<a href="./posts/lagrange-cobb-douglas/index.html" class="title listing-title">Production Maximization with Lagrange Mutlipliers</a>
-</td>
-<td>
-<span class="listing-categories">R, Calculus</span>
-</td>
-<td>
-<span class="listing-reading-time">5 min</span>
-</td>
-</tr>
-<tr data-index="4" data-categories="R,Calculus" data-listing-date-sort="1709971200000" data-listing-file-modified-sort="1715534329095" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1368" data-listing-title-sort="Simple Optimization in 3D" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Mar 9, 2024</span>
-</td>
-<td>
-<a href="./posts/minima-3d/index.html" class="title listing-title">Simple Optimization in 3D</a>
-</td>
-<td>
-<span class="listing-categories">R, Calculus</span>
-</td>
-<td>
-<span class="listing-reading-time">7 min</span>
-</td>
-</tr>
-<tr data-index="5" data-categories="Python,Calculus" data-listing-date-sort="1709366400000" data-listing-file-modified-sort="1714493351526" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="535" data-listing-title-sort="Linear Approximation in 3D" data-listing-filename-sort="index.ipynb">
-<td>
-<span class="listing-date">Mar 2, 2024</span>
-</td>
-<td>
-<a href="./posts/linear-approximation-3d/index.html" class="title listing-title">Linear Approximation in 3D</a>
-</td>
-<td>
-<span class="listing-categories">Python, Calculus</span>
-</td>
-<td>
-<span class="listing-reading-time">3 min</span>
-</td>
-</tr>
-<tr data-index="6" data-categories="Python,Statistics" data-listing-date-sort="1702022400000" data-listing-file-modified-sort="1715701721341" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6" data-listing-word-count-sort="1080" data-listing-title-sort="Overfitting and The Train-Test Split" data-listing-filename-sort="index.ipynb">
-<td>
-<span class="listing-date">Dec 8, 2023</span>
-</td>
-<td>
-<a href="./posts/overfitting/index.html" class="title listing-title">Overfitting and The Train-Test Split</a>
-</td>
-<td>
-<span class="listing-categories">Python, Statistics</span>
-</td>
-<td>
-<span class="listing-reading-time">6 min</span>
-</td>
-</tr>
-<tr data-index="7" data-categories="Python,Probability" data-listing-date-sort="1701417600000" data-listing-file-modified-sort="1710819357610" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1374" data-listing-title-sort="Iterated Expectations" data-listing-filename-sort="index.ipynb">
-<td>
-<span class="listing-date">Dec 1, 2023</span>
-</td>
-<td>
-<a href="./posts/iterated-expectations/index.html" class="title listing-title">Iterated Expectations</a>
-</td>
-<td>
-<span class="listing-categories">Python, Probability</span>
-</td>
-<td>
-<span class="listing-reading-time">7 min</span>
-</td>
-</tr>
-<tr data-index="8" data-categories="Python,Calculus" data-listing-date-sort="1698994800000" data-listing-file-modified-sort="1713129417353" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1974" data-listing-title-sort="Newton's Method From The Ground Up" data-listing-filename-sort="index.ipynb">
-<td>
-<span class="listing-date">Nov 3, 2023</span>
-</td>
-<td>
-<a href="./posts/newtons-method/index.html" class="title listing-title">Newton’s Method From The Ground Up</a>
-</td>
-<td>
-<span class="listing-categories">Python, Calculus</span>
-</td>
-<td>
-<span class="listing-reading-time">10 min</span>
-</td>
-</tr>
-<tr data-index="9" data-categories="Python,Calculus" data-listing-date-sort="1688454000000" data-listing-file-modified-sort="1710818354600" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="811" data-listing-title-sort="Simple Constrained Optimization in 2D" data-listing-filename-sort="index.ipynb">
-<td>
-<span class="listing-date">Jul 4, 2023</span>
-</td>
-<td>
-<a href="./posts/simple-constrained-optimization/index.html" class="title listing-title">Simple Constrained Optimization in 2D</a>
-</td>
-<td>
-<span class="listing-categories">Python, Calculus</span>
-</td>
-<td>
-<span class="listing-reading-time">5 min</span>
-</td>
-</tr>
-<tr data-index="10" data-categories="Python,Applications" data-listing-date-sort="1659769200000" data-listing-file-modified-sort="1710806186419" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1257" data-listing-title-sort="Buy vs. Rent, A Financial Modeling Workflow in Python" data-listing-filename-sort="index.ipynb">
-<td>
-<span class="listing-date">Aug 6, 2022</span>
-</td>
-<td>
-<a href="./posts/rent-vs-buy/index.html" class="title listing-title">Buy vs.&nbsp;Rent, A Financial Modeling Workflow in Python</a>
-</td>
-<td>
-<span class="listing-categories">Python, Applications</span>
-</td>
-<td>
-<span class="listing-reading-time">7 min</span>
-</td>
-</tr>
-<tr data-index="11" data-categories="Python,Data Management" data-listing-date-sort="1658300400000" data-listing-file-modified-sort="1712944420649" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6" data-listing-word-count-sort="1155" data-listing-title-sort="Reliable PDF Scraping with tabula-py" data-listing-filename-sort="index.md">
-<td>
-<span class="listing-date">Jul 20, 2022</span>
-</td>
-<td>
-<a href="./posts/pdf-scraping/index.html" class="title listing-title">Reliable PDF Scraping with tabula-py</a>
-</td>
-<td>
-<span class="listing-categories">Python, Data Management</span>
-</td>
-<td>
-<span class="listing-reading-time">6 min</span>
-</td>
-</tr>
-</tbody>
-</table>
+<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
+<div class="list quarto-listing-default">
+<div class="quarto-post image-right" data-index="0" data-categories="Python,Linear Algebra" data-listing-date-sort="1717138800000" data-listing-file-modified-sort="1717360368066" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="22" data-listing-word-count-sort="4259">
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/covariance-matrices/index.html" class="no-external">The Covariance Matrix from Scratch</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./posts/covariance-matrices/index.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
+Python
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Linear Algebra'); return false;">
+Linear Algebra
+</div>
+</div>
+</div>
+<div class="metadata">
+<a href="./posts/covariance-matrices/index.html" class="no-external">
+<div class="listing-date">
+May 31, 2024
+</div>
+<div class="listing-reading-time">
+22 min
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="1" data-categories="R,Calculus,Probability" data-listing-date-sort="1713078000000" data-listing-file-modified-sort="1714592280665" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2628">
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/multiple-integration/index.html" class="no-external">Double Integrals in Probability</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./posts/multiple-integration/index.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
+R
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Calculus'); return false;">
+Calculus
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Probability'); return false;">
+Probability
+</div>
+</div>
+</div>
+<div class="metadata">
+<a href="./posts/multiple-integration/index.html" class="no-external">
+<div class="listing-date">
+Apr 14, 2024
+</div>
+<div class="listing-reading-time">
+14 min
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="2" data-categories="Python,Data Management" data-listing-date-sort="1712905200000" data-listing-file-modified-sort="1715708268040" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1249">
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/dask-data-io/index.html" class="no-external">Scraping with <code>bs4</code>, parquet, and <code>dask</code></a>
+</h3>
+<div class="listing-subtitle">
+<a href="./posts/dask-data-io/index.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
+Python
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Data Management'); return false;">
+Data Management
+</div>
+</div>
+</div>
+<div class="metadata">
+<a href="./posts/dask-data-io/index.html" class="no-external">
+<div class="listing-date">
+Apr 12, 2024
+</div>
+<div class="listing-reading-time">
+7 min
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="3" data-categories="R,Calculus" data-listing-date-sort="1710658800000" data-listing-file-modified-sort="1712512260154" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="929">
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/lagrange-cobb-douglas/index.html" class="no-external">Production Maximization with Lagrange Mutlipliers</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./posts/lagrange-cobb-douglas/index.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
+R
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Calculus'); return false;">
+Calculus
+</div>
+</div>
+</div>
+<div class="metadata">
+<a href="./posts/lagrange-cobb-douglas/index.html" class="no-external">
+<div class="listing-date">
+Mar 17, 2024
+</div>
+<div class="listing-reading-time">
+5 min
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="4" data-categories="R,Calculus" data-listing-date-sort="1709971200000" data-listing-file-modified-sort="1715534329095" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1368">
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/minima-3d/index.html" class="no-external">Simple Optimization in 3D</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./posts/minima-3d/index.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
+R
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Calculus'); return false;">
+Calculus
+</div>
+</div>
+</div>
+<div class="metadata">
+<a href="./posts/minima-3d/index.html" class="no-external">
+<div class="listing-date">
+Mar 9, 2024
+</div>
+<div class="listing-reading-time">
+7 min
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="5" data-categories="Python,Calculus" data-listing-date-sort="1709366400000" data-listing-file-modified-sort="1714493351526" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="535">
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/linear-approximation-3d/index.html" class="no-external">Linear Approximation in 3D</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./posts/linear-approximation-3d/index.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
+Python
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Calculus'); return false;">
+Calculus
+</div>
+</div>
+</div>
+<div class="metadata">
+<a href="./posts/linear-approximation-3d/index.html" class="no-external">
+<div class="listing-date">
+Mar 2, 2024
+</div>
+<div class="listing-reading-time">
+3 min
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="6" data-categories="Python,Statistics" data-listing-date-sort="1702022400000" data-listing-file-modified-sort="1715701721341" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6" data-listing-word-count-sort="1080">
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/overfitting/index.html" class="no-external">Overfitting and The Train-Test Split</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./posts/overfitting/index.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
+Python
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Statistics'); return false;">
+Statistics
+</div>
+</div>
+</div>
+<div class="metadata">
+<a href="./posts/overfitting/index.html" class="no-external">
+<div class="listing-date">
+Dec 8, 2023
+</div>
+<div class="listing-reading-time">
+6 min
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="7" data-categories="Python,Probability" data-listing-date-sort="1701417600000" data-listing-file-modified-sort="1710819357610" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1374">
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/iterated-expectations/index.html" class="no-external">Iterated Expectations</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./posts/iterated-expectations/index.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
+Python
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Probability'); return false;">
+Probability
+</div>
+</div>
+</div>
+<div class="metadata">
+<a href="./posts/iterated-expectations/index.html" class="no-external">
+<div class="listing-date">
+Dec 1, 2023
+</div>
+<div class="listing-reading-time">
+7 min
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="8" data-categories="Python,Calculus" data-listing-date-sort="1698994800000" data-listing-file-modified-sort="1713129417353" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1974">
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/newtons-method/index.html" class="no-external">Newton’s Method From The Ground Up</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./posts/newtons-method/index.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
+Python
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Calculus'); return false;">
+Calculus
+</div>
+</div>
+</div>
+<div class="metadata">
+<a href="./posts/newtons-method/index.html" class="no-external">
+<div class="listing-date">
+Nov 3, 2023
+</div>
+<div class="listing-reading-time">
+10 min
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="9" data-categories="Python,Calculus" data-listing-date-sort="1688454000000" data-listing-file-modified-sort="1710818354600" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="811">
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/simple-constrained-optimization/index.html" class="no-external">Simple Constrained Optimization in 2D</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./posts/simple-constrained-optimization/index.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
+Python
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Calculus'); return false;">
+Calculus
+</div>
+</div>
+</div>
+<div class="metadata">
+<a href="./posts/simple-constrained-optimization/index.html" class="no-external">
+<div class="listing-date">
+Jul 4, 2023
+</div>
+<div class="listing-reading-time">
+5 min
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="10" data-categories="Python,Applications" data-listing-date-sort="1659769200000" data-listing-file-modified-sort="1710806186419" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1257">
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/rent-vs-buy/index.html" class="no-external">Buy vs.&nbsp;Rent, A Financial Modeling Workflow in Python</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./posts/rent-vs-buy/index.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
+Python
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Applications'); return false;">
+Applications
+</div>
+</div>
+</div>
+<div class="metadata">
+<a href="./posts/rent-vs-buy/index.html" class="no-external">
+<div class="listing-date">
+Aug 6, 2022
+</div>
+<div class="listing-reading-time">
+7 min
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="11" data-categories="Python,Data Management" data-listing-date-sort="1658300400000" data-listing-file-modified-sort="1712944420649" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6" data-listing-word-count-sort="1155">
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/pdf-scraping/index.html" class="no-external">Reliable PDF Scraping with tabula-py</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./posts/pdf-scraping/index.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('Python'); return false;">
+Python
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Data Management'); return false;">
+Data Management
+</div>
+</div>
+</div>
+<div class="metadata">
+<a href="./posts/pdf-scraping/index.html" class="no-external">
+<div class="listing-date">
+Jul 20, 2022
+</div>
+<div class="listing-reading-time">
+6 min
+</div>
+</a>
+</div>
+</div>
+</div>
 <div class="listing-no-matching d-none">
 No matching items
 </div>

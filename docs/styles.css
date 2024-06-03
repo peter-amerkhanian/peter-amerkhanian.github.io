@@ -1,4 +1,19 @@
 /* css styles */
+
+div.quarto-post .body h3.listing-title, div.quarto-post .body .listing-title.h3 {
+    font-size: larger
+}
+div.quarto-post .metadata{
+    flex-basis: 20%;
+    font-size: .95em;
+
+}
+div.quarto-post .listing-categories .listing-category {
+    color: #41464a;
+    font-size: .75em
+}
+
+
 div.quarto-about-trestles .about-entity .about-link {
     border: 0px;
 }
