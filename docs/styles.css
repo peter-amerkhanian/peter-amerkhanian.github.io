@@ -1,16 +1,16 @@
 /* css styles */
 
 div.quarto-post .body h3.listing-title, div.quarto-post .body .listing-title.h3 {
-    font-size: larger
+    font-size: larger !important;
 }
 div.quarto-post .metadata{
-    flex-basis: 20%;
-    font-size: .95em;
+    flex-basis: 20% !important;
+    font-size: .95em !important;
 
 }
 div.quarto-post .listing-categories .listing-category {
-    color: #41464a;
-    font-size: .75em
+    color: #41464a !important;
+    font-size: .75em !important;
 }
 
 
