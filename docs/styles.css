@@ -3,6 +3,7 @@
 div.quarto-post .body h3.listing-title, div.quarto-post .body .listing-title.h3 {
     font-size: larger !important;
 }
+
 div.quarto-post .metadata{
     flex-basis: 20% !important;
     font-size: .95em !important;
