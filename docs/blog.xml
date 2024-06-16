@@ -10,7 +10,16 @@
 <atom:link href="https://peter-amerkhanian.com/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Peter Amerkhanian&#39;s Blog</description>
 <generator>quarto-1.4.551</generator>
-<lastBuildDate>Fri, 31 May 2024 07:00:00 GMT</lastBuildDate>
+<lastBuildDate>Sun, 16 Jun 2024 07:00:00 GMT</lastBuildDate>
+<item>
+  <title>Building Time-series Utilities for matplotlib</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
+  <link>https://peter-amerkhanian.com/posts/time-series-matplotlib/</link>
+  <description><![CDATA[ In my day job I’ve recently been working on visualizing time series data with <code>matplotlib</code>. When I’ve wanted some sort of specific formatting or behavior, I’ve had to wade deep in the library documentation to figure out the code for the things I want to do. That’s fine, but what frustrates me is that in the back of my mind, I’m pretty sure these are all things I’ve actually done before. A few years ago in graduate school I took a course that was heavy on <code>matplotlib</code> plotting, and I spent many hours figuring out bizarre techniques for getting very specific results. Unfortunately I’ve forgotten almost all of that library-specific minutiae. ]]></description>
+  <category>Python</category>
+  <guid>https://peter-amerkhanian.com/posts/time-series-matplotlib/</guid>
+  <pubDate>Sun, 16 Jun 2024 07:00:00 GMT</pubDate>
+</item>
 <item>
   <title>The Covariance Matrix from Scratch</title>
   <dc:creator>Peter Amerkhanian</dc:creator>
@@ -20,6 +29,7 @@
   <category>Linear Algebra</category>
   <guid>https://peter-amerkhanian.com/posts/covariance-matrices/</guid>
   <pubDate>Fri, 31 May 2024 07:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/covariance-matrices/thumbnail.png" medium="image" type="image/png" height="39" width="144"/>
 </item>
 <item>
   <title>Double Integrals in Probability</title>
@@ -31,6 +41,7 @@
   <category>Probability</category>
   <guid>https://peter-amerkhanian.com/posts/multiple-integration/</guid>
   <pubDate>Sun, 14 Apr 2024 07:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/multiple-integration/thumbnail.png" medium="image" type="image/png" height="83" width="144"/>
 </item>
 <item>
   <title>Scraping with bs4, parquet, and dask</title>
@@ -41,6 +52,7 @@
   <category>Data Management</category>
   <guid>https://peter-amerkhanian.com/posts/dask-data-io/</guid>
   <pubDate>Fri, 12 Apr 2024 07:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/dask-data-io/thumbnail.png" medium="image" type="image/png" height="93" width="144"/>
 </item>
 <item>
   <title>Production Maximization with Lagrange Mutlipliers</title>
@@ -51,6 +63,7 @@
   <category>Calculus</category>
   <guid>https://peter-amerkhanian.com/posts/lagrange-cobb-douglas/</guid>
   <pubDate>Sun, 17 Mar 2024 07:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/lagrange-cobb-douglas/thumbnail.png" medium="image" type="image/png" height="82" width="144"/>
 </item>
 <item>
   <title>A Minima Problem in 3D</title>
@@ -61,6 +74,7 @@
   <category>Calculus</category>
   <guid>https://peter-amerkhanian.com/posts/minima-3d/</guid>
   <pubDate>Sat, 09 Mar 2024 08:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/minima-3d/thumbnail.png" medium="image" type="image/png" height="107" width="144"/>
 </item>
 <item>
   <title>Linear Approximation in 3D</title>
@@ -71,6 +85,7 @@
   <category>Calculus</category>
   <guid>https://peter-amerkhanian.com/posts/linear-approximation-3d/</guid>
   <pubDate>Sat, 02 Mar 2024 08:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/linear-approximation-3d/thumbnail.png" medium="image" type="image/png" height="84" width="144"/>
 </item>
 <item>
   <title>Overfitting and The Train-Test Split</title>
@@ -81,6 +96,7 @@
   <category>Statistics</category>
   <guid>https://peter-amerkhanian.com/posts/overfitting/</guid>
   <pubDate>Fri, 08 Dec 2023 08:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/overfitting/thumbnail.png" medium="image" type="image/png" height="54" width="144"/>
 </item>
 <item>
   <title>Iterated Expectations</title>
@@ -91,6 +107,7 @@
   <category>Probability</category>
   <guid>https://peter-amerkhanian.com/posts/iterated-expectations/</guid>
   <pubDate>Fri, 01 Dec 2023 08:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/iterated-expectations/thumbnail.png" medium="image" type="image/png" height="40" width="144"/>
 </item>
 <item>
   <title>Newton’s Method From The Ground Up</title>

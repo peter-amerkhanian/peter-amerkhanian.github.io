@@ -2,6 +2,7 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/posts/time-series-matplotlib/index.html",
       "/posts/covariance-matrices/index.html",
       "/posts/multiple-integration/index.html",
       "/posts/dask-data-io/index.html",
