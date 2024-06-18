@@ -436,16 +436,13 @@ Freq: ME, Name: Riders, dtype: int64</code></pre>
 </div>
 </div>
 <p>Simply plotting the series shows the impact of the pandemic, which is interesting:</p>
-<div id="cell-12" class="cell" data-execution_count="577">
+<div id="cell-12" class="cell" data-execution_count="590">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>month_time_series.plot()</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Monthly Total BART Riders"</span>)</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="577">
-<pre><code>Text(0.5, 1.0, 'Monthly Total BART Riders')</code></pre>
-</div>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Monthly Total BART Riders"</span>)<span class="op">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-7-output-2.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -462,174 +459,174 @@ Freq: ME, Name: Riders, dtype: int64</code></pre>
 <div id="cell-14" class="cell" data-execution_count="578">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> time_overlay_plot(month_time_series: pd.Series,</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                      ax: matplotlib.axes.Axes,</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                      step_size: <span class="bu">int</span>,</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                      highlight_year: <span class="bu">int</span>,</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                      date_formatter: <span class="bu">str</span>,</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                      bg_alpha: <span class="bu">float</span> <span class="op">=</span> <span class="fl">.3</span>) <span class="op">-&gt;</span> Tuple[matplotlib.axes.Axes, pd.Index]:</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">    Create an overlay plot where the x-axis represents months and each series corresponds to a year of data.</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co">    This function reads in a month-level time series with data spanning multiple years. It overlays the data for each year </span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co">    on the same plot, allowing for year-over-year comparison. One year can be highlighted for emphasis.</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co">        month_time_series (pd.Series): A time series with observations at one-month intervals.</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co">        ax (matplotlib.axes.Axes): A Matplotlib axis object to plot on.</span></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="co">        step_size (int): The number of years to skip between plotted series.</span></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="co">        highlight_year (int): The year to highlight in the overlay plot. Set to None for no highlight.</span></span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="co">        date_formatter (str): The format string for the date labels on the x-axis.</span></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co">        bg_alpha (float): The alpha transparency for the non-highlighted lines. Defaults to 0.3.</span></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="co">        matplotlib.axes.Axes: The updated axis object with the overlay plot.</span></span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="co">        pd.Index: The x-tick labels of the plot.</span></span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="co">    Raises:</span></span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="co">        AssertionError: If step_size is larger than the number of unique years in the time series.</span></span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>    target_years <span class="op">=</span> month_time_series.index.year.unique()[::step_size]</span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> (<span class="bu">len</span>(target_years) <span class="op">&gt;</span> step_size), <span class="st">"Step size larger than index length"</span></span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>    labs <span class="op">=</span> month_time_series.loc[<span class="bu">str</span>(</span>
-<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>        target_years[<span class="op">-</span>step_size]):<span class="bu">str</span>(target_years[<span class="op">-</span><span class="dv">1</span>])].index.strftime(date_formatter)</span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(target_years)<span class="op">-</span>(step_size<span class="op">-</span><span class="dv">1</span>)):</span>
-<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>        a <span class="op">=</span> <span class="dv">1</span> <span class="cf">if</span> (target_years[i <span class="op">+</span> (step_size<span class="op">-</span><span class="dv">1</span>)]</span>
-<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>                  <span class="op">==</span> highlight_year) <span class="cf">else</span> bg_alpha</span>
-<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>        subset_time_series <span class="op">=</span> (</span>
-<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>            month_time_series</span>
-<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>            .loc[<span class="bu">str</span>(target_years[i]): <span class="bu">str</span>(target_years[i <span class="op">+</span> (step_size<span class="op">-</span><span class="dv">1</span>)])]</span>
-<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>            .reset_index()</span>
-<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>            .set_index(labs)[month_time_series.name]</span>
-<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>        label <span class="op">=</span> <span class="vs">fr"$</span><span class="sc">{</span>target_years[i]<span class="sc">}</span><span class="vs"> \rightarrow </span><span class="sc">{</span>target_years[i <span class="op">+</span> (step_size<span class="op">-</span><span class="dv">1</span>)]<span class="sc">}</span><span class="vs">$"</span> <span class="cf">if</span> step_size <span class="op">!=</span> <span class="dv">1</span> <span class="cf">else</span> <span class="vs">fr"$</span><span class="sc">{</span>target_years[i]<span class="sc">}</span><span class="vs">$"</span></span>
-<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>        subset_time_series.plot(linewidth<span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>                                ax<span class="op">=</span>ax,</span>
-<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>                                alpha<span class="op">=</span>a,</span>
-<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>                                label<span class="op">=</span>label)</span>
-<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ax, labs</span>
-<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> show_all_xticks(ax: matplotlib.axes.Axes, labs: pd.Index) <span class="op">-&gt;</span> matplotlib.axes.Axes:</span>
-<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a><span class="co">    Sets all x-ticks on a Matplotlib axis object and labels them with the provided list of labels.</span></span>
-<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a><span class="co">    This function ensures that all x-ticks are displayed and labeled as specified, making it easier to read and interpret the x-axis of the plot. The labels are displayed horizontally.</span></span>
-<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters:</span></span>
-<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a><span class="co">    ax (matplotlib.axes.Axes): The axis object on which to set the x-ticks and labels.</span></span>
-<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a><span class="co">    labs (list of str): A list of labels to set on the x-axis. The number of labels should correspond to the number of ticks.</span></span>
-<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
-<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a><span class="co">    matplotlib.axes.Axes: The modified axis object with updated x-ticks and labels.</span></span>
-<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>    ax.set_xticks(<span class="bu">range</span>(<span class="bu">len</span>(labs)))</span>
-<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>    ax.set_xticklabels(labs, rotation<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ax</span>
-<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> comma_formatter() <span class="op">-&gt;</span> ticker.FuncFormatter:</span>
-<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a><span class="co">    Creates a custom Matplotlib tick formatter that formats axis ticks with commas.</span></span>
-<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a><span class="co">    This formatter converts axis tick values to integers and formats them with commas for thousands </span></span>
-<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a><span class="co">    separators. This can be useful for improving the readability of plots with large numerical values.</span></span>
-<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
-<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a><span class="co">    --------</span></span>
-<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a><span class="co">    ticker.FuncFormatter:</span></span>
-<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a><span class="co">        A Matplotlib FuncFormatter object that applies the comma formatting to axis ticks.</span></span>
-<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> comma(x: <span class="bu">float</span>, pos) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
-<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""Format the tick value `x` with commas. The parameter `pos` is not used."""</span></span>
-<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">'</span><span class="sc">{:,}</span><span class="st">'</span>.<span class="bu">format</span>(<span class="bu">int</span>(x))</span>
-<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ticker.FuncFormatter(comma)</span>
-<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> custom_legend(ax: matplotlib.axes.Axes,</span>
-<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a>                  outside_loc: <span class="bu">str</span> <span class="op">=</span> <span class="va">None</span>,</span>
-<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a>                  order: Union[<span class="bu">str</span>, <span class="bu">list</span>] <span class="op">=</span> <span class="st">"default"</span>,</span>
-<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a>                  title: <span class="bu">str</span> <span class="op">=</span> <span class="st">""</span>,</span>
-<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a>                  linewidth: <span class="bu">int</span> <span class="op">=</span> <span class="dv">2</span>,</span>
-<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a>                  <span class="op">**</span>kwargs) <span class="op">-&gt;</span> matplotlib.axes.Axes:</span>
-<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a><span class="co">    Customize the legend location and order on a Matplotlib axis.</span></span>
-<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a><span class="co">    This function adjusts the position of the legend, optionally placing it outside the plot area,</span></span>
-<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a><span class="co">    and can reorder the legend entries based on specified criteria.</span></span>
-<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
-<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a><span class="co">        ax (matplotlib.axes.Axes): An existing Matplotlib axis object to which the legend belongs.</span></span>
-<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a><span class="co">        outside_loc (str, optional): Specifies the location of the legend outside the plot area.</span></span>
-<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a><span class="co">                                     Must be one of ["lower", "center", "upper", None]. </span></span>
-<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a><span class="co">                                     Defaults to None.</span></span>
-<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a><span class="co">        order (str, optional): Determines the order of the legend entries. </span></span>
-<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a><span class="co">                               Must be one of ["default", "reverse", "desc"]. </span></span>
-<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a><span class="co">                               "default" keeps the current order, </span></span>
-<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a><span class="co">                               "reverse" reverses the current order, </span></span>
-<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a><span class="co">                               "desc" orders entries by descending values. </span></span>
-<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a><span class="co">                               Defaults to "default".</span></span>
-<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
-<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a><span class="co">        matplotlib.axes.Axes: The axis object with the customized legend.</span></span>
-<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a><span class="co">    Raises:</span></span>
-<span id="cb9-114"><a href="#cb9-114" aria-hidden="true" tabindex="-1"></a><span class="co">        AssertionError: If `outside_loc` is not in ["lower", "center", "upper", None].</span></span>
-<span id="cb9-115"><a href="#cb9-115" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb9-116"><a href="#cb9-116" aria-hidden="true" tabindex="-1"></a>    handles, labels <span class="op">=</span> ax.get_legend_handles_labels()</span>
-<span id="cb9-117"><a href="#cb9-117" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> order <span class="op">==</span> <span class="st">'default'</span>:</span>
-<span id="cb9-118"><a href="#cb9-118" aria-hidden="true" tabindex="-1"></a>        <span class="cf">pass</span></span>
-<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> order <span class="op">==</span> <span class="st">'reverse'</span>:</span>
-<span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a>        handles <span class="op">=</span> handles[::<span class="op">-</span><span class="dv">1</span>]</span>
-<span id="cb9-121"><a href="#cb9-121" aria-hidden="true" tabindex="-1"></a>        labels <span class="op">=</span> labels[::<span class="op">-</span><span class="dv">1</span>]</span>
-<span id="cb9-122"><a href="#cb9-122" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> order <span class="op">==</span> <span class="st">'desc'</span>:</span>
-<span id="cb9-123"><a href="#cb9-123" aria-hidden="true" tabindex="-1"></a>        ordering <span class="op">=</span> np.flip(np.argsort(np.array([line.get_ydata()[<span class="op">-</span><span class="dv">1</span>] <span class="cf">for</span> line <span class="kw">in</span> ax.lines <span class="cf">if</span> <span class="bu">len</span>(line.get_ydata())<span class="op">&gt;</span><span class="dv">0</span>])))</span>
-<span id="cb9-124"><a href="#cb9-124" aria-hidden="true" tabindex="-1"></a>        handles <span class="op">=</span> np.array(handles)[ordering].tolist()</span>
-<span id="cb9-125"><a href="#cb9-125" aria-hidden="true" tabindex="-1"></a>        labels <span class="op">=</span> np.array(labels)[ordering].tolist()</span>
-<span id="cb9-126"><a href="#cb9-126" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> <span class="bu">isinstance</span>(order, Iterable):</span>
-<span id="cb9-127"><a href="#cb9-127" aria-hidden="true" tabindex="-1"></a>        value_to_index <span class="op">=</span> {value: idx <span class="cf">for</span> idx, value <span class="kw">in</span> <span class="bu">enumerate</span>(labels)}</span>
-<span id="cb9-128"><a href="#cb9-128" aria-hidden="true" tabindex="-1"></a>        indices <span class="op">=</span> [value_to_index[value] <span class="cf">for</span> value <span class="kw">in</span> order]</span>
-<span id="cb9-129"><a href="#cb9-129" aria-hidden="true" tabindex="-1"></a>        labels <span class="op">=</span> <span class="bu">list</span>(order)</span>
-<span id="cb9-130"><a href="#cb9-130" aria-hidden="true" tabindex="-1"></a>        handles <span class="op">=</span> np.array(handles)[indices].tolist()</span>
-<span id="cb9-131"><a href="#cb9-131" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb9-132"><a href="#cb9-132" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">Exception</span>(<span class="st">"Invalid Order"</span>)</span>
-<span id="cb9-133"><a href="#cb9-133" aria-hidden="true" tabindex="-1"></a>    error_msg <span class="op">=</span> <span class="st">"legend_to_right loc must be None or in 'lower', 'center', or 'upper'"</span></span>
-<span id="cb9-134"><a href="#cb9-134" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> outside_loc <span class="kw">in</span> [<span class="st">"lower"</span>, <span class="st">"center"</span>, <span class="st">"upper"</span>, <span class="va">None</span>], error_msg</span>
-<span id="cb9-135"><a href="#cb9-135" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> outside_loc <span class="op">==</span> <span class="st">"lower"</span>:</span>
-<span id="cb9-136"><a href="#cb9-136" aria-hidden="true" tabindex="-1"></a>        ax.legend(handles, labels, loc<span class="op">=</span><span class="st">'lower left'</span>, bbox_to_anchor<span class="op">=</span>(<span class="dv">1</span>, <span class="dv">0</span>), <span class="op">**</span>kwargs)</span>
-<span id="cb9-137"><a href="#cb9-137" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> outside_loc <span class="op">==</span> <span class="st">"center"</span>:</span>
-<span id="cb9-138"><a href="#cb9-138" aria-hidden="true" tabindex="-1"></a>        ax.legend(handles, labels, loc<span class="op">=</span><span class="st">'center left'</span>, bbox_to_anchor<span class="op">=</span>(<span class="dv">1</span>, <span class="fl">.5</span>), <span class="op">**</span>kwargs)</span>
-<span id="cb9-139"><a href="#cb9-139" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> outside_loc <span class="op">==</span> <span class="st">"upper"</span>:</span>
-<span id="cb9-140"><a href="#cb9-140" aria-hidden="true" tabindex="-1"></a>        ax.legend(handles, labels, loc<span class="op">=</span><span class="st">'upper left'</span>, bbox_to_anchor<span class="op">=</span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="op">**</span>kwargs)</span>
-<span id="cb9-141"><a href="#cb9-141" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb9-142"><a href="#cb9-142" aria-hidden="true" tabindex="-1"></a>        ax.legend(handles, labels, <span class="op">**</span>kwargs)</span>
-<span id="cb9-143"><a href="#cb9-143" aria-hidden="true" tabindex="-1"></a>    legend <span class="op">=</span> ax.get_legend()</span>
-<span id="cb9-144"><a href="#cb9-144" aria-hidden="true" tabindex="-1"></a>    legend.set_title(title)</span>
-<span id="cb9-145"><a href="#cb9-145" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> line <span class="kw">in</span> legend.get_lines():</span>
-<span id="cb9-146"><a href="#cb9-146" aria-hidden="true" tabindex="-1"></a>        line.set_linewidth(linewidth)</span>
-<span id="cb9-147"><a href="#cb9-147" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ax</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> time_overlay_plot(month_time_series: pd.Series,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                      ax: matplotlib.axes.Axes,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                      step_size: <span class="bu">int</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                      highlight_year: <span class="bu">int</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                      date_formatter: <span class="bu">str</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                      bg_alpha: <span class="bu">float</span> <span class="op">=</span> <span class="fl">.3</span>) <span class="op">-&gt;</span> Tuple[matplotlib.axes.Axes, pd.Index]:</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">    Create an overlay plot where the x-axis represents months and each series corresponds to a year of data.</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">    This function reads in a month-level time series with data spanning multiple years. It overlays the data for each year </span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">    on the same plot, allowing for year-over-year comparison. One year can be highlighted for emphasis.</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">        month_time_series (pd.Series): A time series with observations at one-month intervals.</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">        ax (matplotlib.axes.Axes): A Matplotlib axis object to plot on.</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">        step_size (int): The number of years to skip between plotted series.</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">        highlight_year (int): The year to highlight in the overlay plot. Set to None for no highlight.</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">        date_formatter (str): The format string for the date labels on the x-axis.</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co">        bg_alpha (float): The alpha transparency for the non-highlighted lines. Defaults to 0.3.</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co">        matplotlib.axes.Axes: The updated axis object with the overlay plot.</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co">        pd.Index: The x-tick labels of the plot.</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co">    Raises:</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="co">        AssertionError: If step_size is larger than the number of unique years in the time series.</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    target_years <span class="op">=</span> month_time_series.index.year.unique()[::step_size]</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> (<span class="bu">len</span>(target_years) <span class="op">&gt;</span> step_size), <span class="st">"Step size larger than index length"</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>    labs <span class="op">=</span> month_time_series.loc[<span class="bu">str</span>(</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>        target_years[<span class="op">-</span>step_size]):<span class="bu">str</span>(target_years[<span class="op">-</span><span class="dv">1</span>])].index.strftime(date_formatter)</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(target_years)<span class="op">-</span>(step_size<span class="op">-</span><span class="dv">1</span>)):</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>        a <span class="op">=</span> <span class="dv">1</span> <span class="cf">if</span> (target_years[i <span class="op">+</span> (step_size<span class="op">-</span><span class="dv">1</span>)]</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>                  <span class="op">==</span> highlight_year) <span class="cf">else</span> bg_alpha</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>        subset_time_series <span class="op">=</span> (</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>            month_time_series</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>            .loc[<span class="bu">str</span>(target_years[i]): <span class="bu">str</span>(target_years[i <span class="op">+</span> (step_size<span class="op">-</span><span class="dv">1</span>)])]</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>            .reset_index()</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>            .set_index(labs)[month_time_series.name]</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>        label <span class="op">=</span> <span class="vs">fr"$</span><span class="sc">{</span>target_years[i]<span class="sc">}</span><span class="vs"> \rightarrow </span><span class="sc">{</span>target_years[i <span class="op">+</span> (step_size<span class="op">-</span><span class="dv">1</span>)]<span class="sc">}</span><span class="vs">$"</span> <span class="cf">if</span> step_size <span class="op">!=</span> <span class="dv">1</span> <span class="cf">else</span> <span class="vs">fr"$</span><span class="sc">{</span>target_years[i]<span class="sc">}</span><span class="vs">$"</span></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>        subset_time_series.plot(linewidth<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>                                ax<span class="op">=</span>ax,</span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>                                alpha<span class="op">=</span>a,</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>                                label<span class="op">=</span>label)</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ax, labs</span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> show_all_xticks(ax: matplotlib.axes.Axes, labs: pd.Index) <span class="op">-&gt;</span> matplotlib.axes.Axes:</span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a><span class="co">    Sets all x-ticks on a Matplotlib axis object and labels them with the provided list of labels.</span></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a><span class="co">    This function ensures that all x-ticks are displayed and labeled as specified, making it easier to read and interpret the x-axis of the plot. The labels are displayed horizontally.</span></span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters:</span></span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a><span class="co">    ax (matplotlib.axes.Axes): The axis object on which to set the x-ticks and labels.</span></span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a><span class="co">    labs (list of str): A list of labels to set on the x-axis. The number of labels should correspond to the number of ticks.</span></span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a><span class="co">    matplotlib.axes.Axes: The modified axis object with updated x-ticks and labels.</span></span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>    ax.set_xticks(<span class="bu">range</span>(<span class="bu">len</span>(labs)))</span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>    ax.set_xticklabels(labs, rotation<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ax</span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> comma_formatter() <span class="op">-&gt;</span> ticker.FuncFormatter:</span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a><span class="co">    Creates a custom Matplotlib tick formatter that formats axis ticks with commas.</span></span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a><span class="co">    This formatter converts axis tick values to integers and formats them with commas for thousands </span></span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a><span class="co">    separators. This can be useful for improving the readability of plots with large numerical values.</span></span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a><span class="co">    --------</span></span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a><span class="co">    ticker.FuncFormatter:</span></span>
+<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a><span class="co">        A Matplotlib FuncFormatter object that applies the comma formatting to axis ticks.</span></span>
+<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> comma(x: <span class="bu">float</span>, pos) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""Format the tick value `x` with commas. The parameter `pos` is not used."""</span></span>
+<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">'</span><span class="sc">{:,}</span><span class="st">'</span>.<span class="bu">format</span>(<span class="bu">int</span>(x))</span>
+<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ticker.FuncFormatter(comma)</span>
+<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> custom_legend(ax: matplotlib.axes.Axes,</span>
+<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a>                  outside_loc: <span class="bu">str</span> <span class="op">=</span> <span class="va">None</span>,</span>
+<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a>                  order: Union[<span class="bu">str</span>, <span class="bu">list</span>] <span class="op">=</span> <span class="st">"default"</span>,</span>
+<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a>                  title: <span class="bu">str</span> <span class="op">=</span> <span class="st">""</span>,</span>
+<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a>                  linewidth: <span class="bu">int</span> <span class="op">=</span> <span class="dv">2</span>,</span>
+<span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a>                  <span class="op">**</span>kwargs) <span class="op">-&gt;</span> matplotlib.axes.Axes:</span>
+<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a><span class="co">    Customize the legend location and order on a Matplotlib axis.</span></span>
+<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a><span class="co">    This function adjusts the position of the legend, optionally placing it outside the plot area,</span></span>
+<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a><span class="co">    and can reorder the legend entries based on specified criteria.</span></span>
+<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
+<span id="cb8-99"><a href="#cb8-99" aria-hidden="true" tabindex="-1"></a><span class="co">        ax (matplotlib.axes.Axes): An existing Matplotlib axis object to which the legend belongs.</span></span>
+<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a><span class="co">        outside_loc (str, optional): Specifies the location of the legend outside the plot area.</span></span>
+<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a><span class="co">                                     Must be one of ["lower", "center", "upper", None]. </span></span>
+<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a><span class="co">                                     Defaults to None.</span></span>
+<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a><span class="co">        order (str, optional): Determines the order of the legend entries. </span></span>
+<span id="cb8-104"><a href="#cb8-104" aria-hidden="true" tabindex="-1"></a><span class="co">                               Must be one of ["default", "reverse", "desc"]. </span></span>
+<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a><span class="co">                               "default" keeps the current order, </span></span>
+<span id="cb8-106"><a href="#cb8-106" aria-hidden="true" tabindex="-1"></a><span class="co">                               "reverse" reverses the current order, </span></span>
+<span id="cb8-107"><a href="#cb8-107" aria-hidden="true" tabindex="-1"></a><span class="co">                               "desc" orders entries by descending values. </span></span>
+<span id="cb8-108"><a href="#cb8-108" aria-hidden="true" tabindex="-1"></a><span class="co">                               Defaults to "default".</span></span>
+<span id="cb8-109"><a href="#cb8-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-110"><a href="#cb8-110" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb8-111"><a href="#cb8-111" aria-hidden="true" tabindex="-1"></a><span class="co">        matplotlib.axes.Axes: The axis object with the customized legend.</span></span>
+<span id="cb8-112"><a href="#cb8-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-113"><a href="#cb8-113" aria-hidden="true" tabindex="-1"></a><span class="co">    Raises:</span></span>
+<span id="cb8-114"><a href="#cb8-114" aria-hidden="true" tabindex="-1"></a><span class="co">        AssertionError: If `outside_loc` is not in ["lower", "center", "upper", None].</span></span>
+<span id="cb8-115"><a href="#cb8-115" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb8-116"><a href="#cb8-116" aria-hidden="true" tabindex="-1"></a>    handles, labels <span class="op">=</span> ax.get_legend_handles_labels()</span>
+<span id="cb8-117"><a href="#cb8-117" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> order <span class="op">==</span> <span class="st">'default'</span>:</span>
+<span id="cb8-118"><a href="#cb8-118" aria-hidden="true" tabindex="-1"></a>        <span class="cf">pass</span></span>
+<span id="cb8-119"><a href="#cb8-119" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> order <span class="op">==</span> <span class="st">'reverse'</span>:</span>
+<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a>        handles <span class="op">=</span> handles[::<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb8-121"><a href="#cb8-121" aria-hidden="true" tabindex="-1"></a>        labels <span class="op">=</span> labels[::<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb8-122"><a href="#cb8-122" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> order <span class="op">==</span> <span class="st">'desc'</span>:</span>
+<span id="cb8-123"><a href="#cb8-123" aria-hidden="true" tabindex="-1"></a>        ordering <span class="op">=</span> np.flip(np.argsort(np.array([line.get_ydata()[<span class="op">-</span><span class="dv">1</span>] <span class="cf">for</span> line <span class="kw">in</span> ax.lines <span class="cf">if</span> <span class="bu">len</span>(line.get_ydata())<span class="op">&gt;</span><span class="dv">0</span>])))</span>
+<span id="cb8-124"><a href="#cb8-124" aria-hidden="true" tabindex="-1"></a>        handles <span class="op">=</span> np.array(handles)[ordering].tolist()</span>
+<span id="cb8-125"><a href="#cb8-125" aria-hidden="true" tabindex="-1"></a>        labels <span class="op">=</span> np.array(labels)[ordering].tolist()</span>
+<span id="cb8-126"><a href="#cb8-126" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> <span class="bu">isinstance</span>(order, Iterable):</span>
+<span id="cb8-127"><a href="#cb8-127" aria-hidden="true" tabindex="-1"></a>        value_to_index <span class="op">=</span> {value: idx <span class="cf">for</span> idx, value <span class="kw">in</span> <span class="bu">enumerate</span>(labels)}</span>
+<span id="cb8-128"><a href="#cb8-128" aria-hidden="true" tabindex="-1"></a>        indices <span class="op">=</span> [value_to_index[value] <span class="cf">for</span> value <span class="kw">in</span> order]</span>
+<span id="cb8-129"><a href="#cb8-129" aria-hidden="true" tabindex="-1"></a>        labels <span class="op">=</span> <span class="bu">list</span>(order)</span>
+<span id="cb8-130"><a href="#cb8-130" aria-hidden="true" tabindex="-1"></a>        handles <span class="op">=</span> np.array(handles)[indices].tolist()</span>
+<span id="cb8-131"><a href="#cb8-131" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb8-132"><a href="#cb8-132" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">Exception</span>(<span class="st">"Invalid Order"</span>)</span>
+<span id="cb8-133"><a href="#cb8-133" aria-hidden="true" tabindex="-1"></a>    error_msg <span class="op">=</span> <span class="st">"legend_to_right loc must be None or in 'lower', 'center', or 'upper'"</span></span>
+<span id="cb8-134"><a href="#cb8-134" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> outside_loc <span class="kw">in</span> [<span class="st">"lower"</span>, <span class="st">"center"</span>, <span class="st">"upper"</span>, <span class="va">None</span>], error_msg</span>
+<span id="cb8-135"><a href="#cb8-135" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> outside_loc <span class="op">==</span> <span class="st">"lower"</span>:</span>
+<span id="cb8-136"><a href="#cb8-136" aria-hidden="true" tabindex="-1"></a>        ax.legend(handles, labels, loc<span class="op">=</span><span class="st">'lower left'</span>, bbox_to_anchor<span class="op">=</span>(<span class="dv">1</span>, <span class="dv">0</span>), <span class="op">**</span>kwargs)</span>
+<span id="cb8-137"><a href="#cb8-137" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> outside_loc <span class="op">==</span> <span class="st">"center"</span>:</span>
+<span id="cb8-138"><a href="#cb8-138" aria-hidden="true" tabindex="-1"></a>        ax.legend(handles, labels, loc<span class="op">=</span><span class="st">'center left'</span>, bbox_to_anchor<span class="op">=</span>(<span class="dv">1</span>, <span class="fl">.5</span>), <span class="op">**</span>kwargs)</span>
+<span id="cb8-139"><a href="#cb8-139" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> outside_loc <span class="op">==</span> <span class="st">"upper"</span>:</span>
+<span id="cb8-140"><a href="#cb8-140" aria-hidden="true" tabindex="-1"></a>        ax.legend(handles, labels, loc<span class="op">=</span><span class="st">'upper left'</span>, bbox_to_anchor<span class="op">=</span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="op">**</span>kwargs)</span>
+<span id="cb8-141"><a href="#cb8-141" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb8-142"><a href="#cb8-142" aria-hidden="true" tabindex="-1"></a>        ax.legend(handles, labels, <span class="op">**</span>kwargs)</span>
+<span id="cb8-143"><a href="#cb8-143" aria-hidden="true" tabindex="-1"></a>    legend <span class="op">=</span> ax.get_legend()</span>
+<span id="cb8-144"><a href="#cb8-144" aria-hidden="true" tabindex="-1"></a>    legend.set_title(title)</span>
+<span id="cb8-145"><a href="#cb8-145" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> line <span class="kw">in</span> legend.get_lines():</span>
+<span id="cb8-146"><a href="#cb8-146" aria-hidden="true" tabindex="-1"></a>        line.set_linewidth(linewidth)</span>
+<span id="cb8-147"><a href="#cb8-147" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ax</span></code></pre></div>
 </details>
 </div>
 <p>Using these functions, I’ll create a time series overlay that shows the impact of the pandemic on BART ridership in the context of previous three year trends, e.g.&nbsp;how does 2019-2021 compare to 2015-17? The effect is a plot that suggests that monthly BART ridership was on a trajectory similar to previous years leading up to the pandemic before sharply departing.</p>
 <p>Note that I’m able to flexibly define the date formatting for the x-axis using a <code>date_formatter</code> argument, and I can select to highlight a particular year with the <code>highlight_year</code> argument.</p>
 <div id="cell-16" class="cell" data-execution_count="579">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>date_formatter <span class="op">=</span> <span class="st">'%b</span><span class="ch">\n\'</span><span class="st">%y'</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>_, labs <span class="op">=</span> time_overlay_plot(month_time_series.loc[<span class="st">"2011"</span>:<span class="st">"2021"</span>],</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                            ax<span class="op">=</span>ax, step_size<span class="op">=</span><span class="dv">2</span>,</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                            highlight_year<span class="op">=</span><span class="dv">2021</span>,</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                            date_formatter<span class="op">=</span>date_formatter)</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>ax.yaxis.set_major_formatter(comma_formatter())</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(ylim<span class="op">=</span><span class="dv">0</span>, title<span class="op">=</span><span class="st">"Three Year Trends in BART Ridership"</span>,</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>       ylabel<span class="op">=</span><span class="st">"Total Monthly Riders"</span>)</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>ax.axvline(np.where(labs <span class="op">==</span> datetime(<span class="dv">2020</span>, <span class="dv">1</span>, <span class="dv">1</span>).strftime(date_formatter)),</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>           linestyle<span class="op">=</span><span class="st">":"</span>,</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>           label<span class="op">=</span><span class="st">"First Covid Case in CA"</span>,</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>           color<span class="op">=</span><span class="st">"black"</span>,</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>           linewidth<span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>           alpha<span class="op">=</span><span class="fl">.4</span>)</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>ax.legend()<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>date_formatter <span class="op">=</span> <span class="st">'%b</span><span class="ch">\n\'</span><span class="st">%y'</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>_, labs <span class="op">=</span> time_overlay_plot(month_time_series.loc[<span class="st">"2011"</span>:<span class="st">"2021"</span>],</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                            ax<span class="op">=</span>ax, step_size<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                            highlight_year<span class="op">=</span><span class="dv">2021</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                            date_formatter<span class="op">=</span>date_formatter)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>ax.yaxis.set_major_formatter(comma_formatter())</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(ylim<span class="op">=</span><span class="dv">0</span>, title<span class="op">=</span><span class="st">"Three Year Trends in BART Ridership"</span>,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>       ylabel<span class="op">=</span><span class="st">"Total Monthly Riders"</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>ax.axvline(np.where(labs <span class="op">==</span> datetime(<span class="dv">2020</span>, <span class="dv">1</span>, <span class="dv">1</span>).strftime(date_formatter)),</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>           linestyle<span class="op">=</span><span class="st">":"</span>,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>           label<span class="op">=</span><span class="st">"First Covid Case in CA"</span>,</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>           color<span class="op">=</span><span class="st">"black"</span>,</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>           linewidth<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>           alpha<span class="op">=</span><span class="fl">.4</span>)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>ax.legend()<span class="op">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -640,21 +637,21 @@ Freq: ME, Name: Riders, dtype: int64</code></pre>
 </div>
 <p>I’ll use the same <code>time_overlay_plot</code> function to examine the recovery of the BART system in the post-pandemic period. This time, I’ll also use <code>custom_legend</code> to easily move the legend outside of the plot area.</p>
 <div id="cell-18" class="cell" data-execution_count="580">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>month_time_series_trunc <span class="op">=</span> pd.concat(</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    [df_rph_d.resample(<span class="st">"ME"</span>)[<span class="st">'Riders'</span>].<span class="bu">sum</span>().loc[<span class="st">"2019-01-01"</span>: <span class="st">"2020-01-01"</span>],</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>     df_rph_d.resample(<span class="st">"ME"</span>)[<span class="st">'Riders'</span>].<span class="bu">sum</span>().loc[<span class="st">"2021-01-01"</span>: <span class="st">"2024-01-01"</span>]])</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>date_formatter <span class="op">=</span> <span class="st">'%b'</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>_, labs <span class="op">=</span> time_overlay_plot(month_time_series_trunc, ax<span class="op">=</span>ax, step_size<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>                            highlight_year<span class="op">=</span><span class="dv">2019</span>, date_formatter<span class="op">=</span>date_formatter, bg_alpha<span class="op">=</span><span class="fl">.5</span>)</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>show_all_xticks(ax, labs)</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>ax.yaxis.set_major_formatter(comma_formatter())</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(ylim<span class="op">=</span><span class="dv">0</span>, title<span class="op">=</span><span class="st">"Post-Pandemic Recovery"</span>, ylabel<span class="op">=</span><span class="st">"Total Monthly Riders"</span>)</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">.5</span>)</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>custom_legend(ax, outside_loc<span class="op">=</span><span class="st">"center"</span>, order<span class="op">=</span><span class="st">"desc"</span>,</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>              title<span class="op">=</span><span class="st">"Year"</span>, linewidth<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>handles, labels <span class="op">=</span> ax.get_legend_handles_labels()</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>month_time_series_trunc <span class="op">=</span> pd.concat(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    [df_rph_d.resample(<span class="st">"ME"</span>)[<span class="st">'Riders'</span>].<span class="bu">sum</span>().loc[<span class="st">"2019-01-01"</span>: <span class="st">"2020-01-01"</span>],</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>     df_rph_d.resample(<span class="st">"ME"</span>)[<span class="st">'Riders'</span>].<span class="bu">sum</span>().loc[<span class="st">"2021-01-01"</span>: <span class="st">"2024-01-01"</span>]])</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>date_formatter <span class="op">=</span> <span class="st">'%b'</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>_, labs <span class="op">=</span> time_overlay_plot(month_time_series_trunc, ax<span class="op">=</span>ax, step_size<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>                            highlight_year<span class="op">=</span><span class="dv">2019</span>, date_formatter<span class="op">=</span>date_formatter, bg_alpha<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>show_all_xticks(ax, labs)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>ax.yaxis.set_major_formatter(comma_formatter())</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(ylim<span class="op">=</span><span class="dv">0</span>, title<span class="op">=</span><span class="st">"Post-Pandemic Recovery"</span>, ylabel<span class="op">=</span><span class="st">"Total Monthly Riders"</span>)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>custom_legend(ax, outside_loc<span class="op">=</span><span class="st">"center"</span>, order<span class="op">=</span><span class="st">"desc"</span>,</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>              title<span class="op">=</span><span class="st">"Year"</span>, linewidth<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>handles, labels <span class="op">=</span> ax.get_legend_handles_labels()</span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -669,55 +666,55 @@ Freq: ME, Name: Riders, dtype: int64</code></pre>
 <p>I’ll now move onto examining some commute patterns. Here I’ll create some custom functions for building a colormap that I can use to consistently denote color-class relationships across multiple plots. Default behavior in <code>matplotlib</code> and <code>seaborn</code> typically leads to color-class relationships changing across charts of different types or involving different subsets of the data, e.g.&nbsp;in Chart 1, class A is Red, but in Chart 2, class A is Blue. My custom function, <code>build_colormap</code>, creates a simple color-class relationship dictionary that defines the color-class relationships once and can be input to various <code>seaborn</code> visuals.</p>
 <p>I’ll define color-class relationships for the days of the week, but first I’ll do some setup in <code>pandas</code></p>
 <div id="cell-20" class="cell" data-execution_count="581">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'day_of_week'</span>] <span class="op">=</span> df_rph[<span class="st">'Date'</span>].dt.day_name()</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'Weekend'</span>] <span class="op">=</span> df_rph[<span class="st">'day_of_week'</span>].isin([<span class="st">'Saturday'</span>, <span class="st">'Sunday'</span>])</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'Hour_12'</span>] <span class="op">=</span> pd.to_datetime(</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    df_rph[<span class="st">'Hour'</span>], <span class="bu">format</span><span class="op">=</span><span class="st">'%H'</span>).dt.strftime(<span class="st">'%I:%M %p'</span>)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'Hour_12'</span>] <span class="op">=</span> df_rph[<span class="st">'Hour_12'</span>].<span class="bu">str</span>.replace(<span class="st">":00 "</span>, <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>).<span class="bu">str</span>.strip(<span class="st">"0"</span>)</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'Rider_Thousands'</span>] <span class="op">=</span> df_rph[<span class="st">'Riders'</span>] <span class="op">/</span> <span class="dv">1000</span></span></code></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'day_of_week'</span>] <span class="op">=</span> df_rph[<span class="st">'Date'</span>].dt.day_name()</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'Weekend'</span>] <span class="op">=</span> df_rph[<span class="st">'day_of_week'</span>].isin([<span class="st">'Saturday'</span>, <span class="st">'Sunday'</span>])</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'Hour_12'</span>] <span class="op">=</span> pd.to_datetime(</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    df_rph[<span class="st">'Hour'</span>], <span class="bu">format</span><span class="op">=</span><span class="st">'%H'</span>).dt.strftime(<span class="st">'%I:%M %p'</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'Hour_12'</span>] <span class="op">=</span> df_rph[<span class="st">'Hour_12'</span>].<span class="bu">str</span>.replace(<span class="st">":00 "</span>, <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>).<span class="bu">str</span>.strip(<span class="st">"0"</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'Rider_Thousands'</span>] <span class="op">=</span> df_rph[<span class="st">'Riders'</span>] <span class="op">/</span> <span class="dv">1000</span></span></code></pre></div>
 </div>
 <p>Now I’ll define the <code>build_colormap</code> function and create my color mapping</p>
 <div id="cell-22" class="cell" data-execution_count="582">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_colormap(series: pd.Series) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Build a colormap dictionary for a pandas Series.</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">    This function creates a dictionary that maps each unique value in the input</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">    Series to a unique color from the 'tab10' colormap provided by Seaborn. The </span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">    function ensures that the number of unique values in the Series is less than 10.</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters:</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="co">    series : pd.Series</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co">        The pandas Series for which to build the colormap. Each unique value in the </span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co">        Series will be assigned a unique color.</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co">    dict</span></span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="co">        A dictionary where the keys are the unique values from the input Series </span></span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="co">        and the values are the corresponding colors from the 'tab10' colormap.</span></span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="co">    Raises:</span></span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="co">    ------</span></span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="co">    AssertionError</span></span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="co">        If the number of unique values in the Series is 10 or more.</span></span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>    unique_set <span class="op">=</span> series.unique()</span>
-<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">len</span>(unique_set) <span class="op">&lt;</span> <span class="dv">10</span></span>
-<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>    colors <span class="op">=</span> sns.color_palette(<span class="st">"tab10"</span>)</span>
-<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>    colormap <span class="op">=</span> {}</span>
-<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> d, c <span class="kw">in</span> <span class="bu">zip</span>(unique_set, colors[:<span class="bu">len</span>(unique_set)]):</span>
-<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>        colormap[d] <span class="op">=</span> c</span>
-<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> colormap</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_colormap(series: pd.Series) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Build a colormap dictionary for a pandas Series.</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">    This function creates a dictionary that maps each unique value in the input</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">    Series to a unique color from the 'tab10' colormap provided by Seaborn. The </span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">    function ensures that the number of unique values in the Series is less than 10.</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters:</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co">    series : pd.Series</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co">        The pandas Series for which to build the colormap. Each unique value in the </span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co">        Series will be assigned a unique color.</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="co">    dict</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="co">        A dictionary where the keys are the unique values from the input Series </span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="co">        and the values are the corresponding colors from the 'tab10' colormap.</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="co">    Raises:</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="co">    ------</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="co">    AssertionError</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="co">        If the number of unique values in the Series is 10 or more.</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>    unique_set <span class="op">=</span> series.unique()</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> <span class="bu">len</span>(unique_set) <span class="op">&lt;</span> <span class="dv">10</span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>    colors <span class="op">=</span> sns.color_palette(<span class="st">"tab10"</span>)</span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>    colormap <span class="op">=</span> {}</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> d, c <span class="kw">in</span> <span class="bu">zip</span>(unique_set, colors[:<span class="bu">len</span>(unique_set)]):</span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>        colormap[d] <span class="op">=</span> c</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> colormap</span></code></pre></div>
 </details>
 </div>
 <p>Here is the resulting color-mapping dictionary</p>
 <div id="cell-24" class="cell" data-execution_count="583">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>colormap <span class="op">=</span> build_colormap(df_rph[<span class="st">'day_of_week'</span>])</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>colormap</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>colormap <span class="op">=</span> build_colormap(df_rph[<span class="st">'day_of_week'</span>])</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>colormap</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="583">
 <pre><code>{'Saturday': (0.12156862745098039, 0.4666666666666667, 0.7058823529411765),
  'Sunday': (1.0, 0.4980392156862745, 0.054901960784313725),
@@ -730,25 +727,25 @@ Freq: ME, Name: Riders, dtype: int64</code></pre>
 </div>
 <p>and here’s a simple application of that colormap to examine the average riders-per-hour in the BART system.</p>
 <div id="cell-26" class="cell" data-execution_count="584">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>sns.despine(top<span class="op">=</span><span class="va">True</span>, ax<span class="op">=</span>ax)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>sns.lineplot(</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df_rph,</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">'Hour_12'</span>,</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">'Rider_Thousands'</span>,</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    hue<span class="op">=</span><span class="st">'day_of_week'</span>,</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    palette<span class="op">=</span>colormap,</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    linewidth<span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    estimator<span class="op">=</span><span class="st">'mean'</span>,</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    errorbar<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>ax)</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    title<span class="op">=</span><span class="st">"Average Hourly Riders"</span>,</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    ylabel<span class="op">=</span><span class="st">"Average Riders (1,000s)"</span>,</span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    xlabel<span class="op">=</span><span class="st">"Hour"</span>)</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>custom_legend(ax, title<span class="op">=</span><span class="st">"Day of the week"</span>, linewidth<span class="op">=</span><span class="dv">2</span>, order<span class="op">=</span><span class="bu">list</span>(colormap.keys()))</span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">.6</span>)</span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>sns.despine(top<span class="op">=</span><span class="va">True</span>, ax<span class="op">=</span>ax)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>sns.lineplot(</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df_rph,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">'Hour_12'</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">'Rider_Thousands'</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    hue<span class="op">=</span><span class="st">'day_of_week'</span>,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    palette<span class="op">=</span>colormap,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    linewidth<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    estimator<span class="op">=</span><span class="st">'mean'</span>,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    errorbar<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>ax)</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    title<span class="op">=</span><span class="st">"Average Hourly Riders"</span>,</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    ylabel<span class="op">=</span><span class="st">"Average Riders (1,000s)"</span>,</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    xlabel<span class="op">=</span><span class="st">"Hour"</span>)</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>custom_legend(ax, title<span class="op">=</span><span class="st">"Day of the week"</span>, linewidth<span class="op">=</span><span class="dv">2</span>, order<span class="op">=</span><span class="bu">list</span>(colormap.keys()))</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">.6</span>)</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -761,65 +758,65 @@ Freq: ME, Name: Riders, dtype: int64</code></pre>
 <div id="cell-28" class="cell" data-execution_count="585">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> grid_plot(grid_subset: pd.DataFrame,</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>              seaborn_func: <span class="bu">callable</span>,</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>              rows: <span class="bu">int</span>,</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>              cols: <span class="bu">int</span>,</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>              group_var: <span class="bu">str</span>,</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>              figsize: <span class="bu">tuple</span> <span class="op">=</span> (<span class="dv">10</span>, <span class="dv">5</span>),</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>              legend_loc: <span class="bu">str</span> <span class="op">=</span> <span class="st">"lower"</span>,</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>              <span class="op">**</span>kwargs):</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    facet <span class="op">=</span> grid_subset[group_var].unique()</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    facet <span class="op">=</span> facet.reshape(rows, cols)</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    fig, axes <span class="op">=</span> plt.subplots(</span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>        facet.shape[<span class="dv">0</span>], facet.shape[<span class="dv">1</span>], sharex<span class="op">=</span><span class="va">True</span>, sharey<span class="op">=</span><span class="va">True</span>, figsize<span class="op">=</span>figsize)</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> m <span class="kw">in</span> <span class="bu">range</span>(facet.shape[<span class="dv">0</span>]):</span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> n <span class="kw">in</span> <span class="bu">range</span>(facet.shape[<span class="dv">1</span>]):</span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>            group <span class="op">=</span> facet[m, n]</span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>            subset <span class="op">=</span> grid_subset[grid_subset[group_var] <span class="op">==</span> group]</span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> legend_loc <span class="op">==</span> <span class="st">'lower'</span>:</span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>                legend <span class="op">=</span> <span class="va">True</span> <span class="cf">if</span> (m<span class="op">+</span><span class="dv">1</span> <span class="op">==</span> rows) <span class="kw">and</span> (n<span class="op">+</span><span class="dv">1</span> <span class="op">==</span> cols) <span class="cf">else</span> <span class="va">False</span></span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> legend_loc <span class="op">==</span> <span class="st">"upper"</span>:</span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>                legend <span class="op">=</span> <span class="va">True</span> <span class="cf">if</span> (m<span class="op">+</span><span class="dv">1</span> <span class="op">==</span> <span class="dv">1</span>) <span class="kw">and</span> (n<span class="op">+</span><span class="dv">1</span> <span class="op">==</span> cols) <span class="cf">else</span> <span class="va">False</span></span>
-<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
-<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>                legend <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>            seaborn_func(</span>
-<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>                data<span class="op">=</span>subset,</span>
-<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>                ax<span class="op">=</span>axes[m, n],</span>
-<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>                legend<span class="op">=</span>legend,</span>
-<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>                <span class="op">**</span>kwargs)</span>
-<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>            axes[m, n].<span class="bu">set</span>(ylabel<span class="op">=</span><span class="va">None</span>, xlabel<span class="op">=</span><span class="va">None</span>, title<span class="op">=</span>group)</span>
-<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>            axes[m, n].grid()</span>
-<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> fig, axes</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> grid_plot(grid_subset: pd.DataFrame,</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>              seaborn_func: <span class="bu">callable</span>,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>              rows: <span class="bu">int</span>,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>              cols: <span class="bu">int</span>,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>              group_var: <span class="bu">str</span>,</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>              figsize: <span class="bu">tuple</span> <span class="op">=</span> (<span class="dv">10</span>, <span class="dv">5</span>),</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>              legend_loc: <span class="bu">str</span> <span class="op">=</span> <span class="st">"lower"</span>,</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>              <span class="op">**</span>kwargs):</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    facet <span class="op">=</span> grid_subset[group_var].unique()</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    facet <span class="op">=</span> facet.reshape(rows, cols)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    fig, axes <span class="op">=</span> plt.subplots(</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>        facet.shape[<span class="dv">0</span>], facet.shape[<span class="dv">1</span>], sharex<span class="op">=</span><span class="va">True</span>, sharey<span class="op">=</span><span class="va">True</span>, figsize<span class="op">=</span>figsize)</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> m <span class="kw">in</span> <span class="bu">range</span>(facet.shape[<span class="dv">0</span>]):</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> n <span class="kw">in</span> <span class="bu">range</span>(facet.shape[<span class="dv">1</span>]):</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>            group <span class="op">=</span> facet[m, n]</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>            subset <span class="op">=</span> grid_subset[grid_subset[group_var] <span class="op">==</span> group]</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> legend_loc <span class="op">==</span> <span class="st">'lower'</span>:</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>                legend <span class="op">=</span> <span class="va">True</span> <span class="cf">if</span> (m<span class="op">+</span><span class="dv">1</span> <span class="op">==</span> rows) <span class="kw">and</span> (n<span class="op">+</span><span class="dv">1</span> <span class="op">==</span> cols) <span class="cf">else</span> <span class="va">False</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> legend_loc <span class="op">==</span> <span class="st">"upper"</span>:</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>                legend <span class="op">=</span> <span class="va">True</span> <span class="cf">if</span> (m<span class="op">+</span><span class="dv">1</span> <span class="op">==</span> <span class="dv">1</span>) <span class="kw">and</span> (n<span class="op">+</span><span class="dv">1</span> <span class="op">==</span> cols) <span class="cf">else</span> <span class="va">False</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>                legend <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>            seaborn_func(</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>                data<span class="op">=</span>subset,</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>                ax<span class="op">=</span>axes[m, n],</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>                legend<span class="op">=</span>legend,</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>                <span class="op">**</span>kwargs)</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>            axes[m, n].<span class="bu">set</span>(ylabel<span class="op">=</span><span class="va">None</span>, xlabel<span class="op">=</span><span class="va">None</span>, title<span class="op">=</span>group)</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>            axes[m, n].grid()</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> fig, axes</span></code></pre></div>
 </details>
 </div>
 <p>For an application, I’ll create a dataset from 2018-2024 where I want to display one chart per year in a grid pattern</p>
 <div id="cell-30" class="cell" data-execution_count="586">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>grid_subset <span class="op">=</span> df_rph.copy()[(df_rph[<span class="st">'Date'</span>] <span class="op">&gt;</span> <span class="st">"2018"</span>)</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>                            <span class="op">&amp;</span> (df_rph[<span class="st">'Date'</span>] <span class="op">&lt;</span> <span class="st">"2024"</span>)]</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>grid_subset[<span class="st">'Year'</span>] <span class="op">=</span> grid_subset[<span class="st">'Date'</span>].dt.year</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>grid_subset <span class="op">=</span> df_rph.copy()[(df_rph[<span class="st">'Date'</span>] <span class="op">&gt;</span> <span class="st">"2018"</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>                            <span class="op">&amp;</span> (df_rph[<span class="st">'Date'</span>] <span class="op">&lt;</span> <span class="st">"2024"</span>)]</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>grid_subset[<span class="st">'Year'</span>] <span class="op">=</span> grid_subset[<span class="st">'Date'</span>].dt.year</span></code></pre></div>
 </div>
 <p>Now I can use my function, <code>grid_plot</code>, to specify a plot type, a grid shape, and pass <code>seaborn</code> <code>**kwargs</code> to the underlying plotting function.</p>
 <div id="cell-32" class="cell" data-execution_count="587">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> grid_plot(grid_subset,</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                      sns.lineplot,</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                      rows<span class="op">=</span><span class="dv">2</span>, cols<span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                      group_var<span class="op">=</span><span class="st">'Year'</span>,</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>                      legend_loc<span class="op">=</span><span class="st">"lower"</span>,</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>                      x<span class="op">=</span><span class="st">'Hour'</span>,</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>                      y<span class="op">=</span><span class="st">'Rider_Thousands'</span>,</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>                      hue<span class="op">=</span><span class="st">'day_of_week'</span>,</span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>                      figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>),</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>                      palette<span class="op">=</span>colormap,</span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>                      estimator<span class="op">=</span><span class="st">'mean'</span>,</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>                      linewidth<span class="op">=</span><span class="dv">2</span>,</span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>                      errorbar<span class="op">=</span><span class="va">None</span>)</span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>custom_legend(axes[<span class="dv">1</span>, <span class="dv">2</span>], outside_loc<span class="op">=</span><span class="st">"upper"</span>,</span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>              title<span class="op">=</span><span class="st">"Day of the week"</span>, linewidth<span class="op">=</span><span class="dv">2</span>, order<span class="op">=</span><span class="bu">list</span>(colormap.keys()))</span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>fig.supxlabel(<span class="st">"Hour of Day"</span>)</span>
-<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>fig.supylabel(<span class="st">"Average Riders (1,000s)"</span>)</span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
-<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="st">"Hourly Ridership Trends Across Years"</span>, y<span class="op">=</span><span class="fl">1.05</span>)<span class="op">;</span></span></code></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> grid_plot(grid_subset,</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>                      sns.lineplot,</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>                      rows<span class="op">=</span><span class="dv">2</span>, cols<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>                      group_var<span class="op">=</span><span class="st">'Year'</span>,</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>                      legend_loc<span class="op">=</span><span class="st">"lower"</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>                      x<span class="op">=</span><span class="st">'Hour'</span>,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>                      y<span class="op">=</span><span class="st">'Rider_Thousands'</span>,</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>                      hue<span class="op">=</span><span class="st">'day_of_week'</span>,</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>                      figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>),</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>                      palette<span class="op">=</span>colormap,</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>                      estimator<span class="op">=</span><span class="st">'mean'</span>,</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>                      linewidth<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>                      errorbar<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>custom_legend(axes[<span class="dv">1</span>, <span class="dv">2</span>], outside_loc<span class="op">=</span><span class="st">"upper"</span>,</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>              title<span class="op">=</span><span class="st">"Day of the week"</span>, linewidth<span class="op">=</span><span class="dv">2</span>, order<span class="op">=</span><span class="bu">list</span>(colormap.keys()))</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>fig.supxlabel(<span class="st">"Hour of Day"</span>)</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>fig.supylabel(<span class="st">"Average Riders (1,000s)"</span>)</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="st">"Hourly Ridership Trends Across Years"</span>, y<span class="op">=</span><span class="fl">1.05</span>)<span class="op">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -830,24 +827,25 @@ Freq: ME, Name: Riders, dtype: int64</code></pre>
 </div>
 <p>The grid presents an interesting pattern in so far as the general level of ridership drops across all hours, but the raw plot seems to suggest that the gap between peak commute ridership levels and off-peak ridership seems to have shrunken post-pandemic. In late 2023, BART <a href="https://www.bart.gov/news/articles/2023/news20230427">instituted scheduling changes</a> to reflect their belief that demand has shifted in the post-pandemic towards rides outside of peak commute times.</p>
 <p>We can check that with a simple time series plot that relies on my <code>custom_legend</code> function to move the legend and resize the lines within it.</p>
-<div id="cell-34" class="cell" data-execution_count="588">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>is_commute <span class="op">=</span> (df_rph[<span class="st">'Hour'</span>].isin([<span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">16</span>, <span class="dv">17</span>, <span class="dv">18</span>, <span class="dv">19</span>]) <span class="op">&amp;</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>              <span class="op">~</span>df_rph[<span class="st">'Weekend'</span>]).replace({</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>                  <span class="va">True</span>: <span class="st">'Peak Commute'</span>,</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>                  <span class="va">False</span>: <span class="st">'Off Peak'</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>              })</span></code></pre></div>
+<div id="cell-34" class="cell" data-execution_count="591">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>is_commute <span class="op">=</span> (df_rph[<span class="st">'Hour'</span>].isin([<span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">16</span>, <span class="dv">17</span>, <span class="dv">18</span>, <span class="dv">19</span>]) <span class="op">&amp;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>              <span class="op">~</span>df_rph[<span class="st">'Weekend'</span>]).replace({</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                  <span class="va">True</span>: <span class="st">'Riders during Peak Commute times'</span>,</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                  <span class="va">False</span>: <span class="st">'Riders during Off-Peak times'</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>              })</span></code></pre></div>
 </div>
-<div id="cell-35" class="cell" data-execution_count="589">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>(df_rph[df_rph[<span class="st">'Date'</span>] <span class="op">&lt;</span> <span class="st">"2024-05-01"</span>]</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a> .pivot_table(index<span class="op">=</span>pd.Grouper(key<span class="op">=</span><span class="st">'Date'</span>, freq<span class="op">=</span><span class="st">'ME'</span>),</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>              columns<span class="op">=</span>is_commute,</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>              values<span class="op">=</span><span class="st">"Riders"</span>,</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>              aggfunc<span class="op">=</span><span class="st">'sum'</span>)</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a> ).plot(linewidth<span class="op">=</span><span class="dv">2</span>, ax<span class="op">=</span>ax)</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>ax.yaxis.set_major_formatter(comma_formatter())</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">.4</span>)</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>custom_legend(ax, title<span class="op">=</span><span class="st">"Travel Time"</span>, linewidth<span class="op">=</span><span class="dv">3</span>, loc<span class="op">=</span><span class="st">"lower left"</span>)<span class="op">;</span></span></code></pre></div>
+<div id="cell-35" class="cell" data-execution_count="593">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>(df_rph[df_rph[<span class="st">'Date'</span>] <span class="op">&lt;</span> <span class="st">"2024-05-01"</span>]</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a> .pivot_table(index<span class="op">=</span>pd.Grouper(key<span class="op">=</span><span class="st">'Date'</span>, freq<span class="op">=</span><span class="st">'ME'</span>),</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>              columns<span class="op">=</span>is_commute,</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>              values<span class="op">=</span><span class="st">"Riders"</span>,</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>              aggfunc<span class="op">=</span><span class="st">'sum'</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a> ).plot(linewidth<span class="op">=</span><span class="dv">2</span>, ax<span class="op">=</span>ax)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>ax.yaxis.set_major_formatter(comma_formatter())</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>ax.grid(alpha<span class="op">=</span><span class="fl">.4</span>)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(ylabel<span class="op">=</span><span class="st">"Riders"</span>, title<span class="op">=</span><span class="st">"Trends in Commute versus Non-Commute Ridership"</span>)</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>custom_legend(ax, title<span class="op">=</span><span class="st">"Travel Time"</span>, linewidth<span class="op">=</span><span class="dv">3</span>, loc<span class="op">=</span><span class="st">"lower left"</span>)<span class="op">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
