@@ -1,4 +1,16 @@
 /* css styles */
+pre.sourceCode {
+    border-left: 3px;
+    border-left-style: solid;
+    border-left-color: #dee2e6;
+}
+div.quarto-post .listing-categories .listing-category {
+    border: solid 1px #4f4f4f;
+    font-weight: 500;
+}
+code {
+    background-color: #ecebeb;
+}
 
 div.quarto-post .body h3.listing-title, div.quarto-post .body .listing-title.h3 {
     font-size: larger !important;
