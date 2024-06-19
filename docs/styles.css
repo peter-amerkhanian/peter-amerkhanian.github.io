@@ -1,15 +1,24 @@
 /* css styles */
+
+/* Code Block styling */
 pre.sourceCode {
     border-left: 3px;
     border-left-style: solid;
     border-left-color: #dee2e6;
 }
+code {
+    background-color: #ecebeb;
+}
+
+p pre code:not(.sourceCode), li pre code:not(.sourceCode), pre code:not(.sourceCode) {
+    background-color: rgb(247, 247, 255);
+    border-bottom: .2em solid #e2e2e2;
+}
+
+/* Listing formatting */
 div.quarto-post .listing-categories .listing-category {
     border: solid 1px #4f4f4f;
     font-weight: 500;
-}
-code {
-    background-color: #ecebeb;
 }
 
 div.quarto-post .body h3.listing-title, div.quarto-post .body .listing-title.h3 {
