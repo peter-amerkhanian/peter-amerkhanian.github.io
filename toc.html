@@ -1,0 +1,16 @@
+<nav id="$idprefix$TOC" role="doc-toc">
+    $if(toc-title)$
+    <h2 id="$idprefix$toc-title"><a href="#" class="nav-link">$title$</a></h2>
+    $endif$ 
+    $table-of-contents$
+  </nav>
+
+<script>
+  document.getElementById('$idprefix$toc-title').addEventListener('click', function(event) {
+  event.preventDefault(); // Prevent default behavior of anchor tag
+  const firstHeader = document.querySelector('body'); // Select the first h2 element
+  if (firstHeader) {
+    firstHeader.scrollIntoView({ behavior: 'smooth', block: "start", inline: "nearest"}); // Scroll to the first header smoothly
+  }
+});
+</script>

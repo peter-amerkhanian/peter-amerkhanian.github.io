@@ -1,0 +1,2 @@
+,dask + parquet,dask + .csv.gz,pandas + parquet,pandas + .csv.gz
+Bart Data Read-In Time,22.85,47.08,35.42,51.37

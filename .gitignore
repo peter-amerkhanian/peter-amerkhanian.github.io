@@ -1,0 +1,6 @@
+/.quarto/
+.Rproj.user
+/_site
+/.ipynb_checkpoints
+.Rhistory
+quarto-test.Rproj

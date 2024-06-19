@@ -1,0 +1,29 @@
+---
+title: "Peter Amerkhanian"
+pagetitle: "Peter Amerkhanian"
+image: profile.jpg
+about:
+  id: hero-heading
+  template: trestles
+  image-width: 8em
+  image-shape : round
+  links:
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/peteramerkhanian/
+    - icon: github
+      text: Github
+      href: https://github.com/peter-amerkhanian
+    - icon: envelope-open-fill
+      text: Email
+      href: mailto:peteramerkhanian@berkeley.edu
+---
+<p style="font-weight: 650; color: #4d4d4d">Data Scientist @ CA Department of Social Services  
+UC Berkeley MPP '23, BA '16
+</p>
+---
+I’m a Data Scientist/Policy Analyst working in government. My professional background is largely in using data and computing to improve public service delivery.      
+
+Formal reports and software $\rightarrow$ [Projects](projects.qmd)
+
+Short-form technical resources $\rightarrow$ [Notes](blog.qmd)

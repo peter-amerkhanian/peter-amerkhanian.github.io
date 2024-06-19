@@ -1,0 +1,34 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  favicon: "profile.jpg"
+  google-analytics: "G-V95HGLKTEB"
+  title: "Home"
+  site-url: https://peter-amerkhanian.com
+  description: "Peter Amerkhanian's Blog"
+  navbar:
+    logo: "profile.jpg"
+    search: true
+    right:
+      - blog.qmd
+      - projects.qmd
+
+  page-footer: "Copyright 2024, Peter Amerkhanian"
+
+format:
+  html:
+    link-external-newwindow: true
+    highlight-style: pygments
+    code-copy: false
+    code-block-bg: true
+    code-block-border-left: true
+    theme:
+      - default
+      - custom.scss
+    css: styles.css
+    template-partials:
+      - toc.html
+
+

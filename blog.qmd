@@ -1,0 +1,25 @@
+---
+title: "Notes"
+pagetitle: "Notes"
+listing:
+  contents: posts
+  sort: "date desc"
+  type: default
+  feed:
+    type: partial
+  categories: true
+  sort-ui: false
+  filter-ui: false
+  fields: [date, title, categories,  reading-time]
+  image-align: right
+  field-display-names:
+    date: Date
+    title: Title
+    categories: Topics
+    reading-time: Time
+page-layout: full
+title-block-banner: true
+---
+
+The following are a collection of my informal notes on topics in programming, math, statistics, and policy analysis. If you find errors or else find them helpful, I'd love to hear from you. You can subscribe to the [RSS feed](blog.xml) if you'd like updates as I write new posts.  
+<hr>

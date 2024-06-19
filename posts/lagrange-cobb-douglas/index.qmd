@@ -1,0 +1,239 @@
+---
+title: "Production Maximization with Lagrange Mutlipliers"
+bibliography: "../../blog.bib"
+author: "Peter Amerkhanian"
+date: "2024-3-17"
+categories: ['R', 'Calculus']
+image: thumbnail.png
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: false
+    code-tools: true
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+```{r}
+#| warning: false
+#| code-fold: true
+library(plotly)
+library(dplyr)
+
+scene <- list(
+  camera = list(eye = list(
+    x = -2.2, y = 1.1, z = 1.2
+  )),
+  xaxis = list(title = "L"),
+  yaxis = list(title = "K"),
+  zaxis = list(title = "$")
+)
+```
+
+### The Optimization Problem
+
+> A company has determined that its production level is given by the
+> Cobb-Douglas function $f(x,y)=2.5x^{0.45}y^{0.55}$ where $x$
+> represents the total number of labor hours in 1 year and $y$
+> represents the total capital input for the company. Suppose 1 unit of
+> labor costs \$40 and 1 unit of capital costs \$50. Use the method of
+> Lagrange multipliers to find the maximum value of
+> $f(x,y)=2.5x^{0.45}y^{0.55}$ subject to a budgetary constraint of
+> \$500,000 per year.  
+> 
+> -- [@strang_calculus_2016-1, chapter 4.8]
+
+$$
+\begin{align}
+f(x, y) \rightarrow P(L, K) \\
+P(L, K) &= 2.5L^{0.45}K^{0.55} \\
+g(L, K) &= 40L + 50K - 500,000
+\end{align}
+$$ {#eq-all}
+
+We set the equation up in `R` so that we can inspect a plot and better
+understand the optimization problem.
+
+```{r}
+P_l_k <- function(L, K) {
+  2.5 * L ^ (0.45) * K ^ (0.55)
+}
+g_l_k <- function(L, K) {
+  40 * L + 50 * K - 500000
+}
+n <- 100
+L <- seq(0, 6000, length.out = n)
+K <- seq(0, 6000, length.out = n)
+P <- outer(L, K, P_l_k)
+g <- outer(L, K, g_l_k)
+```
+
+```{r}
+#| code-fold: true
+plot_ly(
+  x = L,
+  y = K,
+  z = P,
+  type = "surface",
+  name = "P(L,K)"
+) %>%
+  colorbar(title = "P(L,K)") %>%
+  add_trace(
+    x = L,
+    y = K,
+    z = g,
+    type = "surface",
+    colorscale = "coolwarm",
+    name = "g(L,K)",
+    colorbar = list(title = "g(L,K)")
+  ) %>% layout(scene = scene)
+```
+
+We see that the production function $P$ and the cost function $g$ are surfaces that intersect. We are looking for the highest possible
+point in $P$ that does not exceed the constraint $g$, which will be
+somewhere around their intersection. Note that generally, all values
+below the intersection are possible, though not profit-maximizing,
+points. The points higher than the intersection are more
+profit-maximizing, but are not possible with this budget constraint.
+
+### Maximizing using the Method of Lagrange Multipliers
+
+We adapt the Lagrange multiplier problem-solving strategy from
+[@strang_calculus_2016-1, chapter 4.8] to our function input, and set up
+the following system of equations, which we will solve for $L_0$ and
+$K_0$:
+
+$$
+\begin{align*}
+\nabla P(L_0, K_0) &= \lambda \nabla g(L_0, K_0) \\
+g(L_0, K_0) &= 0
+\end{align*}
+$$ {#eq-lagrange}
+
+At this point, we will need to do some calculations to find each
+function in @eq-all's gradient.
+
+$$
+\begin{align*}
+\nabla P(L_0, K_0) &= \left<  \frac{1.125K^{0.55}}{L^{0.55}} , \frac{1.375L^{0.45}}{K^{0.45}}\right> \\
+\nabla g(L_0, K_0) &= \left< 40, 50 \right> \\
+\end{align*}
+$$
+
+$$
+\begin{align*}
+&\begin{cases}
+\left<  \frac{1.125K^{0.55}}{L^{0.55}} , \frac{1.375L^{0.45}}{K^{0.45}}\right> &= \lambda \left< 40, 50 \right> \\
+40L + 50K - 500,000 &= 0
+\end{cases} \\
+&\begin{cases}
+\frac{1.125K^{0.55}}{L^{0.55}} &= 40 \lambda\\
+\frac{1.375L^{0.45}}{K^{0.45}} &= 50 \lambda \\
+40L + 50K - 500,000 &= 0
+\end{cases} \\
+&\begin{cases}
+\frac{1.125K^{0.55}}{40L^{0.55}} &= \lambda\\
+\frac{1.375L^{0.45}}{50K^{0.45}} &= \lambda \\
+40L + 50K - 500,000 &= 0
+\end{cases} \\
+&\begin{cases}
+\frac{1.125K^{0.55}}{40L^{0.55}} &= \frac{1.375L^{0.45}}{50K^{0.45}} \\
+40L + 50K - 500,000 &= 0
+\end{cases} \\
+&\begin{cases}
+5.5L &= 5.625K \\
+40L + 50K - 500,000 &= 0
+\end{cases} \\
+&\begin{cases}
+5.5L- 5.625K &= 0 \\
+40L + 50K &= 500,000
+\end{cases}
+\end{align*}
+$$
+
+We now have a clear linear system of equations that we can solve via
+some substitution and algebraic manipulation:
+
+$$
+\begin{align*}
+L &= \frac{5.625K}{5.5} \\
+40 (\frac{5.625K}{5.5}) + 50K &= 500,000 \\
+K &= \frac{500,000}{(40 (\frac{5.625}{5.5}) + 50)} = \boxed{K = \$ 5,500} \\
+40 L + 50(5,500) &= 500,000 \\
+ L &= \frac{500,000 - 50(5,500)}{40} = \boxed{L = 5,625 \, \text{labor hours}}
+\end{align*}
+$$
+
+We'll now plug those values for capital and labor into our production function and see how much output this maximizing parameter combination produces (we'll round given we are solving for whole output):
+```{r}
+P_l_k(5625, 5500) %>% round()
+```
+When we return to the plot of the product function and budget constraint, we can see that this point clearly is the highest possible output under the constraints.
+```{r}
+#| code-fold: true
+plot_ly(
+  x = L,
+  y = K,
+  z = P,
+  type = "surface",
+  name = "P(L,K)"
+) %>%
+  colorbar(title = "P(L,K)") %>%
+  add_trace(
+    x = L,
+    y = K,
+    z = g,
+    type = "surface",
+    colorscale = "coolwarm",
+    name = "g(L,K)",
+    colorbar = list(title = "g(L,K)")
+  ) %>%
+  add_trace(
+    x = 5625,
+    y = 5500,
+    z = P_l_k(5625, 5500) %>% round(),
+    type = "scatter3d",
+    mode = "markers",
+    marker = list(size = 5, color = "black")
+  ) %>%
+  layout(scene = scene, legend=list(x=.5, y=0))
+```
+
+However, in $R^3$, contour plots offer a much clearer way of visualizing our solution.
+
+```{r}
+#| warning: false
+#| code-fold: true
+plot_ly(
+  x = L,
+  y = K,
+  z = P,
+  type = "contour",
+  name = "P(L,K)"
+) %>%
+  colorbar(title = "P(L,K)") %>%
+  add_trace(
+    x =  L,
+    y = 10000 - 4 * K / 5,
+    type = 'scatter',
+    mode = 'lines',
+    name = "g(L, K)",
+    color = "red"
+  ) %>%
+  add_trace(
+    x = 5625,
+    y = 5500,
+    type = "scatter",
+    mode = "markers",
+    marker = list(
+      size = 10,
+      color = "black",
+      name = "P(L*,K*)"
+    )
+  ) %>%
+  layout(xaxis = list(range = c(0, max(L))),
+         yaxis = list(range = c(0, max(K))))
+```
+
