@@ -61,7 +61,7 @@ Tools: `pyautogui`, `xlwings`.
 The following are some of my course papers from graduate school:
 
 **Simulating School Desegregation in San Francisco**  
-Peter Amerkhanian (2022), <a href="https://www.globalpolicy.science/courses">Public Policy 275</a> Final Paper (A+).  
+Peter Amerkhanian (2022), <a href="https://www.globalpolicy.science/courses">Public Policy 275</a> Final Paper.  
 [Paper](https://drive.google.com/file/d/1vRbN9dOT8-uFneSbTShG2RMmztQULrX4/view?usp=sharing){.btn .btn-outline-primary .btn-sm role="button"}
 [Repo](https://github.com/peter-amerkhanian/sf-schools-simulation){.btn .btn-outline-primary .btn-sm role="button"}
 
@@ -71,7 +71,7 @@ Tools: `geopandas`, `networkx`. Methods: dijkstra's algorithm, entropy/dissimila
 ---
 
 **Measuring Differences in California Politician Agendas in Press Releases**  
-Peter Amerkhanian (2021), <a href="https://people.ischool.berkeley.edu/~dbamman/info256.html">Information 254</a> Final Paper (A).  
+Peter Amerkhanian (2021), <a href="https://people.ischool.berkeley.edu/~dbamman/info256.html">Information 254</a> Final Paper.  
 [Paper](https://drive.google.com/file/d/134YMeVodA3_kytoq-u8rqO34b3U6Bkoy/view?usp=sharing){.btn .btn-outline-primary .btn-sm role="button"}
 
 **Summary**: I use a novel dataset of press releases issued by governors and mayors in California to 1.) Develop a regression model to identify press release authorship, 2.) Cluster press releases by topic, and 3.) Estimate the political similarities between mayors and governors.  

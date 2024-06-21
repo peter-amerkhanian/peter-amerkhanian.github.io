@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://peter-amerkhanian.com/projects.html</loc>
-    <lastmod>2024-06-19T16:48:55.119Z</lastmod>
+    <lastmod>2024-06-21T17:24:45.647Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/simple-constrained-optimization/index.html</loc>
@@ -14,7 +14,7 @@
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/newtons-method/index.html</loc>
-    <lastmod>2024-04-14T21:16:57.353Z</lastmod>
+    <lastmod>2024-06-20T19:25:41.941Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/minima-3d/index.html</loc>
@@ -25,8 +25,8 @@
     <lastmod>2024-06-15T21:33:13.243Z</lastmod>
   </url>
   <url>
-    <loc>https://peter-amerkhanian.com/posts/dask-data-io/index.html</loc>
-    <lastmod>2024-06-15T21:29:05.270Z</lastmod>
+    <loc>https://peter-amerkhanian.com/posts/covariance-matrices/index.html</loc>
+    <lastmod>2024-06-15T21:19:18.239Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/blog.html</loc>
@@ -34,11 +34,11 @@
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/index.html</loc>
-    <lastmod>2024-06-19T16:51:35.609Z</lastmod>
+    <lastmod>2024-06-21T17:24:42.733Z</lastmod>
   </url>
   <url>
-    <loc>https://peter-amerkhanian.com/posts/covariance-matrices/index.html</loc>
-    <lastmod>2024-06-15T21:19:18.239Z</lastmod>
+    <loc>https://peter-amerkhanian.com/posts/dask-data-io/index.html</loc>
+    <lastmod>2024-06-15T21:29:05.270Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/iterated-expectations/index.html</loc>
@@ -58,7 +58,7 @@
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/rent-vs-buy/index.html</loc>
-    <lastmod>2024-03-18T23:56:26.419Z</lastmod>
+    <lastmod>2024-06-20T19:25:50.245Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/time-series-matplotlib/index.html</loc>

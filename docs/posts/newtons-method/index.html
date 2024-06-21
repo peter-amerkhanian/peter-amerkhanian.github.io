@@ -441,7 +441,10 @@ x &amp;= -\pi
 <span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> euclidean_dist_to_truth(x): <span class="cf">return</span> np.sqrt((<span class="op">-</span>np.pi <span class="op">-</span> <span class="bu">float</span>(x))<span class="op">**</span><span class="dv">2</span>)</span></code></pre></div>
 </details>
 </div>
-<p>Now we’ll begin the process of using Newton’s Method to arrive at that same answer of <span class="math inline">\(x=-\pi\)</span>. #### Step 1: Make a first guess and evaluate its (x, y) coordinates For a first guess, it’s typical to start close to 0. In our case, we’ll try -2.</p>
+<p>Now we’ll begin the process of using Newton’s Method to arrive at that same answer of <span class="math inline">\(x=-\pi\)</span>.</p>
+<section id="step-1-make-a-first-guess-and-evaluate-its-x-y-coordinates" class="level4">
+<h4 class="anchored" data-anchor-id="step-1-make-a-first-guess-and-evaluate-its-x-y-coordinates">Step 1: Make a first guess and evaluate its (x, y) coordinates</h4>
+<p>For a first guess, it’s typical to start close to 0. In our case, we’ll try -2.</p>
 <div id="cell-7" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>x_0 <span class="op">=</span> <span class="op">-</span><span class="dv">2</span></span></code></pre></div>
 </div>
@@ -475,6 +478,7 @@ f(x_0) &amp;\approx −3.6371897 \\\
 <pre><code>error for guess x_0: 1.1415926535897931</code></pre>
 </div>
 </div>
+</section>
 <section id="step-2-find-the-equation-of-the-tangent-line-at-those-coordinates" class="level4">
 <h4 class="anchored" data-anchor-id="step-2-find-the-equation-of-the-tangent-line-at-those-coordinates">Step 2: Find the equation of the tangent line at those coordinates</h4>
 <p>We will proceed to improve upon that initial guess by computing the linear approximation of the function at that point, then retrieve its root to make a next-guess. Our first guess wasn’t based on any relevant information other than the domain of our search (between -5 and 0). Our next guess is going to be better-informed, as it is an estimate based on an approximation of the function.</p>
