@@ -1,5 +1,11 @@
 [
   {
+    "listing": "/memos.html",
+    "items": [
+      "/memos/SIR/index.html"
+    ]
+  },
+  {
     "listing": "/blog.html",
     "items": [
       "/posts/time-series-matplotlib/index.html",

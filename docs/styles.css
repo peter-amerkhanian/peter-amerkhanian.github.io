@@ -1,5 +1,23 @@
 /* css styles */
 
+/* div.quarto-post .thumbnail {
+    flex-basis: 45%;
+}
+div.quarto-post .body {
+        flex-basis: 35%;
+}
+div.quarto-post .metadata {
+    flex-basis: 15% !important;
+} */
+
+/* Fix thumbnail margins */
+/* .thumbnail p:not(.card-img-top){
+    display: none !important;
+} */
+div.quarto-post .thumbnail img{
+    margin-top: 0em !important;
+}
+
 /* Code Block styling */
 pre.sourceCode {
     border-left: 3px;

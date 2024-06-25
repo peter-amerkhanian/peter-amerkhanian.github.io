@@ -1,0 +1,23 @@
+---
+title: "Memos"
+pagetitle: "Memos"
+listing:
+  contents: memos
+  sort: "date desc"
+  type: grid
+  feed:
+    type: partial
+  categories: false
+  grid-columns: 2
+  sort-ui: false
+  filter-ui: false
+  fields: [date, title, reading-time, description, image]
+  image-align: right
+  field-display-names:
+    date: Date
+    title: Title
+    reading-time: Time
+page-layout: article
+title-block-banner: true
+---
+The following are short, standalone policy analyses that I completed as part of graduate studies, consulting projects, or else for fun. Let me know if you find errors or else find them interesting!

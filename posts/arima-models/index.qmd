@@ -1,0 +1,323 @@
+---
+title: "Basic Concepts in Forecasting"
+bibliography: "../../blog.bib"
+author: "Peter Amerkhanian"
+date: "2024-3-17"
+draft: true
+categories: ['R', 'Statistics']
+format:
+  html:
+    warning: false
+    df-print: kable
+    fig-dpi: 300
+    toc: true
+    toc-depth: 3
+    code-fold: false
+    code-tools: true
+editor: 
+  markdown: 
+    wrap: 72
+---
+```{r}
+library(dplyr)
+library(arrow)
+library(fpp3)
+library(knitr)
+library(ggdist)
+```
+
+Let's say we are analyzing the data in the BART time series that I've been using a various blog posts.
+
+```{r}
+#| cache: true
+
+parquet_directory <- "../dask-data-io/data/parquet_data"
+
+df <- open_dataset(parquet_directory)
+
+df_daily <- df %>%
+  group_by(Date) %>%
+  summarise(daily_riders=sum(Riders)) %>%
+  mutate(date=as.Date(Date)) %>%
+  select(c(date, daily_riders)) %>% 
+  collect()
+
+df_daily %>% head()
+```
+I'll create a `tstibble` of monthly BART riders, 2011 through the end of 2018 and run through some exercises where I try to forecast how many monthly riders there will be in 2019.  
+
+Here's the groundtruth dataset for $[2011, 2019]$:
+
+```{r}
+df_daily_ts <- df_daily %>% 
+  as_tsibble(index=date) %>%
+  filter_index("2011-01-01" ~ "2018-12-31")
+
+df_monthly_ts <- df_daily_ts %>%
+  group_by_key() %>%
+  index_by(year_month = ~ yearmonth(.)) %>% 
+  summarise(
+    monthly_riders = sum(daily_riders, na.rm = TRUE),
+  )
+
+df_monthly_ts %>% head()
+```
+
+```{r}
+#| code-fold: true
+#| 
+# Create the date dynamically
+earliest_date <- min(df_monthly_ts$year_month)
+latest_date <- max(df_monthly_ts$year_month)
+formatted_string <- sprintf("%s through %s",
+                            format(earliest_date, "%b %Y"),
+                            format(latest_date, "%b %Y"))
+color <- ""
+
+plot_bart_series <- function(title, subtitle) {
+  df_monthly_ts %>%
+    ggplot(aes(x = year_month, y = monthly_riders)) +
+    geom_line(linewidth = .9,
+              alpha = 1,
+              color = "#619CFF")   +
+    scale_y_continuous(labels = scales::comma_format()) +
+    theme_minimal() +
+    labs(
+      title = title,
+      subtitle = if (missing(subtitle)) {
+        ""
+      } else {
+        subtitle
+      },
+      y = "Riders",
+      x = "Month"
+    )
+}
+plot_bart_series("Monthly Bart Rides", formatted_string)
+```
+
+
+When analyzing a time series, we often want to produce a forecast, $\hat{y}_{T+h|T}$. I found this to be a weird looking term when I first saw it in [@hyndman_forecasting_2021], so I'll break down what it's referring to here:  
+
+1.  $\hat{y}$: The "hat" symbol (^) over the ($y$) indicates that
+    this is an estimated value.
+2.  $T$: This represents the most recent observation from the time series.
+3.  $h$: This is the "forecast horizon", indicating how many time
+    steps ahead from (T) we are forecasting.
+4.  $|T$: The vertical bar ($|$) followed by ($T$) signifies that
+    the forecast is conditional on the information available up to time
+    (T).  
+
+Thus,$\hat{y}_{T+h|T}$ is a forecast of the time series, $y$ at time $T+h$, given the
+information available up to and including time $T$.
+
+## Benchmark Forecasts
+
+
+### Predicting the mean
+One of the most straightforward prediction models in the mean, a single scalar that minimizes mean-squared error across the data.
+
+$$
+\hat{y}_{T+h|T} = \frac{1}{T} \sum_{i=1}^T y_{i}
+$$
+We can calculate that on our BART data:
+```{r}
+pred <- mean(df_monthly_ts$monthly_riders)
+pred
+```
+So if we are forecasting with the mean, we'll simply predict always predict $\hat{y}=$`{r} scales::comma(pred)` as the monthly rider total for all months going forward.  
+
+```{r}
+fc_mean <- df_monthly_ts %>%
+  model(Mean = MEAN(monthly_riders))
+plot_bart_series("Mean Forecast") +
+  geom_line(
+    data = fc_mean %>% forecast(h = 12),
+    linewidth = 1,
+    linetype="dotted",
+    aes(x = year_month, y = .mean, color = "Forecast")
+  ) +
+  geom_line(
+    data = fc_mean %>% augment(),
+    linewidth = 1,
+    alpha=.5,
+    aes(x = year_month, y = .fitted, color = "Fitted")
+  ) +
+  labs(color = "")
+```
+
+#### Model Evaluation
+
+If we want to evaluate that prediction, we would look at its residuals, $\hat{y}-y$, across the observed data. Here we'll take a look at the distribution of these residuals, which will be important for both model evaluation and model inference.
+```{r}
+residuals <- df_monthly_ts$monthly_riders - pred
+residuals %>% summary()
+```
+The most important checks on these are that their mean is 0 and that the residuals are not auto-correlated -- if those two conditions don't hold, that means that **the model can be improved**. In addition to those essential properties, it is also preferable that the residuals exhibit constant variance (homoscedasticity) and are normally distributed, but a model that fails on those last two conditions cannot necessarily be improved  [@hyndman_forecasting_2021, chap 5.4].  
+
+We can use `gg_tsresiduals()` from the `feast` package to get some simple visuals that let us evaluate these diagnostics:
+```{r}
+df_monthly_ts |>
+  model(MEAN(monthly_riders)) |>
+  gg_tsresiduals()
+```
+From these visuals, I'll informally conclude that:  
+ 
+1. The mean is 0
+2. There is significant autocorrelation 
+3. The residuals *look* kind of normally distributed
+4. The variance of the residuals is not constant -- we start out systematically overestimating ridership
+
+Given that we failed on autocorrelation, we conclude that this model can be improved, and this is unsurprising given that we were just predicting the mean. However, we'll keep working with this model as we establish how to do inference on this forecast and produce prediction intervals, rather than just a point estimate forecast.
+
+#### Model Inference
+
+If we **assume that the distribution of future observations is normal**, a 95% prediction interval would be computed as follows:  
+$$
+\hat{y}_{T+h|T} \pm 1.96 \hat\sigma_h
+$$
+This follows from the fact that 95% of the area under a Gaussian curve lies within ~1.96 standard deviations, or, $1.96 \hat\sigma_h$, of the mean ([see proof](https://en.wikipedia.org/wiki/68%E2%80%9395%E2%80%9399.7_rule#Proof)). 1.96 can be switched out with a different multiplier depending on the desired interval ([see table](https://otexts.com/fpp3/prediction-intervals.html#prediction-intervals-1)). When we are forecasting, the standard deviation of the forecast distribution is estimated using the [corrected sample standard deviation](https://en.wikipedia.org/wiki/Standard_deviation#Corrected_sample_standard_deviation) of the residuals.
+$$
+\begin{equation}
+  \hat{\sigma} = \sqrt{\frac{1}{T-K-M}\sum_{t=1}^T e_t^2}
+\end{equation}
+$$
+
+```{r}
+T <- df_monthly_ts %>% dim() %>% .[1]
+K <- 1
+M <- 0
+sample_sd <- sqrt( (1 / (T - K - M)) * sum(residuals^2) )
+interval_95 <- 1.96 * sample_sd
+interval_95
+```
+So for our mean forecast, the prediction interval would be `{r} pred %>% scales::comma()` $\pm$ `{r} interval_95 %>% scales::comma()` 
+
+```{r}
+fc_mean <- df_monthly_ts %>%
+  model(MEAN(monthly_riders)) %>%
+  forecast(h=12)
+plot_bart_series("Mean Forecast") + autolayer(fc_mean)
+```
+
+We can also relax some of the assumptions necessary for theoretical inference by using bootstrapping, where we only have to assume that the residuals are uncorrelated and have constant variance. To be fair, both of these conditions are violated in this example model, but we'll still bootstrap this as an example.  
+
+When we bootstrap a time series forecast, we use the following equation:  
+
+$$
+\begin{align*}
+y^*_{T+1} &= y_{T} + e^*_{T+1} \\
+y^*_{T+2} &= y_{T+1}^* + e^*_{T+2} \\
+\vdots \\
+y^*_{T+h} &= y_{T+h-1}^* + e^*_{T+h}
+\end{align*}
+$$   
+
+Where each $e^*_{T+h}$ is a random sample with replacement from the residuals distribution.  
+
+```{r}
+#| layout-ncol: 2
+#| fig-cap: 
+#|   - "Bootstrap Simulations, b=1"
+#|   - "Bootstrapped Prediction Interval, b=5000"
+#| cache: true
+
+bootstrapped_fs <- df_monthly_ts %>%
+  model(MEAN(monthly_riders)) %>%
+  generate(h = 12, times = 1, bootstrap = TRUE)
+
+plot_bart_series("") +
+  geom_line(data = bootstrapped_fs, alpha=.5, linewidth=1, aes(y = .sim, colour = as.factor(.rep) )) +
+  guides(colour = "none")
+
+fc_mean <- df_monthly_ts %>%
+  model(MEAN(monthly_riders)) %>%
+  forecast(h=12, bootstrap = TRUE, times = 5000)
+plot_bart_series("") + autolayer(fc_mean) +
+  theme(axis.line.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.y = element_blank())
+```
+
+
+
+
+### Random Walk
+
+$$
+\hat{y}_{T+h|T} = y_T
+$$
+```{r}
+fc_mean <- df_monthly_ts %>%
+  model(Naive = NAIVE(monthly_riders))
+plot_bart_series("Mean Forecast") +
+  geom_line(
+    data = fc_mean %>% forecast(h = 12),
+    linewidth = 1,
+    linetype="solid",
+    aes(x = year_month, y = .mean, color = "Forecast")
+  ) +
+  geom_line(
+    data = fc_mean %>% augment(),
+    linewidth = 1,
+    linetype = "solid",
+    alpha=.5,
+    aes(x = year_month, y = .fitted, color = "Fitted")
+  ) +
+  labs(color = "")
+```
+
+```{r}
+fc_mean <- df_monthly_ts %>%
+  model(snaive = SNAIVE(monthly_riders))
+plot_bart_series("Mean Forecast") +
+  geom_line(
+    data = fc_mean %>% forecast(h = 12),
+    linewidth = 1,
+    linetype="solid",
+    aes(x = year_month, y = .mean, color = "Forecast")
+  ) +
+  geom_line(
+    data = fc_mean %>% augment(),
+    linewidth = 1,
+    linetype = "solid",
+    alpha=.5,
+    aes(x = year_month, y = .fitted, color = "Fitted")
+  ) +
+  labs(color = "")
+```
+
+## Exponential Smoothing
+
+Exponential Smoothing is a popular forecasting method where the forecast
+is simply a weighted average of past observations, with weights
+decreasing exponentially as observations get older
+[@hyndman_forecasting_2021, chapter 8].
+
+[@hyndman_forecasting_2021, chapter 9]
+
+```{r}
+library(fpp3)
+```
+
+```{r}
+algeria_economy <- global_economy |>
+  filter(Country == "Algeria")
+algeria_economy 
+optim
+```
+
+```{r}
+google_2015 <- gafa_stock %>% 
+  filter(Symbol == "GOOG", year(Date) == 2018)
+
+google_2015 %>% autoplot(Close)
+
+google_2015 %>% ACF(Close) %>% autoplot()
+
+```
+
+```{r}
+google_2015 %>% autoplot(difference(Close))
+google_2015 %>% ACF(difference(Close)) %>% autoplot()
+```
