@@ -188,7 +188,7 @@ window.Quarto = {
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="../../blog.html"> 
-<span class="menu-text">Notes</span></a>
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../memos.html"> 
@@ -271,7 +271,7 @@ window.Quarto = {
   }
 });
 </script>
-<div id="cell-1" class="cell" data-execution_count="131">
+<div id="cell-1" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -294,7 +294,7 @@ window.Quarto = {
 <p>Use a tangent plane to approximate the value of the following function at the point <span class="math inline">\((2.1, -5.1)\)</span>.<br>
 <span class="math display">\[f(x,y) = \sqrt{42-4x^2-y^2}\]</span></p>
 <p>Here’s some code setup for the question:</p>
-<div id="cell-3" class="cell" data-execution_count="155">
+<div id="cell-3" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="kw">lambda</span> x, y: np.sqrt(<span class="dv">42</span><span class="op">-</span><span class="dv">4</span><span class="op">*</span>x<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> y<span class="op">**</span><span class="dv">2</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>range_x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">8</span>, <span class="dv">8</span>, <span class="dv">500</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>range_y <span class="op">=</span> range_x.copy()</span>
@@ -304,14 +304,14 @@ window.Quarto = {
 <section id="why-do-we-need-to-approximate-this" class="level3">
 <h3 class="anchored" data-anchor-id="why-do-we-need-to-approximate-this">Why do we need to approximate this?</h3>
 <p>We can’t just plug in and compute this output because the point (2.1, -5.1) is outside of the domain of this function – thus <span class="math inline">\(f(2.1, -5.1)\)</span> does not exist.</p>
-<div id="cell-5" class="cell" data-execution_count="158">
+<div id="cell-5" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>f(<span class="fl">2.1</span>, <span class="op">-</span><span class="fl">5.1</span>)</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="158">
+<div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>nan</code></pre>
 </div>
 </div>
 <p><span class="math display">\[f(2.1, -5.1) \approx \sqrt{-1.65} = DNE\]</span></p>
-<div id="cell-7" class="cell" data-execution_count="166">
+<div id="cell-7" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> style_plot(ax, z<span class="op">=</span><span class="va">False</span>):</span>
@@ -343,7 +343,7 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="developing-a-linear-approximation-of-the-function">Developing a linear approximation of the function</h3>
 <p>To approximate this quantity, we find a nearby point where the function is defined, and construct a tangent plane to extrapolate our quantity of interest. For a nearby point, I select <span class="math inline">\(P_0 = (x_0=2, y_0=-5)\)</span>, where the function still produces a real number output:<br>
 <span class="math display">\[f(x_0, y_0) = f(2, -5) =\sqrt{1} = 1\]</span></p>
-<div id="cell-9" class="cell" data-execution_count="174">
+<div id="cell-10" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">3</span>))</span>
@@ -368,7 +368,7 @@ window.Quarto = {
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-6-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -403,10 +403,10 @@ window.Quarto = {
          L(x,y) &amp;= -8x + 5y + 42
 \end{align*}
 \]</span></p>
-<div id="cell-12" class="cell" data-execution_count="148">
+<div id="cell-13" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> <span class="kw">lambda</span> x, y: <span class="op">-</span><span class="dv">8</span><span class="op">*</span>x <span class="op">+</span> <span class="dv">5</span><span class="op">*</span>y <span class="op">+</span> <span class="dv">42</span></span></code></pre></div>
 </div>
-<div id="cell-13" class="cell" data-outputid="72273b42-2558-43b1-de7c-72a9edac8561" data-execution_count="180">
+<div id="cell-14" class="cell" data-outputid="72273b42-2558-43b1-de7c-72a9edac8561" data-execution_count="8">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
@@ -442,15 +442,15 @@ window.Quarto = {
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-8-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
 <p>With that linear approximation established, we can now estimate our original quantity of interest, <span class="math inline">\(f(2.1, -5.1)\)</span>. <span class="math display">\[f(2.1, -5.1) \approx L(2.1, -5.1) = -8(2.1) + 5(-5.1) + 42 \approx \boxed{-0.3} \]</span></p>
-<div id="cell-15" class="cell" data-execution_count="457">
+<div id="cell-16" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>L(<span class="fl">2.1</span>, <span class="op">-</span><span class="fl">5.1</span>)</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="457">
+<div class="cell-output cell-output-display" data-execution_count="9">
 <pre><code>-0.29999999999999716</code></pre>
 </div>
 </div>

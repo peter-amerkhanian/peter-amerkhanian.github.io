@@ -26,6 +26,6 @@ I’m a Data Scientist/Policy Analyst working in government. Check out my:
 
 - Formal reports and software $\rightarrow$ [Projects](projects.qmd)
 
-- Standalone policy analysis memos $\rightarrow$ [Memos](memos.qmd)
+- General audience policy analyses $\rightarrow$ [Memos](memos.qmd)
 
-- Short-form technical resources $\rightarrow$ [Notes](blog.qmd)
+- Technical blog $\rightarrow$ [Blog](blog.qmd)

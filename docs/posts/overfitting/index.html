@@ -191,7 +191,7 @@ window.Quarto = {
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="../../blog.html"> 
-<span class="menu-text">Notes</span></a>
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../memos.html"> 
@@ -279,7 +279,7 @@ window.Quarto = {
   }
 });
 </script>
-<div id="cell-1" class="cell" data-execution_count="32">
+<div id="cell-1" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -314,7 +314,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="some-notes-on-modeling-data-and-resampling-methods">Some Notes on Modeling Data and Resampling Methods</h2>
 <p>The following is an exercise with synthetic data intended to memorialize some thoughts on models and resampling methods. I won’t reference a lot of specific books here, but generally this post is influenced by <span class="citation" data-cites="james_introduction_2013">James et al. (<a href="#ref-james_introduction_2013" role="doc-biblioref">2013</a>)</span> and <span class="citation" data-cites="hastie_elements_2016">Hastie, Tibshirani, and Friedman (<a href="#ref-hastie_elements_2016" role="doc-biblioref">2016</a>)</span>.</p>
 <p>To begin, say we are examining the relationship between income and years of education.</p>
-<div id="cell-3" class="cell" data-execution_count="33">
+<div id="cell-3" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">46</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">200</span></span>
@@ -323,14 +323,14 @@ window.Quarto = {
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"Education"</span>] <span class="op">=</span> education</span></code></pre></div>
 </div>
 <p>Let’s say that income is a function of years of education:</p>
-<div id="cell-5" class="cell" data-execution_count="34">
+<div id="cell-5" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">49</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"Income"</span>] <span class="op">=</span> <span class="dv">33000</span> <span class="op">+</span> <span class="dv">6000</span> <span class="op">*</span> education</span></code></pre></div>
 </div>
 <p>The relationship is governed by the deterministic function, which is a data generating process (DGP): <span class="math display">\[
 income = 33000 + 6000 \times education
 \]</span></p>
-<div id="cell-7" class="cell" data-outputid="8f75ca7c-7403-44b5-cf8d-3ff38f6a81a1" data-execution_count="35">
+<div id="cell-7" class="cell" data-outputid="8f75ca7c-7403-44b5-cf8d-3ff38f6a81a1" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> sns.JointGrid(data<span class="op">=</span>df, x<span class="op">=</span><span class="st">"Education"</span>, y<span class="op">=</span><span class="st">"Income"</span>, marginal_ticks<span class="op">=</span><span class="va">False</span>, height<span class="op">=</span><span class="dv">5</span>)</span>
@@ -353,7 +353,7 @@ income = 33000 + 6000 \times education
 </div>
 </div>
 <p>Modeling this relationship is trivial. Given that it is a deterministic, linear function, we can use data to solve a linear system of equations and find the exact parameters of the relationship:</p>
-<div id="cell-9" class="cell" data-outputid="fe0adcb8-eb9c-440c-8cb4-30d99f7b21fe" data-execution_count="36">
+<div id="cell-9" class="cell" data-outputid="fe0adcb8-eb9c-440c-8cb4-30d99f7b21fe" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, sharey<span class="op">=</span><span class="va">True</span>)</span>
@@ -396,17 +396,17 @@ income = 33000 + 6000 \times education
 <section id="modeling-a-non-deterministic-process" class="level2">
 <h2 class="anchored" data-anchor-id="modeling-a-non-deterministic-process">Modeling a Non-Deterministic Process</h2>
 <p>In policy analysis settings, it’s rare that we would encounter deterministic processes that we have any interest in modeling. Instead, we typically encounter processes with some stochastic element. For example, the following is a new DGP, where income is a linear function of years of education, but with an added random variable, representing noise.</p>
-<div id="cell-12" class="cell" data-execution_count="37">
+<div id="cell-12" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>noise_std <span class="op">=</span> <span class="dv">9000</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>DGP <span class="op">=</span> <span class="kw">lambda</span> x: <span class="dv">33000</span> <span class="op">+</span> <span class="dv">6000</span> <span class="op">*</span> x <span class="op">+</span> np.random.normal(<span class="dv">0</span>, noise_std, size<span class="op">=</span><span class="bu">len</span>(x))</span></code></pre></div>
 </div>
 <p><span class="math display">\[
 income = 33000 + 6000 \times education + \mathcal{N}(0, 9000)
 \]</span></p>
-<div id="cell-14" class="cell" data-execution_count="38">
+<div id="cell-14" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"Income"</span>] <span class="op">=</span> DGP(education)</span></code></pre></div>
 </div>
-<div id="cell-15" class="cell" data-outputid="2dfb6b64-6ffa-4768-80f5-54359720bf68" data-execution_count="39">
+<div id="cell-15" class="cell" data-outputid="2dfb6b64-6ffa-4768-80f5-54359720bf68" data-execution_count="8">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> sns.JointGrid(data<span class="op">=</span>df, x<span class="op">=</span><span class="st">"Education"</span>, y<span class="op">=</span><span class="st">"Income"</span>, marginal_ticks<span class="op">=</span><span class="va">False</span>, height<span class="op">=</span><span class="dv">5</span>)</span>
@@ -435,7 +435,7 @@ income = 33000 + 6000 \times education + \mathcal{N}(0, 9000)
 <p>We will model this DGP using a linear regression fit via the ordinary least squares algorithm. We face a number of choices in using linear regression – for example, we can freely use polynomial transformations to make our model flexible to non-linear relationships. Here we’ll examine the behavior of a polynomial regression by setting up an infinite series as follows: <span class="math display">\[
 y_p=\sum_{p=0}^{\infty} \beta_p x^p
 \]</span> As this series expands, it represents a polynomial regression of degree <span class="math inline">\(p\)</span>. When we expand, we can examine how this model performs as the degree increases.</p>
-<div id="cell-19" class="cell" data-outputid="01f349b5-33b6-4494-ca23-70338e6a266e" data-execution_count="40">
+<div id="cell-19" class="cell" data-outputid="01f349b5-33b6-4494-ca23-70338e6a266e" data-execution_count="9">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>y_max <span class="op">=</span> <span class="dv">3</span></span>
@@ -479,7 +479,7 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 <section id="an-optimal-model" class="level4">
 <h4 class="anchored" data-anchor-id="an-optimal-model">An “Optimal” Model</h4>
 <p>We expand the series, or, in more typical language, we conduct a “grid-search,” to find the optimal model as defined by the maximum <span class="math inline">\(R^2\)</span> score:</p>
-<div id="cell-22" class="cell" data-execution_count="41">
+<div id="cell-22" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>r2s <span class="op">=</span> []</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>max_root <span class="op">=</span> <span class="dv">25</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>roots <span class="op">=</span> <span class="bu">range</span>(max_root)</span>
@@ -488,7 +488,7 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    r2s.append(r2)</span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>r2s <span class="op">=</span> np.array(r2s)</span></code></pre></div>
 </div>
-<div id="cell-23" class="cell" data-outputid="f1a1c088-82dc-462d-cb0c-9774d8c7883f" data-execution_count="42">
+<div id="cell-23" class="cell" data-outputid="f1a1c088-82dc-462d-cb0c-9774d8c7883f" data-execution_count="11">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>)</span>
@@ -541,11 +541,11 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 <section id="out-of-sample-performance-or-what-happens-when-we-collect-new-data" class="level3">
 <h3 class="anchored" data-anchor-id="out-of-sample-performance-or-what-happens-when-we-collect-new-data">Out of sample performance, or, what happens when we collect new data?</h3>
 <p>One simple way to further evaluate this model is to collect new data (from outside of our original sample) and then evaluate whether the model can describe variation in that new data. Given that we are working with synthetic data, it’s straightforward to simulate new observations from the underlying DGP, and thus “collect” new data. In the following plot, the right-hand pane is a fresh sample of individuals with observed education and income values:</p>
-<div id="cell-26" class="cell" data-execution_count="43">
+<div id="cell-26" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>education <span class="op">=</span> education_dgp(<span class="dv">1000</span>)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>correct_income <span class="op">=</span> DGP(education)</span></code></pre></div>
 </div>
-<div id="cell-27" class="cell" data-outputid="0009e7f3-42fd-40c7-e2f1-937ea41e41e6" data-execution_count="44">
+<div id="cell-27" class="cell" data-outputid="0009e7f3-42fd-40c7-e2f1-937ea41e41e6" data-execution_count="13">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>om_residuals <span class="op">=</span> np.<span class="bu">abs</span>(optimal_model.predict(education.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)) <span class="op">-</span> correct_income)</span>
@@ -594,7 +594,7 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 </div>
 </div>
 <p>Here we can see that, when exposed to a new sample from the same DGP, the model produces extreme error.</p>
-<div id="cell-29" class="cell" data-outputid="5b198912-78c0-413c-8c9b-9ee0ff9a3d29" data-execution_count="45">
+<div id="cell-29" class="cell" data-outputid="5b198912-78c0-413c-8c9b-9ee0ff9a3d29" data-execution_count="14">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>norm <span class="op">=</span> (<span class="dv">0</span>, <span class="dv">1000000</span>)</span>
@@ -636,7 +636,7 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 </div>
 </div>
 <p>We quantify this error as follows:</p>
-<div id="cell-31" class="cell" data-outputid="c621e93b-d48e-4762-c487-a3628fa6ef76" data-execution_count="46">
+<div id="cell-31" class="cell" data-outputid="c621e93b-d48e-4762-c487-a3628fa6ef76" data-execution_count="15">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>rmse <span class="op">=</span> <span class="kw">lambda</span> y, y_hat: np.sqrt(np.mean((y_hat <span class="op">-</span> y) <span class="op">**</span> <span class="dv">2</span>))</span>
@@ -651,7 +651,7 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 <span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="bu">round</span>(output_1, <span class="dv">2</span>)</span></code></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="46">
+<div class="cell-output cell-output-display" data-execution_count="15">
 <div>
 <div>
 
@@ -679,7 +679,7 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 </div>
 <p>This is clearly a bad model. What’s worrying is that it <em>seemed</em> like the best model when we simply examined model accuracy on one dataset. This raises the possibility that we might be duped into selecting models like this in practice.</p>
 <p>Out of curiosity, let’s see how an extremely simply model, a linear regression with <span class="math inline">\(p=1\)</span> compares on this new data.</p>
-<div id="cell-33" class="cell" data-outputid="3168df13-bbb7-4424-eb1f-7078bf97e3d7" data-execution_count="47">
+<div id="cell-33" class="cell" data-outputid="3168df13-bbb7-4424-eb1f-7078bf97e3d7" data-execution_count="16">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>X_test, y_pred, _, r2, sub_optimal_model <span class="op">=</span> model_data_lm(<span class="dv">1</span>, df)</span>
@@ -726,7 +726,7 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 </div>
 </div>
 <p>This is a very good fit, even though our previous empirical fitting process told us that the high <span class="math inline">\(p\)</span> model was optimal.</p>
-<div id="cell-35" class="cell" data-outputid="914a0d4b-f152-4990-dd36-be73bdc9bbb9" data-execution_count="48">
+<div id="cell-35" class="cell" data-outputid="914a0d4b-f152-4990-dd36-be73bdc9bbb9" data-execution_count="17">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>output_2 <span class="op">=</span> pd.DataFrame(</span>
@@ -744,7 +744,7 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 <span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="bu">round</span>(output_2, <span class="dv">2</span>)</span></code></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="48">
+<div class="cell-output cell-output-display" data-execution_count="17">
 <div>
 <div>
 
@@ -777,19 +777,19 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 <h1>The Train-Test Split</h1>
 <p>The process we just went through is analogous to a resampling method called the train-test split.</p>
 <p>In the real world, we rarely can just collect more data. However, it is straightforward to simulate the data collection process using resampling methods. Specifically, we can split our original dataset into two parts – a training dataset, wherein we will train and intially evaluate our model, and a “test” dataset, which we will use just as we used the newly collected data in the previous example, for more objective, empirical model evaluation.</p>
-<div id="cell-38" class="cell" data-execution_count="49">
+<div id="cell-38" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">40</span>)</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>train_stop <span class="op">=</span> <span class="bu">int</span>(<span class="fl">0.6</span> <span class="op">*</span> n)</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>indices <span class="op">=</span> df.sample(frac<span class="op">=</span><span class="dv">1</span>, replace<span class="op">=</span><span class="va">False</span>).index</span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>train_ind <span class="op">=</span> indices[:train_stop]</span></code></pre></div>
 </div>
 <p>Here we designate 60% of our data as training and 40% as test:</p>
-<div id="cell-40" class="cell" data-outputid="4dc19a4c-129b-47fe-ba91-98546da3127a" data-execution_count="50">
+<div id="cell-40" class="cell" data-outputid="4dc19a4c-129b-47fe-ba91-98546da3127a" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>df.loc[:, <span class="st">"Sample"</span>] <span class="op">=</span> <span class="va">None</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>df.loc[train_ind, <span class="st">"Sample"</span>] <span class="op">=</span> <span class="st">"Train"</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>df.loc[df[<span class="st">"Sample"</span>] <span class="op">!=</span> <span class="st">"Train"</span>, <span class="st">"Sample"</span>] <span class="op">=</span> <span class="st">"Test"</span></span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>df.head()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="50">
+<div class="cell-output cell-output-display" data-execution_count="19">
 <div>
 <div>
 
@@ -842,7 +842,7 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 </div>
 </div>
 <p>Next, we hold the test data aside and only examine the training dataset.</p>
-<div id="cell-42" class="cell" data-outputid="92e9b4a8-7b81-4072-9e88-f9d7d1a87183" data-execution_count="51">
+<div id="cell-42" class="cell" data-outputid="92e9b4a8-7b81-4072-9e88-f9d7d1a87183" data-execution_count="20">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
@@ -892,7 +892,7 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 </div>
 </div>
 <p>We proceed to train models on the training data, and evaluate each model on the test dataset. We do that process for each degree polynomial regression.</p>
-<div id="cell-44" class="cell" data-outputid="33d16cb4-444b-4dcb-86fe-ea9c5a09fa4e" data-execution_count="52">
+<div id="cell-44" class="cell" data-outputid="33d16cb4-444b-4dcb-86fe-ea9c5a09fa4e" data-execution_count="21">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>x_max <span class="op">=</span> <span class="dv">2</span></span>
@@ -952,7 +952,7 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 </div>
 <p>When we examine the relationship between polynomial degree and <span class="math inline">\(R^2\)</span>, we now seek the argument that maximizes <span class="math inline">\(R^2_{test}\)</span>, rather than <span class="math inline">\(R^2_{train}\)</span>.</p>
 <p>Here we’ll also note that, typically, <span class="math inline">\(R^2_{test} &lt; R^2_{train}\)</span>.</p>
-<div id="cell-46" class="cell" data-outputid="3968621a-abea-49ab-96ba-5abe2a130c74" data-execution_count="53">
+<div id="cell-46" class="cell" data-outputid="3968621a-abea-49ab-96ba-5abe2a130c74" data-execution_count="22">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>r2s_test <span class="op">=</span> []</span>
@@ -1016,7 +1016,7 @@ y_p=\sum_{p=0}^{\infty} \beta_p x^p
 <p><span class="math display">\[
 income = 33000 + 6000 \times education + \mathcal{N}(0, 9000)
 \]</span> Indeed, we can see the exact functional form that our optimal model takes:</p>
-<div id="cell-49" class="cell" data-outputid="9c57d3eb-b00d-4a58-c87a-6030d919a101" data-execution_count="54">
+<div id="cell-49" class="cell" data-outputid="9c57d3eb-b00d-4a58-c87a-6030d919a101" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>resid <span class="op">=</span> correct_income <span class="op">-</span> sub_optimal_model.predict(education.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"income = </span><span class="sc">{</span><span class="bu">round</span>(sub_optimal_model[<span class="dv">1</span>].intercept_, <span class="dv">2</span>)<span class="sc">}</span><span class="ss">"</span></span>
@@ -1031,7 +1031,7 @@ income = 33000 + 6000 \times education + \mathcal{N}(0, 9000)
 <section id="an-aside-about-nonparametric-models" class="level3">
 <h3 class="anchored" data-anchor-id="an-aside-about-nonparametric-models">An Aside about Nonparametric models</h3>
 <p>The issues we just discussed in the context of polynomial regression only compound as we exit the realm of linear regression and consider nonparametric models like decision trees. For example, when we examine a decision tree model and vary <span class="math inline">\(M\)</span>, the number of partitions of the feature space that the model uses (a measure of complexity), we see extreme divergence between training the testing performance.</p>
-<div id="cell-52" class="cell" data-outputid="6c1e4bbb-45a9-4fa3-b4a0-a31fcba17076" data-execution_count="55">
+<div id="cell-52" class="cell" data-outputid="6c1e4bbb-45a9-4fa3-b4a0-a31fcba17076" data-execution_count="24">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> model_data_cart(degree, df):</span>
@@ -1107,7 +1107,7 @@ income = 33000 + 6000 \times education + \mathcal{N}(0, 9000)
 <span class="math display">\[
 \lim_{M \rightarrow \infty} R_{train}^2 \approx 1.0
 \]</span> Being able to perfectly model a DGP that is in itself random is a worrying sign, and this condition creates especial danger of over-fitting and creating overly-confident models when using decision trees.</p>
-<div id="cell-54" class="cell" data-outputid="02c9e6bd-9687-4167-b614-7e9f2dc857ab" data-execution_count="56">
+<div id="cell-55" class="cell" data-outputid="02c9e6bd-9687-4167-b614-7e9f2dc857ab" data-execution_count="26">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>r2s_test_cart <span class="op">=</span> []</span>
@@ -1159,7 +1159,7 @@ income = 33000 + 6000 \times education + \mathcal{N}(0, 9000)
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-26-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-27-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>

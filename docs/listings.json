@@ -1,11 +1,5 @@
 [
   {
-    "listing": "/memos.html",
-    "items": [
-      "/memos/SIR/index.html"
-    ]
-  },
-  {
     "listing": "/blog.html",
     "items": [
       "/posts/time-series-matplotlib/index.html",
@@ -21,6 +15,13 @@
       "/posts/simple-constrained-optimization/index.html",
       "/posts/rent-vs-buy/index.html",
       "/posts/pdf-scraping/index.html"
+    ]
+  },
+  {
+    "listing": "/memos.html",
+    "items": [
+      "/memos/SF-Arrests/index.html",
+      "/memos/SIR/index.html"
     ]
   }
 ]

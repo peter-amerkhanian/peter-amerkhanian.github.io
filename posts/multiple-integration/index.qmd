@@ -299,6 +299,51 @@ an hour and a half (90 minutes) or less. Again, we'll need to add up all of the 
 
 To set up the problem, we'll plot the joint density function, the $xy$ plane, and this 90 minute constraint.
 
+```{python}
+#| output: false
+#| echo: false
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+# Define the PDF function
+def pdf_function(x, y):
+    # Replace this with the actual PDF function
+    return np.exp(-0.01 * (x**2 + y**2))
+
+# Define range for x and y
+x_range = np.linspace(0, 25, 100)
+y_range = np.linspace(0, 25, 100)
+x_grid, y_grid = np.meshgrid(x_range, y_range)
+
+# Calculate z values for the surface plot
+z_values = pdf_function(x_grid, y_grid)
+z_plane = np.zeros_like(z_values)
+
+
+
+# Create the plot
+fig = plt.figure(figsize=(3, 3))
+ax = fig.add_subplot(111, projection='3d')
+# Plot the surface
+surf = ax.plot_surface(x_grid, y_grid, z_plane, color='lightgrey', alpha=0.5)
+surf = ax.plot_surface(x_grid, y_grid, z_values, cmap='coolwarm', alpha=.8)
+
+# Zoom in on the plot by setting axis limits
+ax.set_xlim(1, 10)
+ax.set_ylim(1, 10)
+ax.set_zlim(.1, .7)
+
+ax.view_init(elev=3, azim=-55)
+ax.set_axis_off()
+fig.tight_layout()
+fig.savefig("thumbnail.png", dpi=300)
+plt.show()
+
+```
+
 ```{r}
 #| warning: false
 #| code-fold: true

@@ -142,7 +142,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="../../blog.html"> 
-<span class="menu-text">Notes</span></a>
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../memos.html"> 
@@ -230,7 +230,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <li>Reusing a colormap in <code>seaborn</code> so that the same classes correspond to the same colors across various visualizations</li>
 <li>Grid plots</li>
 </ul>
-<div id="cell-2" class="cell" data-execution_count="572">
+<div id="cell-2" class="cell" data-execution_count="75">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> dask.dataframe <span class="im">as</span> dd</span>
@@ -244,10 +244,10 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections.abc <span class="im">import</span> Iterable</span></code></pre></div>
 </div>
 <p>I’ll be using the BART dataset that I created in <a href="../../posts/dask-data-io/index.html">my blog post on <code>dask</code></a>.</p>
-<div id="cell-4" class="cell" data-execution_count="573">
+<div id="cell-4" class="cell" data-execution_count="76">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> dd.read_parquet(<span class="st">"../dask-data-io/data/parquet_data"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="573">
+<div class="cell-output cell-output-display" data-execution_count="76">
 <div>
 <div>
 
@@ -312,11 +312,11 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Let’s say I’m interested specifically in an aggregate time series with the number of riders that used the system, for each hour from 2011-2024. I’ll do the appropriate grouping to build that dataset and move from <code>dask</code> to <code>pandas</code>.</p>
-<div id="cell-6" class="cell" data-execution_count="574">
+<div id="cell-6" class="cell" data-execution_count="77">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df_rph <span class="op">=</span> df.groupby([<span class="st">'Date'</span>, <span class="st">'Hour'</span>])[<span class="st">'Riders'</span>].<span class="bu">sum</span>().compute()</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>df_rph <span class="op">=</span> df_rph.reset_index()</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>df_rph.head()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="574">
+<div class="cell-output cell-output-display" data-execution_count="77">
 <div>
 <div>
 
@@ -369,12 +369,12 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </div>
 </div>
 <p>I’m going to be doing a lot of slicing on the date, and I find that it’s easiest to do that when the date column is a datetime index. Also, since I’ll do some analysis of months of data, I’m going to truncate the time series to the last full month.</p>
-<div id="cell-8" class="cell" data-execution_count="575">
+<div id="cell-8" class="cell" data-execution_count="78">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'Date'</span>] <span class="op">=</span> pd.to_datetime(df_rph[<span class="st">'Date'</span>], <span class="bu">format</span><span class="op">=</span><span class="st">"%Y-%m-</span><span class="sc">%d</span><span class="st">"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df_rph_d <span class="op">=</span> df_rph.set_index(<span class="st">"Date"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>df_rph_d <span class="op">=</span> df_rph_d.loc[:<span class="st">"2024-04-30"</span>]</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>df_rph_d.head()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="575">
+<div class="cell-output cell-output-display" data-execution_count="78">
 <div>
 <div>
 
@@ -426,10 +426,10 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </div>
 </div>
 <p>For now I’ll sum over the hours and just examine ride totals per day in a <code>pd.Series</code></p>
-<div id="cell-10" class="cell" data-execution_count="576">
+<div id="cell-10" class="cell" data-execution_count="79">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>month_time_series <span class="op">=</span> df_rph_d.resample(<span class="st">"ME"</span>)[<span class="st">'Riders'</span>].<span class="bu">sum</span>()</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>month_time_series.head()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="576">
+<div class="cell-output cell-output-display" data-execution_count="79">
 <pre><code>Date
 2011-01-31    8203562
 2011-02-28    7933264
@@ -440,7 +440,7 @@ Freq: ME, Name: Riders, dtype: int64</code></pre>
 </div>
 </div>
 <p>Simply plotting the series shows the impact of the pandemic, which is interesting:</p>
-<div id="cell-12" class="cell" data-execution_count="590">
+<div id="cell-12" class="cell" data-execution_count="80">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>month_time_series.plot()</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Monthly Total BART Riders"</span>)<span class="op">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
@@ -460,7 +460,7 @@ Freq: ME, Name: Riders, dtype: int64</code></pre>
 <li><code>show_all_xticks</code>, which overrides default matplotlib x-tick behavior and shows all possible ticks</li>
 <li><code>custom_legend</code>, which will make it easier to move a legend outside of the plot area</li>
 </ul>
-<div id="cell-14" class="cell" data-execution_count="578">
+<div id="cell-14" class="cell" data-execution_count="81">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> time_overlay_plot(month_time_series: pd.Series,</span>
@@ -614,7 +614,7 @@ Freq: ME, Name: Riders, dtype: int64</code></pre>
 </div>
 <p>Using these functions, I’ll create a time series overlay that shows the impact of the pandemic on BART ridership in the context of previous three year trends, e.g.&nbsp;how does 2019-2021 compare to 2015-17? The effect is a plot that suggests that monthly BART ridership was on a trajectory similar to previous years leading up to the pandemic before sharply departing.</p>
 <p>Note that I’m able to flexibly define the date formatting for the x-axis using a <code>date_formatter</code> argument, and I can select to highlight a particular year with the <code>highlight_year</code> argument.</p>
-<div id="cell-16" class="cell" data-execution_count="579">
+<div id="cell-16" class="cell" data-execution_count="82">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>date_formatter <span class="op">=</span> <span class="st">'%b</span><span class="ch">\n\'</span><span class="st">%y'</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>_, labs <span class="op">=</span> time_overlay_plot(month_time_series.loc[<span class="st">"2011"</span>:<span class="st">"2021"</span>],</span>
@@ -640,7 +640,7 @@ Freq: ME, Name: Riders, dtype: int64</code></pre>
 </div>
 </div>
 <p>I’ll use the same <code>time_overlay_plot</code> function to examine the recovery of the BART system in the post-pandemic period. This time, I’ll also use <code>custom_legend</code> to easily move the legend outside of the plot area.</p>
-<div id="cell-18" class="cell" data-execution_count="580">
+<div id="cell-18" class="cell" data-execution_count="83">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>month_time_series_trunc <span class="op">=</span> pd.concat(</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    [df_rph_d.resample(<span class="st">"ME"</span>)[<span class="st">'Riders'</span>].<span class="bu">sum</span>().loc[<span class="st">"2019-01-01"</span>: <span class="st">"2020-01-01"</span>],</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>     df_rph_d.resample(<span class="st">"ME"</span>)[<span class="st">'Riders'</span>].<span class="bu">sum</span>().loc[<span class="st">"2021-01-01"</span>: <span class="st">"2024-01-01"</span>]])</span>
@@ -669,7 +669,7 @@ Freq: ME, Name: Riders, dtype: int64</code></pre>
 <h2 class="anchored" data-anchor-id="commute-patterns">Commute Patterns</h2>
 <p>I’ll now move onto examining some commute patterns. Here I’ll create some custom functions for building a colormap that I can use to consistently denote color-class relationships across multiple plots. Default behavior in <code>matplotlib</code> and <code>seaborn</code> typically leads to color-class relationships changing across charts of different types or involving different subsets of the data, e.g.&nbsp;in Chart 1, class A is Red, but in Chart 2, class A is Blue. My custom function, <code>build_colormap</code>, creates a simple color-class relationship dictionary that defines the color-class relationships once and can be input to various <code>seaborn</code> visuals.</p>
 <p>I’ll define color-class relationships for the days of the week, but first I’ll do some setup in <code>pandas</code></p>
-<div id="cell-20" class="cell" data-execution_count="581">
+<div id="cell-20" class="cell" data-execution_count="84">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'day_of_week'</span>] <span class="op">=</span> df_rph[<span class="st">'Date'</span>].dt.day_name()</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'Weekend'</span>] <span class="op">=</span> df_rph[<span class="st">'day_of_week'</span>].isin([<span class="st">'Saturday'</span>, <span class="st">'Sunday'</span>])</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'Hour_12'</span>] <span class="op">=</span> pd.to_datetime(</span>
@@ -678,7 +678,7 @@ Freq: ME, Name: Riders, dtype: int64</code></pre>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>df_rph[<span class="st">'Rider_Thousands'</span>] <span class="op">=</span> df_rph[<span class="st">'Riders'</span>] <span class="op">/</span> <span class="dv">1000</span></span></code></pre></div>
 </div>
 <p>Now I’ll define the <code>build_colormap</code> function and create my color mapping</p>
-<div id="cell-22" class="cell" data-execution_count="582">
+<div id="cell-22" class="cell" data-execution_count="85">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_colormap(series: pd.Series) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
@@ -716,10 +716,10 @@ Freq: ME, Name: Riders, dtype: int64</code></pre>
 </details>
 </div>
 <p>Here is the resulting color-mapping dictionary</p>
-<div id="cell-24" class="cell" data-execution_count="583">
+<div id="cell-24" class="cell" data-execution_count="86">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>colormap <span class="op">=</span> build_colormap(df_rph[<span class="st">'day_of_week'</span>])</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>colormap</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="583">
+<div class="cell-output cell-output-display" data-execution_count="86">
 <pre><code>{'Saturday': (0.12156862745098039, 0.4666666666666667, 0.7058823529411765),
  'Sunday': (1.0, 0.4980392156862745, 0.054901960784313725),
  'Monday': (0.17254901960784313, 0.6274509803921569, 0.17254901960784313),
@@ -730,7 +730,7 @@ Freq: ME, Name: Riders, dtype: int64</code></pre>
 </div>
 </div>
 <p>and here’s a simple application of that colormap to examine the average riders-per-hour in the BART system.</p>
-<div id="cell-26" class="cell" data-execution_count="584">
+<div id="cell-26" class="cell" data-execution_count="87">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>sns.despine(top<span class="op">=</span><span class="va">True</span>, ax<span class="op">=</span>ax)</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>sns.lineplot(</span>
@@ -759,7 +759,7 @@ Freq: ME, Name: Riders, dtype: int64</code></pre>
 </div>
 </div>
 <p>I can see the degree to which BART seems to have a lot of its ridership concentrated in commute times. Now lets say that I want to reproduce this plot repeatedly for different years, so see how this general shape changes before and after the pandemic. This is going to be a grid plot, where each individual plot in the grid represents one year of data. I’ll create a flexible function for grid-plotting, <code>grid_plot</code>, below, which allows for one to pass in a <code>seaborn</code> plot, and <code>**kwargs</code> for that plotting function, and repeat that plot across some grouping variable, <code>group_var</code>.</p>
-<div id="cell-28" class="cell" data-execution_count="585">
+<div id="cell-28" class="cell" data-execution_count="88">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> grid_plot(grid_subset: pd.DataFrame,</span>
@@ -774,34 +774,52 @@ Freq: ME, Name: Riders, dtype: int64</code></pre>
 <span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    facet <span class="op">=</span> facet.reshape(rows, cols)</span>
 <span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    fig, axes <span class="op">=</span> plt.subplots(</span>
 <span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>        facet.shape[<span class="dv">0</span>], facet.shape[<span class="dv">1</span>], sharex<span class="op">=</span><span class="va">True</span>, sharey<span class="op">=</span><span class="va">True</span>, figsize<span class="op">=</span>figsize)</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> m <span class="kw">in</span> <span class="bu">range</span>(facet.shape[<span class="dv">0</span>]):</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> n <span class="kw">in</span> <span class="bu">range</span>(facet.shape[<span class="dv">1</span>]):</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>            group <span class="op">=</span> facet[m, n]</span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>            subset <span class="op">=</span> grid_subset[grid_subset[group_var] <span class="op">==</span> group]</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> legend_loc <span class="op">==</span> <span class="st">'lower'</span>:</span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>                legend <span class="op">=</span> <span class="va">True</span> <span class="cf">if</span> (m<span class="op">+</span><span class="dv">1</span> <span class="op">==</span> rows) <span class="kw">and</span> (n<span class="op">+</span><span class="dv">1</span> <span class="op">==</span> cols) <span class="cf">else</span> <span class="va">False</span></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> legend_loc <span class="op">==</span> <span class="st">"upper"</span>:</span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>                legend <span class="op">=</span> <span class="va">True</span> <span class="cf">if</span> (m<span class="op">+</span><span class="dv">1</span> <span class="op">==</span> <span class="dv">1</span>) <span class="kw">and</span> (n<span class="op">+</span><span class="dv">1</span> <span class="op">==</span> cols) <span class="cf">else</span> <span class="va">False</span></span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>                legend <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>            seaborn_func(</span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>                data<span class="op">=</span>subset,</span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>                ax<span class="op">=</span>axes[m, n],</span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>                legend<span class="op">=</span>legend,</span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>                <span class="op">**</span>kwargs)</span>
-<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>            axes[m, n].<span class="bu">set</span>(ylabel<span class="op">=</span><span class="va">None</span>, xlabel<span class="op">=</span><span class="va">None</span>, title<span class="op">=</span>group)</span>
-<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>            axes[m, n].grid()</span>
-<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> fig, axes</span></code></pre></div>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> rows <span class="op">&gt;</span> <span class="dv">1</span>:</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> m <span class="kw">in</span> <span class="bu">range</span>(facet.shape[<span class="dv">0</span>]):</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> n <span class="kw">in</span> <span class="bu">range</span>(facet.shape[<span class="dv">1</span>]):</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>                group <span class="op">=</span> facet[m, n]</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>                subset <span class="op">=</span> grid_subset[grid_subset[group_var] <span class="op">==</span> group]</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> legend_loc <span class="op">==</span> <span class="st">'lower'</span>:</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>                    legend <span class="op">=</span> <span class="va">True</span> <span class="cf">if</span> (m<span class="op">+</span><span class="dv">1</span> <span class="op">==</span> rows) <span class="kw">and</span> (n<span class="op">+</span><span class="dv">1</span> <span class="op">==</span> cols) <span class="cf">else</span> <span class="va">False</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>                <span class="cf">elif</span> legend_loc <span class="op">==</span> <span class="st">"upper"</span>:</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>                    legend <span class="op">=</span> <span class="va">True</span> <span class="cf">if</span> (m<span class="op">+</span><span class="dv">1</span> <span class="op">==</span> <span class="dv">1</span>) <span class="kw">and</span> (n<span class="op">+</span><span class="dv">1</span> <span class="op">==</span> cols) <span class="cf">else</span> <span class="va">False</span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>                <span class="cf">else</span>:</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>                    legend <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>                seaborn_func(</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>                    data<span class="op">=</span>subset,</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>                    ax<span class="op">=</span>axes[m, n],</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>                    legend<span class="op">=</span>legend,</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>                    <span class="op">**</span>kwargs)</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>                axes[m, n].<span class="bu">set</span>(ylabel<span class="op">=</span><span class="va">None</span>, xlabel<span class="op">=</span><span class="va">None</span>, title<span class="op">=</span>group)</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>                axes[m, n].grid()</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> n <span class="kw">in</span> <span class="bu">range</span>(facet.shape[<span class="dv">1</span>]):</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>            group <span class="op">=</span> facet[n]</span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>            subset <span class="op">=</span> grid_subset[grid_subset[group_var] <span class="op">==</span> group]</span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> legend_loc <span class="op">==</span> <span class="st">'lower'</span>:</span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>                legend <span class="op">=</span> <span class="va">True</span> <span class="cf">if</span> (m<span class="op">+</span><span class="dv">1</span> <span class="op">==</span> rows) <span class="kw">and</span> (n<span class="op">+</span><span class="dv">1</span> <span class="op">==</span> cols) <span class="cf">else</span> <span class="va">False</span></span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> legend_loc <span class="op">==</span> <span class="st">"upper"</span>:</span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>                legend <span class="op">=</span> <span class="va">True</span> <span class="cf">if</span> (m<span class="op">+</span><span class="dv">1</span> <span class="op">==</span> <span class="dv">1</span>) <span class="kw">and</span> (n<span class="op">+</span><span class="dv">1</span> <span class="op">==</span> cols) <span class="cf">else</span> <span class="va">False</span></span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a>                legend <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a>            seaborn_func(</span>
+<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a>                data<span class="op">=</span>subset,</span>
+<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a>                ax<span class="op">=</span>axes[m, n],</span>
+<span id="cb16-44"><a href="#cb16-44" aria-hidden="true" tabindex="-1"></a>                legend<span class="op">=</span>legend,</span>
+<span id="cb16-45"><a href="#cb16-45" aria-hidden="true" tabindex="-1"></a>                <span class="op">**</span>kwargs)</span>
+<span id="cb16-46"><a href="#cb16-46" aria-hidden="true" tabindex="-1"></a>            axes[n].<span class="bu">set</span>(ylabel<span class="op">=</span><span class="va">None</span>, xlabel<span class="op">=</span><span class="va">None</span>, title<span class="op">=</span>group)</span>
+<span id="cb16-47"><a href="#cb16-47" aria-hidden="true" tabindex="-1"></a>            axes[n].grid()</span>
+<span id="cb16-48"><a href="#cb16-48" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> fig, axes</span></code></pre></div>
 </details>
 </div>
 <p>For an application, I’ll create a dataset from 2018-2024 where I want to display one chart per year in a grid pattern</p>
-<div id="cell-30" class="cell" data-execution_count="586">
+<div id="cell-30" class="cell" data-execution_count="89">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>grid_subset <span class="op">=</span> df_rph.copy()[(df_rph[<span class="st">'Date'</span>] <span class="op">&gt;</span> <span class="st">"2018"</span>)</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>                            <span class="op">&amp;</span> (df_rph[<span class="st">'Date'</span>] <span class="op">&lt;</span> <span class="st">"2024"</span>)]</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>grid_subset[<span class="st">'Year'</span>] <span class="op">=</span> grid_subset[<span class="st">'Date'</span>].dt.year</span></code></pre></div>
 </div>
 <p>Now I can use my function, <code>grid_plot</code>, to specify a plot type, a grid shape, and pass <code>seaborn</code> <code>**kwargs</code> to the underlying plotting function.</p>
-<div id="cell-32" class="cell" data-execution_count="587">
+<div id="cell-32" class="cell" data-execution_count="90">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> grid_plot(grid_subset,</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>                      sns.lineplot,</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>                      rows<span class="op">=</span><span class="dv">2</span>, cols<span class="op">=</span><span class="dv">3</span>,</span>
@@ -831,14 +849,14 @@ Freq: ME, Name: Riders, dtype: int64</code></pre>
 </div>
 <p>The grid presents an interesting pattern in so far as the general level of ridership drops across all hours, but the raw plot seems to suggest that the gap between peak commute ridership levels and off-peak ridership seems to have shrunken post-pandemic. In late 2023, BART <a href="https://www.bart.gov/news/articles/2023/news20230427">instituted scheduling changes</a> to reflect their belief that demand has shifted in the post-pandemic towards rides outside of peak commute times.</p>
 <p>We can check that with a simple time series plot that relies on my <code>custom_legend</code> function to move the legend and resize the lines within it.</p>
-<div id="cell-34" class="cell" data-execution_count="591">
+<div id="cell-34" class="cell" data-execution_count="91">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>is_commute <span class="op">=</span> (df_rph[<span class="st">'Hour'</span>].isin([<span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">16</span>, <span class="dv">17</span>, <span class="dv">18</span>, <span class="dv">19</span>]) <span class="op">&amp;</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>              <span class="op">~</span>df_rph[<span class="st">'Weekend'</span>]).replace({</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                  <span class="va">True</span>: <span class="st">'Riders during Peak Commute times'</span>,</span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                  <span class="va">False</span>: <span class="st">'Riders during Off-Peak times'</span></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>              })</span></code></pre></div>
 </div>
-<div id="cell-35" class="cell" data-execution_count="593">
+<div id="cell-35" class="cell" data-execution_count="92">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>(df_rph[df_rph[<span class="st">'Date'</span>] <span class="op">&lt;</span> <span class="st">"2024-05-01"</span>]</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a> .pivot_table(index<span class="op">=</span>pd.Grouper(key<span class="op">=</span><span class="st">'Date'</span>, freq<span class="op">=</span><span class="st">'ME'</span>),</span>

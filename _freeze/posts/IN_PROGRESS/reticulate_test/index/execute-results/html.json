@@ -1,0 +1,16 @@
+{
+  "hash": "e983a79755a535204e88bf3ffbca1954",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: Basic Concepts in Forecasting\nbibliography: ../../blog.bib\nauthor: Peter Amerkhanian\ndate: 2024-3-17\ndraft: true\ncategories:\n  - R\n  - Statistics\nformat:\n  html:\n    warning: false\n    df-print: kable\n    fig-dpi: 300\n    toc: true\n    toc-depth: 3\n    code-fold: false\n    code-tools: true\neditor:\n  markdown:\n    wrap: 72\n---\n\n::: {#d9f515cc .cell execution_count=1}\n``` {.python .cell-code}\nimport pandas as pd\ndf = pd.DataFrame({\n  \"Peter\": [1, 2, 3],\n  \"John\": [4, 5, 6]\n})\n\ndf\n```\n\n::: {.cell-output .cell-output-display execution_count=1}\n```{=html}\n<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>Peter</th>\n      <th>John</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>1</td>\n      <td>4</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>2</td>\n      <td>5</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>3</td>\n      <td>6</td>\n    </tr>\n  </tbody>\n</table>\n</div>\n```\n:::\n:::\n\n\nPeter is 1\n\n",
+    "supporting": [
+      "index_files"
+    ],
+    "filters": [],
+    "includes": {
+      "include-in-header": [
+        "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js\" integrity=\"sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==\" crossorigin=\"anonymous\"></script>\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js\" integrity=\"sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==\" crossorigin=\"anonymous\" data-relocate-top=\"true\"></script>\n<script type=\"application/javascript\">define('jquery', [],function() {return window.jQuery;})</script>\n"
+      ]
+    }
+  }
+}

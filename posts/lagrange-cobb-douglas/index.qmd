@@ -32,6 +32,56 @@ scene <- list(
 )
 ```
 
+```{python}
+#| output: false
+#| echo: false
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define the functions
+def P_l_k(L, K):
+    return 2.5 * L ** 0.45 * K ** 0.55
+
+def g_l_k(L, K):
+    return 40 * L + 50 * K - 500000
+
+# Generate the data
+n = 100
+L = np.linspace(0, 6000, n)
+K = np.linspace(0, 6000, n)
+L, K = np.meshgrid(L, K)
+P = P_l_k(L, K)
+g = g_l_k(L, K)
+
+# Create the contour plot
+fig, ax = plt.subplots(figsize=(3, 3))
+
+# Plot the contour for P(L, K)
+contour = ax.contourf(L, K, P, cmap='Blues', alpha=.7)
+
+# Plot the line for g(L, K)
+L_line = np.linspace(0, 6000, n)
+K_line = (10000 - 4 * L_line / 5)
+
+# Add the point (5625, 5500)
+#ax.plot(L_line, K_line, color='black', linewidth="3", zorder=1)
+#ax.scatter(5625, 5500, color='black', s=50, zorder=4)
+
+# Set axis ranges and labels
+ax.set_xlim(0, 6000)
+ax.set_ylim(0, 6000)
+
+ax.set_axis_off()
+fig.tight_layout()
+
+fig.savefig("thumbnail.png", dpi=300)
+# Show the plot
+plt.show()
+
+```
+
+
 ### The Optimization Problem
 
 > A company has determined that its production level is given by the

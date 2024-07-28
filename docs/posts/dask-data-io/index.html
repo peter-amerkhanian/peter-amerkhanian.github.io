@@ -9,7 +9,7 @@
 <meta name="author" content="Peter Amerkhanian">
 <meta name="dcterms.date" content="2024-04-12">
 
-<title>Scraping with bs4, parquet, and dask</title>
+<title>Benchmarking parquet and dask</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -142,7 +142,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="../../blog.html"> 
-<span class="menu-text">Notes</span></a>
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../memos.html"> 
@@ -163,7 +163,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <div class="quarto-title-block"><div><h1 class="title">Scraping with <code>bs4</code>, parquet, and <code>dask</code></h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
+      <div class="quarto-title-block"><div><h1 class="title">Benchmarking parquet and <code>dask</code></h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
                                 <div class="quarto-categories">
                 <div class="quarto-category">Python</div>
                 <div class="quarto-category">Data Management</div>
@@ -197,7 +197,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-        <h2 id="toc-title"><a href="#" class="nav-link">Scraping with <code>bs4</code>, parquet, and <code>dask</code></a></h2>
+        <h2 id="toc-title"><a href="#" class="nav-link">Benchmarking parquet and <code>dask</code></a></h2>
      
     <ul>
     <li><a href="#scraping-our-data" id="toc-scraping-our-data" class="nav-link active" data-scroll-target="#scraping-our-data">Scraping our data</a></li>
@@ -249,7 +249,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <img src="fig2.png" id="fig-readin" class="img-fluid" style="width:70.0%" alt="Read-in Efficiency"></p>
 <p>I should note that my adoption of <code>dask</code> and parquet storage is due to the influence of two of my day-job coworkers, Batool Hasan and Konrad Franco, after we leveraged them for an internal project with a similar workflow.</p>
 <p>As an aside, I highly recommend watching the <a href="https://www.youtube.com/watch?v=wKH0-zs2g_U&amp;t=118s">“Background” section of this talk</a> for some basic information on <code>dask</code> and how it differs from Spark, DuckDB, and <code>polars</code>. The talk also features some comprehensive benchmarks of <code>dask</code> and establishes the core differences between [<code>dask</code> and Spark] in one group, and [<code>polars</code> and DuckDB] in the other.</p>
-<div id="cell-2" class="cell" data-execution_count="1">
+<div id="cell-2" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> dask.dataframe <span class="im">as</span> dd</span>
@@ -371,8 +371,8 @@ File 3 size: 21415653 bytes (21.42 mega-bytes)
 File 4 size: 24350926 bytes (24.35 mega-bytes)
 File 5 size: 30546036 bytes (30.55 mega-bytes)
 File 6 size: 32224174 bytes (32.22 mega-bytes)
-File 7 size: 11183443 bytes (11.18 mega-bytes)
-Total size of data: 196.52453 mega-bytes</code></pre>
+File 7 size: 16468035 bytes (16.47 mega-bytes)
+Total size of data: 201.809122 mega-bytes</code></pre>
 </div>
 </div>
 <p>We’ll proceed to download all of this into a folder, <code>data</code>. Here I take advantage of <code>tqdm</code>’s progress bar so that I can track the potentially large job’s progress. I also add logic for two conditions:</p>
@@ -400,7 +400,7 @@ Total size of data: 196.52453 mega-bytes</code></pre>
 <span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
 <span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"Failed to download: </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>100%|██████████| 7/7 [00:03&lt;00:00,  2.29it/s]</code></pre>
+<pre><code>100%|██████████| 7/7 [00:00&lt;00:00,  7.79it/s]</code></pre>
 </div>
 </div>
 <p>Since we are storing a large amount of data in the project directory, we will also set up a <code>.gitignore</code> to make sure that it doesn’t end up being tracked in version control.</p>
@@ -541,7 +541,7 @@ Total size of data: 196.52453 mega-bytes</code></pre>
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>pbar <span class="op">=</span> ProgressBar()</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>pbar.register()</span></code></pre></div>
 </div>
-<p>For data of this size, the one-time conversion takes under two minutes</p>
+<p>For data of this size, the one-time conversion typically takes under two minutes</p>
 <div id="cell-31" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>data.to_parquet(<span class="st">'data/parquet_data'</span>, write_index<span class="op">=</span><span class="va">False</span>)</span></code></pre></div>
 </div>
@@ -605,14 +605,14 @@ Figure&nbsp;3: Storage Comparison: .csv.gz versus parquet
 <div id="cell-41" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>df.shape</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="19">
-<pre><code>(121427227, 5)</code></pre>
+<pre><code>(122851920, 5)</code></pre>
 </div>
 </div>
 <p>In what seems like a short amount of time:</p>
 <div id="cell-43" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">round</span>(dask_parquet_end, <span class="dv">2</span>), <span class="st">"seconds"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>32.5 seconds</code></pre>
+<pre><code>31.32 seconds</code></pre>
 </div>
 </div>
 <p>and this data is now all in memory as a <code>pandas</code> dataframe, ready for typical use.</p>
@@ -701,7 +701,7 @@ Figure&nbsp;3: Storage Comparison: .csv.gz versus parquet
 <section id="dask-with-.csv.gz" class="level3">
 <h3 class="anchored" data-anchor-id="dask-with-.csv.gz"><code>dask</code> with .csv.gz</h3>
 <p>Here we simply use the <code>.csv.gz</code> files with <code>dask</code> – does the parallel processing in <code>dask</code> make the conversion from <code>.csv.gz</code> to parquet not worth it?</p>
-<div id="cell-52" class="cell" data-execution_count="23">
+<div id="cell-52" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"times.csv"</span>):</span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>    start <span class="op">=</span> time.time()</span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    df_dask_csv <span class="op">=</span> dd.read_csv(data_paths,</span>
@@ -715,7 +715,7 @@ Figure&nbsp;3: Storage Comparison: .csv.gz versus parquet
 <section id="pandas-with-.csv.gz" class="level3">
 <h3 class="anchored" data-anchor-id="pandas-with-.csv.gz"><code>pandas</code> with .csv.gz</h3>
 <p>Here we simply use the <code>.csv.gz</code> files with <code>pandas</code> for read-in – how do things look if we use no new libraries and do no file conversions?</p>
-<div id="cell-55" class="cell" data-execution_count="24">
+<div id="cell-55" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"times.csv"</span>):</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    dfs <span class="op">=</span> []</span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    start <span class="op">=</span> time.time()</span>
@@ -730,7 +730,7 @@ Figure&nbsp;3: Storage Comparison: .csv.gz versus parquet
 <section id="pandas-with-parquet" class="level3">
 <h3 class="anchored" data-anchor-id="pandas-with-parquet"><code>pandas</code> with parquet</h3>
 <p>Finally, we’ll take advantage of the fact that <code>pandas</code> also supports the read-in of directories of parquet data and try the parquet files with <code>pandas</code> for read-in – can we avoid using <code>dask</code>?</p>
-<div id="cell-58" class="cell" data-execution_count="25">
+<div id="cell-58" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"times.csv"</span>):</span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>    start <span class="op">=</span> time.time()</span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    df_pandas_parquet <span class="op">=</span> pd.read_parquet(<span class="st">'data/parquet_data'</span>)</span>
@@ -739,7 +739,7 @@ Figure&nbsp;3: Storage Comparison: .csv.gz versus parquet
 <span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    gc.collect()</span></code></pre></div>
 </div>
 <p>We’ll answer all of those questions at once with a plot:</p>
-<div id="cell-fig-2" class="cell" data-execution_count="26">
+<div id="cell-fig-2" class="cell" data-execution_count="20">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"times.csv"</span>):</span>

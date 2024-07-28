@@ -12,8 +12,8 @@ pagetitle: "{{< meta title >}}"
 
 
 toc-title: Contents
-jupyter: python3
-
+# jupyter: python3
+image: thumbnail.png
 format:
   html:
     anchor-sections: true

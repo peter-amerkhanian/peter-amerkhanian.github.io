@@ -10,12 +10,29 @@ div.quarto-post .metadata {
     flex-basis: 15% !important;
 } */
 
+.abstract {
+    display: none
+}
+
 /* Fix thumbnail margins */
-/* .thumbnail p:not(.card-img-top){
-    display: none !important;
-} */
+
 div.quarto-post .thumbnail img{
     margin-top: 0em !important;
+}
+
+.thumbnail p:not(:has(img)) {
+    /* Your CSS properties here */
+    display: none !important;
+}
+
+
+div.list.quarto-listing-default .thumbnail img{
+    width: 50% !important;
+}
+
+div.quarto-post {
+    margin-bottom: 1em;
+    gap: .5em
 }
 
 /* Code Block styling */

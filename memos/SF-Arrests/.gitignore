@@ -1,0 +1,5 @@
+__pycache__/
+.jupyter_cache/
+data/
+main_data.parquet
+main_data.pkl
