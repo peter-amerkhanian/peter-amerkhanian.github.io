@@ -59,7 +59,7 @@
   <title>Production Maximization with Lagrange Mutlipliers</title>
   <dc:creator>Peter Amerkhanian</dc:creator>
   <link>https://peter-amerkhanian.com/posts/lagrange-cobb-douglas/</link>
-  <description><![CDATA[ A company has determined that its production level is given by the Cobb-Douglas function <img src="https://latex.codecogs.com/png.latex?f(x,y)=2.5x%5E%7B0.45%7Dy%5E%7B0.55%7D"> where <img src="https://latex.codecogs.com/png.latex?x"> represents the total number of labor hours in 1 year and <img src="https://latex.codecogs.com/png.latex?y"> represents the total capital input for the company. Suppose 1 unit of labor costs $40 and 1 unit of capital costs $50. Use the method of Lagrange multipliers to find the maximum value of <img src="https://latex.codecogs.com/png.latex?f(x,y)=2.5x%5E%7B0.45%7Dy%5E%7B0.55%7D"> subject to a budgetary constraint of $500,000 per year. ]]></description>
+  <description><![CDATA[ In <a href="../minima-3d/index.ipynb">“Simple Optimization in 3D”</a>, I blogged about a basic optimization problem in three dimensional space. In this post, I’ll look at a more complex problem that deals with kind-of abstract quantities and involves a constraint. This is also an opportunity to cover the <a href="https://en.wikipedia.org/wiki/Lagrange_multiplier">method of lagrange multipliers</a> optimization strategy. ]]></description>
   <category>R</category>
   <category>Calculus</category>
   <guid>https://peter-amerkhanian.com/posts/lagrange-cobb-douglas/</guid>

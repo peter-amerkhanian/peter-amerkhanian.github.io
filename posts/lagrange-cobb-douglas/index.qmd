@@ -15,6 +15,7 @@ editor:
   markdown: 
     wrap: 72
 ---
+In ["Simple Optimization in 3D"](../minima-3d/index.ipynb), I blogged about a basic optimization problem in three dimensional space. In this post, I'll look at a more complex problem that deals with kind-of abstract quantities and involves a constraint. This is also an opportunity to cover the [method of lagrange multipliers](https://en.wikipedia.org/wiki/Lagrange_multiplier) optimization strategy.
 
 ```{r}
 #| warning: false
