@@ -18,7 +18,12 @@ editor:
   markdown: 
     wrap: 72
 ---
+I've previously blogged about optimization in two dimensional space:
 
+- Analytical[optimization in two dimensions](../simple-constrained-optimization/index.ipynb)
+- Numerical optimization in two dimensions via [Newton's Method](../newtons-method/index.ipynb)
+
+In this post, I'm going to expand into three dimensions, with an overview of a distance minimization problem.
 ```{r}
 #| warning: false
 #| code-fold: true
@@ -125,7 +130,7 @@ $\pm$ in @eq-z).
 
 ### Defining the Objective Function
 Returning to the text of the problem, we want to find the point closest to $P$, on some surface. "Closest to" implies that we will be minimizing a distance. Recall the equation for distance between a point, $P(x, y, z)$ and some other point
-$P_1(x_1, y_1, z_1)$ in $\mathbb{R}^3$ ([@strang_calculus_2016-1, chapter 2]):
+$P_1(x_1, y_1, z_1)$ in $\mathbb{R}^3$ [@strang_calculus_2016-1, chapter 2]:
 
 $$
 \begin{equation}
@@ -142,7 +147,7 @@ d((-3, -5, 0), P_1) &= \sqrt{(x+3)^2 + (y+5)^2 + z^2} \\
  &= \sqrt{x^2 + 6x + y^2 + 10y + z^2 + 34}
 \end{align}
 $$
-Now, given that this function describes the distance between $P = (-3, -5, 0)$ and any other point in $\mathbb{R}^3$, it follows that, without constraints, the closest point would just be $P$:  
+Now, given that this function describes the distance between $P = (-3, -5, 0)$ and any other point in $\mathbb{R}^3$, it follows that, without constraints, the closest point would just be $P$^[0 is the smallest possible real number output of the square root function.]:  
 
 $$
 \begin{align}
@@ -152,11 +157,10 @@ d((-3, -5, 0),(-3, -5, 0)) &= \sqrt{x^2 + 6x + y^2 + 10y + z^2 + 34} \\
 &= \sqrt{0} = 0
 \end{align}
 $$
-(0 is the smallest possible real number output of a square root function).
 
 However, we were explicitly tasked with finding the point closest to $P$ on a surface $z$. We have the equation of our surface, @eq-z, which we can square and then substitute in for $z^2$. This substitution is in effect the application
-of a constraint -- we optimize for the closest point possible to our
-target, $P_1$, subject to the constraint that the point must lie on the
+of a constraint -- we optimize for the closest point $P_1$ possible to our
+target, $P$, subject to the constraint that the point must lie on the
 surface, $z^2 = x^2 + y^2$.\
 $$
 \begin{align}
@@ -165,7 +169,7 @@ f^* &= \sqrt{x^2 + 6x + y^2 + 10y + z^2 + 34} \\
 &= \sqrt{2x^2 + 6x + 2y^2 + 10y + 34}
 \end{align}
 $$ Note that minimizing $f^*$ is going to be equivalent to minimizing
-$(f^*)^2$ [^1], so let's focus on the more simple equation,
+$(f^*)^2$,[^1] so let's focus on the more simple equation,
 
 [^1]: This is beyond the scope of this post, but based on the inequality
     $0 \leq x \leq y \rightarrow  x^2 \leq y^2$.

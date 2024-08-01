@@ -67,14 +67,14 @@
     "href": "posts/minima-3d/index.html",
     "title": "Simple Optimization in 3D",
     "section": "",
-    "text": "Code\nlibrary(plotly)\nlibrary(dplyr)"
+    "text": "I’ve previously blogged about optimization in two dimensional space:\nIn this post, I’m going to expand into three dimensions, with an overview of a distance minimization problem.\nCode\nlibrary(plotly)\nlibrary(dplyr)"
   },
   {
     "objectID": "posts/minima-3d/index.html#footnotes",
     "href": "posts/minima-3d/index.html#footnotes",
     "title": "Simple Optimization in 3D",
     "section": "Footnotes",
-    "text": "Footnotes\n\n\nThis is beyond the scope of this post, but based on the inequality \\(0 \\leq x \\leq y \\rightarrow  x^2 \\leq y^2\\).↩︎"
+    "text": "Footnotes\n\n\n0 is the smallest possible real number output of the square root function.↩︎\nThis is beyond the scope of this post, but based on the inequality \\(0 \\leq x \\leq y \\rightarrow  x^2 \\leq y^2\\).↩︎"
   },
   {
     "objectID": "posts/lagrange-cobb-douglas/index.html",
