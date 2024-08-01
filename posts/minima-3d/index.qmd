@@ -3,8 +3,10 @@ title: "Simple Optimization in 3D"
 bibliography: "../../blog.bib"
 author: "Peter Amerkhanian"
 date: "2024-3-9"
+draft: false
 categories: ['R', 'Calculus']
 image: thumbnail.png
+engine: knitr
 jupyter: info251
 format:
   html:
@@ -12,6 +14,9 @@ format:
     toc-depth: 3
     code-fold: false
     code-tools: true
+editor: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r}
@@ -22,16 +27,22 @@ library(dplyr)
 ```
 
 ### The Minima Problem
-Find the point *closest* to $P(-3, -5, 0)$ on the surface defined as follows:
-$$
-\begin{align}
-z^2 &= x^2 + y^2 \\
-z = f(x, y) &= \pm \sqrt{x^2 + y^2}
-\end{align}
-$${#eq-z}
 
+Consider the following question:
 
-We set the equation up in `R` so that we can inspect a plot and better understand the optimization problem.
+> Find the point *closest* to $P(-3, -5, 0)$ on the surface defined as
+> follows: $$
+> \begin{align}
+> z^2 &= x^2 + y^2 \\
+> z = f(x, y) &= \pm \sqrt{x^2 + y^2}
+> \end{align}
+> $$ {#eq-z} -- [@strang_calculus_2016-1, chapter 4]
+
+Emphasis is put on *closest* to denote that this is a keyword suggesting
+we are looking at an optimization problem. To start approaching this, we
+will set the equation up in `R` so that we can inspect a plot and better
+understand the problem.
+
 ```{r}
 f <- function(x, y) sqrt(x^2 + y^2)
 n <- 100
@@ -58,6 +69,7 @@ plot_ly(x = x, y = y, z = z, type = "surface") %>%
             name = '(-3, -5, 0)') %>% 
   layout(scene = scene)
 ```
+
 ```{python}
 #| echo: false
 #| output: false
@@ -106,41 +118,61 @@ plt.show()
 
 ```
 
-We see that the red dot is our target, and we want to find the point on the surface closest to that point. Given the shape of the surface, it's clear that there will be two solutions (this is also apparent from the $\pm$ in @eq-z).  
+We see that the red dot is our target, and we want to find the point on
+the surface closest to that point. Given the shape of the surface, it's
+clear that there will be two solutions (this is also apparent from the
+$\pm$ in @eq-z).
 
 ### Defining the Objective Function
-Recall the equation for distance between two point, $P(x, y, z)$ and $P_1(x_1, y_1, z_1)$ in $R^3$:  
+Returning to the text of the problem, we want to find the point closest to $P$, on some surface. "Closest to" implies that we will be minimizing a distance. Recall the equation for distance between a point, $P(x, y, z)$ and some other point
+$P_1(x_1, y_1, z_1)$ in $\mathbb{R}^3$ ([@strang_calculus_2016-1, chapter 2]):
 
 $$
 \begin{equation}
 d(P, P_1) = \sqrt{(x-x_1)^2 + (y-y_1)^2 + (z-z_1)^2}
 \end{equation}
-$${#eq-dist}
+$$ {#eq-dist}
 
-We have the point, $P_1 = (-3, -5, 0)$, which we can plug into @eq-dist to yield the equation for distance from this specific point:  
+We have the point, $P = (-3, -5, 0)$, which we can plug into @eq-dist
+to yield the equation for the distance from this specific point to some other location in $\mathbb{R}^3$:\
 $$
 \begin{align}
-d(P, (-3, -5, 0)) &= \sqrt{(x+3)^2 + (y+5)^2 + z^2} \\
+d((-3, -5, 0), P_1) &= \sqrt{(x+3)^2 + (y+5)^2 + z^2} \\
  &= \sqrt{x^2 + 6x + 9 + y^2 + 10y + 25 + z^2} \\
  &= \sqrt{x^2 + 6x + y^2 + 10y + z^2 + 34}
 \end{align}
 $$
+Now, given that this function describes the distance between $P = (-3, -5, 0)$ and any other point in $\mathbb{R}^3$, it follows that, without constraints, the closest point would just be $P$:  
 
-We were given the equation of our surface, @eq-z, which we can substitute in for $z^2$. This substitution is in effect the application of a constraint -- we optimize for the closest point possible to our target, $P_1$, with the constraint that the point must lie on the surface, $z^2 = x^2 + y^2$.  
+$$
+\begin{align}
+d((-3, -5, 0),(-3, -5, 0)) &= \sqrt{x^2 + 6x + y^2 + 10y + z^2 + 34} \\
+&= \sqrt{(-3)^2 + 6(-3) + (-5)^2 + 10(-5) + 0^2 + 34} \\
+&= \sqrt{-34 + 34} \\
+&= \sqrt{0} = 0
+\end{align}
+$$
+(0 is the smallest possible real number output of a square root function).
+
+However, we were explicitly tasked with finding the point closest to $P$ on a surface $z$. We have the equation of our surface, @eq-z, which we can square and then substitute in for $z^2$. This substitution is in effect the application
+of a constraint -- we optimize for the closest point possible to our
+target, $P_1$, subject to the constraint that the point must lie on the
+surface, $z^2 = x^2 + y^2$.\
 $$
 \begin{align}
 f^* &= \sqrt{x^2 + 6x + y^2 + 10y + z^2 + 34} \\
 &= \sqrt{x^2 + 6x + y^2 + 10y + (x^2 + y^2) + 34} \\
 &= \sqrt{2x^2 + 6x + 2y^2 + 10y + 34}
 \end{align}
-$$
-Note that minimizing $f^*$ is going to be equivalent to minimizing $(f^*)^2$ [^1], so let's focus on the more simple equation,
+$$ Note that minimizing $f^*$ is going to be equivalent to minimizing
+$(f^*)^2$ [^1], so let's focus on the more simple equation,
+
+[^1]: This is beyond the scope of this post, but based on the inequality
+    $0 \leq x \leq y \rightarrow  x^2 \leq y^2$.
 
 $$
 (f^*)^2 = (2x^2 + 6x + 2y^2 + 10y + 34)
 $$
-
-[^1]: This is beyond the scope of this post, but based on the inequality $0 \leq x \leq y \rightarrow  x^2 \leq y^2$.
 
 ```{r}
 parameter_space <- function(x, y) {2*x^2 + 6*x + 2*y^2 + 10*y + 34}
@@ -157,26 +189,17 @@ plot_ly(x = x, y = y, z = z_p, type = "surface", colorscale="coolwarm") %>%
 ```
 
 ### Minimizing the Objective Function
-To find the point $x^*, y^*$ that minimizes this parameter surface, we'll take the gradient:
-$$
+
+To find the point $x^*, y^*$ that minimizes this parameter surface,
+we'll first find the critical points. In the bivariate setting, this implies finding the derivative then setting that equal to 0. In the multivariate setting, we find the gradient vector: $$
  \nabla (f^*)^2 = \left< 2 x + 3, 2 y + 5 \right>
-$$
-and set that equal to zero:
-$$
+$$ and set that equal to zero: $$
 \begin{align*}
  \nabla (f^*)^2  &= 0 \\
 &\begin{cases}
    2 x + 3 = 0 \\
    2 y + 5  = 0
    \end{cases} \\
-rref(&\begin{bmatrix}
-2 & 0 & -3\\
-0 & 2 & -5
-\end{bmatrix}) \\
-&\begin{bmatrix}
-1 & 0 & -\frac{3}{2}\\
-0 & 1 & -\frac{5}{2}
-\end{bmatrix} \\
    &\begin{cases}
    x = -\frac{3}{2} \\
    y  = -\frac{5}{2}
@@ -184,7 +207,8 @@ rref(&\begin{bmatrix}
 \end{align*}
 $$
 
-We can visually inspect this point and its output to confirm that we have indeed found the minimum of the surface:
+Thus we have the critical value. We can visually inspect this point and its output to confirm that we
+have indeed found the minimum of the surface:
 
 ```{r options(warn = -1)}
 #| code-fold: true
@@ -206,7 +230,9 @@ plot_ly(x = x, y = y, z = z_p, type = "surface") %>%
 ```
 
 ### Answering the Original Minima Question
-Now we'll return to the original surface and substitute this $x^*,y^*$ into @eq-z to find the $z^*$ of this minimizing point:  
+
+Now we'll return to the original surface and substitute this $x^*,y^*$
+into @eq-z to find the $z^*$ of this minimizing point:\
 $$
 \begin{align*}
 z^* = f(x^*, y^*) &= \pm \sqrt{(x^*)^2 + (y^*)^2} \\
@@ -243,7 +269,9 @@ plot_ly(x = x, y = y, z = z, type = "surface") %>%
             name = '(-3/2, -5/2, -sqrt(34)/2)') %>% 
   layout(scene = scene)
 ```
-Thus on the surface $z^2 = x^2 + y^2$, the two closest points to $P=(-2, -5, 0)$ are:  
+
+Thus on the surface $z^2 = x^2 + y^2$, the two closest points to
+$P=(-2, -5, 0)$ are:\
 $$
 (-\frac{3}{2},-\frac{5}{2}, \frac{\sqrt{34}}{2}) , (-\frac{3}{2},-\frac{5}{2}, -\frac{\sqrt{34}}{2}) 
 $$

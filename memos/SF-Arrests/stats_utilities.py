@@ -84,7 +84,7 @@ def custom_legend(ax: matplotlib.axes.Axes,
         handles = handles[::-1]
         labels = labels[::-1]
     elif order == 'desc':
-        ordering = np.flip(np.argsort(np.array([line.get_ydata()[-1] for line in ax.lines if len(line.get_ydata())>0])))
+        ordering = np.flip(np.argsort(np.array([line.get_ydata()[-1] for line in ax.lines if (len(line.get_ydata())>0 and line.get_label() in labels)])))
         handles = np.array(handles)[ordering].tolist()
         labels = np.array(labels)[ordering].tolist()
     elif isinstance(order, Iterable):

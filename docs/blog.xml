@@ -67,10 +67,10 @@
   <media:content url="https://peter-amerkhanian.com/posts/lagrange-cobb-douglas/thumbnail.png" medium="image" type="image/png" height="144" width="144"/>
 </item>
 <item>
-  <title>A Minima Problem in 3D</title>
+  <title>Simple Optimization in 3D</title>
   <dc:creator>Peter Amerkhanian</dc:creator>
   <link>https://peter-amerkhanian.com/posts/minima-3d/</link>
-  <description><![CDATA[ Find the point <em>closest</em> to <img src="https://latex.codecogs.com/png.latex?P(-3,%20-5,%200)"> on the surface defined as follows: <span id="eq-z"><img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Balign%7D%0Az%5E2%20&amp;=%20x%5E2%20+%20y%5E2%20%5C%5C%0Az%20=%20f(x,%20y)%20&amp;=%20%5Cpm%20%5Csqrt%7Bx%5E2%20+%20y%5E2%7D%0A%5Cend%7Balign%7D%0A%5Ctag%7B1%7D"></span> ]]></description>
+  <description><![CDATA[ Consider the following question: ]]></description>
   <category>R</category>
   <category>Calculus</category>
   <guid>https://peter-amerkhanian.com/posts/minima-3d/</guid>
