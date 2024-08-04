@@ -5,6 +5,8 @@ author: "Peter Amerkhanian"
 date: "2024-4-14"
 draft: false
 image: thumbnail.png
+jupyter: python3
+engine: knitr
 categories: ['R', 'Calculus', 'Probability']
 format:
   html:
@@ -22,6 +24,7 @@ editor:
 #| code-fold: true
 library(plotly)
 library(dplyr)
+
 x_vec <- seq(0, 25)
 y_vec <- seq(0, 25)
 
@@ -39,11 +42,12 @@ vline <- function(x = 0, color = "black") {
 
 ```
 
-The folllwing are some notes on using integration for finding cumulative probability distribution functions in the univariate and joint/multivariate settings. The exercises and citation are all coming out of a textbook for a course in vector calculus [@strang_calculus_2016-1]. I wrote this out because:  
+The following are some notes on using integration for finding cumulative probability distribution functions in the univariate and joint/multivariate settings. The exercises and citations are all coming out of a textbook for a course in vector calculus [@strang_calculus_2016-1]. I wrote this out because:  
 
-1. I always forget how to calculate integrals and wanted to make some notes on a basic application of [$u$ subsitition](https://en.wikipedia.org/wiki/Integration_by_substitution) and the mechanics of multiple integration over general regions, and  
+1. I always forget how to calculate integrals and wanted to make some notes on a basic application of [$u$ subsitition](https://en.wikipedia.org/wiki/Integration_by_substitution) and the mechanics of multiple integration over general regions
+2. I think that it's useful to pair the long, step-by-step integration walkthroughs with equivalent, much easier solutions using a [computer algebra system](https://en.wikipedia.org/wiki/Computer_algebra), a.k.a. symbolic computation. In practice I use [`sympy`](https://www.sympy.org/en/index.html) for all symbolic computation.
 
-2. I think this application area, modeling waiting times, is interesting and relevant for policy analysis
+3. I think this application area, modeling waiting times, is interesting and relevant for policy analysis
 
 ### Modeling a single waiting time
 
@@ -65,7 +69,7 @@ f(x) = \begin{cases}
 \frac{1}{\beta} e^{-\frac{x}{\beta}} \quad &x \geq 0 \\
 0 \quad &x < 0 
 \end{cases}
-$$  
+$${#eq-uni-pdf}  
 
 Where $\beta$ is the average waiting time [@strang_calculus_2016-1, chapter 5.2].
 
@@ -87,8 +91,8 @@ P_x <- function(x, beta=3) {
 #| warning: false
 data <- data.frame(x = x_vec, y = P_x(x_vec))
 ggplot(data, aes(x = x, y = y)) +
-  geom_point(color = "royalblue", size=3.2) +
-  geom_line(color = "royalblue", size=1.2) +
+  geom_point(color = "royalblue", size=3.1, alpha=.8) +
+  geom_line(color = "royalblue", size=1.2, alpha=.7) +
   labs(x = "x (Minutes)", y = "f(x)", title = "An exponential probability density function (pdf)") +
   theme_minimal()
 ```
@@ -126,12 +130,22 @@ plot_ly(
          )
 ```
 
-We'll compute that integral by hand because why not -- it's a good
-refresher on $u$ substitution.
+We can formally define that integral as follows:  
+
 $$
 \begin{align*}
 P(X \leq 6) &= \int_0 ^6 f(x)dx \\
-&= \int_0 ^6 \frac{1}{\beta} e^{-\frac{x}{\beta}}dx \\
+&= \int_0 ^6 \frac{1}{\beta} e^{-\frac{x}{\beta}}dx
+\end{align*}
+$$
+Now that we've defined the problem, we'll solve it by-hand, then using symbolic computation software.
+
+#### Solving by hand
+
+After setting the problem up, we can solve it step-by-step using $u$ substitution to compute the integral:
+$$
+\begin{align*}
+P(X \leq 6) &= \int_0 ^6 \frac{1}{\beta} e^{-\frac{x}{\beta}}dx \\
 \text{Substitute}\, u &= -\frac{x}{\beta} \\
 \text{And substitute}\, dx \rightarrow \, \frac{du}{dx} &= -\frac{1}{\beta} \rightarrow dx = -\beta du \\
 P(X \leq 6) &= \int_0 ^6 \frac{1}{\beta} e^u (-\beta du) \\
@@ -148,9 +162,59 @@ Leading us to our answer:
 ```{r}
 (-exp(-6/3)) + 1
 ```
-
 Which is the probability that it takes six minutes or less to order in
 this drive-thru.
+
+#### Solving with symbolic computation
+Now we'll overview a more practically useful way of solving the integral using python's `sympy` library. To switch to python, I'll first load the `reticulate` library in R and specify that I want to use my conda install of python, which comes pre-loaded with `sympy`.
+
+```{r}
+#| warning: false
+library(reticulate)
+use_condaenv('base')
+```
+
+Now I'll switch to python code and set up some preliminaries -- I load the library, define the variables, and define the constant $e$ just so I can match the notation in the problem set-up:
+
+```{python filename="python"}
+import sympy as sp
+from IPython.display import Markdown
+render = lambda x: Markdown(sp.latex(x, mode='equation'))
+```
+
+Now I'll define the variables, the constant $e$,^[This is not strictly necessary -- I do it purely so that I can reference `e` in my code and match the problem notation] and @eq-uni-pdf in `sympy`. `sympy` will automatically apply some simplification to the expression, so don't worry if it doesn't look exactly like @eq-uni-pdf.
+
+```{python filename="python"}
+# Define the variables
+x, beta = sp.symbols('x beta')
+# Define the constant, e
+e = sp.exp(1)
+# Define the equation
+pdf = (1/beta) * e**(-x/beta)
+# Render the equation
+render(pdf)
+```
+In our specific problem, we know that the average time it takes to place an order is 3, so we'll substitute in $\beta=3$.
+```{python filename="python"}
+f_x = pdf.subs({beta: 3})
+render(f_x)
+```
+
+Integration is not trivially easy -- to get the indefinite integral, we can just call `.integrate()` and supply the variable of integration.
+```{python filename="python"}
+render(f_x.integrate(x)) 
+```
+
+The problem requires the definite integrate, which is just as straightforward -- we supply the variable to integrate over, and the upper and lower limits of integration.
+```{python filename="python"}
+render(f_x.integrate( (x, 0, 6) )) 
+```
+We'll retrieve the decimal output by running `.evalf()` on the integral.
+```{python filename="python"}
+f_x.integrate( (x, 0, 6) ).evalf()
+```
+
+Much less painful than $u$-substitution!
 
 ### Cumulative Probability
 
@@ -417,6 +481,8 @@ $$
 \end{align*}
 $$  
 
+#### Solving by hand
+
 Computing this integral is difficult, but we'll walk through it. We will again use $u$ substitution.
 
 $$
@@ -474,6 +540,34 @@ $$
 
 Thus, the probability that the total experience is 90 minutes or less is about 83%.  
 
+#### Solving with symbolic computation
+Computing that double integral by hand provides us with a lot of opportunities to make a small error and break the whole computation. In practice, we can solve problems like this in a much faster and less error-prone manner using symbolic computation software. We'll again switch to python and use `sympy`.
+
+Returning to the problem,
+
+$$
+P(X+Y \leq 90) = \frac{1}{600} \int_0^{90} \int_0^{90-x} e^{-\frac{x}{40}-\frac{y}{15}} dydx
+$$  
+We'll first define the function that we are integrating over.
+```{python filename="python"}
+# Define the variables
+x, y, = sp.symbols("x y")
+# Define the function
+f_x_y = e ** (-x/40 - y/15)
+render(f_x_y)
+```
+Now, we'll compute the entire double integral in one line. Note that we chain the `.integrate()` method, each time over a different variable, to perform the multiple integration.
+```{python filename="python"}
+(1/600) * (
+  f_x_y
+  .integrate( (y, 0, 90-x) )
+  .integrate( (x, 0, 90) )
+  .evalf()
+  )
+
+```
+We confirm that this is the same answer we arrived at by hand.
+
 ### Deriving a generalizable approach
 Let's look at another problem, but now, instead of solving just one specific problem, we'll derive an equation that can easily solve any question structured like this so that don't have to do so many integrals...  
 
@@ -525,7 +619,10 @@ $$
 &= \frac{1}{\beta_1\beta_2} \int_0^{c} \int_0^{c-x} e^{-\frac{x}{\beta_1}-\frac{y}{\beta_2}} dydx
 \end{align*}
 $$
-We proceed to solve the quite painful integral one more time. We'll start with $u$ substitution:  
+
+#### Solving by hand
+
+Let's walk through one more painful double integral  by-hand. We'll start with $u$ substitution:  
 $$
 \begin{align*}
 u &= -\frac{x}{\beta_1}-\frac{y}{\beta_2} \\
@@ -612,3 +709,53 @@ plot_ly(
   mode="lines+markers",
   name = "CDF: F(a)")
 ```
+
+#### Solving using symbolic computation
+
+For the sake of completeness, we'll derive that same generizable equation using `sympy`. Returning to the problem,
+
+$$
+\begin{align*}
+P(X + Y \leq x) &= \frac{1}{\beta_1\beta_2} \int_0^{c} \int_0^{c-x} e^{-\frac{x}{\beta_1}-\frac{y}{\beta_2}} dydx
+\end{align*}
+$$
+
+we'll define the constants and function in `sympy`.
+```{python filename="python"}
+x, y = sp.symbols('x y')
+beta1, beta2, c = sp.symbols('beta1 beta2 c')
+f_x_y_general = e**(-x/beta1 - y/beta2)
+render(f_x_y_general)
+```
+We compute the double integral, and define our generalizable function as `f_b1_b2_c`.
+```{python filename="python"}
+f_b1_b2_c = ( 1/(beta1 * beta2) ) * (
+  f_x_y_general
+  .integrate( (y, 0, c - x) )
+  .integrate( (x, 0, c) )
+)
+render(f_b1_b2_c.simplify())
+```
+Note that for more complex equations like this, `sympy`'s simplified output might not look like what you'd reach by hand. We can be more confident that this is indeed the same $f(\beta_1, \beta_2, c)$ as the one we computed by hand above by testing it with a few problems and confirming the expected output.
+
+Returning to the drive-thru experience, where waiting to order takes 3 minutes on average and ordering takes 5, we can compute the probability that the whole experience takes 6 minutes or less as follows:
+```{python filename="python"}
+f_b1_b2_c.subs({beta1:  3, beta2: 5, c:6}).evalf()
+```
+
+This is the same as what we get using the by-hand function.
+```{r}
+cdf_wait(3, 5, 6)
+```
+
+In the case of the first problem, with a restaurant where ordering takes 40 minutes on average and eating takes 15, we can compute the probability that the whole experience takes 90 minutes or less just as easily:
+```{python filename="python"}
+f_b1_b2_c.subs({beta1:  40, beta2: 15, c:90}).evalf()
+```
+
+Again, let's check this with the by-hand version.
+```{r}
+cdf_wait(15, 40, 90)
+```
+
+Great!

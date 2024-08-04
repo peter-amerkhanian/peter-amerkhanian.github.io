@@ -36,7 +36,7 @@
   <title>Double Integrals in Probability</title>
   <dc:creator>Peter Amerkhanian</dc:creator>
   <link>https://peter-amerkhanian.com/posts/multiple-integration/</link>
-  <description><![CDATA[ The folllwing are some notes on using integration for finding cumulative probability distribution functions in the univariate and joint/multivariate settings. The exercises and citation are all coming out of a textbook for a course in vector calculus <span class="citation" data-cites="strang_calculus_2016-1">(Strang and Herman 2016)</span>. I wrote this out because: ]]></description>
+  <description><![CDATA[ The following are some notes on using integration for finding cumulative probability distribution functions in the univariate and joint/multivariate settings. The exercises and citations are all coming out of a textbook for a course in vector calculus <span class="citation" data-cites="strang_calculus_2016-1">(Strang and Herman 2016)</span>. I wrote this out because: ]]></description>
   <category>R</category>
   <category>Calculus</category>
   <category>Probability</category>
