@@ -46,10 +46,10 @@ The following are notes on using integration for finding cumulative probability 
 
 #### Learning Goals
 
-1. Get comfortable with leveraging [$u$ subsitition](https://en.wikipedia.org/wiki/Integration_by_substitution) to compute single and even double integrals over general regions, by hand.
-2. Connect the by-hand approach to a more practically useful approach tha leverages a [computer algebra system](https://en.wikipedia.org/wiki/Computer_algebra). We will cover examples in [`sympy`](https://www.sympy.org/en/index.html).
+1. Get comfortable with leveraging [$u$ subsitition](https://en.wikipedia.org/wiki/Integration_by_substitution) to compute single and double integrals over general regions, by hand.
+2. Connect the by-hand approach to a more practically useful approach that leverages a [computer algebra system](https://en.wikipedia.org/wiki/Computer_algebra). We will cover examples in [`sympy`](https://www.sympy.org/en/index.html).
 
-3. Connect integration and probability models to policy analysis. These methods are of particular use in logistics problems.
+3. Connect integration and probability models to policy analysis. These methods are of particular use in logistics problems that involve wait times.
 
 ## Modeling a single waiting time
 
