@@ -42,14 +42,16 @@ vline <- function(x = 0, color = "black") {
 
 ```
 
-The following are some notes on using integration for finding cumulative probability distribution functions in the univariate and joint/multivariate settings. The exercises and citations are all coming out of a textbook for a course in vector calculus [@strang_calculus_2016-1]. I wrote this out because:  
+The following are notes on using integration for finding cumulative probability distribution functions in the univariate and joint settings. The exercises and citations are all coming out of a textbook for a course in vector calculus [@strang_calculus_2016-1].  
 
-1. I always forget how to calculate integrals and wanted to make some notes on a basic application of [$u$ subsitition](https://en.wikipedia.org/wiki/Integration_by_substitution) and the mechanics of multiple integration over general regions
-2. I think that it's useful to pair the long, step-by-step integration walkthroughs with equivalent, much easier solutions using a [computer algebra system](https://en.wikipedia.org/wiki/Computer_algebra), a.k.a. symbolic computation. In practice I use [`sympy`](https://www.sympy.org/en/index.html) for all symbolic computation.
+#### Learning Goals
 
-3. I think this application area, modeling waiting times, is interesting and relevant for policy analysis
+1. Get comfortable with leveraging [$u$ subsitition](https://en.wikipedia.org/wiki/Integration_by_substitution) to compute single and even double integrals over general regions, by hand.
+2. Connect the by-hand approach to a more practically useful approach tha leverages a [computer algebra system](https://en.wikipedia.org/wiki/Computer_algebra). We will cover examples in [`sympy`](https://www.sympy.org/en/index.html).
 
-### Modeling a single waiting time
+3. Connect integration and probability models to policy analysis. These methods are of particular use in logistics problems.
+
+## Modeling a single waiting time
 
 Consider the following question:
 
@@ -140,7 +142,7 @@ P(X \leq 6) &= \int_0 ^6 f(x)dx \\
 $$
 Now that we've defined the problem, we'll solve it by-hand, then using symbolic computation software.
 
-#### Solving by hand
+### Solving by hand
 
 After setting the problem up, we can solve it step-by-step using $u$ substitution to compute the integral:
 $$
@@ -165,7 +167,7 @@ Leading us to our answer:
 Which is the probability that it takes six minutes or less to order in
 this drive-thru.
 
-#### Solving with symbolic computation
+### Solving with `sympy`
 Now we'll overview a more practically useful way of solving the integral using python's `sympy` library. To switch to python, I'll first load the `reticulate` library in R and specify that I want to use my conda install of python, which comes pre-loaded with `sympy`.
 
 ```{r}
@@ -174,7 +176,7 @@ library(reticulate)
 use_condaenv('base')
 ```
 
-Now I'll switch to python code and set up some preliminaries -- I load the library, define the variables, and define the constant $e$ just so I can match the notation in the problem set-up:
+Now I'll switch to python code and set up some preliminaries -- I define a custom render function so that I can output the `sympy` equations I create in LaTeX:
 
 ```{python filename="python"}
 import sympy as sp
@@ -200,7 +202,7 @@ f_x = pdf.subs({beta: 3})
 render(f_x)
 ```
 
-Integration is not trivially easy -- to get the indefinite integral, we can just call `.integrate()` and supply the variable of integration.
+Integration using `sympy` is trivially easy -- to get the indefinite integral, we can just call `.integrate()` and supply the variable of integration.
 ```{python filename="python"}
 render(f_x.integrate(x)) 
 ```
@@ -216,7 +218,7 @@ f_x.integrate( (x, 0, 6) ).evalf()
 
 Much less painful than $u$-substitution!
 
-### Cumulative Probability
+## Cumulative Probability
 
 When we derived the indefinite integral,
 $\int \frac{1}{\beta} e^{-\frac{x}{\beta}}dx = - e^{-\frac{x}{\beta}}$,
@@ -268,7 +270,7 @@ plot_ly(
 )
 ```
 
-### Modeling multiple waiting times
+## Modeling multiple waiting times
 
 > At Sydney’s Restaurant, customers must wait an average of 15 minutes
 > for a table. From the time they are seated until they have finished
@@ -481,7 +483,7 @@ $$
 \end{align*}
 $$  
 
-#### Solving by hand
+### Solving by hand
 
 Computing this integral is difficult, but we'll walk through it. We will again use $u$ substitution.
 
@@ -540,7 +542,7 @@ $$
 
 Thus, the probability that the total experience is 90 minutes or less is about 83%.  
 
-#### Solving with symbolic computation
+### Solving with `sympy`
 Computing that double integral by hand provides us with a lot of opportunities to make a small error and break the whole computation. In practice, we can solve problems like this in a much faster and less error-prone manner using symbolic computation software. We'll again switch to python and use `sympy`.
 
 Returning to the problem,
@@ -568,7 +570,7 @@ Now, we'll compute the entire double integral in one line. Note that we chain th
 ```
 We confirm that this is the same answer we arrived at by hand.
 
-### Deriving a generalizable approach
+## Deriving a generalizable approach
 Let's look at another problem, but now, instead of solving just one specific problem, we'll derive an equation that can easily solve any question structured like this so that don't have to do so many integrals...  
 
 >[...] At a drive-thru restaurant, customers spend, on average, 3 minutes placing their orders and an additional 5 minutes paying for and picking up their meals. Assume that placing the order and paying for/picking up the meal are two independent events $X$ and $Y$. If the waiting times are modeled by the exponential probability densities. Find $P[X+Y \leq 6]$  and interpret the result.
@@ -620,7 +622,7 @@ $$
 \end{align*}
 $$
 
-#### Solving by hand
+### Solving by hand
 
 Let's walk through one more painful double integral  by-hand. We'll start with $u$ substitution:  
 $$
@@ -710,7 +712,7 @@ plot_ly(
   name = "CDF: F(a)")
 ```
 
-#### Solving using symbolic computation
+### Solving with `sympy`
 
 For the sake of completeness, we'll derive that same generizable equation using `sympy`. Returning to the problem,
 
