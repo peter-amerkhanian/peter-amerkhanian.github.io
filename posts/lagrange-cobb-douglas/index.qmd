@@ -15,7 +15,7 @@ editor:
   markdown: 
     wrap: 72
 ---
-In ["Simple Optimization in 3D"](../minima-3d/index.ipynb), I blogged about a basic optimization problem in three dimensional space. In this post, I'll look at a more complex problem that deals with kind-of abstract quantities and involves a constraint. This is also an opportunity to cover the [method of lagrange multipliers](https://en.wikipedia.org/wiki/Lagrange_multiplier) optimization strategy.
+In ["Simple Optimization in 3D"](../minima-3d/index.qmd), I blogged about a basic optimization problem in three dimensional space. In this post, I'll look at a more complex problem that deals with an equation constraint. I'll utilize the [method of lagrange multipliers](https://en.wikipedia.org/wiki/Lagrange_multiplier) optimization strategy to solve the problem.
 
 ```{r}
 #| warning: false
@@ -209,11 +209,26 @@ some substitution and algebraic manipulation:
 
 $$
 \begin{align*}
+&\begin{cases}
 L &= \frac{5.625K}{5.5} \\
 40 (\frac{5.625K}{5.5}) + 50K &= 500,000 \\
-K &= \frac{500,000}{(40 (\frac{5.625}{5.5}) + 50)} = \boxed{K = \$ 5,500} \\
-40 L + 50(5,500) &= 500,000 \\
- L &= \frac{500,000 - 50(5,500)}{40} = \boxed{L = 5,625 \, \text{labor hours}}
+\end{cases} \\
+&\begin{cases}
+L &= \frac{5.625K}{5.5} \\
+K(40 (\frac{5.625}{5.5}) + 50) &= 500,000 \\
+\end{cases} \\
+&\begin{cases}
+L &= \frac{5.625K}{5.5} \\
+K &= \frac{500,000}{(40 (\frac{5.625}{5.5}) + 50)} = 5,500
+\end{cases} \\
+&\begin{cases}
+L &= \frac{5.625 (5,500)}{5.5} = 5,625 \\
+K &= 5,500
+\end{cases} \\
+&\begin{cases}
+L &= \boxed{5,625 \, \text{labor hours}} \\
+K &= \boxed{\$ 5,500}
+\end{cases}
 \end{align*}
 $$
 

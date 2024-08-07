@@ -59,7 +59,7 @@
   <title>Production Maximization with Lagrange Mutlipliers</title>
   <dc:creator>Peter Amerkhanian</dc:creator>
   <link>https://peter-amerkhanian.com/posts/lagrange-cobb-douglas/</link>
-  <description><![CDATA[ In <a href="../minima-3d/index.ipynb">“Simple Optimization in 3D”</a>, I blogged about a basic optimization problem in three dimensional space. In this post, I’ll look at a more complex problem that deals with kind-of abstract quantities and involves a constraint. This is also an opportunity to cover the <a href="https://en.wikipedia.org/wiki/Lagrange_multiplier">method of lagrange multipliers</a> optimization strategy. ]]></description>
+  <description><![CDATA[ In <a href="../../posts/minima-3d/index.html">“Simple Optimization in 3D”</a>, I blogged about a basic optimization problem in three dimensional space. In this post, I’ll look at a more complex problem that deals with an equation constraint. I’ll utilize the <a href="https://en.wikipedia.org/wiki/Lagrange_multiplier">method of lagrange multipliers</a> optimization strategy to solve the problem. ]]></description>
   <category>R</category>
   <category>Calculus</category>
   <guid>https://peter-amerkhanian.com/posts/lagrange-cobb-douglas/</guid>
