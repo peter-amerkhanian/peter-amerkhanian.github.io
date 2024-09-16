@@ -1,0 +1,116 @@
+---
+title: "Getting census data with the ipums API"
+bibliography: "../../blog.bib"
+author: "Peter Amerkhanian"
+date: "2024-9-1"
+draft: false
+image: thumbnail.png
+engine: knitr
+categories: ['R', 'Data Management']
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: false
+    code-tools: true
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+```{r}
+library(ipumsr)
+library(dplyr)
+set_ipums_api_key(Sys.getenv("api_key"))
+```
+```{r}
+ipums_data_collections() %>%
+  filter(collection_type == "microdata",
+         api_support == TRUE)
+```
+
+```{r}
+get_sample_info(collection="usa") %>%
+  filter(stringr::str_detect(description, "ACS")) %>% 
+  arrange(desc(name)) %>% 
+  head(10)
+```
+
+
+```{r}
+
+
+xml_files <- list.files(
+  path = here::here("data"),
+  pattern = "\\.xml$",
+  full.names = TRUE)
+
+if (length(xml_files) == 1) {
+  existing_path <- here::here("data", xml_files[1])
+  data <- read_ipums_micro(existing_path)
+} else if (length(xml_files) > 1) {
+  print("ALERT, multiple extracts present...")
+} else {
+  
+  extract <- define_extract_usa(
+    description = "Alameda County Incomes by PUMA",
+    samples = c("us2022a"),
+    variables = list(
+      "COUNTYFIP",
+      "PUMA",
+      "FAMUNIT",
+      "RELATE",
+      "AGE",
+      "SEX",
+      "POVERTY",
+      "FTOTINC",
+      var_spec("STATEFIP", case_selections = "06")
+    )
+  )
+  data_path <- extract %>%
+    submit_extract() %>%
+    wait_for_extract() %>%
+    download_extract(download_dir = here::here("data"),
+                     overwrite = TRUE)
+  data <- read_ipums_micro(data_path)
+  
+}
+
+```
+Use the [2020 PUMA Names](https://www2.census.gov/geo/pdfs/reference/puma2020/2020_PUMA_Names.pdf).
+```{r}
+oak <- data %>%
+  filter(PUMA %in% c(111, 112, 113, 123))
+
+families <- oak %>%
+  filter(FTOTINC != 9999999) %>%
+  distinct(SERIAL, FAMUNIT, .keep_all = TRUE) %>% 
+  mutate(in_pov = (POVERTY <= 100) %>% as.factor)
+```
+
+```{r}
+null_dist <- families %>%
+  specify(response = in_pov, success = "TRUE") %>% 
+  hypothesize(null = "point", p=0) %>% 
+  generate(reps = 1000, type = "bootstrap") %>% 
+  calculate(stat = "prop")
+
+point_estimate <- families %>%
+  specify(response =in_pov, success = "TRUE") %>% 
+  calculate(stat = "prop")
+
+null_dist %>% visualise()
+```
+
+```{r}
+null_dist %>%
+  # calculate the confidence interval around the point estimate
+  get_confidence_interval(point_estimate = point_estimate,
+                          # at the 95% confidence level
+                          level = .95,
+                          # using the standard error
+                          type = "se")
+```
+
+
+
