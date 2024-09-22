@@ -142,16 +142,5 @@
   <pubDate>Sat, 06 Aug 2022 07:00:00 GMT</pubDate>
   <media:content url="https://peter-amerkhanian.com/posts/rent-vs-buy/thumbnail.png" medium="image" type="image/png" height="144" width="144"/>
 </item>
-<item>
-  <title>Reliable PDF Scraping with tabula-py</title>
-  <dc:creator>Peter Amerkhanian</dc:creator>
-  <link>https://peter-amerkhanian.com/posts/pdf-scraping/</link>
-  <description><![CDATA[ I’m interested in conducting a data analysis that involves the market value of single family homes in San Mateo County, California. This data can be hard to come by, but I’ve found a good county level resource – The San Mateo Association of Realtors’ <a href="https://www.samcar.org/member-resources/market-data/">“Market Data” page</a>. ]]></description>
-  <category>Python</category>
-  <category>Data Management</category>
-  <guid>https://peter-amerkhanian.com/posts/pdf-scraping/</guid>
-  <pubDate>Wed, 20 Jul 2022 07:00:00 GMT</pubDate>
-  <media:content url="https://peter-amerkhanian.com/posts/pdf-scraping/thumbnail.png" medium="image" type="image/png" height="144" width="144"/>
-</item>
 </channel>
 </rss>

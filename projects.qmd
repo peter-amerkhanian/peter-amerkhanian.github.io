@@ -8,9 +8,10 @@ format:
     toc-depth: 3
 ---  
 
-The following are some of my formal, public-facing projects:
 
-## Professional Reports & Software
+## Professional Reports and Software
+
+The following are some of my formal, public-facing projects:
 
 <i class="bi bi-newspaper"></i> **A Tale of Two Cities: Alameda and Alameda Point**  
 Peter Amerkhanian (2023)  
@@ -48,16 +49,36 @@ Tools: `pandas`.
 
 <i class="bi bi-code-square"></i> **Grade Migration Manager**  
 Peter Amerkhanian (2019)  
-Software developed for Ismael Perez Pazmiño High School via The U.S. Peace Corps</a>.   
+Software developed for Ismael Perez Pazmiño High School via The U.S. Peace Corps.   
 [Code](https://github.com/peter-amerkhanian/grade-manager){.btn .btn-outline-primary .btn-sm role="button"} 
 [Slides](https://docs.google.com/presentation/d/1c3OQMwLTboWrP0cyoQrkerRkpXzk0QYFBTg6Bycah7c/edit?usp=sharing){.btn .btn-outline-primary .btn-sm role="button"} 
 [Demo Video](https://youtu.be/C7hel3R0OKo?si=Oan6iWskowB4NTIB){.btn .btn-outline-primary .btn-sm role="button"}       
 
 **Summary**: I developed a full stack software application to migrate student grade data from a school's excel-based system into the education ministry's java application.  
 Tools: `pyautogui`, `xlwings`.
+
+
+## Teaching
+
+The following are courses and workshops that I've taught, largely at UC Berkeley:
+
+<i class="bi bi-mortarboard"></i> **Python Data Wrangling Workshop**  
+Peter Amerkhanian, Pratik Sachdeva, Tom van Nuenen, Aniket Kesari (2023)  
+[Code](https://github.com/peter-amerkhanian/grade-manager){.btn .btn-outline-primary .btn-sm role="button"}
+
+**Summary**: I led a re-design of this 3-hour, flagship Python workshop for the UC Berkeley D-Lab. It provides an introduction to basic data wrangling actions -- index, merge, group, and plot -- using `pandas` functions.
+
 ---
 
-## Academic Miscelanea
+<i class="bi bi-mortarboard"></i> **Python for MBAs**  
+Peter Amerkhanian (2023)  
+[Code](https://github.com/dlab-berkeley/HAAS-Python-Workshop){.btn .btn-outline-primary .btn-sm role="button"}
+
+**Summary**: I designed this one and a half hour workshop and taught it to students at MBA students at UC Berkeley's Haas Business School. The course directly connects `pandas` functions to equivalent workflows an intermediate Excel user would be familiar with.
+
+
+
+## Academic Course Papers
 The following are some of my course papers from graduate school:
 
 **Simulating School Desegregation in San Francisco**  

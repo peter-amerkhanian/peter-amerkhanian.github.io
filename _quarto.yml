@@ -1,6 +1,10 @@
 project:
   type: website
   output-dir: docs
+  render:
+    - "*.ipynb"
+    - "*.qmd"
+    - "!in-progress/"
 
 website:
   favicon: "profile.jpg"

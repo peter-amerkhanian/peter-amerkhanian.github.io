@@ -1,0 +1,94 @@
+<!-- ```{r}
+library(arrow)
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(tsibble)
+```
+
+
+```{r}
+data <- open_dataset("../dask-data-io/data/parquet_data")
+df <- data %>%
+  group_by(Date, Start) %>%
+  summarise(total_riders=sum(Riders)) %>% 
+  mutate(Date = ymd(Date)) %>% 
+  as_tibble()
+```
+
+```{r}
+woak_df <- df %>%
+  filter(Start == 'WOAK') %>%
+  mutate(post_gate = case_when(
+    Date > "2023-12-28" ~ 1, .default = 0)
+    ) %>%
+  filter(year(Date) >= 2020) %>% 
+  as_tsibble(index=Date)
+woak_df
+```
+```{r}
+woak_weeks <- woak_df %>%
+  index_by(Week = ~yearweek(.)) %>% 
+  summarise(weekly_riders = sum(total_riders)) %>%
+  slice(2:(n()-1))
+
+woak_model <- woak_weeks %>%
+  mutate(
+    post_gate = case_when(Week > yearweek("2023-12-28") ~ 1, .default = 0),
+    time = 1:n(),
+    post_gate_time = case_when(post_gate == 1 ~ 1, .default=0) %>% cumsum()
+    )
+woak_model
+```
+```{r}
+model <- lm(weekly_riders ~ time + post_gate + post_gate_time, data = woak_model)
+
+preds_ <- model %>% predict(woak_model, se.fit=T)
+
+counter_fact_ <- woak_model %>% mutate(post_gate_time = 0, post_gate = 0) %>% predict(model, ., se.fit=T)
+
+counter_fact$se
+
+woak_model <- woak_model %>% mutate(preds = preds_$fit,
+                                    pred_se = preds_$se,
+                                    counter_fact = counter_fact_$fit,
+                                    conter_fact_se = counter_fact_$se
+                                    )
+
+woak_model
+```
+```{r}
+library(forecast)
+woak_ts <- woak_model %>% select(weekly_riders) %>% mutate(Week = as.Date(Week))
+
+fit <- auto.arima(woak_ts, seasonal = TRUE, 
+                   stepwise = FALSE, approximation = FALSE)
+
+fit
+
+woak_model <- woak_model %>% mutate(arima_preds = fit$fitted)
+```
+
+
+```{r}
+woak_model %>% 
+  filter(Week >= yearweek("2023-06-01")) %>% 
+  ggplot(aes(x=Week, y=weekly_riders)) +
+  geom_point() +
+  geom_vline(xintercept=as.Date("2023-12-28")) +
+  geom_line(aes(x=Week, y=arima_preds), lty=2, color="red")
+```
+
+
+
+
+```{r}
+```
+
+```{r}
+
+```
+
+
+
+ -->

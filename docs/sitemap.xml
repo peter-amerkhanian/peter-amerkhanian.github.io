@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://peter-amerkhanian.com/projects.html</loc>
-    <lastmod>2024-06-21T17:24:45.647Z</lastmod>
+    <lastmod>2024-09-22T17:51:16.275Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/simple-constrained-optimization/index.html</loc>
@@ -74,6 +74,34 @@
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/time-series-matplotlib/index.html</loc>
-    <lastmod>2024-08-09T17:43:58.842Z</lastmod>
+    <lastmod>2024-09-21T17:21:16.647Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/IN_PROGRESS/oakland-pumas/test.html</loc>
+    <lastmod>2024-09-21T17:21:16.633Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/IN_PROGRESS/fare-gate-eval/test.html</loc>
+    <lastmod>2024-09-21T17:32:20.123Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/IN_PROGRESS/fare-gate-eval/test_.html</loc>
+    <lastmod>2024-09-21T17:32:32.633Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/in-progress/oakland-pumas/test.html</loc>
+    <lastmod>2024-09-21T17:21:16.633Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/in-progress/fare-gate-eval/test_.html</loc>
+    <lastmod>2024-09-21T17:32:32.633Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/in-progress/fare-gate-eval/test.html</loc>
+    <lastmod>2024-09-21T17:32:20.123Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/in-progress/fare-gate-eval/test__.html</loc>
+    <lastmod>2024-09-21T17:33:43.119Z</lastmod>
   </url>
 </urlset>
