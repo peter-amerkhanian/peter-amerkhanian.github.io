@@ -1,0 +1,112 @@
+<!-- ---
+title: Evaluating BART's West Oakland Fare Gate
+bibliography: ../../blog.bib
+author: Peter Amerkhanian
+date: 2024-6-16
+draft: true
+categories:
+  - Python
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: false
+    code-tools: true
+jupyter: python3
+---
+
+
+```{python}
+import pandas as pd
+import numpy as np
+import dask.dataframe as dd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import matplotlib
+import matplotlib.ticker as ticker
+plt.style.use('default')
+from datetime import datetime
+from typing import Tuple, Union
+from collections.abc import Iterable
+```
+
+```{python}
+df = dd.read_parquet("../dask-data-io/data/parquet_data")
+df.head()
+```
+
+```{python}
+# Change to SQL?
+df_rpd = df.groupby(['Date', 'Start', 'End'])['Riders'].sum().compute()
+```
+
+```{python}
+df_rpd.reset_index()
+```
+
+```{python}
+df_rpd = df_rpd.reset_index()
+```
+
+```{python}
+woak_fare_gate_completed = datetime(2023, 12, 28)
+```
+
+```{python}
+woak_fare_gate_completed
+```
+
+```{python}
+df_rpd['Date'] = pd.to_datetime(df_rpd['Date'])
+```
+
+```{python}
+df_rpd['WOAK_gate'] = df_rpd['Date'] >= woak_fare_gate_completed
+```
+
+```{python}
+df_rpd['Start'].unique()
+```
+
+```{python}
+from sklearn.preprocessing import StandardScaler
+```
+
+```{python}
+def isolate_station(name, df_rpd=df_rpd):
+    df_woak = df_rpd[df_rpd['Start'] == name]
+    df_woak_all = df_woak.groupby(['Date', 'Start'])['Riders'].sum().reset_index()
+    df_woak_all['WOAK_gate'] = df_woak_all['Date'] >= woak_fare_gate_completed
+    df_woak_all = df_woak_all.set_index('Date').drop(columns=['Start'])
+    scaler = StandardScaler()
+    scaler.fit(df_woak_all[['Riders']])
+    df_woak_all['Riders_std'] = scaler.transform(df_woak_all[['Riders']])[:, 0]
+    return df_woak_all
+
+def agg_station_pct(df, sample, date_start = "2023-08-01", date_end = "2024-05-01"):
+    df_agg = df.resample(sample)['Riders'].sum().pct_change()
+    df_agg = df_agg.loc[date_start:date_end]
+    return df_agg
+
+def agg_station_std(df, sample, date_start = "2023-08-01", date_end = "2024-05-01"):
+    df_agg = df.resample(sample)['Riders'].sum()
+    df_agg = df_agg.loc[date_start:date_end]
+    return df_agg
+```
+
+```{python}
+fig, ax = plt.subplots(figsize=(8, 4))
+label_other = True
+for station in ['FTVL', '12TH', '19TH', 'LAKE']:
+    if label_other:
+        agg_station_std(isolate_station(station), 'W').plot(ax=ax, color="grey", alpha=.5, label="Other Oakland Stations")
+    else:
+        agg_station_std(isolate_station(station), 'W').plot(ax=ax, color="grey", alpha=.5, label="_Hidden")
+    label_other = False
+agg_station_std(isolate_station('WOAK'), 'W').plot(ax=ax, label="WOAK")
+ax.axvline(woak_fare_gate_completed, color="black", linestyle="--", label="WOAK Fare Gates Installed")
+ax.grid(alpha=.4)
+ax.legend();
+```
+
+ -->

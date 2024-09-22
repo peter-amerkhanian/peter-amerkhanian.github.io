@@ -9,6 +9,12 @@ div.quarto-post .body {
 div.quarto-post .metadata {
     flex-basis: 15% !important;
 } */
+
+/* Fix the overflow of references */
+#refs {
+    overflow-y: scroll
+}
+
 .callout.callout-style-simple {
     padding: .4em .7em;
     border-left: 2px solid;
