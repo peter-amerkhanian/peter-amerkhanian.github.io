@@ -66,7 +66,7 @@ The following are courses and workshops that I've taught, largely at UC Berkeley
 Peter Amerkhanian, Pratik Sachdeva, Tom van Nuenen, Aniket Kesari (2023)  
 [Code](https://github.com/peter-amerkhanian/grade-manager){.btn .btn-outline-primary .btn-sm role="button"}
 
-**Summary**: I led a re-design of this 3-hour, flagship Python workshop for the UC Berkeley D-Lab. It provides an introduction to basic data wrangling actions -- index, merge, group, and plot -- using `pandas` functions.
+**Summary**: I led a re-design of this 3-hour, flagship Python workshop for the UC Berkeley D-Lab. It provides an introduction to basic data wrangling actions -- index, merge, group, and plot -- using `pandas`.
 
 ---
 
