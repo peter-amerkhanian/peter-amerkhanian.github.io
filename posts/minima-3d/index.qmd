@@ -168,7 +168,8 @@ f^* &= \sqrt{x^2 + 6x + y^2 + 10y + z^2 + 34} \\
 &= \sqrt{x^2 + 6x + y^2 + 10y + (x^2 + y^2) + 34} \\
 &= \sqrt{2x^2 + 6x + 2y^2 + 10y + 34}
 \end{align}
-$$ Note that minimizing $f^*$ is going to be equivalent to minimizing
+$$
+Note that minimizing $f^*$ is going to be equivalent to minimizing
 $(f^*)^2$,[^1] so let's focus on the more simple equation,
 
 [^1]: This is beyond the scope of this post, but based on the inequality
@@ -195,9 +196,12 @@ plot_ly(x = x, y = y, z = z_p, type = "surface", colorscale="coolwarm") %>%
 ### Minimizing the Objective Function
 
 To find the point $x^*, y^*$ that minimizes this parameter surface,
-we'll first find the critical points. In the bivariate setting, this implies finding the derivative then setting that equal to 0. In the multivariate setting, we find the gradient vector: $$
+we'll first find the critical points. In the bivariate setting, this implies finding the derivative then setting that equal to 0. In the multivariate setting, we find the gradient vector:
+$$
  \nabla (f^*)^2 = \left< 2 x + 3, 2 y + 5 \right>
-$$ and set that equal to zero: $$
+$$
+and set that equal to zero:
+$$
 \begin{align*}
  \nabla (f^*)^2  &= 0 \\
 &\begin{cases}
@@ -275,7 +279,7 @@ plot_ly(x = x, y = y, z = z, type = "surface") %>%
 ```
 
 Thus on the surface $z^2 = x^2 + y^2$, the two closest points to
-$P=(-2, -5, 0)$ are:\
+$P=(-2, -5, 0)$ are:
 $$
 (-\frac{3}{2},-\frac{5}{2}, \frac{\sqrt{34}}{2}) , (-\frac{3}{2},-\frac{5}{2}, -\frac{\sqrt{34}}{2}) 
 $$
