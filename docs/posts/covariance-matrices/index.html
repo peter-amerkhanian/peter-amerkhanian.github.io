@@ -847,10 +847,10 @@ T_\text{mean}: \mathbb{R}^n \rightarrow \mathbb{R}^1 \quad \text{defined by} \qu
 \right]_{n \times 2} =
 \left[
 \begin{matrix}
-    \sum_{i=1}^n \frac{x}{n}   &amp; \sum_{i=1}^n \frac{y}{n}   \\
-    \sum_{i=1}^n \frac{x}{n}   &amp; \sum_{i=1}^n \frac{y}{n}  \\
+    \sum_{i=1}^n \frac{x_i}{n}   &amp; \sum_{i=1}^n \frac{y_i}{n}   \\
+    \sum_{i=1}^n \frac{x_i}{n}   &amp; \sum_{i=1}^n \frac{y_i}{n}  \\
     \vdots   &amp; \vdots   \\
-    \sum_{i=1}^n \frac{x}{n}   &amp; \sum_{i=1}^n \frac{y}{n}   \\
+    \sum_{i=1}^n \frac{x_i}{n}   &amp; \sum_{i=1}^n \frac{y_i}{n}   \\
 \end{matrix}
 \right]_{n \times 2}
 = \left[
@@ -909,12 +909,12 @@ n^{-1} \mathbf{1}_{n \times 1} \mathbf{1}_{n \times 1}^\intercal X_{n \times 2} 
 \right]_{n \times 2} \\
 &amp;= \left[
 \begin{matrix}
-    \sum_{i=1}^n \frac{x}{n}   &amp; \sum_{i=1}^n \frac{y}{n}   \\
-    \sum_{i=1}^n \frac{x}{n}   &amp; \sum_{i=1}^n \frac{y}{n}  \\
+    \sum_{i=1}^n \frac{x_i}{n}   &amp; \sum_{i=1}^n \frac{y_i}{n}   \\
+    \sum_{i=1}^n \frac{x_i}{n}   &amp; \sum_{i=1}^n \frac{y_i}{n}  \\
     \vdots   &amp; \vdots   \\
-    \sum_{i=1}^n \frac{x}{n}   &amp; \sum_{i=1}^n \frac{y}{n}   \\
+    \sum_{i=1}^n \frac{x_i}{n}   &amp; \sum_{i=1}^n \frac{y_i}{n}   \\
 \end{matrix}
-\right]_{n \times 2} \\
+\right]_{n \times 2}  \\
 &amp;= \left[
 \begin{matrix}
     \bar{\mathbf{x}}   &amp; \bar{\mathbf{y}}   \\
