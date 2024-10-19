@@ -9,9 +9,22 @@ format:
 ---  
 
 
-## Professional Reports and Software
+## Professional Reports, Dashboards, & Software
 
 The following are some of my formal, public-facing projects:
+
+<i class="bi bi-file-bar-graph"></i> **Interactive CalWORKs Resource Model**  
+Stephanie Peng, Peter Amerkhanian, Joaquín Carbonell (2024)  
+Dashboard for The California Department of Social Services.  
+[Live Report](https://www.cdss.ca.gov/inforesources/calworks-summary/program-services-utilization/poverty-measures){.btn .btn-outline-primary .btn-sm role="button"}
+[Dashboard](https://public.tableau.com/app/profile/peter.amerkhanian7533/viz/CalWORKsResourceModel/CalWORKsResourceModel){.btn .btn-outline-primary .btn-sm role="button"}
+[Static Report](https://drive.google.com/file/d/1xOP5gBiWarYX0LPAnV_fZAT6McTSUm9M/view?usp=sharing){.btn .btn-outline-primary .btn-sm role="button"}  
+
+**Summary**: We produce an interactive tool to model the anti-poverty effects of state/federal supports on families participating in CalWORKs.   
+*Contribution*: Co-wrote R code-base, developed Tableau visual.  
+Tools: `ipumsr`, Tableau.
+
+---
 
 <i class="bi bi-newspaper"></i> **A Tale of Two Cities: Alameda and Alameda Point**  
 Peter Amerkhanian (2023)  
@@ -33,6 +46,7 @@ Report for The UC Berkeley Institute for Young Americans.
 [Data Appendix](https://youngamericans.berkeley.edu/wp-content/uploads/2023/02/Report_Benchmarking-The-Zillow-Transaction-and-Assessment-Dataset-ZTRAX_final.pdf){.btn .btn-outline-primary .btn-sm role="button"}
 
 **Summary**: We utilize 12 million property records in California to estimate the tax discount effects of Proposition 13 across property types.   
+*Contribution*: Co-wrote R code-base, co-developed statistical design, wrote report draft.  
 Tools: `tidyverse`, `marginaleffects`.
 
 ---
@@ -49,7 +63,7 @@ Tools: `pandas`.
 
 <i class="bi bi-code-square"></i> **Grade Migration Manager**  
 Peter Amerkhanian (2019)  
-Software developed for Ismael Perez Pazmiño High School via The U.S. Peace Corps.   
+Software developed for Colegio Ismael Perez Pazmiño via The U.S. Peace Corps.   
 [Code](https://github.com/peter-amerkhanian/grade-manager){.btn .btn-outline-primary .btn-sm role="button"} 
 [Slides](https://docs.google.com/presentation/d/1c3OQMwLTboWrP0cyoQrkerRkpXzk0QYFBTg6Bycah7c/edit?usp=sharing){.btn .btn-outline-primary .btn-sm role="button"} 
 [Demo Video](https://youtu.be/C7hel3R0OKo?si=Oan6iWskowB4NTIB){.btn .btn-outline-primary .btn-sm role="button"}       

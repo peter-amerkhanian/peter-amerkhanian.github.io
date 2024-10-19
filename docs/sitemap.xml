@@ -2,67 +2,67 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://peter-amerkhanian.com/projects.html</loc>
-    <lastmod>2024-10-09T15:24:42.137Z</lastmod>
+    <lastmod>2024-10-19T15:55:15.338Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/minima-3d/index.html</loc>
     <lastmod>2024-10-09T15:23:58.309Z</lastmod>
   </url>
   <url>
-    <loc>https://peter-amerkhanian.com/index.html</loc>
-    <lastmod>2024-09-22T17:49:25.467Z</lastmod>
-  </url>
-  <url>
-    <loc>https://peter-amerkhanian.com/posts/time-series-matplotlib/index.html</loc>
-    <lastmod>2024-09-22T18:05:50.218Z</lastmod>
-  </url>
-  <url>
-    <loc>https://peter-amerkhanian.com/posts/rent-vs-buy/index.html</loc>
-    <lastmod>2024-07-28T17:08:30.283Z</lastmod>
-  </url>
-  <url>
-    <loc>https://peter-amerkhanian.com/posts/newtons-method/index.html</loc>
-    <lastmod>2024-07-27T03:10:39.514Z</lastmod>
-  </url>
-  <url>
-    <loc>https://peter-amerkhanian.com/posts/iterated-expectations/index.html</loc>
-    <lastmod>2024-07-27T18:06:16.704Z</lastmod>
-  </url>
-  <url>
-    <loc>https://peter-amerkhanian.com/posts/covariance-matrices/index.html</loc>
-    <lastmod>2024-10-09T15:31:31.804Z</lastmod>
-  </url>
-  <url>
-    <loc>https://peter-amerkhanian.com/memos/SF-Arrests/index.html</loc>
-    <lastmod>2024-08-04T16:54:41.873Z</lastmod>
-  </url>
-  <url>
-    <loc>https://peter-amerkhanian.com/memos/SIR/index.html</loc>
-    <lastmod>2024-10-09T15:34:44.673Z</lastmod>
-  </url>
-  <url>
-    <loc>https://peter-amerkhanian.com/posts/dask-data-io/index.html</loc>
-    <lastmod>2024-07-28T17:48:56.386Z</lastmod>
-  </url>
-  <url>
-    <loc>https://peter-amerkhanian.com/posts/linear-approximation-3d/index.html</loc>
-    <lastmod>2024-07-28T17:51:42.170Z</lastmod>
-  </url>
-  <url>
-    <loc>https://peter-amerkhanian.com/posts/overfitting/index.html</loc>
-    <lastmod>2024-07-28T17:20:51.045Z</lastmod>
-  </url>
-  <url>
-    <loc>https://peter-amerkhanian.com/posts/simple-constrained-optimization/index.html</loc>
-    <lastmod>2024-07-28T17:09:41.005Z</lastmod>
+    <loc>https://peter-amerkhanian.com/memos.html</loc>
+    <lastmod>2024-07-06T20:20:36.594Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/blog.html</loc>
     <lastmod>2024-07-31T03:11:54.122Z</lastmod>
   </url>
   <url>
-    <loc>https://peter-amerkhanian.com/memos.html</loc>
-    <lastmod>2024-07-06T20:20:36.594Z</lastmod>
+    <loc>https://peter-amerkhanian.com/posts/simple-constrained-optimization/index.html</loc>
+    <lastmod>2024-07-28T17:09:41.005Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/overfitting/index.html</loc>
+    <lastmod>2024-07-28T17:20:51.045Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/linear-approximation-3d/index.html</loc>
+    <lastmod>2024-07-28T17:51:42.170Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/dask-data-io/index.html</loc>
+    <lastmod>2024-07-28T17:48:56.386Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/memos/SIR/index.html</loc>
+    <lastmod>2024-10-09T15:40:04.204Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/memos/SF-Arrests/index.html</loc>
+    <lastmod>2024-08-04T16:54:41.873Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/covariance-matrices/index.html</loc>
+    <lastmod>2024-10-09T15:31:31.804Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/iterated-expectations/index.html</loc>
+    <lastmod>2024-07-27T18:06:16.704Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/newtons-method/index.html</loc>
+    <lastmod>2024-07-27T03:10:39.514Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/rent-vs-buy/index.html</loc>
+    <lastmod>2024-07-28T17:08:30.283Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/time-series-matplotlib/index.html</loc>
+    <lastmod>2024-09-22T18:05:50.218Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/index.html</loc>
+    <lastmod>2024-10-19T15:56:01.611Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/lagrange-cobb-douglas/index.html</loc>
