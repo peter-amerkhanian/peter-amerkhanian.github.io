@@ -2,14 +2,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.551">
+<meta name="generator" content="quarto-1.5.57">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Peter Amerkhanian">
 <meta name="dcterms.date" content="2024-04-12">
 
-<title>Benchmarking parquet and dask</title>
+<title>Benchmarking parquet and &lt;code&gt;dask&lt;/code&gt; – Home</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -35,7 +35,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -135,7 +135,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -154,7 +154,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
-          <div class="quarto-navbar-tools">
+            <div class="quarto-navbar-tools">
 </div>
       </div> <!-- /container-fluid -->
     </nav>
@@ -273,7 +273,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <section id="scraping-our-data" class="level2">
 <h2 class="anchored" data-anchor-id="scraping-our-data">Scraping our data</h2>
 <p>Anyways, to start, here is the homepage of the BART data portal:</p>
-<div id="fig-zero" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-zero" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-zero-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1: BART data portal
@@ -303,7 +303,7 @@ Figure&nbsp;1: BART data portal
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Failed to retrieve the webpage"</span>)</span></code></pre></div>
 </div>
 <p>The page is laid out as follows:</p>
-<div id="fig-pointfive" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-pointfive" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-pointfive-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2: Origin-destination pairing data
@@ -460,10 +460,9 @@ Total size of data: 201.809122 mega-bytes</code></pre>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>data.columns <span class="op">=</span> [<span class="st">'Date'</span>, <span class="st">'Hour'</span>, <span class="st">'Start'</span>, <span class="st">'End'</span>, <span class="st">'Riders'</span>]</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>data</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
-<div>
 <div><strong>Dask DataFrame Structure:</strong></div>
 
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
@@ -529,7 +528,6 @@ Total size of data: 201.809122 mega-bytes</code></pre>
 <div>Dask Name: operation, 2 expressions</div>
 </div>
 </div>
-</div>
 <p>…</p>
 <p>Now I’ll establish a subdirectory in <code>data</code> that’s just for the parquet directory</p>
 <div id="cell-27" class="cell" data-execution_count="13">
@@ -573,7 +571,7 @@ Total size of data: 201.809122 mega-bytes</code></pre>
 <span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>fig.savefig(<span class="st">'fig1.png'</span>, dpi<span class="op">=</span><span class="dv">300</span>)</span></code></pre></div>
 </details>
 <div class="cell-output cell-output-display">
-<div id="fig-1" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-1" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;3: Storage Comparison: .csv.gz versus parquet
@@ -620,10 +618,9 @@ Figure&nbsp;3: Storage Comparison: .csv.gz versus parquet
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>df.head()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="21">
 <div>
-<div>
 
 
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
@@ -678,7 +675,6 @@ Figure&nbsp;3: Storage Comparison: .csv.gz versus parquet
 </tbody>
 </table>
 
-</div>
 </div>
 </div>
 </div>
@@ -763,7 +759,7 @@ Figure&nbsp;3: Storage Comparison: .csv.gz versus parquet
 <span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>fig.savefig(<span class="st">'fig2.png'</span>, dpi<span class="op">=</span><span class="dv">300</span>)</span></code></pre></div>
 </details>
 <div class="cell-output cell-output-display">
-<div id="fig-2" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-2" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;4: Storage Comparison: .csv.gz versus parquet
@@ -873,7 +869,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {

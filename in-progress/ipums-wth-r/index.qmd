@@ -22,11 +22,76 @@ editor:
 ```{r}
 #| output: false
 library(ipumsr)
+library(tidycensus)
+library(ggplot2)
 library(dplyr)
-# Note -- I store my ipums api key in the .Renviron file
-set_ipums_api_key(Sys.getenv("api_key"))
+library(sf)
 ```
 
+```{r}
+#| output: false
+# Note -- I store my ipums api key in the .Renviron file
+set_ipums_api_key(Sys.getenv("ipums_api_key"))
+# Note -- I store my census api key in the .Renviron file
+census_api_key(Sys.getenv("census_api_key"))
+```
+```{r}
+# Get median income data for Alameda County census tracts
+alameda_income <- get_acs(
+  geography = "tract",
+  variables = "B19013_001", # Median household income
+  state = "CA",
+  county = "Alameda",
+  geometry = TRUE, # Download geometries for spatial plotting
+  year = 2022, # Year of the ACS
+  survey = "acs5" # 1-year ACS data
+)
+
+# View the data
+head(alameda_income)
+```
+```{r}
+# Plot median income as a heatmap
+
+x_limits <- c(-122.4, -122.0)  # Longitude limits
+y_limits <- c(37.65, 37.91)
+
+ggplot(alameda_income) +
+  geom_sf(aes(fill = estimate), color = NA, alpha=.9) + # `estimate` contains median income
+  scale_fill_viridis_c(option = "plasma", name = "Median Income") + # Color scale
+  labs(
+    title = "Median Household Income by Census Tract in Alameda County, CA",
+    subtitle = "American Community Survey 5-Year Estimates",
+    caption = "Source: U.S. Census Bureau"
+  ) +
+  coord_sf(xlim = x_limits, ylim = y_limits, expand = FALSE) + 
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major = element_line(color = "gray80")
+  )
+
+```
+```{r}
+# Retrieve poverty data for Oakland (place level)
+oakland_stats <- get_acs(
+  geography = "place",
+  variables = c(
+    median_hh_income = "B19013_001", # Median household income
+    total_pop = "B17001_001",  # Total population for poverty status determination
+    below_poverty = "B17001_002"  # Population below the poverty level
+  ),
+  state = "CA",
+  year = 2022,  # Adjust the year for ACS 5-year estimates
+  survey = "acs1"  # Use 5-year ACS estimates
+)
+
+oakland_stats <- oakland_stats %>% tibble() %>% filter(GEOID == '0653000')
+oakland_stats
+```
+
+
+I often want to reference 
 ## What is IPUMS?
 
 > IPUMS provides census and survey data from around the world integrated
@@ -58,12 +123,6 @@ follows:
 get_sample_info(collection="usa") %>% arrange(desc(name)) %>% head(10)
 ```
 
-IPUMS CPS: Current Population Survey microdata including basic monthly
-surveys and supplements from 1962 to the present. \[\@\]
-
-```{r}
-get_sample_info(collection="cps") %>% arrange(desc(name)) %>% head(10)
-```
 
 ```{r}
 get_sample_info(collection="usa") %>%
@@ -72,33 +131,6 @@ get_sample_info(collection="usa") %>%
   head(10)
 ```
 
-
-```{r}
-#| eval: false
-# Define an extract
-extract <- define_extract_usa(
-    description = "Alameda County Incomes by PUMA",
-    samples = c("us2022a"),
-    variables = list(
-      "COUNTYFIP",
-      "PUMA",
-      "FAMUNIT",
-      "RELATE",
-      "AGE",
-      "SEX",
-      "POVERTY",
-      "FTOTINC",
-      var_spec("STATEFIP", case_selections = "06")
-    )
-  )
-# Submit the extract request to ipums and download locally
-data_path <- extract %>%
-    submit_extract() %>%
-    wait_for_extract() %>%
-    download_extract(download_dir = here::here("data"),
-                     overwrite = TRUE)
-  data <- read_ipums_micro(data_path)
-```
 I'll define a function, `retrieve_alameda_sample()` that accomplishes that and only run the IPUMS request if I don't already have the data locally.
 
 ```{r}
@@ -116,6 +148,8 @@ retrieve_alameda_sample <- function(){
       "SEX",
       "POVERTY",
       "FTOTINC",
+      "HHINCOME",
+      "INCTOT",
       var_spec("STATEFIP", case_selections = "06")
     )
   )
@@ -153,10 +187,25 @@ library(dplyr)
 oak <- data %>%
   filter(PUMA %in% c(111, 112, 113, 123))
 
-families <- oak %>%
-  filter(FTOTINC != 9999999) %>%
-  distinct(SERIAL, FAMUNIT, .keep_all = TRUE) %>%
+households <- oak %>%
+  filter(! HHINCOME %in% c(9999999, 0, 9999998)) %>%
+  # distinct(SERIAL, .keep_all = TRUE) %>%
   mutate(in_pov = (POVERTY <= 100) %>% as.factor)
+```
+
+```{r}
+households %>% select(HHINCOME) %>% summary()
+```
+
+
+```{r}
+library(ggstats)
+weighted.median(households$HHINCOME, households$HHWT)
+```
+
+
+```{r}
+oakland_stats
 ```
 
 

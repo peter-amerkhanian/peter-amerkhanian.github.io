@@ -9,7 +9,7 @@
 <link>https://peter-amerkhanian.com/blog.html</link>
 <atom:link href="https://peter-amerkhanian.com/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Peter Amerkhanian&#39;s Blog</description>
-<generator>quarto-1.4.551</generator>
+<generator>quarto-1.5.57</generator>
 <lastBuildDate>Sun, 16 Jun 2024 07:00:00 GMT</lastBuildDate>
 <item>
   <title>Building Time-series Utilities for matplotlib</title>
