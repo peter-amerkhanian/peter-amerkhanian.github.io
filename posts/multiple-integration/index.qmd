@@ -1,5 +1,5 @@
 ---
-title: "Double Integrals in Probability"
+title: "Integrals in Probability"
 bibliography: "../../blog.bib"
 author: "Peter Amerkhanian"
 date: "2024-4-14"

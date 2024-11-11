@@ -78,15 +78,14 @@ The following are courses and workshops that I've taught, largely at UC Berkeley
 
 <i class="bi bi-mortarboard"></i> **Python Data Wrangling Workshop**  
 Peter Amerkhanian, Pratik Sachdeva, Tom van Nuenen, Aniket Kesari (2023)  
-[Code](https://github.com/peter-amerkhanian/grade-manager){.btn .btn-outline-primary .btn-sm role="button"}
+[Code](https://github.com/dlab-berkeley/Python-Data-Wrangling/tree/dda0513ab19cf802d82ee76b793038a958d8fc15){.btn .btn-outline-primary .btn-sm role="button"}
 
-**Summary**: I led a re-design of this 3-hour, flagship Python workshop for the UC Berkeley D-Lab. It provides an introduction to basic data wrangling actions -- index, merge, group, and plot -- using `pandas`.
-
+**Summary**: I led a re-design of this 3-hour, flagship Python workshop for the UC Berkeley D-Lab. It provides an introduction to basic data wrangling actions -- index, merge, group, and plot -- using `pandas`.  
 ---
 
 <i class="bi bi-mortarboard"></i> **Python for MBAs**  
 Peter Amerkhanian (2023)  
-[Code](https://github.com/dlab-berkeley/HAAS-Python-Workshop){.btn .btn-outline-primary .btn-sm role="button"}
+[Code](https://github.com/dlab-berkeley/HAAS-Python-Workshop/tree/72a719d13a974806d57a5278748f1083159ebf2e){.btn .btn-outline-primary .btn-sm role="button"}
 
 **Summary**: I designed this one and a half hour workshop and taught it to students at MBA students at UC Berkeley's Haas Business School. The course directly connects `pandas` functions to equivalent workflows an intermediate Excel user would be familiar with.
 

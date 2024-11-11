@@ -1,5 +1,5 @@
 ---
-title: "How I work with census data"
+title: "Working with IPUMS microdata"
 bibliography: "../../blog.bib"
 author: "Peter Amerkhanian"
 date: "2024-9-1"
@@ -23,37 +23,77 @@ editor:
 #| output: false
 library(dplyr)
 library(ggplot2)
+# Statistics
 library(modelsummary)
-library(ggstats)
 library(srvyr)
-
+library(survey)
+# Webscraping
+library(httr)
+library(rvest)
+library(readr)
+library(glue)
 ```
 
 
+What is the median household income in Oakland, California?
 
-I often want to reference 
+Answering that question is pretty straightforward using the census. Here I'll load the R package `tidycensus`, set an API key for accessing the census:
+
+```{r}
+#| output: false
+#| warning: false
+library(tidycensus)
+census_api_key(Sys.getenv("census_api_key"))
+```
+Then, I'll query the median household income variable, using the 2022 1-year American Community Survey sample. I'll throw in the total population variable for good measure:
+
+```{r}
+#| warning: false
+
+oakland_stats <- get_acs(
+  geography = "place",
+  variables = c(
+    # Median household income
+    median_hh_income = "B19013_001",
+    # Total population for poverty status determination
+    total_pop = "B17001_001"
+  ),
+  state = "CA",
+  year = 2022,
+  survey = "acs1"
+)
+oakland_stats <- oakland_stats %>% filter(GEOID == '0653000')
+oakland_stats %>% select(c(variable, estimate))
+```
+
+Done! This is an example of retrieving aggregate census data -- in this case a statistic describing the population of Oakland. This is very useful, and I reccomend [@walker_analyzing_2023] for a comprehsive treatment of use cases, but what if instead of aggregate census data, I wanted to see *individual-level* census data, as-in, each row is an individual person? That entails accessing census microdata, a slightly more complicated process that I'll cover in this blog post. I want to note that some of the points I cover here are things I learned from a coworker, [Bert Wilden](https://www.bwilden.com/) (thanks Bert!).
 
 ## Microdata via IPUMS
 
-> IPUMS provides census and survey data from around the world integrated
-> across time and space. IPUMS integration and documentation makes it
-> easy to study change, conduct comparative research, merge information
-> across data types, and analyze individuals within family and community
-> contexts. Data and services available free of charge. -- \[\@\]
+One of the most popular sources for downloading census microdata is the
+University of Minesota's Integrated Public Use Microdata Series (IPUMS).
+The IPUMS team provides the following products, all for free! - A
+centralized API for downloading census microdata - Comprehensive
+documentation for working with census microdata - Harmonized variables
+across time.
 
+[@walker_analyzing_2023, chapter 9].
 
-[@walker_analyzing_2023, chapter 9]
-
-ipums r is cool
+Here I'll load the `ipumsr` library and set an API key for submitting
+requests.
 
 ```{r}
 #| output: false
 library(ipumsr)
-# Note -- I store my ipums api key in the .Renviron file
 set_ipums_api_key(Sys.getenv("ipums_api_key"))
 ```
 
-What's available?
+The [`ipumsr` website](https://tech.popdata.org/ipumsr/) provides
+details on what degree of support the package has for various IPUMS
+products, though it's also possible to check using the
+`ipums_data_collections()` function. I prefer the function so that I can
+see exactly what code I'll need to plug into the API (see
+`api_support`).
 
 ```{r}
 ipums_data_collections() %>%
@@ -61,12 +101,14 @@ ipums_data_collections() %>%
   arrange(desc(collection_type))
 ```
 
+For any analysis of populations in the U.S., the IPUMS USA (annual
+surveys) and IPUMS CPS (monthly surveys) collections are of particular
+interest. I'll look at IPUMS USA:
 
-For analysis of populations in the U.S., the IPUMS USA and IPUMS CPS collections are of particular interest:
-
-IPUMS USA: IPUMS USA collects, preserves and harmonizes U.S. census
-microdata and provides easy access to this data with enhanced
-documentation. Data includes decennial censuses from 1790 to 2010 and American Community Surveys (ACS) from 2000 to the present [@ruggles_ipums_2024].
+> IPUMS USA collects, preserves and harmonizes U.S. census microdata and
+> provides easy access to this data with enhanced documentation. Data
+> includes decennial censuses from 1790 to 2010 and American Community
+> Surveys (ACS) from 2000 to the present [@ruggles_ipums_2024].
 
 We can check out the newest products they have in the USA collection as
 follows:
@@ -75,19 +117,12 @@ follows:
 get_sample_info(collection="usa") %>% arrange(desc(name)) %>% head(5)
 ```
 
-
-```{r}
-get_sample_info(collection="usa") %>%
-  filter(stringr::str_detect(description, "ACS")) %>%
-  arrange(desc(name)) %>%
-  head(5)
-```
-
 ## An IPUMS USA example
 
 What is the median household income in Oakland, California?
 
-I'll define a function, `retrieve_ca_sample()` that accomplishes that and only run the IPUMS request if I don't already have the data locally.
+I'll define a function, `retrieve_ca_sample()` that accomplishes that
+and only run the IPUMS request if I don't already have the data locally.
 
 ```{r}
 retrieve_ca_sample <- function(sample){
@@ -97,14 +132,13 @@ retrieve_ca_sample <- function(sample){
     samples = c(sample),
     variables = list(
       "PUMA",
-      "FAMUNIT",
-      "RELATE",
       "AGE",
       "SEX",
       "EDUC",
-      "POVERTY",
       "HHINCOME",
       "INCTOT",
+      "REPWT",
+      "REPWTP",
       var_spec("STATEFIP", case_selections = "06")
     )
   )
@@ -118,7 +152,9 @@ retrieve_ca_sample <- function(sample){
   }
 ```
 
-Now I will run the retrieval conditionally, so that if I already have the file, I don't re-download it
+Now I will run the retrieval conditionally, so that if I already have
+the file, I don't re-download it
+
 ```{r}
 local_ipums_extracts <- list.files(
   path = here::here('data'),
@@ -132,30 +168,136 @@ if (length(local_ipums_extracts) > 0) {
   data <- retrieve_ca_sample("us2022a")
 }
 ```
-### Small geographies in the ACS
-Use the [2020 PUMA
-Names](https://www2.census.gov/geo/pdfs/reference/puma2020/2020_PUMA_Names.pdf).
 
+We will return to replicate weights later.
 
-The smallest geographic area explicitly identified in the microdata is public use microdata area (PUMA), a geographic area defined based on population. Each PUMA includes about 100,000 residents. IPUMS geographers are sometimes able to infer other small geographic areas, such as city, metro area, and county, from PUMA, depending on how the boundaries of PUMAs and these other geographic areas correspond. As a result, some cities, metro areas, and counties are not able to be identified in the microdata.
+```{r}
+data_no_rep <- data %>%
+  select(-starts_with("REPWT"))
+data_no_rep %>%
+  head()
+```
+
+### Geographies in ACS microdata
+
+The smallest geographic area explicitly identified in the microdata is
+public use microdata area (PUMA), a geographic area defined based on
+population. Each PUMA includes about 100,000 residents. IPUMS
+geographers are sometimes able to infer other small geographic areas,
+such as city, metro area, and county, from PUMA, depending on how the
+boundaries of PUMAs and these other geographic areas correspond. As a
+result, some cities, metro areas, and counties are not able to be
+identified in the microdata.
 https://forum.ipums.org/t/how-can-i-pull-data-at-the-zip-code-or-city-level/5650/2
 
+What are PUMAS?
+
+GEOCORR
+
+![Geocorr 2022](geocorr.png){width="80%"}
+
+The Geocorr (geographic correspondence engine) application generates
+files and/or reports — called correlation lists — showing relationships
+between two or more geographic coverages in the United States.
+
+For example, suppose you have county-level data for California and would
+like to convert that data to the ZIP code level. Geocorr can show how
+each county relates to the ZIP code(s) that intersect it. It can tell
+you, for each of those ZIP/county intersections, what the size of that
+intersection is and what portion of the ZIP's total population is in
+that intersection.
+https://mcdc.missouri.edu/applications/docs/geocorr2022-help.html
+
+PUMAs are typically completely inside of counties, but they sometimes
+cross them. GEO Corr allows you to "crosswalk." If a puma crosses a
+county line, geocorr gives you a crosswalk with every Puma-county combo
+that exists. There's an allocation factor for each Puma that shows how
+much it should allocated, e.g. .3, .7. You can weight it by household.
+You can also cross walk to places, metro areas. Puma-\>Place.
+
+Here I'll define a function, `geocorr_2022()` that queries GEOCORR 2022
+and retrieves a .csv file establishing the relationships between
+geographies in California.
+
+```{r}
+#| code-fold: true
+geocorr_2022 <- function(state, geo_1, geo_2, weight_var) {
+  base_url <- "https://mcdc.missouri.edu"
+  params <- glue(
+    "cgi-bin/broker?_PROGRAM=apps.geocorr2022.sas&",
+    "_SERVICE=MCDC_long&_debug=0&",
+    "state={state}&g1_={geo_1}&g2_={geo_2}&wtvar={weight_var}&",
+    "nozerob=1&fileout=1&filefmt=csv&lstfmt=txt&title=&",
+    "counties=&metros=&places=&oropt=&latitude=&longitude=&",
+    "distance=&kiloms=0&locname="
+  )
+  initial_url <- params %>% url_absolute(base = base_url)
+  initial_response <- GET(initial_url)
+  html_content <- content(initial_response, as = "text")
+  parsed_html <- read_html(html_content)
+  # Extract the one link
+  csv_url <- parsed_html %>%
+    html_node("a") %>%     # Assuming there is only one link on the page
+    html_attr("href") %>%
+    stringr::str_trim() %>%
+    url_absolute(base = base_url) # Convert to absolute URL if necessary
+  csv_data <- read_csv(csv_url)
+  return(csv_data)
+}
+```
+
+We'll use that function to establish the relationships between
+California's 2022 PUMAs and places, using individual population to
+weight the relationships.
+
+```{r}
+#| output: false
+csv_data <- geocorr_2022("Ca06", "puma22", "place", "pop20")
+```
+
+With that, we can whether Oakland can be represented as a collection of
+PUMAs, and, if so, which PUMAs make up the city.
+
+```{r}
+csv_data %>%
+  select(-c(state, stab, place)) %>%
+  filter(PlaceName == 'Oakland city, CA')
+```
+
+The AFACT (allocation factor) column shows the proportion of the source
+area contained in the target area -- this case the proportion of the
+PUMA population that belongs to Oakland. In this case, 100% of the
+populations in PUMAs 111, 112, 113, and 123 belong to Oakland, and 0% of
+PUMA 114. To be clear, GEOCORR believes that 9 individuals from 114 do
+live in Oakland, but based on the AFACT I'll feel comfortable dropping
+that PUMA.[^1]
+
+[^1]: Were the AFACT higher, e.g. 1%, I would randomly sample 1% of the
+    individuals from that PUMA and include them in my Oakland sample.
 
 ```{r}
 oakland_pumas <- c(111, 112, 113, 123)
-oak <- data %>%
+oak <- data_no_rep %>%
   filter(PUMA %in% oakland_pumas)
 oak %>% head()
 ```
 
 ### Granularity and weights in the ACS
 
-SERIAL is an identifying number unique to each household record in a given sample. All person records are assigned the same serial number as the household record that they follow. (Person records also have their own unique identifiers - see PERNUM.) 
+> `SERIAL` is an identifying number unique to each household record in a
+> given sample. All person records are assigned the same serial number
+> as the household record that they follow. (Person records also have
+> their own unique identifiers - see `PERNUM.`)
 
-**A combination of SAMPLE and SERIAL provides a unique identifier for every household in the IPUMS**;  
-**the combination of SAMPLE, SERIAL, and PERNUM uniquely identifies every person in the database.** https://usa.ipums.org/usa-action/variables/SERIAL
+Households: The combination of `SAMPLE` and `SERIAL` provides a unique
+identifier for every household in the IPUMS\
+Individuals: The combination of `SAMPLE`, `SERIAL`, and `PERNUM`
+provides a unique identifier for every person in the IPUMS\
+https://usa.ipums.org/usa-action/variables/SERIAL
 
 ```{r}
+#| label: tbl-granularity
+#| tbl-cap: "Oakland Dataset Granularity by PUMA"
 oak %>% group_by(PUMA) %>% summarise(
   n_rows = n(),
   n_individuals = n_distinct(SAMPLE, SERIAL, PERNUM),
@@ -163,39 +305,17 @@ oak %>% group_by(PUMA) %>% summarise(
   )
 ```
 
-Thus, `oak` is at the individual level. Here I'll make a `oak_households` dataframe that is at the household level:
+Thus, `oak` is at the individual level. Here I'll make a
+`oak_households` dataframe that is at the household level:
 
 ```{r}
-oak_households <- oak %>%
-  distinct(SAMPLE, SERIAL, .keep_all = TRUE)
+oak_households <- oak %>% distinct(SAMPLE, SERIAL, .keep_all = TRUE)
 ```
-
-Now that I have the households-level dataset, I'll look at how we define household income:
-
-INCTOT reports each respondent's total pre-tax personal income or losses from all sources for the previous year. The censuses collected information on income received from these sources during the previous calendar year; [...] the reference period was the past 12 months.
-https://usa.ipums.org/usa-action/variables/INCTOT
-
-HHINCOME reports the total money income of all household members age 15+ during the previous year. The amount should equal the sum of all household members' individual incomes, as recorded in the person-record variable INCTOT. https://usa.ipums.org/usa-action/variables/HHINCOME
-
-Missing variables--  
-For both INCTOT and HHINCOME,
-9999999 = N/A
-For INCTOT:
-9999998 = Unknown
-
-
-
-```{r}
-households_w_income <- oak_households %>% 
-  filter(HHINCOME != 9999999,
-         HHINCOME >= 0)
-```
-
-
 
 ```{r}
 #| label: tbl-example-hh
 #| tbl-cap: "An example household"
+#| code-fold: true
 
 household_serials <- oak %>%
   group_by(SERIAL) %>%
@@ -208,86 +328,131 @@ oak %>% filter(SERIAL == sample(household_serials, 1)) %>%
   select(c(SEX, AGE, HHINCOME, INCTOT, PERWT, HHWT))
 ```
 
-To apply sample weights to an IPUMS file, users should follow one of the following procedures:
+Now that I have the households-level dataset, I'll look at how we define
+household income:
 
-1. For household-level analyses using the [...] ACS/PRCS samples, weight the households using the HHWT variable. HHWT gives the number of households in the general population represented by each household in the sample.
-2. For person-level analyses using the [...] ACS/PRCS samples, apply the PERWT variable. PERWT gives the population represented by each individual in the sample.
+`INCTOT` reports each respondent's total pre-tax personal income or
+losses from all sources for the previous year. The censuses collected
+information on income received from these sources during the previous
+calendar year; \[...\] the reference period was the past 12 months.
+https://usa.ipums.org/usa-action/variables/INCTOT
+
+`HHINCOME` reports the total money income of all household members age
+15+ during the previous year. The amount should equal the sum of all
+household members' individual incomes, as recorded in the person-record
+variable INCTOT. https://usa.ipums.org/usa-action/variables/HHINCOME
+
+Missing variables--\
+For both INCTOT and HHINCOME, 9999999 = N/A For INCTOT: 9999998 =
+Unknown
+
+> To apply sample weights to an IPUMS file, users should follow one of
+> the following procedures:
+>
+> 1.  For household-level analyses using the \[...\] ACS/PRCS samples,
+>     weight the households using the HHWT variable. HHWT gives the
+>     number of households in the general population represented by each
+>     household in the sample.
+> 2.  For person-level analyses using the \[...\] ACS/PRCS samples,
+>     apply the PERWT variable. PERWT gives the population represented
+>     by each individual in the sample.
 
 https://usa.ipums.org/usa/intro.shtml#weights
 
 ```{r}
 households_w_income <- oak_households %>% 
-filter(HHINCOME != 9999999, HHINCOME > 0)
-
-households_w_income%>% 
-  select(HHINCOME) %>% summary()
-
-households_w_income
+  filter(HHINCOME != 9999999, HHINCOME >= 0)
 ```
-```{r}
-households_w_income %>%
-  as_survey_design(ids = CLUSTER, weights=HHWT, strata=STRATA, nest = TRUE) %>%
-  srvyr::summarize(survey_quantile(HHINCOME, c(0.5)), .name_spec='e')
-```
-
 
 ```{r}
-print(weighted.median(households_w_income$HHINCOME, households_w_income$HHWT))
+households_w_income <- households_w_income %>% mutate(
+  HHINCOME = haven::zap_labels(HHINCOME)
+  )
+
+households_w_income <- households_w_income %>% haven::zap_labels()
+
+median_table <- households_w_income %>%
+  as_survey(weights=HHWT) %>% 
+  summarise(weighted_median = survey_median(HHINCOME))
+median_table
 ```
+
 ```{r}
-households_w_income %>% select(HHWT) %>% sum()
+count_table <- oak %>%
+  as_survey(weights=PERWT) %>% 
+  survey_count()
+count_table
 ```
+
 ### Comparing results to census aggregates
 
-I don't like the IPUMS option for getting single year data points, for that I like tidycensus
+
+
+But recall that our IPUMS estimates were slightly different:
 
 ```{r}
-#| output: false
-#| warning: false
-library(tidycensus)
-# Note -- I store my census api key in the .Renviron file
-census_api_key(Sys.getenv("census_api_key"))
+#| code-fold: true
+median_table <- median_table %>%
+  mutate(variable = "Median HH Income",
+         ipums_estimate = weighted_median,
+         se = weighted_median_se)
+count_table <- count_table %>%
+  mutate(variable = "Population",
+         ipums_estimate = n,
+         se = n_se)
+bind_rows(count_table, median_table)%>% 
+  select(c(variable, ipums_estimate))
 ```
-I can use tidycensus to easily access aggregate measures from the census. https://walker-data.com/tidycensus/
+
 
 ```{r}
-#| warning: false
-# Retrieve poverty data for Oakland (place level)
-oakland_stats <- get_acs(
-  geography = "place",
-  variables = c(
-    median_hh_income = "B19013_001", # Median household income
-    total_pop = "B17001_001"  # Total population for poverty status determination
-  ),
-  state = "CA",
-  year = 2022,  # Adjust the year for ACS 5-year estimates
-  survey = "acs1"  # Use 5-year ACS estimates
-)
-
-oakland_stats <- oakland_stats %>% filter(GEOID == '0653000')
-oakland_stats
+oakland_stats %>% select(c(variable, estimate))
 ```
 
-The public use samples of the ACS and PRCS are extracted from the Census Bureau's larger internal data files and are thus subject to additional sampling error and further data processing (such as imputation and allocation).
-[...]
-individual variables, such as income and housing values, are Top coded.
-[...]
-Weights included with the ACS PUMS for the household and person-level data adjust for the mixed geographic sampling rates, nonresponse adjustments, and individual sampling probabilities. Estimates from the ACS IPUMS samples may not be consistent with summary table ACS estimates due to the additional sampling error.
+What gives?
+
+> The public use samples of the ACS and PRCS are extracted from the
+> Census Bureau's larger internal data files and are thus subject to
+> additional sampling error and further data processing (such as
+> imputation and allocation). \[...\] individual variables, such as
+> income and housing values, are Top coded. \[...\] Weights included
+> with the ACS PUMS for the household and person-level data adjust for
+> the mixed geographic sampling rates, nonresponse adjustments, and
+> individual sampling probabilities. Estimates from the ACS IPUMS
+> samples may not be consistent with summary table ACS estimates due to
+> the additional sampling error.
 
 https://usa.ipums.org/usa/chapter2/chapter2.shtml#ACS
 
-### Using microdata
+### Estimation with Replicate Weights
 
-Why is it coooler to get microdata?
+Note: Look at the Walker textbook chapter on ACS microdata!!!
+
+1 year is higher variance, but less bias because we are just taking
+stuff from that year. time series with the 1 year acs.
+
+Replicate weights are a way of estimating the uncertainty around each
+weighted observation. They estimate the uncertainty of the weights?
+
+replicate weights take into account the uncertainty around the
+household/person weights.
+
+Bert uses the replicate weights to estimate the eligible population for
+benefits.
+
+Why is it cooler to get microdata?
+
+survey and srvyr -- if you do any sort of summing, it will know to use
+the weights and use the replicate weights.
 
 ```{r}
 individuals_w_income <- oak %>%
   # Find adult earners
   filter(INCTOT != 9999999, INCTOT > 0, AGE >= 18) %>%
-  # Label sex
-  mutate(SEX = case_when(SEX == 1 ~ 'Male', TRUE ~ 'Female')) %>%
-  # Label education
   mutate(
+    # Label sex
+    SEX = case_when(SEX == 1 ~ 'Male', TRUE ~ 'Female'),
+    # Label education
     educ_attain = case_when(
       EDUC == 10 ~ "Bachelor's degree",
       EDUC == 11 ~ "Graduate degree",
@@ -301,46 +466,42 @@ individuals_w_income <- oak %>%
   )
 ```
 
-```{r}
-individuals_w_income %>%
-  group_by(SEX) %>%
-  summarise(mean_income = mean(INCTOT))
-```
-
-```{r}
-99333.91 / 76766.01
-```
-
+<https://www.andrewheiss.com/blog/2022/06/23/long-labels-ggplot/index.html>
 
 ```{r}
 #| warning: false
-#| code-fold: true
 
-colors <- RColorBrewer::brewer.pal(n=5, "Set1")[c(5, 2)]
+# Define colors and order as in your original code
+colors <- RColorBrewer::brewer.pal(n=5, "Set1")[4]
 
-max_income <- 400000
-steps <- 50000
+order <- individuals_w_income %>%
+  distinct(EDUC, educ_attain) %>%
+  arrange(EDUC) %>%
+  distinct(educ_attain) %>%
+  pull()
 
-ggplot(individuals_w_income, aes(x = INCTOT, color = factor(SEX), fill = factor(SEX), weight = PERWT)) +
-  geom_histogram(binwidth = steps, position = "dodge", boundary = 0, alpha = 0.8, aes(y = ..density..)) +
-  scale_color_manual(values = colors) +
-  scale_fill_manual(values = colors) +
-  scale_x_continuous(labels = scales::label_dollar(),
-                     limits = c(0, 400000),
-                     breaks = seq(0, 400000, steps)) +
-  scale_y_continuous(labels = scales::label_percent(), ) +
-  labs(title = "Income Distribution by Sex",
-       x = "Income",
-       y = "Density",
-       color = "Sex",
-       fill = "Sex") +
+# # Calculate the mean income for each education level
+# mean_income <- individuals_w_income %>%
+#   group_by(educ_attain) %>%
+#   summarize(mean_INCTOT = weighted.mean(INCTOT, w = PERWT)) %>%
+#   mutate(educ_attain = factor(educ_attain, levels = order))
+
+# Plot with jitter and mean points
+ggplot(individuals_w_income, aes(x = factor(educ_attain, levels = order), y = INCTOT, weight = PERWT)) +
+  geom_jitter(position = position_jitter(width=.2), alpha = 0.6, color = "grey", size=1.2) +
+  geom_boxplot(alpha = 0.9, color = "black", size=.9, outliers = FALSE, linewidth=.8) +
+  scale_y_continuous(labels = scales::label_currency(scale_cut = scales::cut_short_scale()),
+                     limits = c(0, 500000),
+                     breaks = seq(0, 500000, 100000)) +
+  scale_x_discrete(labels = scales::label_wrap(10)) +
+  labs(title = "Income by Education Level",
+       y = "Income",
+       x = "Education Level") +
   theme(panel.grid.minor = element_blank(),
-        panel.grid = element_line(color="lightgrey",
-                                  size=.2,
+        panel.grid = element_line(color = "lightgrey",
+                                  size = .2,
                                   linetype = 1),
-        panel.background = element_rect("white")
-        )
-
+        panel.background = element_rect("white"))
 
 ```
 
@@ -352,7 +513,6 @@ gof_stuff <- tribble(
   "r.squared", "R²", 3
 )
 ```
-
 
 ```{r}
 model_ols1 <- lm(log(INCTOT) ~ factor(SEX),
@@ -366,13 +526,11 @@ modelsummary(list(model_ols1, model_ols2, model_ols3),
 
 ```
 
-
-
-
-
 ```{r}
 #| warning: false
 #| code-fold: true
+
+colors <- RColorBrewer::brewer.pal(n=5, "Set1")[c(5, 2)]
 
 order <- individuals_w_income %>% distinct(EDUC, educ_attain) %>% arrange(desc(EDUC)) %>% distinct(educ_attain) %>% pull()
 
@@ -393,11 +551,3 @@ ggplot(individuals_w_income, aes(y = factor(educ_attain, level=order), color = f
         panel.background = element_rect("white")
         )
 ```
-
-```{r}
-model_ols4 <- lm(log(INCTOT) ~  AGE + I(AGE^2) + factor(SEX)*relevel(educ_attain, ref="Highschool diploma"),
-                 data = individuals_w_income, weights = individuals_w_income$PERWT)
-modelsummary(list(model_ols4),
-             gof_map = gof_stuff, exponentiate = TRUE)
-```
-
