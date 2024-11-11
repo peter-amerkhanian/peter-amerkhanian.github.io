@@ -6,6 +6,8 @@ date: "2024-9-1"
 draft: false
 image: thumbnail.png
 engine: knitr
+execute: 
+  cache: false
 categories: ['R', 'Data Management']
 format:
   html:
@@ -35,9 +37,12 @@ library(glue)
 ```
 
 
-What is the median household income in Oakland, California?
+What was the median household income in Oakland, California in 2022?
 
-Answering that question is pretty straightforward using the census. Here I'll load the R package `tidycensus`, set an API key for accessing the census:
+Answering that question is pretty straightforward using data from the U.S. Census. If I needed to get the number quickly and wasn't using it for analysis, I might use a web-based tool like [Census Reporter](https://censusreporter.org/) to quickly look it up. However, if I were going to use the number in an analysis, I would like the retrieval to be replicable and preferably carried out via an API.  
+
+## Aggregate data with `tidycensus`
+In R, the `tidycensus` package provides an easy-to-use wrapper for requesting data from the Census API. Note that I set up an API key for the U.S. Census and am storing it in my `.Renviron` file.
 
 ```{r}
 #| output: false
@@ -45,17 +50,14 @@ Answering that question is pretty straightforward using the census. Here I'll lo
 library(tidycensus)
 census_api_key(Sys.getenv("census_api_key"))
 ```
-Then, I'll query the median household income variable, using the 2022 1-year American Community Survey sample. I'll throw in the total population variable for good measure:
+I can query `B19013_001`, the median household income variable, using the 2022 1-year American Community Survey sample and filter down to Oakland's GEOID, `0653000`. I'll throw in the total population variable for good measure:
 
 ```{r}
 #| warning: false
-
 oakland_stats <- get_acs(
   geography = "place",
   variables = c(
-    # Median household income
     median_hh_income = "B19013_001",
-    # Total population for poverty status determination
     total_pop = "B17001_001"
   ),
   state = "CA",
@@ -66,21 +68,18 @@ oakland_stats <- oakland_stats %>% filter(GEOID == '0653000')
 oakland_stats %>% select(c(variable, estimate))
 ```
 
-Done! This is an example of retrieving aggregate census data -- in this case a statistic describing the population of Oakland. This is very useful, and I reccomend [@walker_analyzing_2023] for a comprehsive treatment of use cases, but what if instead of aggregate census data, I wanted to see *individual-level* census data, as-in, each row is an individual person? That entails accessing census microdata, a slightly more complicated process that I'll cover in this blog post. I want to note that some of the points I cover here are things I learned from a coworker, [Bert Wilden](https://www.bwilden.com/) (thanks Bert!).
+Done! This is an example of retrieving aggregate census data -- in this case a statistic describing the population of Oakland. This is very useful, and [@walker_analyzing_2023] offers a comprehsive treatment of use cases of aggregate census data.  
+
+However, what if instead of the median, I wanted a different quantile? What if I wanted to run a regression and find the association between gender and income while adjusting for education? These statistics are not obviously available as aggregate measures in the census API. Indeed, if I want them, I would need to calculate them myself using *individual-level* census data, as-in, data where each row is an individual person. This is a common need and entails accessing census *microdata*, a complicated process that I'll cover in this blog post. I want to note that several of the points I cover here are things I learned from some coworkers-- [Bert Wilden](https://www.bwilden.com/) and Stephanie Peng.
 
 ## Microdata via IPUMS
 
 One of the most popular sources for downloading census microdata is the
 University of Minesota's Integrated Public Use Microdata Series (IPUMS).
-The IPUMS team provides the following products, all for free! - A
-centralized API for downloading census microdata - Comprehensive
-documentation for working with census microdata - Harmonized variables
-across time.
+The IPUMS team provides a centralized API for downloading census microdata, comprehensive
+documentation for working with census microdata, and harmonized variables across time [@walker_analyzing_2023, chapter 9].
 
-[@walker_analyzing_2023, chapter 9].
-
-Here I'll load the `ipumsr` library and set an API key for submitting
-requests.
+The easiest way to access IPUMS data in R with with the `ipumsr` package, which is managed by the IPUMs team. Here I'll load the `ipumsr` library and set an API key for submitting requests.
 
 ```{r}
 #| output: false
@@ -90,10 +89,10 @@ set_ipums_api_key(Sys.getenv("ipums_api_key"))
 
 The [`ipumsr` website](https://tech.popdata.org/ipumsr/) provides
 details on what degree of support the package has for various IPUMS
-products, though it's also possible to check using the
+products, though it's also possible to check for support using the
 `ipums_data_collections()` function. I prefer the function so that I can
 see exactly what code I'll need to plug into the API (see
-`api_support`).
+`code_for_api`). The following are the survey products that currently have API support:
 
 ```{r}
 ipums_data_collections() %>%
@@ -102,45 +101,35 @@ ipums_data_collections() %>%
 ```
 
 For any analysis of populations in the U.S., the IPUMS USA (annual
-surveys) and IPUMS CPS (monthly surveys) collections are of particular
-interest. I'll look at IPUMS USA:
-
-> IPUMS USA collects, preserves and harmonizes U.S. census microdata and
-> provides easy access to this data with enhanced documentation. Data
-> includes decennial censuses from 1790 to 2010 and American Community
-> Surveys (ACS) from 2000 to the present [@ruggles_ipums_2024].
+survey) and IPUMS CPS (monthly survey) collections are of particular
+interest. I'll look at IPUMS USA. The IPUMS USA project collects, preserves and harmonizes U.S. census microdata and provides easy access to this data with enhanced documentation. Data includes decennial censuses from 1790 to 2010 and American Community Surveys (ACS) from 2000 to the present [@ruggles_ipums_2024].
 
 We can check out the newest products they have in the USA collection as
 follows:
 
 ```{r}
-get_sample_info(collection="usa") %>% arrange(desc(name)) %>% head(5)
+get_sample_info(collection="usa") %>%
+  arrange(desc(name)) %>%
+  head(5)
 ```
+Some things to note:  
+
+- PRCS refers to the Puerto Rico Community Survey
+- the 5-year ACS/PRCS is a dataset that is representative of the last year in the range, but includes
 
 ## An IPUMS USA example
 
-What is the median household income in Oakland, California?
+Let's return to the motivating question for this post: "What was the median household income in Oakland, California in 2022?"
 
-I'll define a function, `retrieve_ca_sample()` that accomplishes that
-and only run the IPUMS request if I don't already have the data locally.
+We'll need to get income data from the 2022 1-year ACS, and we will need to filter our data down to just the city of Oakland. For the first task, I'll define a function, `retrieve_ca_sample()` that retrieves the 2022 1-year ACS for the State of California.
 
 ```{r}
-retrieve_ca_sample <- function(sample){
+retrieve_ca_sample <- function(sample, variables){
   extract <- define_extract_micro(
     description = "CA Incomes by PUMA",
     collection = "usa",
     samples = c(sample),
-    variables = list(
-      "PUMA",
-      "AGE",
-      "SEX",
-      "EDUC",
-      "HHINCOME",
-      "INCTOT",
-      "REPWT",
-      "REPWTP",
-      var_spec("STATEFIP", case_selections = "06")
-    )
+    variables = variables
   )
   data_path <- extract %>%
     submit_extract() %>%
@@ -152,47 +141,49 @@ retrieve_ca_sample <- function(sample){
   }
 ```
 
-Now I will run the retrieval conditionally, so that if I already have
-the file, I don't re-download it
-
+I'll also define a list of variables that I want, including Income. I'll cover exactly what each of these represent later in the post.
 ```{r}
+variables <- list(
+  "PUMA",
+  "AGE",
+  "SEX",
+  "EDUC",
+  "HHINCOME",
+  "INCTOT",
+  "REPWT",
+  "REPWTP",
+  var_spec("STATEFIP",
+           case_selections = "06")
+)
+```
+
+Finally, I'll use the function to request the 2022 1-year ACS with these variables from IPUMS. 
+```{r}
+#| output: false
 local_ipums_extracts <- list.files(
   path = here::here('data'),
   pattern = "\\.xml$",
   full.names = TRUE)
-
 if (length(local_ipums_extracts) > 0) {
   existing_path <- local_ipums_extracts[1]
   data <- read_ipums_micro(existing_path)
 } else {
-  data <- retrieve_ca_sample("us2022a")
+  data <- retrieve_ca_sample("us2022a", variables)
 }
 ```
 
-We will return to replicate weights later.
-
-```{r}
-data_no_rep <- data %>%
-  select(-starts_with("REPWT"))
-data_no_rep %>%
-  head()
-```
 
 ### Geographies in ACS microdata
 
-The smallest geographic area explicitly identified in the microdata is
+We now have microdata for all of California, but how do we filter down to just Oakland? Unfortunately, this isn't as simple as just running `filter(CITY == 'Oakland')` -- ACS microdata does not include a field for city (this is typically "place" in the census). Indeed, the smallest geographic area explicitly identified in the microdata is something called a
 public use microdata area (PUMA), a geographic area defined based on
-population. Each PUMA includes about 100,000 residents. IPUMS
-geographers are sometimes able to infer other small geographic areas,
-such as city, metro area, and county, from PUMA, depending on how the
-boundaries of PUMAs and these other geographic areas correspond. As a
-result, some cities, metro areas, and counties are not able to be
+population. PUMAS are unique geographies that sometimes correspond to other small geographic areas,
+such as city, metro area, and county, but not always. Some cities, metro areas, and counties are not able to be
 identified in the microdata.
+
 https://forum.ipums.org/t/how-can-i-pull-data-at-the-zip-code-or-city-level/5650/2
 
-What are PUMAS?
-
-GEOCORR
+To find out if a city corresponds to a collection of PUMAs and which PUMAs those are, we use a tool called GEOCORR.
 
 ![Geocorr 2022](geocorr.png){width="80%"}
 
@@ -220,7 +211,6 @@ and retrieves a .csv file establishing the relationships between
 geographies in California.
 
 ```{r}
-#| code-fold: true
 geocorr_2022 <- function(state, geo_1, geo_2, weight_var) {
   base_url <- "https://mcdc.missouri.edu"
   params <- glue(
@@ -237,10 +227,10 @@ geocorr_2022 <- function(state, geo_1, geo_2, weight_var) {
   parsed_html <- read_html(html_content)
   # Extract the one link
   csv_url <- parsed_html %>%
-    html_node("a") %>%     # Assuming there is only one link on the page
+    html_node("a") %>%
     html_attr("href") %>%
     stringr::str_trim() %>%
-    url_absolute(base = base_url) # Convert to absolute URL if necessary
+    url_absolute(base = base_url)
   csv_data <- read_csv(csv_url)
   return(csv_data)
 }
@@ -275,25 +265,28 @@ that PUMA.[^1]
 [^1]: Were the AFACT higher, e.g. 1%, I would randomly sample 1% of the
     individuals from that PUMA and include them in my Oakland sample.
 
+Filtering to those PUMAs gets us the 2022 1-year ACS microdata for the City of Oakland.
 ```{r}
 oakland_pumas <- c(111, 112, 113, 123)
-oak <- data_no_rep %>%
-  filter(PUMA %in% oakland_pumas)
+oak <- data %>%
+  filter(PUMA %in% oakland_pumas) %>% 
+  haven::zap_labels()
 oak %>% head()
 ```
+But what do these data actually represent?
 
-### Granularity and weights in the ACS
+### Granularity in the ACS
 
-> `SERIAL` is an identifying number unique to each household record in a
-> given sample. All person records are assigned the same serial number
-> as the household record that they follow. (Person records also have
-> their own unique identifiers - see `PERNUM.`)
+Each row in the ACS microdata is an individual, identified by a unique combination of `SERIAL`, the unique identifier for their household,  and `PERNUM`, their unique identifier within their household. Thus, we can identify units as follows:  
 
-Households: The combination of `SAMPLE` and `SERIAL` provides a unique
-identifier for every household in the IPUMS\
-Individuals: The combination of `SAMPLE`, `SERIAL`, and `PERNUM`
-provides a unique identifier for every person in the IPUMS\
-https://usa.ipums.org/usa-action/variables/SERIAL
+- Households: The combination of `SAMPLE` and `SERIAL` provides a unique
+identifier for every household in the IPUMS  
+- Individuals: The combination of `SAMPLE`, `SERIAL`, and `PERNUM`
+provides a unique identifier for every person in the IPUMS  
+
+Where `SAMPLE` defines when the inidividual was surveyed (in the 1-year ACS it's the same for all rows) [See [SERIAL](https://usa.ipums.org/usa-action/variables/SERIAL) in @ruggles_ipums_2024].  
+
+We can group by these variable combinations and see how many individuals and rows were surveyed across PUMAs:
 
 ```{r}
 #| label: tbl-granularity
@@ -305,46 +298,38 @@ oak %>% group_by(PUMA) %>% summarise(
   )
 ```
 
-Thus, `oak` is at the individual level. Here I'll make a
-`oak_households` dataframe that is at the household level:
-
+Let's randomly select a family in the data and see what that looks like in practice.
 ```{r}
-oak_households <- oak %>% distinct(SAMPLE, SERIAL, .keep_all = TRUE)
-```
-
-```{r}
-#| label: tbl-example-hh
-#| tbl-cap: "An example household"
 #| code-fold: true
-
 household_serials <- oak %>%
   group_by(SERIAL) %>%
   count() %>%
   filter(n > 1) %>%
   pull(SERIAL)
 set.seed(2)
-
-oak %>% filter(SERIAL == sample(household_serials, 1)) %>% 
-  select(c(SEX, AGE, HHINCOME, INCTOT, PERWT, HHWT))
+sample_household <- sample(household_serials, 1)
+n <- oak %>% filter(SERIAL == sample_household) %>% dim() %>% .[1]
 ```
 
-Now that I have the households-level dataset, I'll look at how we define
-household income:
+```{r}
+#| label: tbl-example-hh
+#| tbl-cap: "An example household"
+#| 
+oak %>% filter(SERIAL == sample_household) %>% 
+  select(c(SERIAL, PERNUM, AGE, HHINCOME, INCTOT, PERWT, HHWT))
+```
 
-`INCTOT` reports each respondent's total pre-tax personal income or
-losses from all sources for the previous year. The censuses collected
-information on income received from these sources during the previous
-calendar year; \[...\] the reference period was the past 12 months.
-https://usa.ipums.org/usa-action/variables/INCTOT
+So here we can see that this household, with `SERIAL` `{r} format(sample_household, scientific=FALSE)` has `{r} n` members, each with a unique `PERNUM`.
+
+We also see their individual incomes in `INCTOT`, which reports each respondent's total pre-tax personal income or
+losses from all sources for the previous year. `9999999` is code to denote that the value is missing, which makes sense given that the missing values above correspond to children in the household [See [INCTOT](https://usa.ipums.org/usa-action/variables/INCTOT) in @ruggles_ipums_2024].  
 
 `HHINCOME` reports the total money income of all household members age
 15+ during the previous year. The amount should equal the sum of all
 household members' individual incomes, as recorded in the person-record
-variable INCTOT. https://usa.ipums.org/usa-action/variables/HHINCOME
+variable INCTOT [See [HHINCOME](https://usa.ipums.org/usa-action/variables/HHINCOME) in @ruggles_ipums_2024]
 
-Missing variables--\
-For both INCTOT and HHINCOME, 9999999 = N/A For INCTOT: 9999998 =
-Unknown
+### Sample weights in the ACS
 
 > To apply sample weights to an IPUMS file, users should follow one of
 > the following procedures:
@@ -359,50 +344,39 @@ Unknown
 
 https://usa.ipums.org/usa/intro.shtml#weights
 
+Thus, `oak` is our data at the individual level. Here I'll make a
+`oak_households` dataset that is at the household level:
+
 ```{r}
+oak_households <- oak %>%
+  distinct(SAMPLE, SERIAL, .keep_all = TRUE)
+
 households_w_income <- oak_households %>% 
   filter(HHINCOME != 9999999, HHINCOME >= 0)
 ```
 
+
 ```{r}
-households_w_income <- households_w_income %>% mutate(
-  HHINCOME = haven::zap_labels(HHINCOME)
-  )
-
-households_w_income <- households_w_income %>% haven::zap_labels()
-
 median_table <- households_w_income %>%
   as_survey(weights=HHWT) %>% 
-  summarise(weighted_median = survey_median(HHINCOME))
-median_table
-```
-
-```{r}
-count_table <- oak %>%
-  as_survey(weights=PERWT) %>% 
-  survey_count()
-count_table
-```
-
-### Comparing results to census aggregates
-
-
-
-But recall that our IPUMS estimates were slightly different:
-
-```{r}
-#| code-fold: true
-median_table <- median_table %>%
+  summarise(weighted_median = survey_median(HHINCOME)) %>% 
   mutate(variable = "Median HH Income",
          ipums_estimate = weighted_median,
          se = weighted_median_se)
-count_table <- count_table %>%
+
+count_table <- oak %>%
+  as_survey(weights=PERWT) %>% 
+  survey_count() %>% 
   mutate(variable = "Population",
          ipums_estimate = n,
          se = n_se)
+
 bind_rows(count_table, median_table)%>% 
   select(c(variable, ipums_estimate))
+
 ```
+
+But recall that our IPUMS estimates were slightly different:
 
 
 ```{r}
