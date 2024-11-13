@@ -3,6 +3,7 @@ title: "Simple Optimization in 3D"
 bibliography: "../../blog.bib"
 author: "Peter Amerkhanian"
 date: "2024-3-9"
+description: "Solving an optimization problem in (Strang and Herman 2016), with `plotly` visuals."
 draft: false
 categories: ['R', 'Calculus']
 image: thumbnail.png

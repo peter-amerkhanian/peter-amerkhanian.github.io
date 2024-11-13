@@ -37,7 +37,7 @@ library(glue)
 ```
 
 
-What was the median household income in Oakland, California in 2022?
+**Question:** What was the median household income in Oakland, California in 2022?
 
 Answering that question is pretty straightforward using data from the U.S. Census. If I needed to get the number quickly and wasn't using it for analysis, I might use a web-based tool like [Census Reporter](https://censusreporter.org/) to quickly look it up. However, if I were going to use the number in an analysis, I would like the retrieval to be replicable and preferably carried out via an API.  
 
@@ -74,8 +74,7 @@ However, what if instead of the median, I wanted a different quantile? What if I
 
 ## Microdata via IPUMS
 
-One of the most popular sources for downloading census microdata is the
-University of Minesota's Integrated Public Use Microdata Series (IPUMS).
+One of the most popular sources for downloading census microdata is the University of Minesota's Integrated Public Use Microdata Series (IPUMS).
 The IPUMS team provides a centralized API for downloading census microdata, comprehensive
 documentation for working with census microdata, and harmonized variables across time [@walker_analyzing_2023, chapter 9].
 
