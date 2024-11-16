@@ -34,23 +34,50 @@ library(httr)
 library(rvest)
 library(readr)
 library(glue)
+# Census
+library(tidycensus)
+library(ipumsr)
 ```
 
+In this post, I'm going to cover how to use census microdata,
+specifically from the American Community Survey (ACS), using the
+University of Minesota's Integrated Public Use Microdata Series (IPUMS).
+I'll cover:
 
-**Question:** What was the median household income in Oakland, California in 2022?
+1.  Data Retrieval and Processing: how to choose which ACS product is
+    relevant, how to submit a request to IPUMS and filter down to
+    relevant levels of granularity.
+2.  How to properly weight ACS data using sample and replication weights
+    for accurate data visualizations and statistical models.
 
-Answering that question is pretty straightforward using data from the U.S. Census. If I needed to get the number quickly and wasn't using it for analysis, I might use a web-based tool like [Census Reporter](https://censusreporter.org/) to quickly look it up. However, if I were going to use the number in an analysis, I would like the retrieval to be replicable and preferably carried out via an API.  
+I'll start with a question:
+
+What was the median household income in Oakland, California in 2022?
 
 ## Aggregate data with `tidycensus`
-In R, the `tidycensus` package provides an easy-to-use wrapper for requesting data from the Census API. Note that I set up an API key for the U.S. Census and am storing it in my `.Renviron` file.
+
+Answering that question is pretty straightforward using *aggregate* data
+from the U.S. Census. I'm interested in a descriptive statistics
+describing an aggregate geography. If I needed to get the number quickly
+and wasn't using it for analysis, I might use a web-based tool like
+[Census Reporter](https://censusreporter.org/) to quickly look it up.
+However, if I were going to use the number in an analysis, I would like
+the retrieval to be replicable and preferably carried out via an API.
+
+In R, the `tidycensus` package provides an easy-to-use wrapper for
+requesting data from the Census API. Note that I set up an API key for
+the U.S. Census and am storing it in my `.Renviron` file.
 
 ```{r}
 #| output: false
 #| warning: false
-library(tidycensus)
 census_api_key(Sys.getenv("census_api_key"))
 ```
-I can query `B19013_001`, the median household income variable, using the 2022 1-year American Community Survey sample and filter down to Oakland's GEOID, `0653000`. I'll throw in the total population variable for good measure:
+
+I can query `B19013_001`, the median household income variable, using
+the 2022 1-year American Community Survey sample and filter down to
+Oakland's GEOID, `0653000`. I'll throw in the total population variable
+for good measure:
 
 ```{r}
 #| warning: false
@@ -68,21 +95,39 @@ oakland_stats <- oakland_stats %>% filter(GEOID == '0653000')
 oakland_stats %>% select(c(variable, estimate))
 ```
 
-Done! This is an example of retrieving aggregate census data -- in this case a statistic describing the population of Oakland. This is very useful, and [@walker_analyzing_2023] offers a comprehsive treatment of use cases of aggregate census data.  
+Done! This is an example of retrieving aggregate census data -- in this
+case a statistic describing the population of Oakland. Aggregate census
+data is very useful, and [@walker_analyzing_2023] offers a comprehensive
+treatment of use cases of aggregate census data.
 
-However, what if instead of the median, I wanted a different quantile? What if I wanted to run a regression and find the association between gender and income while adjusting for education? These statistics are not obviously available as aggregate measures in the census API. Indeed, if I want them, I would need to calculate them myself using *individual-level* census data, as-in, data where each row is an individual person. This is a common need and entails accessing census *microdata*, a complicated process that I'll cover in this blog post. I want to note that several of the points I cover here are things I learned from some coworkers-- [Bert Wilden](https://www.bwilden.com/) and Stephanie Peng.
+However, what if instead of the median, I wanted a different quantile of
+household income? What if I wanted to run a regression and find the
+association between gender and individual income while adjusting for
+education? These statistics are not obviously available as aggregate
+measures in the census API. Indeed, if I want them, I would need to
+calculate them myself using either *individual or household level*
+census data, as-in, data where each row is an individual person or an
+individual household. This is a common need and entails accessing census
+*microdata*, a complicated process that I'll cover in this blog post. I
+want to note that several of the points I cover here are things I
+learned from some coworkers-- [Bert Wilden](https://www.bwilden.com/)
+and Stephanie Peng.
 
 ## Microdata via IPUMS
 
-One of the most popular sources for downloading census microdata is the University of Minesota's Integrated Public Use Microdata Series (IPUMS).
-The IPUMS team provides a centralized API for downloading census microdata, comprehensive
-documentation for working with census microdata, and harmonized variables across time [@walker_analyzing_2023, chapter 9].
+One of the most popular sources for downloading census microdata is the
+University of Minesota's Integrated Public Use Microdata Series (IPUMS).
+The IPUMS team provides a centralized API for downloading census
+microdata, comprehensive documentation for working with census
+microdata, and harmonized variables across time [@walker_analyzing_2023,
+chapter 9]. It's an immensely useful public good.
 
-The easiest way to access IPUMS data in R with with the `ipumsr` package, which is managed by the IPUMs team. Here I'll load the `ipumsr` library and set an API key for submitting requests.
+The easiest way to access IPUMS data in R is with the `ipumsr` package,
+which is managed by the IPUMS team. Here I'll set an API key for
+submitting requests via `ipumsr` .
 
 ```{r}
 #| output: false
-library(ipumsr)
 set_ipums_api_key(Sys.getenv("ipums_api_key"))
 ```
 
@@ -91,7 +136,8 @@ details on what degree of support the package has for various IPUMS
 products, though it's also possible to check for support using the
 `ipums_data_collections()` function. I prefer the function so that I can
 see exactly what code I'll need to plug into the API (see
-`code_for_api`). The following are the survey products that currently have API support:
+`code_for_api`). The following are the survey products that currently
+have API support:
 
 ```{r}
 ipums_data_collections() %>%
@@ -99,9 +145,14 @@ ipums_data_collections() %>%
   arrange(desc(collection_type))
 ```
 
-For any analysis of populations in the U.S., the IPUMS USA (annual
-survey) and IPUMS CPS (monthly survey) collections are of particular
-interest. I'll look at IPUMS USA. The IPUMS USA project collects, preserves and harmonizes U.S. census microdata and provides easy access to this data with enhanced documentation. Data includes decennial censuses from 1790 to 2010 and American Community Surveys (ACS) from 2000 to the present [@ruggles_ipums_2024].
+For any analysis of populations in the U.S., the IPUMS USA (an annual
+survey) and IPUMS CPS (a [monthly
+survey](https://www.census.gov/programs-surveys/acs)) collections are of
+particular interest. I'll look at IPUMS USA. The IPUMS USA project
+collects, preserves and harmonizes U.S. census microdata and provides
+easy access to this data with enhanced documentation. Data includes
+decennial censuses from 1790 to 2010 and American Community Surveys
+(ACS) from 2000 to the present [@ruggles_ipums_2024].
 
 We can check out the newest products they have in the USA collection as
 follows:
@@ -111,16 +162,43 @@ get_sample_info(collection="usa") %>%
   arrange(desc(name)) %>%
   head(5)
 ```
-Some things to note:  
 
-- PRCS refers to the Puerto Rico Community Survey
-- the 5-year ACS/PRCS is a dataset that is representative of the last year in the range, but includes
+Some things to note about these collections:
 
-## An IPUMS USA example
+-   **ACS vs. PRCS**: The ACS (American Community Survey) collects
+    detailed population and housing information for the 50 U.S. states
+    and The District of Columbia, whereas the PRCS (Puerto Rico
+    Community Survey) functions as an ACS equivalent specifically
+    tailored to collect data in Puerto Rico.
 
-Let's return to the motivating question for this post: "What was the median household income in Oakland, California in 2022?"
+-   **One-Year vs. Five-Year Estimates**:
 
-We'll need to get income data from the 2022 1-year ACS, and we will need to filter our data down to just the city of Oakland. For the first task, I'll define a function, `retrieve_ca_sample()` that retrieves the 2022 1-year ACS for the State of California.
+    -   One-Year Estimates are based on data collected over a single
+        year; they provide timely information for areas with populations
+        of 65,000 or more (this excludes some small geographies)[^1] but
+        may have higher margins of error for smaller areas.
+
+    -   Five-Year Estimates represent a moving average of data collected
+        over a 5-year period and covers geographies down to the Census
+        block group. The 5-year window creates a larger sample size and
+        offers more reliable and detailed information for all population
+        sizes, including small areas, but less timely than one-year
+        estimates [@walker_analyzing_2023]
+
+[^1]: See [census
+    hierarchies](https://walker-data.com/census-r/the-united-states-census-and-the-r-programming-language.html#census-hierarchies)
+    in [@walker_analyzing_2023] for explanation of distinct geographical
+    units in Census products.
+
+## Working with IPUMS USA
+
+Let's return to the motivating question for this post: **What was the
+median household income in Oakland, California in 2022?**
+
+We'll need to get income data from the 2022 1-year ACS, and we will need
+to filter our data down to just the city of Oakland. For the first task,
+I'll define a function, `retrieve_ca_sample()` that retrieves the 2022
+1-year ACS for the State of California.
 
 ```{r}
 retrieve_ca_sample <- function(sample, variables){
@@ -140,7 +218,9 @@ retrieve_ca_sample <- function(sample, variables){
   }
 ```
 
-I'll also define a list of variables that I want, including Income. I'll cover exactly what each of these represent later in the post.
+I'll also define a list of variables that I want, including Income. I'll
+cover exactly what each of these represent later in the post.
+
 ```{r}
 variables <- list(
   "PUMA",
@@ -156,7 +236,10 @@ variables <- list(
 )
 ```
 
-Finally, I'll use the function to request the 2022 1-year ACS with these variables from IPUMS. 
+Finally, I'll use the function to request the 2022 1-year ACS with these
+variables from IPUMS (though I first check if I've already downloaded it
+to avoid unnecessary file storage).
+
 ```{r}
 #| output: false
 local_ipums_extracts <- list.files(
@@ -171,31 +254,35 @@ if (length(local_ipums_extracts) > 0) {
 }
 ```
 
-
 ### Geographies in ACS microdata
 
-We now have microdata for all of California, but how do we filter down to just Oakland? Unfortunately, this isn't as simple as just running `filter(CITY == 'Oakland')` -- ACS microdata does not include a field for city (this is typically "place" in the census). Indeed, the smallest geographic area explicitly identified in the microdata is something called a
-public use microdata area (PUMA), a geographic area defined based on
-population. PUMAS are unique geographies that sometimes correspond to other small geographic areas,
-such as city, metro area, and county, but not always. Some cities, metro areas, and counties are not able to be
-identified in the microdata.
+We now have microdata for all of California, but how do we filter down
+to just Oakland? Unfortunately, this isn't as simple as just running
+`filter(CITY == 'Oakland')` -- ACS microdata does not include a field
+for city (this is typically "place" in the census). Indeed, the smallest
+geographic area explicitly identified in the microdata is something
+called a public use microdata area (PUMA), a geographic area defined
+based on population [@pastoor_how_2024]. PUMAS are unique geographies –
+they always correspond to states, but only sometimes correspond to other
+small geographic areas, such as city, metro area, and county
+[@walker_analyzing_2023, chapter 1]. Many cities, metro areas, and
+counties cannot be perfectly identified in microdata
+[@pastoor_how_2024].
 
-https://forum.ipums.org/t/how-can-i-pull-data-at-the-zip-code-or-city-level/5650/2
-
-To find out if a city corresponds to a collection of PUMAs and which PUMAs those are, we use a tool called GEOCORR.
+To find out if a city corresponds to a collection of PUMAs and which
+PUMAs those are, we'll use a tool called GEOCORR.
 
 ![Geocorr 2022](geocorr.png){width="80%"}
 
 The Geocorr (geographic correspondence engine) application generates
 files and/or reports — called correlation lists — showing relationships
-between two or more geographic coverages in the United States.
-
-For example, suppose you have county-level data for California and would
-like to convert that data to the ZIP code level. Geocorr can show how
-each county relates to the ZIP code(s) that intersect it. It can tell
-you, for each of those ZIP/county intersections, what the size of that
-intersection is and what portion of the ZIP's total population is in
-that intersection.
+between two or more geographic coverages in the United States
+[@mihalik_missouri_2022]. For example, suppose you have county-level
+data for California and would like to convert that data to the ZIP code
+level. Geocorr can show how each county relates to the ZIP code(s) that
+intersect it. It can tell you, for each of those ZIP/county
+intersections, what the size of that intersection is and what portion of
+the ZIP's total population is in that intersection.
 https://mcdc.missouri.edu/applications/docs/geocorr2022-help.html
 
 PUMAs are typically completely inside of counties, but they sometimes
@@ -236,8 +323,8 @@ geocorr_2022 <- function(state, geo_1, geo_2, weight_var) {
 ```
 
 We'll use that function to establish the relationships between
-California's 2022 PUMAs and places, using individual population to
-weight the relationships.
+California's 2022 PUMAs and places, using individual population as
+measured in the 2020 Decenial Census to weight the relationships.
 
 ```{r}
 #| output: false
@@ -259,12 +346,12 @@ PUMA population that belongs to Oakland. In this case, 100% of the
 populations in PUMAs 111, 112, 113, and 123 belong to Oakland, and 0% of
 PUMA 114. To be clear, GEOCORR believes that 9 individuals from 114 do
 live in Oakland, but based on the AFACT I'll feel comfortable dropping
-that PUMA.[^1]
+that PUMA.[^2] Filtering to those PUMAs gets us the 2022 1-year ACS
+microdata for the City of Oakland.
 
-[^1]: Were the AFACT higher, e.g. 1%, I would randomly sample 1% of the
+[^2]: Were the AFACT higher, e.g. 1%, I would randomly sample 1% of the
     individuals from that PUMA and include them in my Oakland sample.
 
-Filtering to those PUMAs gets us the 2022 1-year ACS microdata for the City of Oakland.
 ```{r}
 oakland_pumas <- c(111, 112, 113, 123)
 oak <- data %>%
@@ -272,20 +359,28 @@ oak <- data %>%
   haven::zap_labels()
 oak %>% head()
 ```
+
 But what do these data actually represent?
 
 ### Granularity in the ACS
 
-Each row in the ACS microdata is an individual, identified by a unique combination of `SERIAL`, the unique identifier for their household,  and `PERNUM`, their unique identifier within their household. Thus, we can identify units as follows:  
+Each row in the ACS microdata is an individual, identified by a unique
+combination of `SERIAL`, the unique identifier for their household, and
+`PERNUM`, their unique identifier within their household. Thus, we can
+identify units as follows:
 
-- Households: The combination of `SAMPLE` and `SERIAL` provides a unique
-identifier for every household in the IPUMS  
-- Individuals: The combination of `SAMPLE`, `SERIAL`, and `PERNUM`
-provides a unique identifier for every person in the IPUMS  
+-   Households: The combination of `SAMPLE` and `SERIAL` provides a
+    unique identifier for every household in the IPUMS\
+-   Individuals: The combination of `SAMPLE`, `SERIAL`, and `PERNUM`
+    provides a unique identifier for every person in the IPUMS
 
-Where `SAMPLE` defines when the inidividual was surveyed (in the 1-year ACS it's the same for all rows) [See [SERIAL](https://usa.ipums.org/usa-action/variables/SERIAL) in @ruggles_ipums_2024].  
+Where `SAMPLE` defines when the inidividual was surveyed (in the 1-year
+ACS it's the same for all rows) [See
+[SERIAL](https://usa.ipums.org/usa-action/variables/SERIAL) in
+@ruggles_ipums_2024].
 
-We can group by these variable combinations and see how many individuals and rows were surveyed across PUMAs:
+We can group by these variable combinations and see how many individuals
+and rows were surveyed across PUMAs:
 
 ```{r}
 #| label: tbl-granularity
@@ -297,7 +392,9 @@ oak %>% group_by(PUMA) %>% summarise(
   )
 ```
 
-Let's randomly select a family in the data and see what that looks like in practice.
+Let's randomly select a family in the data and see what that looks like
+in practice.
+
 ```{r}
 #| code-fold: true
 household_serials <- oak %>%
@@ -318,15 +415,24 @@ oak %>% filter(SERIAL == sample_household) %>%
   select(c(SERIAL, PERNUM, AGE, HHINCOME, INCTOT, PERWT, HHWT))
 ```
 
-So here we can see that this household, with `SERIAL` `{r} format(sample_household, scientific=FALSE)` has `{r} n` members, each with a unique `PERNUM`.
+So here we can see that this household, with `SERIAL`
+`{r} format(sample_household, scientific=FALSE)` has `{r} n` members,
+each with a unique `PERNUM`.
 
-We also see their individual incomes in `INCTOT`, which reports each respondent's total pre-tax personal income or
-losses from all sources for the previous year. `9999999` is code to denote that the value is missing, which makes sense given that the missing values above correspond to children in the household [See [INCTOT](https://usa.ipums.org/usa-action/variables/INCTOT) in @ruggles_ipums_2024].  
+We also see their individual incomes in `INCTOT`, which reports each
+respondent's total pre-tax personal income or losses from all sources
+for the previous year. `9999999` is code to denote that the value is
+missing, which makes sense given that the missing values above
+correspond to children in the household [See
+[INCTOT](https://usa.ipums.org/usa-action/variables/INCTOT) in
+@ruggles_ipums_2024].
 
 `HHINCOME` reports the total money income of all household members age
 15+ during the previous year. The amount should equal the sum of all
 household members' individual incomes, as recorded in the person-record
-variable INCTOT [See [HHINCOME](https://usa.ipums.org/usa-action/variables/HHINCOME) in @ruggles_ipums_2024]
+variable INCTOT [See
+[HHINCOME](https://usa.ipums.org/usa-action/variables/HHINCOME) in
+@ruggles_ipums_2024]
 
 ### Sample weights in the ACS
 
@@ -354,7 +460,6 @@ households_w_income <- oak_households %>%
   filter(HHINCOME != 9999999, HHINCOME >= 0)
 ```
 
-
 ```{r}
 median_table <- households_w_income %>%
   as_survey(weights=HHWT) %>% 
@@ -376,7 +481,6 @@ bind_rows(count_table, median_table)%>%
 ```
 
 But recall that our IPUMS estimates were slightly different:
-
 
 ```{r}
 oakland_stats %>% select(c(variable, estimate))
