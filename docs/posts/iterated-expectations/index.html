@@ -2,14 +2,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.551">
+<meta name="generator" content="quarto-1.5.57">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Peter Amerkhanian">
 <meta name="dcterms.date" content="2023-12-01">
+<meta name="description" content="Notes on conditional probability and adam’s law, with a mix of formal notation and python code.">
 
-<title>Iterated Expectations</title>
+<title>Iterated Expectations – Home</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -35,7 +36,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -136,7 +137,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
@@ -184,7 +185,7 @@ window.Quarto = {
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -203,7 +204,7 @@ window.Quarto = {
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
-          <div class="quarto-navbar-tools">
+            <div class="quarto-navbar-tools">
 </div>
       </div> <!-- /container-fluid -->
     </nav>
@@ -213,7 +214,12 @@ window.Quarto = {
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
       <h1 class="title">Iterated Expectations</h1>
-                                <div class="quarto-categories">
+                  <div>
+        <div class="description">
+          Notes on conditional probability and adam’s law, with a mix of formal notation and python code.
+        </div>
+      </div>
+                          <div class="quarto-categories">
                 <div class="quarto-category">Python</div>
                 <div class="quarto-category">Probability</div>
               </div>
@@ -297,10 +303,9 @@ window.Quarto = {
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>people_df.head()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div>
-<div>
 
 
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
@@ -335,7 +340,6 @@ window.Quarto = {
 </tbody>
 </table>
 
-</div>
 </div>
 </div>
 </div>
@@ -446,10 +450,9 @@ E(\text{Age}) = &amp;\text{Age}_1P(\text{Age}=\text{Age}_1) + \\
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>people_df.head()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <div>
-<div>
 
 
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
@@ -491,7 +494,6 @@ E(\text{Age}) = &amp;\text{Age}_1P(\text{Age}=\text{Age}_1) + \\
 </tbody>
 </table>
 
-</div>
 </div>
 </div>
 </div>
@@ -633,10 +635,9 @@ E(\text{Age}) &amp;=E( \underbrace{E(\text{Age} \mid \text{Gender}=\text{Gender}
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>P_Age_Gender</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="16">
 <div>
-<div>
 
 
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th">Gender</th>
@@ -696,7 +697,6 @@ E(\text{Age}) &amp;=E( \underbrace{E(\text{Age} \mid \text{Gender}=\text{Gender}
 </div>
 </div>
 </div>
-</div>
 <p>Let’s compute the summation of <span class="math inline">\(P(\text{Age}=\text{Age}_i, \text{Gender}=\text{Gender}_j)\)</span> over <span class="math inline">\(\text{Gender}_j\)</span> and see what we get.</p>
 <div id="cell-41" class="cell" data-outputid="c058acd8-f0aa-4362-81ea-edb5b16b6b50" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>P_Age_Gender[<span class="st">"Male"</span>] <span class="op">+</span> P_Age_Gender[<span class="st">"Female"</span>]</span></code></pre></div>
@@ -746,10 +746,9 @@ E(\text{Age})  &amp;= \sum_{i} \text{Age}_i \sum_j P(\text{Age}=\text{Age}_i, \t
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>P_Age_Gender.head()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="19">
 <div>
-<div>
 
 
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th">Gender</th>
@@ -791,7 +790,6 @@ E(\text{Age})  &amp;= \sum_{i} \text{Age}_i \sum_j P(\text{Age}=\text{Age}_i, \t
 </tbody>
 </table>
 
-</div>
 </div>
 </div>
 </div>
@@ -907,7 +905,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {

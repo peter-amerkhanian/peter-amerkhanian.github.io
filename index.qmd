@@ -24,8 +24,8 @@ UC Berkeley MPP '23, BA '16
 <hr>
 I’m a Data Scientist/Policy Analyst working in government. Check out my:      
 
-- Formal reports and software $\rightarrow$ [Projects](projects.qmd)
+- Formal [reports and software](projects.qmd)
 
-- General audience policy analyses $\rightarrow$ [Memos](memos.qmd)
+- General audience [policy memos](memos.qmd)
 
-- Technical blog $\rightarrow$ [Blog](blog.qmd)
+- Technical [blog](blog.qmd)

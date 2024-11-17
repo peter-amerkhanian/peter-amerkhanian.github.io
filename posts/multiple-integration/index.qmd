@@ -1,9 +1,10 @@
 ---
-title: "Double Integrals in Probability"
+title: "Integrals in Probability"
 bibliography: "../../blog.bib"
 author: "Peter Amerkhanian"
 date: "2024-4-14"
 draft: false
+description: "Notes on the definite integral and probability modeling, with a mix of formal notation, `plotly` visuals, and `sympy` computation."
 image: thumbnail.png
 jupyter: python3
 engine: knitr

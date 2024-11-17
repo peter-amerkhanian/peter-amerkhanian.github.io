@@ -2,14 +2,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.551">
+<meta name="generator" content="quarto-1.5.57">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Peter Amerkhanian">
 <meta name="dcterms.date" content="2024-05-31">
+<meta name="description" content="Notes on matrix algebra and covariance, with a mix of formal notation and python code.">
 
-<title>The Covariance Matrix from Scratch</title>
+<title>The Covariance Matrix from Scratch – Home</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -35,7 +36,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -136,7 +137,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
@@ -184,7 +185,7 @@ window.Quarto = {
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -203,7 +204,7 @@ window.Quarto = {
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
-          <div class="quarto-navbar-tools">
+            <div class="quarto-navbar-tools">
 </div>
       </div> <!-- /container-fluid -->
     </nav>
@@ -213,7 +214,12 @@ window.Quarto = {
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
       <div class="quarto-title-block"><div><h1 class="title">The Covariance Matrix from Scratch</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
-                                <div class="quarto-categories">
+                  <div>
+        <div class="description">
+          Notes on matrix algebra and covariance, with a mix of formal notation and python code.
+        </div>
+      </div>
+                          <div class="quarto-categories">
                 <div class="quarto-category">Python</div>
                 <div class="quarto-category">Linear Algebra</div>
               </div>
@@ -321,10 +327,9 @@ window.Quarto = {
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>example</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div>
-<div>
 
 
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
@@ -361,7 +366,6 @@ window.Quarto = {
 </tbody>
 </table>
 
-</div>
 </div>
 </div>
 </div>
@@ -510,10 +514,9 @@ X_{n \times 2} =
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>X</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <div>
-<div>
 
 
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
@@ -550,7 +553,6 @@ X_{n \times 2} =
 </tbody>
 </table>
 
-</div>
 </div>
 </div>
 </div>
@@ -847,10 +849,10 @@ T_\text{mean}: \mathbb{R}^n \rightarrow \mathbb{R}^1 \quad \text{defined by} \qu
 \right]_{n \times 2} =
 \left[
 \begin{matrix}
-    \sum_{i=1}^n \frac{x}{n}   &amp; \sum_{i=1}^n \frac{y}{n}   \\
-    \sum_{i=1}^n \frac{x}{n}   &amp; \sum_{i=1}^n \frac{y}{n}  \\
+    \sum_{i=1}^n \frac{x_i}{n}   &amp; \sum_{i=1}^n \frac{y_i}{n}   \\
+    \sum_{i=1}^n \frac{x_i}{n}   &amp; \sum_{i=1}^n \frac{y_i}{n}  \\
     \vdots   &amp; \vdots   \\
-    \sum_{i=1}^n \frac{x}{n}   &amp; \sum_{i=1}^n \frac{y}{n}   \\
+    \sum_{i=1}^n \frac{x_i}{n}   &amp; \sum_{i=1}^n \frac{y_i}{n}   \\
 \end{matrix}
 \right]_{n \times 2}
 = \left[
@@ -909,12 +911,12 @@ n^{-1} \mathbf{1}_{n \times 1} \mathbf{1}_{n \times 1}^\intercal X_{n \times 2} 
 \right]_{n \times 2} \\
 &amp;= \left[
 \begin{matrix}
-    \sum_{i=1}^n \frac{x}{n}   &amp; \sum_{i=1}^n \frac{y}{n}   \\
-    \sum_{i=1}^n \frac{x}{n}   &amp; \sum_{i=1}^n \frac{y}{n}  \\
+    \sum_{i=1}^n \frac{x_i}{n}   &amp; \sum_{i=1}^n \frac{y_i}{n}   \\
+    \sum_{i=1}^n \frac{x_i}{n}   &amp; \sum_{i=1}^n \frac{y_i}{n}  \\
     \vdots   &amp; \vdots   \\
-    \sum_{i=1}^n \frac{x}{n}   &amp; \sum_{i=1}^n \frac{y}{n}   \\
+    \sum_{i=1}^n \frac{x_i}{n}   &amp; \sum_{i=1}^n \frac{y_i}{n}   \\
 \end{matrix}
-\right]_{n \times 2} \\
+\right]_{n \times 2}  \\
 &amp;= \left[
 \begin{matrix}
     \bar{\mathbf{x}}   &amp; \bar{\mathbf{y}}   \\
@@ -987,10 +989,9 @@ T_{\text{center}}: \mathbb{R}^n \rightarrow \mathbb{R}^n \quad \text{defined by}
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">-</span> X.mean()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="14">
 <div>
-<div>
 
 
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
@@ -1027,7 +1028,6 @@ T_{\text{center}}: \mathbb{R}^n \rightarrow \mathbb{R}^n \quad \text{defined by}
 </tbody>
 </table>
 
-</div>
 </div>
 </div>
 </div>
@@ -1036,10 +1036,9 @@ T_{\text{center}}: \mathbb{R}^n \rightarrow \mathbb{R}^n \quad \text{defined by}
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>T_center(X)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="15">
 <div>
-<div>
 
 
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
@@ -1076,7 +1075,6 @@ T_{\text{center}}: \mathbb{R}^n \rightarrow \mathbb{R}^n \quad \text{defined by}
 </tbody>
 </table>
 
-</div>
 </div>
 </div>
 </div>
@@ -1133,10 +1131,9 @@ C = (n - 1)^{-1} X_c^\intercal X_c \\
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>X</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="17">
 <div>
-<div>
 
 
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
@@ -1173,7 +1170,6 @@ C = (n - 1)^{-1} X_c^\intercal X_c \\
 </tbody>
 </table>
 
-</div>
 </div>
 </div>
 </div>
@@ -1259,10 +1255,9 @@ C = (n - 1)^{-1} X_c^\intercal X_c
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>X.cov()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="24">
 <div>
-<div>
 
 
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
@@ -1284,7 +1279,6 @@ C = (n - 1)^{-1} X_c^\intercal X_c
 </tbody>
 </table>
 
-</div>
 </div>
 </div>
 </div>
@@ -1419,7 +1413,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {

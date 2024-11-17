@@ -13,7 +13,8 @@ pagetitle: "{{< meta title >}}"
 
 toc-title: Contents
 jupyter: python3
-
+execute:
+  freeze: auto
 format:
   html:
     anchor-sections: true

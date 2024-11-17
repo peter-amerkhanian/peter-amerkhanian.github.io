@@ -3,6 +3,7 @@ title: "Production Maximization with Lagrange Mutlipliers"
 bibliography: "../../blog.bib"
 author: "Peter Amerkhanian"
 date: "2024-3-17"
+description: "Solving an optimization problem in (Strang and Herman 2016) using lagrange multipliers, with some `plotly` visuals mixed in."
 categories: ['R', 'Calculus']
 image: thumbnail.png
 format:

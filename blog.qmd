@@ -10,7 +10,7 @@ listing:
   categories: true
   sort-ui: false
   filter-ui: false
-  fields: [date, title, categories,  image, reading-time]
+  fields: [date, title, categories, description, image, reading-time]
   image-align: right
   field-display-names:
     date: Date

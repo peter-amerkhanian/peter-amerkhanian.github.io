@@ -12,6 +12,8 @@ pagetitle: "{{< meta title >}}"
 
 
 toc-title: Contents
+execute:
+  freeze: auto 
 # jupyter: python3
 image: thumbnail.png
 format:
