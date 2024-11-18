@@ -22,6 +22,7 @@ website:
 
   page-footer: "Copyright 2024, Peter Amerkhanian"
 
+
 format:
   html:
     link-external-newwindow: true
