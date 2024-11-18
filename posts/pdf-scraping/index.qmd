@@ -1,6 +1,7 @@
 ---
 title: "Reliable PDF Scraping with tabula-py"
 author: "Peter Amerkhanian"
+bibliography: "../../blog.bib"
 date: "2022-07-20"
 description: "Using `tabula` in python to read in tables from .pdf files"
 categories: ['Python', 'Data Management']

@@ -6,15 +6,11 @@ freeze: true
 
 # Enable banner style title blocks
 title-block-banner: true
-
-
-pagetitle: "{{< meta title >}}"
-
-
+title-prefix: "Peter Amerkhanian"
 toc-title: Contents
 jupyter: python3
 execute:
-  freeze: auto
+  freeze: true
 format:
   html:
     anchor-sections: true

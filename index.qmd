@@ -1,6 +1,7 @@
 ---
 title: "Peter Amerkhanian"
-pagetitle: "Peter Amerkhanian"
+title-prefix: "Peter Amerkhanian"
+pagetitle: "Home"
 image: profile.jpg
 about:
   id: hero-heading
@@ -24,8 +25,8 @@ UC Berkeley MPP '23, BA '16
 <hr>
 I’m a Data Scientist/Policy Analyst working in government. Check out my:      
 
-- Formal [reports and software](projects.qmd)
-
-- General audience [policy memos](memos.qmd)
+- Professional [reports and software](projects.qmd)
 
 - Technical [blog](blog.qmd)
+
+- Informal [policy memos](memos.qmd)

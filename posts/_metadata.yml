@@ -8,10 +8,10 @@ freeze: true
 title-block-banner: true
 
 
-pagetitle: "{{< meta title >}}"
-
-
+title-prefix: "Peter Amerkhanian"
 toc-title: Contents
+citation: true
+bibliography: biblio.bib
 execute:
   freeze: auto 
 # jupyter: python3
