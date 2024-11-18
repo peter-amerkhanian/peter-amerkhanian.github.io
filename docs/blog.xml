@@ -114,7 +114,7 @@
   <title>Newton’s Method From The Ground Up</title>
   <dc:creator>Peter Amerkhanian</dc:creator>
   <link>https://peter-amerkhanian.com/posts/newtons-method/</link>
-  <description><![CDATA[ Using newton’s method for root-finding, with some python code and a .gif of the search. ]]></description>
+  <description><![CDATA[ Using newton’s method for root-finding and optimization, with python code and a .gif of the search. ]]></description>
   <category>Python</category>
   <category>Calculus</category>
   <guid>https://peter-amerkhanian.com/posts/newtons-method/</guid>
@@ -134,6 +134,7 @@
 </item>
 <item>
   <title>Buy vs. Rent, A Financial Modeling Workflow in Python</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
   <link>https://peter-amerkhanian.com/posts/rent-vs-buy/</link>
   <description><![CDATA[ Using numpy-financial and monte-carlo simulation to evaluate investments. ]]></description>
   <category>Python</category>
@@ -146,7 +147,7 @@
   <title>Reliable PDF Scraping with tabula-py</title>
   <dc:creator>Peter Amerkhanian</dc:creator>
   <link>https://peter-amerkhanian.com/posts/pdf-scraping/</link>
-  <description><![CDATA[ Using tabula in python to read in tables from .pdfs ]]></description>
+  <description><![CDATA[ Using tabula in python to read in tables from .pdf files ]]></description>
   <category>Python</category>
   <category>Data Management</category>
   <guid>https://peter-amerkhanian.com/posts/pdf-scraping/</guid>

@@ -8,9 +8,9 @@
 
 <meta name="author" content="Peter Amerkhanian">
 <meta name="dcterms.date" content="2022-07-20">
-<meta name="description" content="Using tabula in python to read in tables from .pdfs">
+<meta name="description" content="Using tabula in python to read in tables from .pdf files">
 
-<title>Reliable PDF Scraping with tabula-py – Home</title>
+<title>Reliable PDF Scraping with tabula-py – Peter Amerkhanian</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -148,7 +148,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../projects.html"> 
-<span class="menu-text">Projects</span></a>
+<span class="menu-text">Professional</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -164,7 +164,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
       <div class="quarto-title-block"><div><h1 class="title">Reliable PDF Scraping with tabula-py</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
                   <div>
         <div class="description">
-          Using <code>tabula</code> in python to read in tables from <code>.pdf</code>s
+          Using <code>tabula</code> in python to read in tables from .pdf files
         </div>
       </div>
                           <div class="quarto-categories">
@@ -362,7 +362,17 @@ Now I run into something unique to this data – some of the .pdf tables had sli
 
 </section>
 
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{amerkhanian2022,
+  author = {Amerkhanian, Peter},
+  title = {Reliable {PDF} {Scraping} with Tabula-Py},
+  date = {2022-07-20},
+  url = {https://peter-amerkhanian.com/posts/pdf-scraping/},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-amerkhanian2022" class="csl-entry quarto-appendix-citeas" role="listitem">
+Amerkhanian, Peter. 2022. <span>“Reliable PDF Scraping with
+Tabula-Py.”</span> July 20, 2022. <a href="https://peter-amerkhanian.com/posts/pdf-scraping/">https://peter-amerkhanian.com/posts/pdf-scraping/</a>.
+</div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -779,131 +789,132 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <div class="sourceCode" id="cb5" data-shortcodes="false"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Reliable PDF Scraping with tabula-py"</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> "Peter Amerkhanian"</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> "2022-07-20"</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> "Using `tabula` in python to read in tables from `.pdf`s"</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> ['Python', 'Data Management']</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="an">execute:</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">  freeze: true</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-depth: 3</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: false</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">  docx:</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">    number-sections: true</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co">    highlight-style: github</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="fu">### Summary</span></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Use a combination of <span class="in">`tabula`</span>'s <span class="in">`read_pdf()`</span> function  and <span class="in">`pandas`</span>' various data manipulation functions in Python to accurately scrape .pdf files  </span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="fu">### Prerequisites/Assumptions</span></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Windows 10 with administrator privileges (for setting environmental variables)</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Java SE Development Kit installed on your machine (<span class="co">[</span><span class="ot">download</span><span class="co">](https://www.oracle.com/java/technologies/downloads/)</span>)</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>set Java's <span class="in">`PATH`</span> environmental variable to point to the Java directory (see more <span class="co">[</span><span class="ot">here</span><span class="co">](https://tabula-py.readthedocs.io/en/latest/getting_started.html#installation)</span> under "Get tabula-py working (Windows 10)")  </span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Python version ~3.8 ish (I'm using <span class="in">`Python 3.9.12`</span> in Anaconda)</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>Anaconda included packages - Pandas and NumPy</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>Libraries maybe not included in Anaconda: <span class="co">[</span><span class="ot">requests</span><span class="co">](https://requests.readthedocs.io/en/latest/)</span>, <span class="co">[</span><span class="ot">tabula-py</span><span class="co">](https://github.com/chezou/tabula-py)</span></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="fu">### Problem Narrative</span></span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>I'm interested in conducting a data analysis that involves the market value of single family homes in San Mateo County, California. This data can be hard to come by, but I've found a good county level resource -- The San Mateo Association of Realtors' <span class="co">[</span><span class="ot">"Market Data" page</span><span class="co">](https://www.samcar.org/member-resources/market-data/)</span>.  </span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>|<span class="al">![downloader](images/1-smr.png)</span>| </span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>|:--:| </span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>| *Fig 1: San Mateo Realtors Data Download Page* |  </span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>However, to my dismay, I find that when I download one of these reports, I only get a .pdf containing a single table. It seems to be some sort of export of an Excel table, but the Association of Realtors has not made the actual spreadsheet available. Here is an example of one of their .pdf reports -- in this case for April 2022:</span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>|<span class="al">![pdf](images/2-smr.png)</span>| </span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>|:--:| </span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>| *Fig 2: Example PDF report :(* |  </span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>This is the exact data I want, but there are a few key issues:</span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The data are in .pdf files</span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>You can only download monthly data files one at a time</span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a><span class="fu">### Solution</span></span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>I'll solve this issue by writing a script to do the following:</span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Iterate through the urls of each of the monthly reports going back to 2011. For each report:</span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>download its .pdf</span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>parse and save the data from its .pdf</span>
-<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>Start with loading in the necessary libraries:</span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
-<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tabula <span class="im">import</span> read_pdf</span>
-<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>Get right into the script, which implements the pseudo-code I outlined above:</span>
-<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
-<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>agent <span class="op">=</span> [<span class="st">'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'</span>,</span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>         <span class="st">'AppleWebKit/537.36 (KHTML, like Gecko)'</span>,</span>
-<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>         <span class="st">'Chrome/91.0.4472.114 Safari/537.36'</span>]</span>
-<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
-<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>headers <span class="op">=</span> {<span class="st">'user-agent'</span>: <span class="st">" "</span>.join(agent)}</span>
-<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2011</span>, <span class="dv">2021</span>):</span>
-<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> month <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">12</span>):</span>
-<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>        base <span class="op">=</span> <span class="st">"https://www.samcar.org/userfiles/file/salesstats/"</span></span>
-<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>        url <span class="op">=</span> base <span class="op">+</span> <span class="ss">f"SF_</span><span class="sc">{</span>year<span class="sc">}{</span><span class="bu">str</span>(month)<span class="sc">.</span>zfill(<span class="dv">2</span>) <span class="sc">}</span><span class="ss">.pdf"</span></span>
-<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(url)</span>
-<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>        r <span class="op">=</span> requests.get(url,</span>
-<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>                         stream<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>                         headers<span class="op">=</span>headers)</span>
-<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>        <span class="bu">open</span>(<span class="st">'holder.pdf'</span>, <span class="st">'wb'</span>).write(r.content)</span>
-<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a>        df <span class="op">=</span> read_pdf(<span class="st">"holder.pdf"</span>, pages<span class="op">=</span><span class="st">"all"</span>)</span>
-<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a>        table <span class="op">=</span> df[<span class="dv">0</span>].iloc[<span class="op">-</span><span class="dv">1</span>, :]</span>
-<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>        table[<span class="st">"date"</span>] <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>year<span class="sc">}</span><span class="ss">-</span><span class="sc">{</span><span class="bu">str</span>(month)<span class="sc">.</span>zfill(<span class="dv">2</span>)<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>        rows.append(table)</span>
-<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a>Note: I'm defining <span class="in">`agent`</span> in order to preempt being blocked by the site (<span class="co">[</span><span class="ot">read more</span><span class="co">](https://developer.mozilla.org/en-US/docs/Glossary/User_agent)</span>).  </span>
-<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>What's remarkable about <span class="in">`tabula.read_pdf()`</span> is that *it just works*. I didn't have to really do any tinkering or iterating to get it going. Once it had access to the downloaded .pdf files, it easily and quickly parsed them.  </span>
-<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>Now I run into something unique to this data -- some of the .pdf tables had slightly different column names over the years. I implement a fix for that with the following code:</span>
-<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
-<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a>cleaned_rows <span class="op">=</span> []</span>
-<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> row <span class="kw">in</span> rows:</span>
-<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
-<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a>        new <span class="op">=</span> row.rename(</span>
-<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>            {<span class="st">"Sales"</span>: <span class="st">"Closed Sales"</span>,</span>
-<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Sold"</span>: <span class="st">"Closed Sales"</span>,</span>
-<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Avg Sales Price"</span>: <span class="st">"Average Sales Price"</span>,</span>
-<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Avg SalePrice"</span>: <span class="st">"Average Sales Price"</span>,</span>
-<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Unnamed: 3"</span>: <span class="st">"Closed Sales"</span>,</span>
-<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Unnamed: 5"</span>: <span class="st">"Average Sales Price"</span>})[[<span class="st">"date"</span>,</span>
-<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a>                                                    <span class="st">"Closed Sales"</span>,</span>
-<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a>                                                    <span class="st">"Average Sales Price"</span>]]</span>
-<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a>        cleaned_rows.append(new.to_frame())</span>
-<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">KeyError</span>:</span>
-<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"******error"</span>)</span>
-<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a>With the data retrieved and parsed, I perform some final cleaning and arrangement steps before exporting to a .csv</span>
-<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
-<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a>all_years <span class="op">=</span> pd.concat(cleaned_rows, axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a><span class="co"># Transpose the data and set `date` as the index</span></span>
-<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a>final_df <span class="op">=</span> all_years.T.set_index(<span class="st">"date"</span>)</span>
-<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the dollar signs and commas out. E.g. $1,658,900 -&gt; 1658900</span></span>
-<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a>final_df[<span class="st">"Average Sales Price"</span>] <span class="op">=</span> (final_df[<span class="st">"Average Sales Price"</span>]</span>
-<span id="cb5-110"><a href="#cb5-110" aria-hidden="true" tabindex="-1"></a>                                   .<span class="bu">str</span>.replace(<span class="st">"[\$,]"</span>,</span>
-<span id="cb5-111"><a href="#cb5-111" aria-hidden="true" tabindex="-1"></a>                                                <span class="st">""</span>,</span>
-<span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a>                                                regex<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb5-113"><a href="#cb5-113" aria-hidden="true" tabindex="-1"></a>                                   .astype(<span class="bu">int</span>))</span>
-<span id="cb5-114"><a href="#cb5-114" aria-hidden="true" tabindex="-1"></a><span class="co"># Closed Sales is discrete count data, so we convert to `int`</span></span>
-<span id="cb5-115"><a href="#cb5-115" aria-hidden="true" tabindex="-1"></a>final_df[<span class="st">"Closed Sales"</span>] <span class="op">=</span> final_df[<span class="st">"Closed Sales"</span>].astype(<span class="bu">int</span>)</span>
-<span id="cb5-116"><a href="#cb5-116" aria-hidden="true" tabindex="-1"></a>final_df.to_csv(<span class="st">"realtors_data_san_mateo.csv"</span>)</span>
-<span id="cb5-117"><a href="#cb5-117" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb5-118"><a href="#cb5-118" aria-hidden="true" tabindex="-1"></a>The final product is a satisfying time series data set of the number of closed single family home sales and the average price of those sales over time.  </span>
-<span id="cb5-119"><a href="#cb5-119" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-120"><a href="#cb5-120" aria-hidden="true" tabindex="-1"></a>|<span class="al">![pdf](images/3-csv.png)</span>| </span>
-<span id="cb5-121"><a href="#cb5-121" aria-hidden="true" tabindex="-1"></a>|:--:| </span>
-<span id="cb5-122"><a href="#cb5-122" aria-hidden="true" tabindex="-1"></a>| *Fig 3: Final .csv open in Excel* |  </span>
-<span id="cb5-123"><a href="#cb5-123" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-124"><a href="#cb5-124" aria-hidden="true" tabindex="-1"></a>That's surprisingly it.</span>
-<span id="cb5-125"><a href="#cb5-125" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-126"><a href="#cb5-126" aria-hidden="true" tabindex="-1"></a><span class="fu">### Conclusion</span></span>
-<span id="cb5-127"><a href="#cb5-127" aria-hidden="true" tabindex="-1"></a>Tabula-py is a very convenient and powerful .pdf parser (ported from <span class="co">[</span><span class="ot">Java</span><span class="co">](https://tabula.technology/)</span>) and easily handled basically all of the .pdfs I put through it.  </span>
-<span id="cb5-128"><a href="#cb5-128" aria-hidden="true" tabindex="-1"></a>  </span></code></pre></div>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="an">bibliography:</span><span class="co"> "../../blog.bib"</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> "2022-07-20"</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> "Using `tabula` in python to read in tables from .pdf files"</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> ['Python', 'Data Management']</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="an">execute:</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">  freeze: true</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-depth: 3</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: false</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">  docx:</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co">    number-sections: true</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co">    highlight-style: github</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="fu">### Summary</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Use a combination of <span class="in">`tabula`</span>'s <span class="in">`read_pdf()`</span> function  and <span class="in">`pandas`</span>' various data manipulation functions in Python to accurately scrape .pdf files  </span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="fu">### Prerequisites/Assumptions</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Windows 10 with administrator privileges (for setting environmental variables)</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Java SE Development Kit installed on your machine (<span class="co">[</span><span class="ot">download</span><span class="co">](https://www.oracle.com/java/technologies/downloads/)</span>)</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>set Java's <span class="in">`PATH`</span> environmental variable to point to the Java directory (see more <span class="co">[</span><span class="ot">here</span><span class="co">](https://tabula-py.readthedocs.io/en/latest/getting_started.html#installation)</span> under "Get tabula-py working (Windows 10)")  </span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Python version ~3.8 ish (I'm using <span class="in">`Python 3.9.12`</span> in Anaconda)</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>Anaconda included packages - Pandas and NumPy</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>Libraries maybe not included in Anaconda: <span class="co">[</span><span class="ot">requests</span><span class="co">](https://requests.readthedocs.io/en/latest/)</span>, <span class="co">[</span><span class="ot">tabula-py</span><span class="co">](https://github.com/chezou/tabula-py)</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="fu">### Problem Narrative</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>I'm interested in conducting a data analysis that involves the market value of single family homes in San Mateo County, California. This data can be hard to come by, but I've found a good county level resource -- The San Mateo Association of Realtors' <span class="co">[</span><span class="ot">"Market Data" page</span><span class="co">](https://www.samcar.org/member-resources/market-data/)</span>.  </span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>|<span class="al">![downloader](images/1-smr.png)</span>| </span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>|:--:| </span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>| *Fig 1: San Mateo Realtors Data Download Page* |  </span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>However, to my dismay, I find that when I download one of these reports, I only get a .pdf containing a single table. It seems to be some sort of export of an Excel table, but the Association of Realtors has not made the actual spreadsheet available. Here is an example of one of their .pdf reports -- in this case for April 2022:</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>|<span class="al">![pdf](images/2-smr.png)</span>| </span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>|:--:| </span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>| *Fig 2: Example PDF report :(* |  </span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>This is the exact data I want, but there are a few key issues:</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The data are in .pdf files</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>You can only download monthly data files one at a time</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a><span class="fu">### Solution</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>I'll solve this issue by writing a script to do the following:</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Iterate through the urls of each of the monthly reports going back to 2011. For each report:</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>download its .pdf</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>parse and save the data from its .pdf</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>Start with loading in the necessary libraries:</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tabula <span class="im">import</span> read_pdf</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>Get right into the script, which implements the pseudo-code I outlined above:</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>agent <span class="op">=</span> [<span class="st">'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'</span>,</span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>         <span class="st">'AppleWebKit/537.36 (KHTML, like Gecko)'</span>,</span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>         <span class="st">'Chrome/91.0.4472.114 Safari/537.36'</span>]</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>headers <span class="op">=</span> {<span class="st">'user-agent'</span>: <span class="st">" "</span>.join(agent)}</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2011</span>, <span class="dv">2021</span>):</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> month <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">12</span>):</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>        base <span class="op">=</span> <span class="st">"https://www.samcar.org/userfiles/file/salesstats/"</span></span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>        url <span class="op">=</span> base <span class="op">+</span> <span class="ss">f"SF_</span><span class="sc">{</span>year<span class="sc">}{</span><span class="bu">str</span>(month)<span class="sc">.</span>zfill(<span class="dv">2</span>) <span class="sc">}</span><span class="ss">.pdf"</span></span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(url)</span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>        r <span class="op">=</span> requests.get(url,</span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>                         stream<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>                         headers<span class="op">=</span>headers)</span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a>        <span class="bu">open</span>(<span class="st">'holder.pdf'</span>, <span class="st">'wb'</span>).write(r.content)</span>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a>        df <span class="op">=</span> read_pdf(<span class="st">"holder.pdf"</span>, pages<span class="op">=</span><span class="st">"all"</span>)</span>
+<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>        table <span class="op">=</span> df[<span class="dv">0</span>].iloc[<span class="op">-</span><span class="dv">1</span>, :]</span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>        table[<span class="st">"date"</span>] <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>year<span class="sc">}</span><span class="ss">-</span><span class="sc">{</span><span class="bu">str</span>(month)<span class="sc">.</span>zfill(<span class="dv">2</span>)<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a>        rows.append(table)</span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>Note: I'm defining <span class="in">`agent`</span> in order to preempt being blocked by the site (<span class="co">[</span><span class="ot">read more</span><span class="co">](https://developer.mozilla.org/en-US/docs/Glossary/User_agent)</span>).  </span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>What's remarkable about <span class="in">`tabula.read_pdf()`</span> is that *it just works*. I didn't have to really do any tinkering or iterating to get it going. Once it had access to the downloaded .pdf files, it easily and quickly parsed them.  </span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a>Now I run into something unique to this data -- some of the .pdf tables had slightly different column names over the years. I implement a fix for that with the following code:</span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a>cleaned_rows <span class="op">=</span> []</span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> row <span class="kw">in</span> rows:</span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>        new <span class="op">=</span> row.rename(</span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a>            {<span class="st">"Sales"</span>: <span class="st">"Closed Sales"</span>,</span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Sold"</span>: <span class="st">"Closed Sales"</span>,</span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Avg Sales Price"</span>: <span class="st">"Average Sales Price"</span>,</span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Avg SalePrice"</span>: <span class="st">"Average Sales Price"</span>,</span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Unnamed: 3"</span>: <span class="st">"Closed Sales"</span>,</span>
+<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Unnamed: 5"</span>: <span class="st">"Average Sales Price"</span>})[[<span class="st">"date"</span>,</span>
+<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a>                                                    <span class="st">"Closed Sales"</span>,</span>
+<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a>                                                    <span class="st">"Average Sales Price"</span>]]</span>
+<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a>        cleaned_rows.append(new.to_frame())</span>
+<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">KeyError</span>:</span>
+<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"******error"</span>)</span>
+<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a>With the data retrieved and parsed, I perform some final cleaning and arrangement steps before exporting to a .csv</span>
+<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a>all_years <span class="op">=</span> pd.concat(cleaned_rows, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a><span class="co"># Transpose the data and set `date` as the index</span></span>
+<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a>final_df <span class="op">=</span> all_years.T.set_index(<span class="st">"date"</span>)</span>
+<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the dollar signs and commas out. E.g. $1,658,900 -&gt; 1658900</span></span>
+<span id="cb5-110"><a href="#cb5-110" aria-hidden="true" tabindex="-1"></a>final_df[<span class="st">"Average Sales Price"</span>] <span class="op">=</span> (final_df[<span class="st">"Average Sales Price"</span>]</span>
+<span id="cb5-111"><a href="#cb5-111" aria-hidden="true" tabindex="-1"></a>                                   .<span class="bu">str</span>.replace(<span class="st">"[\$,]"</span>,</span>
+<span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a>                                                <span class="st">""</span>,</span>
+<span id="cb5-113"><a href="#cb5-113" aria-hidden="true" tabindex="-1"></a>                                                regex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb5-114"><a href="#cb5-114" aria-hidden="true" tabindex="-1"></a>                                   .astype(<span class="bu">int</span>))</span>
+<span id="cb5-115"><a href="#cb5-115" aria-hidden="true" tabindex="-1"></a><span class="co"># Closed Sales is discrete count data, so we convert to `int`</span></span>
+<span id="cb5-116"><a href="#cb5-116" aria-hidden="true" tabindex="-1"></a>final_df[<span class="st">"Closed Sales"</span>] <span class="op">=</span> final_df[<span class="st">"Closed Sales"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb5-117"><a href="#cb5-117" aria-hidden="true" tabindex="-1"></a>final_df.to_csv(<span class="st">"realtors_data_san_mateo.csv"</span>)</span>
+<span id="cb5-118"><a href="#cb5-118" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-119"><a href="#cb5-119" aria-hidden="true" tabindex="-1"></a>The final product is a satisfying time series data set of the number of closed single family home sales and the average price of those sales over time.  </span>
+<span id="cb5-120"><a href="#cb5-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-121"><a href="#cb5-121" aria-hidden="true" tabindex="-1"></a>|<span class="al">![pdf](images/3-csv.png)</span>| </span>
+<span id="cb5-122"><a href="#cb5-122" aria-hidden="true" tabindex="-1"></a>|:--:| </span>
+<span id="cb5-123"><a href="#cb5-123" aria-hidden="true" tabindex="-1"></a>| *Fig 3: Final .csv open in Excel* |  </span>
+<span id="cb5-124"><a href="#cb5-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-125"><a href="#cb5-125" aria-hidden="true" tabindex="-1"></a>That's surprisingly it.</span>
+<span id="cb5-126"><a href="#cb5-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-127"><a href="#cb5-127" aria-hidden="true" tabindex="-1"></a><span class="fu">### Conclusion</span></span>
+<span id="cb5-128"><a href="#cb5-128" aria-hidden="true" tabindex="-1"></a>Tabula-py is a very convenient and powerful .pdf parser (ported from <span class="co">[</span><span class="ot">Java</span><span class="co">](https://tabula.technology/)</span>) and easily handled basically all of the .pdfs I put through it.  </span>
+<span id="cb5-129"><a href="#cb5-129" aria-hidden="true" tabindex="-1"></a>  </span></code></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 <footer class="footer">
