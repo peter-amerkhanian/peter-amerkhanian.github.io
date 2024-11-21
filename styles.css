@@ -10,6 +10,13 @@ div.quarto-post .metadata {
     flex-basis: 15% !important;
 } */
 
+/* fix the code box border disappearing */
+@media (min-width: 992px) {
+    div.sourceCode {
+        margin-left: 0px
+    }
+}
+
 /* Fix the overflow of references */
 #refs {
     overflow-y: scroll

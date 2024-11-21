@@ -62,7 +62,7 @@
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/blog.html</loc>
-    <lastmod>2024-11-20T03:13:01.372Z</lastmod>
+    <lastmod>2024-11-20T18:25:29.956Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/memos.html</loc>
@@ -75,5 +75,9 @@
   <url>
     <loc>https://peter-amerkhanian.com/posts/minima-3d/index.html</loc>
     <lastmod>2024-11-18T17:35:33.378Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/sql-count-cases/index.html</loc>
+    <lastmod>2024-11-21T03:27:12.030Z</lastmod>
   </url>
 </urlset>
