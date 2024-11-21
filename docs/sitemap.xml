@@ -21,48 +21,52 @@
     <lastmod>2024-11-17T21:58:58.896Z</lastmod>
   </url>
   <url>
-    <loc>https://peter-amerkhanian.com/posts/rent-vs-buy/index.html</loc>
-    <lastmod>2024-11-20T03:13:01.881Z</lastmod>
-  </url>
-  <url>
-    <loc>https://peter-amerkhanian.com/posts/newtons-method/index.html</loc>
-    <lastmod>2024-11-17T21:58:58.832Z</lastmod>
-  </url>
-  <url>
-    <loc>https://peter-amerkhanian.com/posts/iterated-expectations/index.html</loc>
-    <lastmod>2024-11-17T21:58:58.798Z</lastmod>
-  </url>
-  <url>
-    <loc>https://peter-amerkhanian.com/posts/covariance-matrices/index.html</loc>
-    <lastmod>2024-11-17T21:58:58.789Z</lastmod>
-  </url>
-  <url>
-    <loc>https://peter-amerkhanian.com/memos/SF-Arrests/index.html</loc>
-    <lastmod>2024-11-20T03:15:41.261Z</lastmod>
-  </url>
-  <url>
-    <loc>https://peter-amerkhanian.com/memos/SIR/index.html</loc>
-    <lastmod>2024-11-17T21:58:58.778Z</lastmod>
-  </url>
-  <url>
-    <loc>https://peter-amerkhanian.com/posts/dask-data-io/index.html</loc>
-    <lastmod>2024-11-17T21:58:58.795Z</lastmod>
-  </url>
-  <url>
-    <loc>https://peter-amerkhanian.com/posts/linear-approximation-3d/index.html</loc>
-    <lastmod>2024-11-17T21:58:58.812Z</lastmod>
+    <loc>https://peter-amerkhanian.com/posts/simple-constrained-optimization/index.html</loc>
+    <lastmod>2024-11-20T03:13:01.892Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/overfitting/index.html</loc>
     <lastmod>2024-11-17T21:58:58.858Z</lastmod>
   </url>
   <url>
-    <loc>https://peter-amerkhanian.com/posts/simple-constrained-optimization/index.html</loc>
-    <lastmod>2024-11-20T03:13:01.892Z</lastmod>
+    <loc>https://peter-amerkhanian.com/posts/linear-approximation-3d/index.html</loc>
+    <lastmod>2024-11-17T21:58:58.812Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/dask-data-io/index.html</loc>
+    <lastmod>2024-11-17T21:58:58.795Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/memos/SIR/index.html</loc>
+    <lastmod>2024-11-17T21:58:58.778Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/memos/SF-Arrests/index.html</loc>
+    <lastmod>2024-11-20T03:15:41.261Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/covariance-matrices/index.html</loc>
+    <lastmod>2024-11-17T21:58:58.789Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/iterated-expectations/index.html</loc>
+    <lastmod>2024-11-17T21:58:58.798Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/newtons-method/index.html</loc>
+    <lastmod>2024-11-17T21:58:58.832Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/rent-vs-buy/index.html</loc>
+    <lastmod>2024-11-20T03:13:01.881Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/sql-count-cases/index.html</loc>
+    <lastmod>2024-11-21T21:34:05.595Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/blog.html</loc>
-    <lastmod>2024-11-20T18:25:29.956Z</lastmod>
+    <lastmod>2024-11-21T16:25:47.396Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/memos.html</loc>
@@ -75,9 +79,5 @@
   <url>
     <loc>https://peter-amerkhanian.com/posts/minima-3d/index.html</loc>
     <lastmod>2024-11-18T17:35:33.378Z</lastmod>
-  </url>
-  <url>
-    <loc>https://peter-amerkhanian.com/posts/sql-count-cases/index.html</loc>
-    <lastmod>2024-11-21T03:27:12.030Z</lastmod>
   </url>
 </urlset>
