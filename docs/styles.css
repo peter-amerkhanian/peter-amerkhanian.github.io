@@ -10,6 +10,14 @@ div.quarto-post .metadata {
     flex-basis: 15% !important;
 } */
 
+
+/* Make the social media icons horizontal on mobile*/
+@media (max-width: 991.98px) {
+    div.quarto-about-trestles .about-entity .about-links {
+        flex-direction: row;
+    }
+}
+
 /* Fix the overflow of references */
 #refs {
     overflow-y: scroll
