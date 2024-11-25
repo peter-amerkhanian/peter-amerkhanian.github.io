@@ -10,10 +10,18 @@ div.quarto-post .metadata {
     flex-basis: 15% !important;
 } */
 
+<<<<<<< HEAD
 /* fix the code box border disappearing */
 @media (min-width: 992px) {
     div.sourceCode {
         margin-left: 0px
+=======
+
+/* Make the social media icons horizontal on mobile*/
+@media (max-width: 991.98px) {
+    div.quarto-about-trestles .about-entity .about-links {
+        flex-direction: row;
+>>>>>>> e6cbd04062eb1ff9b2962a4444812becba2a46b8
     }
 }
 
