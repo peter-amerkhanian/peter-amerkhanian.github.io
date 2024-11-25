@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Peter Amerkhanian">
+<meta name="dcterms.date" content="2023-12-01">
+<meta name="description" content="Notes on conditional probability and adam’s law, with a mix of formal notation and python code.">
+
+<title>Iterated Expectations – Peter Amerkhanian</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../profile.jpg" rel="icon" type="image/jpeg">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-V95HGLKTEB"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../profile.jpg" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Home</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../memos.html"> 
+<span class="menu-text">Memos</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Professional</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Iterated Expectations</h1>
+                  <div>
+        <div class="description">
+          Notes on conditional probability and adam’s law, with a mix of formal notation and python code.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">Python</div>
+                <div class="quarto-category">Probability</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Peter Amerkhanian </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">December 1, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+        <h2 id="toc-title"><a href="#" class="nav-link">Iterated Expectations</a></h2>
+     
+    <ul>
+    <li><a href="#expectation" id="toc-expectation" class="nav-link active" data-scroll-target="#expectation">Expectation</a></li>
+    <li><a href="#conditional-expectation" id="toc-conditional-expectation" class="nav-link" data-scroll-target="#conditional-expectation">Conditional Expectation</a>
+    <ul class="collapse">
+    <li><a href="#components" id="toc-components" class="nav-link" data-scroll-target="#components">Components</a></li>
+    </ul></li>
+    <li><a href="#the-law-of-iterated-expectations" id="toc-the-law-of-iterated-expectations" class="nav-link" data-scroll-target="#the-law-of-iterated-expectations">The Law of Iterated Expectations</a></li>
+    </ul>
+  </nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+
+<script>
+  document.getElementById('toc-title').addEventListener('click', function(event) {
+  event.preventDefault(); // Prevent default behavior of anchor tag
+  const firstHeader = document.querySelector('body'); // Select the first h2 element
+  if (firstHeader) {
+    firstHeader.scrollIntoView({ behavior: 'smooth', block: "start", inline: "nearest"}); // Scroll to the first header smoothly
+  }
+});
+</script>
+<div id="cell-1" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span></code></pre></div>
+</div>
+<p>I recently came across a list of <a href="https://twitter.com/causalinf/status/1259448663270658050">10 theorems/proofs</a> that you “need to know” if you do econometrics. These were compiled by <a href="https://econ.msu.edu/faculty/wooldridge/">Jeffrey Wooldridge</a>, an economist and textbook author whose introductory textbook has been fundamental to my interest in econometrics. As an exercise, I’m working through these 10 items, compiling resources, textbook passages, and data exercises that I think can make them easier to understand. The first item I’m trying to write my notes on is the Law of Iterated Expectations, but I’ll be prefacing/augmenting the notes with some discussion of basic probability for completeness.</p>
+<p>My core reference is <a href="https://projects.iq.harvard.edu/stat110/home"><em>Introduction to Probability, Second Edition</em></a> By Joseph K. Blitzstein, Jessica Hwang.</p>
+<hr>
+<p>To start, I’ll simulate some data.</p>
+<div id="cell-3" class="cell" data-outputid="a97c9460-71a2-48e9-d54c-84f0b982d33b" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set a random seed for reproducability</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the number of people in the dataset</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>num_people <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate random ages - X ~ Uniform(min, max)</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>ages <span class="op">=</span> np.random.randint(<span class="dv">71</span>, <span class="dv">79</span>, num_people)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Create DataFrame</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> {<span class="st">'Person_ID'</span>: <span class="bu">range</span>(<span class="dv">1</span>, num_people <span class="op">+</span> <span class="dv">1</span>), <span class="st">'Age'</span>: ages}</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>people_df <span class="op">=</span> pd.DataFrame(data).set_index(<span class="st">"Person_ID"</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>people_df.head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Age</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Person_ID</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1</td>
+<td>77</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2</td>
+<td>74</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3</td>
+<td>75</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">4</td>
+<td>77</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5</td>
+<td>73</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Let’s say that these data represent life spans, thus <span class="math inline">\(\text{age}_i\)</span> is an individual’s lifespan, e.g.&nbsp;<span class="math inline">\(\text{age}_2=\)</span></p>
+<div id="cell-5" class="cell" data-outputid="3f549aa3-4243-4b22-be31-98d8d4177cc8" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>people_df.loc[<span class="dv">2</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>Age    74
+Name: 2, dtype: int32</code></pre>
+</div>
+</div>
+<section id="expectation" class="level2">
+<h2 class="anchored" data-anchor-id="expectation">Expectation</h2>
+<p>The mean of a random variable, like age above, is also referred to as its “expected value,” denoted <span class="math inline">\(E(\text{age})\)</span>.</p>
+<div id="cell-7" class="cell" data-outputid="4726c13d-4ee9-4090-b66b-439f5ba7f946" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>people_df[<span class="st">'Age'</span>].mean()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>74.6</code></pre>
+</div>
+</div>
+<p>The mean above is specifically called an <em>arithmetic mean</em>, defined as follows:<br>
+<span class="math display">\[ \bar{x} = \frac{1}{n} \sum_i^n x_i\]</span></p>
+<div id="cell-9" class="cell" data-outputid="6e499402-2a79-4a86-ae02-e1fc9feedc9b" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">1</span><span class="op">/</span><span class="bu">len</span>(people_df)) <span class="op">*</span> people_df[<span class="st">'Age'</span>].<span class="bu">sum</span>()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>74.60000000000001</code></pre>
+</div>
+</div>
+<p>But the arithmetic mean is just a special case of the more general weighted mean:</p>
+<p><span class="math display">\[\begin{align*}
+\text{weighted-mean}(x) &amp;= \sum_i^n x_i p_i \\
+\end{align*}\]</span></p>
+<p>Where the weights, <span class="math inline">\(p_1, p_2, ...,p_n\)</span> are non-negative numbers that sum to 1. We can see that the arithmetic mean is the specific case of the weighted mean where all weights are equal</p>
+<p><span class="math display">\[\begin{align*}
+\text{If } [p_1=p_2=...=p_n] &amp;\text{ And } [\sum_i^n p_i =1]\\
+\text{weighted-mean}(x) &amp;= \sum_i^n x_i \frac{1}{n}\\
+\text{weighted-mean}(x) &amp;= \frac{1}{n} \sum_i^n x_i = \bar{x}\\
+\end{align*}\]</span></p>
+<p>We use the more general weighted mean when we define expectation.</p>
+<blockquote class="blockquote">
+<p>the expected value of <span class="math inline">\(X\)</span> is a weighted average of the possible values that <span class="math inline">\(X\)</span> can take on, weighted by their probabilities<br>
+– <span class="citation" data-cites="blitzstein_introduction_2019">Blitzstein and Hwang (<a href="#ref-blitzstein_introduction_2019" role="doc-biblioref">2019</a>)</span></p>
+</blockquote>
+<p>More formally, given a random variable, <span class="math inline">\(X\)</span>, with distinct possible values, <span class="math inline">\(x_1, x_2, ... x_n\)</span>, the <em>expected value</em> <span class="math inline">\(E(X)\)</span> is defined as:</p>
+<p><span class="math display">\[\begin{align*}
+E(X) = &amp; x_1P(X = x_1) + \\
+&amp;x_2P(X = x_2) +\\
+&amp;... + x_nP(X = x_n) \\
+= &amp;\sum_{i=1}^n x_iP(X = x_i)
+\end{align*}\]</span></p>
+<p>Now we’ll demonstrate this formula on our data. It’s useful here to move from our individual-level dataset, where each row is a person, to the following, where each row is a lifespan, which the probability that an individual has that lifespan.</p>
+<div id="cell-13" class="cell" data-outputid="2d777fad-8a65-4652-c2fc-80599a5182f2" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>prob_table <span class="op">=</span> people_df[<span class="st">'Age'</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>prob_table <span class="op">=</span> prob_table.sort_index()</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>prob_table</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>Age
+71    0.08
+72    0.13
+73    0.11
+74    0.19
+75    0.12
+76    0.13
+77    0.13
+78    0.11
+Name: proportion, dtype: float64</code></pre>
+</div>
+</div>
+<p>Adapting the formula above to our data, we must solve the following:</p>
+<p><span class="math display">\[\begin{align*}
+E(\text{Age}) = &amp;\text{Age}_1P(\text{Age}=\text{Age}_1) + \\
+&amp;\text{Age}_2P(\text{Age}=\text{Age}_2) + \\
+&amp;... + \text{Age}_nP(\text{Age}=\text{Age}_n) \\
+= &amp;\sum_{i=1}^n \text{Age}_iP(\text{Age}=\text{Age}_i)
+\end{align*}\]</span></p>
+<p>Which we can do transparently using a for-loop:</p>
+<div id="cell-15" class="cell" data-outputid="0e906bdb-3826-4e70-9c9a-58299d1a6b35" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>summation <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(prob_table)):</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  summation <span class="op">+=</span> prob_table.index[i] <span class="op">*</span> prob_table.values[i]</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>summation</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>74.60000000000001</code></pre>
+</div>
+</div>
+<p>As a quick aside – this can also be expressed as the dot product of two vectors, where the dot product is defined as follows:</p>
+<p><span class="math display">\[
+\begin{align*}
+\vec{\text{Age}}\cdot P(\vec{\text{Age}}) = &amp;\text{Age}_1P(\text{Age}=\text{Age}_1) + \\
+&amp;\text{Age}_2P(\text{Age}=\text{Age}_2) + \\
+&amp;... + \text{Age}_3P(\text{Age}=\text{Age}_3)
+\end{align*}
+\]</span></p>
+<div id="cell-17" class="cell" data-outputid="b40101c9-86c6-4833-c5f8-b90739434835" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>prob_table.index.values <span class="op">@</span> prob_table.values</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>74.6</code></pre>
+</div>
+</div>
+<p>Though we will stick to the summation notation paired with python for-loops for consistency</p>
+</section>
+<section id="conditional-expectation" class="level2">
+<h2 class="anchored" data-anchor-id="conditional-expectation">Conditional Expectation</h2>
+<p>We often have more than one variable available to us in an analysis. Below I simulate the variable gender:</p>
+<div id="cell-21" class="cell" data-outputid="6ed72f41-d50c-46ef-c586-dd1182715f6b" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">45</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>people_df[<span class="st">'Gender'</span>] <span class="op">=</span> np.random.choice([<span class="st">'Female'</span>, <span class="st">'Male'</span>], <span class="bu">len</span>(people_df))</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>people_df.head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Age</th>
+<th data-quarto-table-cell-role="th">Gender</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Person_ID</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1</td>
+<td>77</td>
+<td>Male</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2</td>
+<td>74</td>
+<td>Female</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3</td>
+<td>75</td>
+<td>Male</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">4</td>
+<td>77</td>
+<td>Female</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5</td>
+<td>73</td>
+<td>Female</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Each row in our dataset represents an individual person, and we now have access to both their gender and their life-span. It follows that we may be interested in how life-span varies across gender. In code, this entails a groupby operation, grouping on gender before calculting the mean age:</p>
+<div id="cell-23" class="cell" data-outputid="138ae177-ffb1-4c05-af42-5a63cf34eeee" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>people_df.groupby(<span class="st">'Gender'</span>)[<span class="st">'Age'</span>].mean()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>Gender
+Female    74.672727
+Male      74.511111
+Name: Age, dtype: float64</code></pre>
+</div>
+</div>
+<p>The code in this case resembles the formal notation of a conditional expectation: <span class="math inline">\(E(\text{Age} \mid \text{Gender}=\text{Gender}_j)\)</span>, where each <span class="math inline">\(\text{Gender}=\text{Gender}_j\)</span> is a distinct event.</p>
+<p>If we are interested specifically in the mean life-span given the event that gender is equal to male (a roundabout way of saying the average life-span for males in the data), we could calculate the following</p>
+<p><span class="math inline">\(E(\text{Age} \mid \text{Gender}=\text{Male})\)</span></p>
+<div id="cell-26" class="cell" data-outputid="d8029a54-97aa-42f5-8179-46efcf0260f1" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>people_df.groupby(<span class="st">'Gender'</span>)[<span class="st">'Age'</span>].mean()[<span class="st">'Male'</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>74.5111111111111</code></pre>
+</div>
+</div>
+<p>These groupby operations in <code>pandas</code> obscure some of the conceptual stuff happening inside the conditional expectation, which we’ll delve deeper into now.</p>
+<p>So what exactly is the conditional expectation, <span class="math inline">\(E(X \mid Y=y)\)</span>?</p>
+<p>Before answering this, it will be useful to refresh the related concept of conditional probability:</p>
+<blockquote class="blockquote">
+<p>If <span class="math inline">\(X=x\)</span> and <span class="math inline">\(Y=y\)</span> are events with <span class="math inline">\(P(Y=y)&gt;0\)</span>, then the conditional probability of <span class="math inline">\(X=x\)</span> given <span class="math inline">\(Y=y\)</span> is denoted by <span class="math inline">\(P(X=x \mid Y=y)\)</span>, defined as<br>
+<span class="math display">\[ P(X=x \mid Y=y) = \frac{P(X=x , Y=y)}{P(Y=y)} \]</span><br>
+– <span class="citation" data-cites="blitzstein_introduction_2019">Blitzstein and Hwang (<a href="#ref-blitzstein_introduction_2019" role="doc-biblioref">2019</a>)</span></p>
+</blockquote>
+<p>This formula specifically describes the probability of the event, <span class="math inline">\(X=x\)</span>, given the <em>evidence</em>, an observed event <span class="math inline">\(Y=y\)</span>.</p>
+<p>We want to shift to describing a mean conditional on that evidence, and we include that information via the weights in the expectation.</p>
+<blockquote class="blockquote">
+<p>Recall that the expectation <span class="math inline">\(E(X)\)</span> is a weighted average of the possible values of <span class="math inline">\(X\)</span>, where the weights are the PMF values <span class="math inline">\(P(X = x)\)</span>. After learning that an event <span class="math inline">\(Y=y\)</span> occurred, we want to <strong>use weights that have been updated to reflect this new information</strong>.</p>
+<p>– <span class="citation" data-cites="blitzstein_introduction_2019">Blitzstein and Hwang (<a href="#ref-blitzstein_introduction_2019" role="doc-biblioref">2019</a>)</span></p>
+</blockquote>
+<p>The key point here is that <strong>just the weights that each <span class="math inline">\(x_i\)</span> gets multiplied by will change</strong>, going from the probability <span class="math inline">\(P(X=x)\)</span> to the <strong>conditional probability <span class="math inline">\(P(X=x \mid Y=y)\)</span></strong>.</p>
+<p>Armed with conditional probability formula above, we can define how to compute the conditional expected value <span class="math display">\[
+\begin{align*}
+E(X \mid Y=y) &amp;= \sum_{x} x P(X=x \mid Y=y) \\
+&amp;= \sum_{x} x \frac{P(X=x , Y=y)}{P(Y=y)}
+\end{align*}
+\]</span></p>
+<p>Returning to our example with data, we substitute terms to find the following: <span class="math display">\[
+\begin{align*}
+E(\text{Age} \mid \text{Gender}=\text{Male}) &amp;= \sum_{i=1}^n \text{Age}_iP(\text{Age}=\text{Age}_i \mid \text{Gender}=\text{Male}) \\
+&amp;= \sum_{i=1}^n \text{Age}_i \frac{P(\text{Age}=\text{Age}_i, \text{Gender}=\text{Male})}{P(\text{Gender}=\text{Male})}
+\end{align*}
+\]</span></p>
+<p>We can explicitly compute this with a for-loop in python, as we did for <span class="math inline">\(E(X)\)</span>, but this time we will need to do a little up front work and define components we need for calculating the weights, <span class="math inline">\(\frac{P(\text{Age}=\text{Age}_i, \text{Gender}=\text{Male})}{P(\text{Gender}=\text{Male})}\)</span></p>
+<section id="components" class="level3">
+<h3 class="anchored" data-anchor-id="components">Components</h3>
+<ol type="1">
+<li>The joint probability distribution: <span class="math inline">\(P(\text{Age}=\text{Age}_i, \text{Gender} = \text{Male})\)</span></li>
+<li>The probability of the event, <span class="math inline">\(P(\text{Gender}=\text{Male})\)</span></li>
+</ol>
+<p>Where 1.) is the following:</p>
+<div id="cell-30" class="cell" data-outputid="2c3a9573-c3e0-4c22-a447-daa6f48cf39c" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>P_Age_Gender <span class="op">=</span> pd.crosstab(people_df[<span class="st">'Age'</span>],</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>                           people_df[<span class="st">'Gender'</span>],</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>                           normalize<span class="op">=</span><span class="st">'all'</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>P_Age_Gender[<span class="st">'Male'</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>Age
+71    0.03
+72    0.07
+73    0.05
+74    0.08
+75    0.07
+76    0.05
+77    0.06
+78    0.04
+Name: Male, dtype: float64</code></pre>
+</div>
+</div>
+<p>and 2.) is:</p>
+<div id="cell-32" class="cell" data-outputid="0c11a04f-b918-40ea-dfdf-1a7b2912ca45" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>P_Gender <span class="op">=</span> people_df[<span class="st">'Gender'</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>P_Gender.loc[<span class="st">'Male'</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>0.45</code></pre>
+</div>
+</div>
+<p>With those two pieces, we’ll convert the following into a for-loop: <span class="math display">\[
+\sum_{i=1}^n \text{Age}_i \frac{P(\text{Age}=\text{Age}_i, \text{Gender}=\text{Male})}{P(\text{Gender}=\text{Male})}
+\]</span></p>
+<div id="cell-34" class="cell" data-outputid="af0ae79b-a683-4c40-ecdc-35e25359838f" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>E_age_male <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="bu">len</span>(P_Age_Gender[<span class="st">'Male'</span>])</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  weight <span class="op">=</span> P_Age_Gender[<span class="st">'Male'</span>].values[i] <span class="op">/</span> P_Gender.loc[<span class="st">'Male'</span>]</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  E_age_male <span class="op">+=</span> P_Age_Gender[<span class="st">'Male'</span>].index[i] <span class="op">*</span> weight</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>E_age_male</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<pre><code>74.51111111111112</code></pre>
+</div>
+</div>
+<p>We confirm that this is equal to the result of the more direct groupby:</p>
+<div id="cell-36" class="cell" data-outputid="1d8a66e6-b7c5-4dfe-acfe-732e860eff9f" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>people_df.groupby(<span class="st">'Gender'</span>)[<span class="st">'Age'</span>].mean()[<span class="st">'Male'</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<pre><code>74.5111111111111</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="the-law-of-iterated-expectations" class="level2">
+<h2 class="anchored" data-anchor-id="the-law-of-iterated-expectations">The Law of Iterated Expectations</h2>
+<p>The law of iterated expectations, also referred to as the law of total expectation, the tower property, Adam’s law, or, my favorite, LIE, states the following: <span class="math display">\[E(X) = E(E(X \mid Y))\]</span> Which is to say, <strong>the weighted average of <span class="math inline">\(X\)</span> is equal to the weighted average of the weighted averages of <span class="math inline">\(X\)</span> conditional on each value of <span class="math inline">\(Y\)</span></strong>. This isn’t a particularly useful sentence, so let’s return to our example data. We plug in our values as follows: <span class="math display">\[E(\text{Age}) = E(E(\text{Age} \mid \text{Gender}))\]</span> Now it is useful to break this into some components that we’ve seen before. We previously found <span class="math display">\[
+E(\text{Age} \mid \text{Gender}=\text{Male}) =  \sum_{i=1}^n \text{Age}_i \frac{P(\text{Age}=\text{Age}_i, \text{Gender}=\text{Male})}{P(\text{Gender}=\text{Male})}
+\]</span></p>
+<p>Over all <span class="math inline">\(\text{Gender}_j\)</span>, we have the more generalizable expression: <span class="math display">\[
+E(\text{Age} \mid \text{Gender}=\text{Gender}_j)
+\]</span></p>
+<p>Which can tell us about any gender, not just <span class="math inline">\(\text{Gender}=\text{Male}\)</span>. This is equivalent to the expression:</p>
+<p><span class="math display">\[
+\begin{align*}
+E(\text{Age} \mid \text{Gender} = \text{Gender}_j) = \sum_{i=1}^n \text{Age}_i \frac{P(\text{Age}=\text{Age}_i, \text{Gender}=\text{Gender}_j) }{P(\text{Gender}=\text{Gender}_j)}
+\end{align*}
+\]</span></p>
+<p>Given this, let’s return to the informal definition of the LIE, but break it into parts. The weighted average of <span class="math inline">\(X\)</span> is equal to:<br>
+1. The weighted average of 2. the weighted averages of <span class="math inline">\(X\)</span> conditional on each value of <span class="math inline">\(Y\)</span>“.</p>
+<p>The expression above, <span class="math inline">\(E(\text{Age} \mid \text{Gender}=\text{Gender}_j)\)</span> is equivalent to 2.) “the weighted averages of <span class="math inline">\(X\)</span> conditional on each value of <span class="math inline">\(Y\)</span>.” So what we need to do now is find the weighted average of that expression. We’ll set up in the next few lines</p>
+<p><span class="math display">\[\begin{align*}
+E(\text{Age}) &amp;=E( \underbrace{E(\text{Age} \mid \text{Gender}=\text{Gender}\_j)}_{\text{weighted averages conditional on each gender}} ) \\
+&amp;=E(\sum_{i} \text{Age}_i \frac{P(\text{Age}=\text{Age}_i, \text{Gender}=\text{Gender}_j) }{P(\text{Gender}=\text{Gender}_j)}) \\
+\end{align*}\]</span></p>
+<p>With that set up, we’ll now write out the last weighted average explicitly. Note that the variation in <span class="math inline">\(\text{Age}_i\)</span> has been accounted for – we are now averaging over gender, <span class="math inline">\(\text{Gender}_j\)</span>.</p>
+<p><span class="math display">\[\begin{align*}
+&amp;=\sum_j (\sum_{i} \text{Age}_i \frac{P(\text{Age}=\text{Age}_i, \text{Gender}=\text{Gender}_j) }{P(\text{Gender}=\text{Gender}_j)}) P(\text{Gender}=\text{Gender}_j) \\
+&amp;=\sum_j \sum_{i} \text{Age}_i P(\text{Age}=\text{Age}_i, \text{Gender}=\text{Gender}_j) \\
+\end{align*}\]</span></p>
+<p>Since <span class="math inline">\(j\)</span> only appears in one of these two terms, we can rewrite this as follows:</p>
+<p><span class="math display">\[\begin{align*}
+&amp;=  \sum_{i} \text{Age}_i \sum_j P(\text{Age}=\text{Age}_i, \text{Gender}=\text{Gender}_j)
+\end{align*}\]</span></p>
+<p>Here I’ll pause, because the next steps can be clarified with code. <span class="math inline">\(P(\text{Age}=\text{Age}_i, \text{Gender}=\text{Gender}_j)\)</span> is the joint probability distribution of age and gender, and it helps to take a look at exactly what it is in pandas:</p>
+<div id="cell-39" class="cell" data-outputid="318093ff-ee73-4a5d-efb4-57a4978d535f" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>P_Age_Gender</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Gender</th>
+<th data-quarto-table-cell-role="th">Female</th>
+<th data-quarto-table-cell-role="th">Male</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Age</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">71</td>
+<td>0.05</td>
+<td>0.03</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">72</td>
+<td>0.06</td>
+<td>0.07</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">73</td>
+<td>0.06</td>
+<td>0.05</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">74</td>
+<td>0.11</td>
+<td>0.08</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">75</td>
+<td>0.05</td>
+<td>0.07</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">76</td>
+<td>0.08</td>
+<td>0.05</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">77</td>
+<td>0.07</td>
+<td>0.06</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">78</td>
+<td>0.07</td>
+<td>0.04</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Let’s compute the summation of <span class="math inline">\(P(\text{Age}=\text{Age}_i, \text{Gender}=\text{Gender}_j)\)</span> over <span class="math inline">\(\text{Gender}_j\)</span> and see what we get.</p>
+<div id="cell-41" class="cell" data-outputid="c058acd8-f0aa-4362-81ea-edb5b16b6b50" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>P_Age_Gender[<span class="st">"Male"</span>] <span class="op">+</span> P_Age_Gender[<span class="st">"Female"</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<pre><code>Age
+71    0.08
+72    0.13
+73    0.11
+74    0.19
+75    0.12
+76    0.13
+77    0.13
+78    0.11
+dtype: float64</code></pre>
+</div>
+</div>
+<p>Interestingly, that is the exact same thing we get if we simply compute the probability of each age, <span class="math inline">\(P(\text{Age}=\text{Age}_i)\)</span></p>
+<div id="cell-43" class="cell" data-outputid="9d0cdcc8-be0b-422d-e6da-798afe426af1" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>people_df[<span class="st">'Age'</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>).sort_index()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<pre><code>Age
+71    0.08
+72    0.13
+73    0.11
+74    0.19
+75    0.12
+76    0.13
+77    0.13
+78    0.11
+Name: proportion, dtype: float64</code></pre>
+</div>
+</div>
+<p>So when you sum <span class="math inline">\(P(\text{Age}=\text{Age}_i, \text{Gender}=\text{Gender}_j)\)</span> only over <span class="math inline">\(\text{Gender}_j\)</span>, you’re just left with <span class="math inline">\(P(\text{Age}=\text{Age}_i)\)</span>. This result stems from the definition of the <em>Marginal PMF</em>:</p>
+<blockquote class="blockquote">
+<p>For the discrete random variables <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, the marginal PMF of <span class="math inline">\(X\)</span> is:<br>
+<span class="math display">\[P(X=x) = \sum_y P(X=x, Y=y)\]</span> – <span class="citation" data-cites="blitzstein_introduction_2019">Blitzstein and Hwang (<a href="#ref-blitzstein_introduction_2019" role="doc-biblioref">2019</a>)</span></p>
+</blockquote>
+<p>and with this definition in mind we can finish the proof for the LIE: <span class="math display">\[
+\begin{align*}
+E(\text{Age})  &amp;= \sum_{i} \text{Age}_i \sum_j P(\text{Age}=\text{Age}_i, \text{Gender}=\text{Gender}_j) \\
+&amp;= \sum_{i} \text{Age}_i  P(\text{Age}=\text{Age}_i) \\
+&amp;= E(\text{Age})
+\end{align*}
+\]</span></p>
+<p>We can directly show the last bit, <span class="math inline">\(E(\text{Age}) = \sum_j \sum_{i} \text{Age}_i P(\text{Age}=\text{Age}_i, \text{Gender}=\text{Gender}_j)\)</span> using the joint probability distribution object from before:</p>
+<div id="cell-46" class="cell" data-outputid="1efa5e04-fe40-424d-bf11-5c915bbebf2c" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>P_Age_Gender.head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Gender</th>
+<th data-quarto-table-cell-role="th">Female</th>
+<th data-quarto-table-cell-role="th">Male</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Age</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">71</td>
+<td>0.05</td>
+<td>0.03</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">72</td>
+<td>0.06</td>
+<td>0.07</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">73</td>
+<td>0.06</td>
+<td>0.05</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">74</td>
+<td>0.11</td>
+<td>0.08</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">75</td>
+<td>0.05</td>
+<td>0.07</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="cell-47" class="cell" data-outputid="61eb2712-1780-4b89-9c07-8040c54512c2" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>(P_Age_Gender</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a> .<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>) <span class="co"># sum over j</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a> .reset_index() <span class="co"># bring out Age_i</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a> .product(axis<span class="op">=</span><span class="dv">1</span>) <span class="co"># Age_i * P(Age=Age_i)</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a> .<span class="bu">sum</span>() <span class="co"># sum over i</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a> )</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<pre><code>74.6</code></pre>
+</div>
+</div>
+<div id="cell-49" class="cell" data-outputid="a3e2cad5-d6d4-40c2-9ead-5174c7bad086" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>people_df[<span class="st">'Age'</span>].mean()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<pre><code>74.6</code></pre>
+</div>
+</div>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-blitzstein_introduction_2019" class="csl-entry" role="listitem">
+Blitzstein, Joseph K., and Jessica Hwang. 2019. <em>Introduction to <span>Probability</span>, <span>Second</span> <span>Edition</span></em>. 2nd edition. Boca Raton: Chapman; Hall/CRC.
+</div>
+</div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{amerkhanian2023,
+  author = {Amerkhanian, Peter},
+  title = {Iterated {Expectations}},
+  date = {2023-12-01},
+  url = {https://peter-amerkhanian.com/posts/iterated-expectations/},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-amerkhanian2023" class="csl-entry quarto-appendix-citeas" role="listitem">
+Amerkhanian, Peter. 2023. <span>“Iterated Expectations.”</span> December
+1, 2023. <a href="https://peter-amerkhanian.com/posts/iterated-expectations/">https://peter-amerkhanian.com/posts/iterated-expectations/</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/peter-amerkhanian\.com");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Copyright 2024, Peter Amerkhanian</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>Home</title>
+<link>https://peter-amerkhanian.com/blog.html</link>
+<atom:link href="https://peter-amerkhanian.com/blog.xml" rel="self" type="application/rss+xml"/>
+<description>Peter Amerkhanian&#39;s Blog</description>
+<generator>quarto-1.5.57</generator>
+<lastBuildDate>Wed, 20 Nov 2024 08:00:00 GMT</lastBuildDate>
+<item>
+  <title>Grouping Problems with SQL</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
+  <link>https://peter-amerkhanian.com/posts/sql-count-cases/</link>
+  <description><![CDATA[ Using DuckDB to look at some GROUP BY and PARTITION BY statements in SQL. ]]></description>
+  <category>SQL</category>
+  <category>Data Management</category>
+  <guid>https://peter-amerkhanian.com/posts/sql-count-cases/</guid>
+  <pubDate>Wed, 20 Nov 2024 08:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/sql-count-cases/thumbnail.png" medium="image" type="image/png" height="138" width="144"/>
+</item>
+<item>
+  <title>Building Time-series Utilities for matplotlib</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
+  <link>https://peter-amerkhanian.com/posts/time-series-matplotlib/</link>
+  <description><![CDATA[ Writing utility functions for matplotlib and using them to visualize BART’s ridership data. ]]></description>
+  <category>Python</category>
+  <guid>https://peter-amerkhanian.com/posts/time-series-matplotlib/</guid>
+  <pubDate>Sun, 16 Jun 2024 07:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/time-series-matplotlib/thumbnail.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>The Covariance Matrix from Scratch</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
+  <link>https://peter-amerkhanian.com/posts/covariance-matrices/</link>
+  <description><![CDATA[ Notes on matrix algebra and covariance, with a mix of formal notation and python code. ]]></description>
+  <category>Python</category>
+  <category>Linear Algebra</category>
+  <guid>https://peter-amerkhanian.com/posts/covariance-matrices/</guid>
+  <pubDate>Fri, 31 May 2024 07:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/covariance-matrices/thumbnail.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>Integrals in Probability</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
+  <link>https://peter-amerkhanian.com/posts/multiple-integration/</link>
+  <description><![CDATA[ Notes on the definite integral and probability modeling, with a mix of formal notation, plotly visuals, and sympy computation. ]]></description>
+  <category>R</category>
+  <category>Calculus</category>
+  <category>Probability</category>
+  <guid>https://peter-amerkhanian.com/posts/multiple-integration/</guid>
+  <pubDate>Sun, 14 Apr 2024 07:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/multiple-integration/thumbnail.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>Benchmarking parquet and dask</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
+  <link>https://peter-amerkhanian.com/posts/dask-data-io/</link>
+  <description><![CDATA[ Using parquet+dask to efficiently read and manipulate BART’s historical ridership data. ]]></description>
+  <category>Python</category>
+  <category>Data Management</category>
+  <guid>https://peter-amerkhanian.com/posts/dask-data-io/</guid>
+  <pubDate>Fri, 12 Apr 2024 07:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/dask-data-io/thumbnail.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>Production Maximization with Lagrange Mutlipliers</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
+  <link>https://peter-amerkhanian.com/posts/lagrange-cobb-douglas/</link>
+  <description><![CDATA[ Solving an optimization problem in (Strang and Herman 2016) using lagrange multipliers, with some plotly visuals mixed in. ]]></description>
+  <category>R</category>
+  <category>Calculus</category>
+  <guid>https://peter-amerkhanian.com/posts/lagrange-cobb-douglas/</guid>
+  <pubDate>Sun, 17 Mar 2024 07:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/lagrange-cobb-douglas/thumbnail.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>Simple Optimization in 3D</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
+  <link>https://peter-amerkhanian.com/posts/minima-3d/</link>
+  <description><![CDATA[ Solving an optimization problem in (Strang and Herman 2016), with plotly visuals. ]]></description>
+  <category>R</category>
+  <category>Calculus</category>
+  <guid>https://peter-amerkhanian.com/posts/minima-3d/</guid>
+  <pubDate>Sat, 09 Mar 2024 08:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/minima-3d/thumbnail.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>Linear Approximation in 3D</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
+  <link>https://peter-amerkhanian.com/posts/linear-approximation-3d/</link>
+  <description><![CDATA[ Using taylor series to approximate function output, with python visuals. ]]></description>
+  <category>Python</category>
+  <category>Calculus</category>
+  <guid>https://peter-amerkhanian.com/posts/linear-approximation-3d/</guid>
+  <pubDate>Sat, 02 Mar 2024 08:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/linear-approximation-3d/thumbnail.png" medium="image" type="image/png" height="143" width="144"/>
+</item>
+<item>
+  <title>Overfitting and The Train-Test Split</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
+  <link>https://peter-amerkhanian.com/posts/overfitting/</link>
+  <description><![CDATA[ Using re-sampling to better estimate model performance. ]]></description>
+  <category>Python</category>
+  <category>Statistics</category>
+  <guid>https://peter-amerkhanian.com/posts/overfitting/</guid>
+  <pubDate>Fri, 08 Dec 2023 08:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/overfitting/thumbnail.png" medium="image" type="image/png" height="143" width="144"/>
+</item>
+<item>
+  <title>Iterated Expectations</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
+  <link>https://peter-amerkhanian.com/posts/iterated-expectations/</link>
+  <description><![CDATA[ Notes on conditional probability and adam’s law, with a mix of formal notation and python code. ]]></description>
+  <category>Python</category>
+  <category>Probability</category>
+  <guid>https://peter-amerkhanian.com/posts/iterated-expectations/</guid>
+  <pubDate>Fri, 01 Dec 2023 08:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/iterated-expectations/thumbnail.png" medium="image" type="image/png" height="143" width="144"/>
+</item>
+<item>
+  <title>Newton’s Method From The Ground Up</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
+  <link>https://peter-amerkhanian.com/posts/newtons-method/</link>
+  <description><![CDATA[ Using newton’s method for root-finding and optimization, with python code and a .gif of the search. ]]></description>
+  <category>Python</category>
+  <category>Calculus</category>
+  <guid>https://peter-amerkhanian.com/posts/newtons-method/</guid>
+  <pubDate>Fri, 03 Nov 2023 07:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/newtons-method/thumbnail.png" medium="image" type="image/png" height="143" width="144"/>
+</item>
+<item>
+  <title>Simple Constrained Optimization in 2D</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
+  <link>https://peter-amerkhanian.com/posts/simple-constrained-optimization/</link>
+  <description><![CDATA[ Introductory optimization, with formal notation, python code, and matplotlib visuals. ]]></description>
+  <category>Python</category>
+  <category>Calculus</category>
+  <guid>https://peter-amerkhanian.com/posts/simple-constrained-optimization/</guid>
+  <pubDate>Tue, 04 Jul 2023 07:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/simple-constrained-optimization/thumbnail.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>Buy vs. Rent, A Financial Modeling Workflow in Python</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
+  <link>https://peter-amerkhanian.com/posts/rent-vs-buy/</link>
+  <description><![CDATA[ Using numpy-financial and monte-carlo simulation to evaluate investments. ]]></description>
+  <category>Python</category>
+  <category>Probability</category>
+  <guid>https://peter-amerkhanian.com/posts/rent-vs-buy/</guid>
+  <pubDate>Sat, 06 Aug 2022 07:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/rent-vs-buy/thumbnail.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>Reliable PDF Scraping with tabula-py</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
+  <link>https://peter-amerkhanian.com/posts/pdf-scraping/</link>
+  <description><![CDATA[ Using tabula in python to read in tables from .pdf files ]]></description>
+  <category>Python</category>
+  <category>Data Management</category>
+  <guid>https://peter-amerkhanian.com/posts/pdf-scraping/</guid>
+  <pubDate>Wed, 20 Jul 2022 07:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/pdf-scraping/thumbnail.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+</channel>
+</rss>
