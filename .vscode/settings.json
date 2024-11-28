@@ -1,2 +1,11 @@
 {
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "DuckDB",
+            "name": "Test",
+            "database": "${workspaceFolder:personal-website}/posts/dask-data-io/data/parquet_data/part.0.parquet"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
 }
