@@ -23,6 +23,17 @@
   <media:content url="https://peter-amerkhanian.com/posts/sql-count-cases/thumbnail.png" medium="image" type="image/png" height="138" width="144"/>
 </item>
 <item>
+  <title>Working with IPUMS microdata</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
+  <link>https://peter-amerkhanian.com/posts/ipums-wth-r/</link>
+  <description><![CDATA[ In this post, I’m going to write up how to use American Community Survey (ACS) microdata, leveraging the University of Minnesota’s Integrated Public Use Microdata Series (IPUMS).<sup>1</sup> I’ll cover: ]]></description>
+  <category>R</category>
+  <category>Data Management</category>
+  <guid>https://peter-amerkhanian.com/posts/ipums-wth-r/</guid>
+  <pubDate>Sun, 01 Sep 2024 07:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/ipums-wth-r/thumbnail.png" medium="image" type="image/png"/>
+</item>
+<item>
   <title>Building Time-series Utilities for matplotlib</title>
   <dc:creator>Peter Amerkhanian</dc:creator>
   <link>https://peter-amerkhanian.com/posts/time-series-matplotlib/</link>

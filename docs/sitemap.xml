@@ -42,7 +42,7 @@
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/memos/SF-Arrests/index.html</loc>
-    <lastmod>2024-11-25T18:42:47.940Z</lastmod>
+    <lastmod>2024-12-11T16:38:09.843Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/covariance-matrices/index.html</loc>
@@ -79,5 +79,9 @@
   <url>
     <loc>https://peter-amerkhanian.com/posts/minima-3d/index.html</loc>
     <lastmod>2024-11-18T17:35:33.378Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/ipums-wth-r/index.html</loc>
+    <lastmod>2024-12-09T17:01:01.520Z</lastmod>
   </url>
 </urlset>

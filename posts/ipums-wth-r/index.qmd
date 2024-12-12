@@ -23,36 +23,38 @@ editor:
 
 ```{r}
 #| output: false
-library(dplyr)
-library(ggplot2)
-# Statistics
-library(modelsummary)
-library(srvyr)
-library(survey)
-# Webscraping
-library(httr)
-library(rvest)
-library(readr)
-library(glue)
-# Census
-library(tidycensus)
-library(ipumsr)
+pacman::p_load(
+  dplyr,
+  ggplot2,
+  # Statistics
+  modelsummary,
+  srvyr,
+  survey,
+  # Webscraping
+  httr,
+  rvest,
+  readr,
+  glue,
+  # Census
+  tidycensus,
+  ipumsr
+)
 ```
 
-In this post, I'm going to cover how to use census microdata,
-specifically from the American Community Survey (ACS), using the
-University of Minesota's Integrated Public Use Microdata Series
-(IPUMS).[^1] I'll cover:
+In this post, I'm going to write up how to use American Community Survey
+(ACS) microdata, leveraging the University of Minnesota's Integrated
+Public Use Microdata Series (IPUMS).[^1] I'll cover:
 
 [^1]: I want to note that several of the points I cover here are things
     I learned from some coworkers-- [Bert
     Wilden](https://www.bwilden.com/) and Stephanie Peng.
 
 1.  Data Retrieval and Processing: how to choose which ACS product is
-    relevant, how to submit a request to IPUMS and filter down to
-    relevant levels of geography/granularity.
-2.  How to properly weight ACS data using sample and replication weights
-    for accurate data visualizations and statistical models.
+    relevant, how to submit a request to IPUMS, and how to filter down
+    to relevant levels of geography/granularity.
+2.  Analysis: how to properly weight ACS data using sample and
+    replication weights for accurate data visualizations and statistical
+    models.
 
 I'll start with a question: **What was the median household income in
 Oakland, California in 2022?**
@@ -60,12 +62,12 @@ Oakland, California in 2022?**
 ## Aggregate data with `tidycensus`
 
 Answering that question is pretty straightforward using *aggregate* data
-from the U.S. Census, which provides various descriptive statistics
-describing aggregate geographies. If I needed to get the number quickly
+from the U.S. Census, which provides various descriptive statistics that
+describe aggregate geographies. If I needed to get the number quickly
 and wasn't using it for analysis, I might use a web-based tool like
 [Census Reporter](https://censusreporter.org/) to quickly look it up.
-However, if I were going to use the number in an analysis, I would like
-the retrieval to be replicable and preferably carried out via an API.
+However, for an analysis, I would like the data retrieval to be carried
+out transparently via an API.
 
 In R, the `tidycensus` package provides an easy-to-use wrapper for
 requesting data from the Census API. Note that I set up an API key for
@@ -78,9 +80,14 @@ census_api_key(Sys.getenv("census_api_key"))
 ```
 
 I can query `B19013_001`, the median household income variable, using
-the 2022 1-year American Community Survey sample and filter down to
-Oakland's GEOID, `0653000`. I'll throw in the total population variable
-for good measure:
+the 2022 1-year American Community Survey sample[^2] and filter down to
+Oakland's GEOID, `0653000`, which is a combination of the state code for
+California, `06`, and the place code for Oakland, `53000`. I'll throw in
+the total population variable for good measure:
+
+[^2]: See the [full variable list for the 2022 1-year
+    ACS](https://api.census.gov/data/2022/acs/acs1/variables.html) for
+    the available variables.
 
 ```{r}
 #| warning: false
@@ -99,31 +106,30 @@ oakland_stats %>% select(c(variable, estimate))
 ```
 
 Done! This is an example of retrieving aggregate census data -- in this
-case a statistic describing the population of Oakland. Aggregate census
-data is very useful, and [@walker_analyzing_2023] offers a comprehensive
-treatment of use cases of aggregate census data.
+case a couple statistics describing the population of Oakland. Aggregate
+census data is very useful, and [@walker_analyzing_2023] offers a
+comprehensive treatment of use cases of aggregate census data.
 
-### Limitations
+## Microdata with IPUMS
 
 What if instead of the median, I wanted a different quantile of
 household income? What if I wanted to run a regression and find the
-association between gender and individual income while adjusting for
+association between sex and individual income while adjusting for
 education? These statistics are not obviously available as aggregate
-measures in the census API. Indeed, if I want them, I would need to
-calculate them myself using either *individual or household level*
-census data, as-in, data where each row is an individual person or an
-individual household. This is a common need and entails accessing census
-*microdata*, a complicated process that I'll now cover.
-
-## IPUMS microdata overview
+measures in the Census API. Indeed, if I want them, I need to calculate
+them myself using either *individual or household level* census data,
+as-in, data where each row is an individual person or an individual
+household (depending on your population of interest). This is a common
+need and entails accessing census *microdata*.
 
 One of the most popular sources for downloading census microdata is the
-University of Minnesota's Integrated Public Use Microdata Series (IPUMS).
-The IPUMS team provides a centralized API for downloading census
-microdata, comprehensive documentation for working with census
+University of Minnesota's Integrated Public Use Microdata Series
+(IPUMS). The IPUMS team provides a centralized API for downloading
+census microdata, comprehensive documentation for working with census
 microdata, and harmonized variables across time [@walker_analyzing_2023,
-chapter 9]. The easiest way to access IPUMS data in R is with the `ipumsr` package, which is managed by the IPUMS team. Here I'll set an API key for
-submitting requests via `ipumsr` .
+chapter 9]. The easiest way to access IPUMS data in R is with the
+`ipumsr` package, which the IPUMS team manages. Here I'll set an API key
+in my `.Renviron` file to use for submitting requests via `ipumsr` .
 
 ```{r}
 #| output: false
@@ -144,17 +150,14 @@ ipums_data_collections() %>%
   arrange(desc(collection_type))
 ```
 
-For any analysis of populations in the U.S., the IPUMS USA (an annual
-survey) and IPUMS CPS (a [monthly
-survey](https://www.census.gov/programs-surveys/acs)) collections are of
-particular interest. I'll look at IPUMS USA since my motivating question involves median household income for a year -- 2022.
-
-The IPUMS USA project collects, preserves and harmonizes U.S. census
-microdata and provides easy access to this data with enhanced
-documentation. Data includes decennial censuses from 1790 to 2010 and
-American Community Surveys (ACS) from 2000 to the present
-[@ruggles_ipums_2024]. We can check out the newest products they have in
-the USA collection as follows:
+For any analysis of populations in the U.S., the IPUMS USA and IPUMS CPS
+(a [monthly survey](https://www.census.gov/programs-surveys/acs)
+product) collections are of particular interest. I'll look at IPUMS USA
+since my motivating question involves median household income for a year
+(2022), and IPUMS USA offers annual data, including decennial censuses
+from 1790 to 2010 and American Community Surveys (ACS) from 2000 to the
+present [@ruggles_ipums_2024]. We can check out the newest products they
+have in the USA collection as follows:
 
 ```{r}
 get_sample_info(collection="usa") %>%
@@ -175,22 +178,23 @@ Some things to note about these collections:
     -   One-Year Estimates (e.g. "2022 ACS") are based on data collected
         over a single year; they provide timely information for areas
         with populations of 65,000 or more (this excludes some small
-        geographies)[^2] but may have higher margins of error for
+        geographies)[^3] but may have higher margins of error for
         smaller areas.
 
-    -   Five-Year Estimates represent a moving average of data collected
-        over a 5-year period and covers geographies down to the Census
-        block group. The 5-year window creates a larger sample size and
-        offers more reliable and detailed information for all population
-        sizes, including small areas, but less timely than one-year
-        estimates [@walker_analyzing_2023].
+    -   Five-Year Estimates (e.g. "2018-2022, ACS 5-Year") represent a
+        moving average of data collected over a 5-year period and cover
+        geographies down to the Census block group. The 5-year window
+        creates a larger sample size and offers more reliable and
+        detailed information for all population sizes, including small
+        areas, but data are less timely than in one-year estimates
+        [@walker_analyzing_2023].
 
-[^2]: See [census
+[^3]: See [census
     hierarchies](https://walker-data.com/census-r/the-united-states-census-and-the-r-programming-language.html#census-hierarchies)
-    in [@walker_analyzing_2023] for explanation of distinct geographical
-    units in Census products.
+    in [@walker_analyzing_2023] for a nice explanation of distinct
+    geographical units in Census products.
 
-## Retrieving dat from IPUMS USA
+## Retrieving data from IPUMS USA
 
 Let's return to the motivating question for this post: **What was the
 median household income in Oakland, California in 2022?**
@@ -198,16 +202,14 @@ median household income in Oakland, California in 2022?**
 We'll need to get income data from the 2022 1-year ACS, and we will need
 to filter our data down to just the city of Oakland. For the first task,
 I'll define a general function, `retrieve_sample()` that retrieves a
-list of variables from an ACS sample.
+list of variables from a given ACS sample.
 
 ```{r}
 retrieve_sample <- function(sample, variables){
-  extract <- define_extract_micro(
-    description = "Incomes by PUMA",
-    collection = "usa",
-    samples = c(sample),
-    variables = variables
-  )
+  extract <- define_extract_micro(description = "Incomes by PUMA",
+                                  collection = "usa",
+                                  samples = c(sample),
+                                  variables = variables)
   data_path <- extract %>%
     submit_extract() %>%
     wait_for_extract() %>%
@@ -248,13 +250,9 @@ is used to provide specifications for individual variables when defining
 an IPUMS microdata extract request [@greg_freedman_ellis_ipumsr_2024].
 
 Now we can request these variables from the 2022 1-year ACS via the
-following function call:
-
-`retrieve_sample("us2022a", variables)`
-
-However, I'll first write code that checks if I've already downloaded
-the data before running the query to avoid running it unnecessarily (the
-query can take some time).
+function call, `retrieve_sample("us2022a", variables)`. However, I'll
+first write code that checks if I've already downloaded the data before
+running the query to avoid repeatedly downloading it.
 
 ```{r}
 #| output: false
@@ -269,16 +267,17 @@ if (length(local_ipums_extracts) > 0) {
   data <- retrieve_sample("us2022a", variables)
 }
 ```
-Here's the resulting dataset, the 2022 1-year ACS for California.
+
+Here's the resulting data, the 2022 1-year ACS for California.
+
 ```{r}
 data %>% head()
 ```
 
+## Using Geocorr to Identify Geographies
 
-## Geography in ACS microdata
-
-We now have microdata for all of California, but how do we filter down
-to just Oakland? Unfortunately, this isn't as simple as just running
+We now have microdata for all of California, but we need to filter down
+to just Oakland. Unfortunately, this isn't as simple as just running
 `filter(CITY == 'Oakland')` -- ACS microdata does not include a field
 for explicitly identifying cities (note that a city is typically
 referred to as a "place" in census data). Indeed, the smallest
@@ -292,25 +291,24 @@ Hierarchies](https://walker-data.com/census-r/the-united-states-census-and-the-r
 in @walker_analyzing_2023, chapter 1].
 
 To find out if a city corresponds to a collection of PUMAs and which
-PUMAs those are, we'll use a tool called Geocorr (geographic
-correspondence engine), an application that generates files and/or
-reports — called correlation lists — showing relationships between two
-or more geographic coverages in the United States
-[@mihalik_missouri_2022]. Geocorr is a sponsored program of the Missouri
-State library and published by the University of Missouri Center for
-Health Policy.[^3]
+PUMAs those are, we use Geocorr (geographic correspondence engine), an
+application that generates files and/or reports — called correlation
+lists — showing relationships between two or more geographic coverages
+in the United States [@mihalik_missouri_2022]. Geocorr is a sponsored
+program of the Missouri State library and published by the University of
+Missouri Center for Health Policy.[^4]
 
-[^3]: I should pause to note that the combination of IPUMS and Geocorr
+[^4]: I should pause to note that the combination of IPUMS and Geocorr
     is an unbelievable public good, and it's extremely generous of the
     public Universities of Minnesota and Missouri to publish these.
 
 ![Geocorr 2022: Geographic Correspondence
 Engine](geocorr.png){width="80%"}
 
-For example, suppose you have county-level data for California and would
-like to convert that data to the ZIP code level. Geocorr can show how
-each county relates to the ZIP code(s) that intersect it. It can tell
-you, for each of those ZIP/county intersections, what the size of that
+For example, suppose you have county-level data for California and want
+to convert that data to the ZIP code level. Geocorr can show how each
+county relates to the ZIP code(s) that intersect it. It can tell you,
+for each of those ZIP/county intersections, what the size of that
 intersection is and what portion of the ZIP's total population is in
 that intersection [@mihalik_missouri_2022].
 
@@ -327,8 +325,7 @@ geocorr_2022 <- function(state, geo_1, geo_2, weight_var) {
     "state={state}&g1_={geo_1}&g2_={geo_2}&wtvar={weight_var}&",
     "nozerob=1&fileout=1&filefmt=csv&lstfmt=txt&title=&",
     "counties=&metros=&places=&oropt=&latitude=&longitude=&",
-    "distance=&kiloms=0&locname="
-  )
+    "distance=&kiloms=0&locname=")
   initial_url <- params %>% url_absolute(base = base_url)
   initial_response <- GET(initial_url)
   html_content <- content(initial_response, as = "text")
@@ -358,23 +355,24 @@ PUMAs, and, if so, which PUMAs make up the city.
 
 ```{r}
 csv_data %>%
-  select(-c(state, stab, place)) %>%
+  select(-c(state, stab, place, PUMA22name)) %>%
   filter(PlaceName == 'Oakland city, CA')
 ```
 
-The AFACT (allocation factor) column shows the proportion of the source
-area contained in the target area -- this case the proportion of the
-PUMA population that belongs to Oakland. In this case, 100% of the
+The `AFACT` (allocation factor) column shows the proportion of the
+source area contained in the target area -- this case the proportion of
+the PUMA population that belongs to Oakland. In this case, 100% of the
 populations in PUMAs 111, 112, 113, and 123 belong to Oakland, and 0% of
 PUMA 114. To be clear, GEOCORR believes that 9 individuals from 114 do
 live in Oakland, but based on the AFACT I'll feel comfortable dropping
-that PUMA.[^4]
+that PUMA.[^5]
 
-[^4]: Were the AFACT higher, e.g. 1%, I would randomly sample 1% of the
+[^5]: Were the AFACT higher, e.g. 1%, I would randomly sample 1% of the
     individuals from that PUMA and include them in my Oakland sample.
 
 Filtering to those PUMAs gets us the 2022 1-year ACS microdata for the
-City of Oakland.
+City of Oakland. We'll proceed to discuss what each row of the data
+represent.
 
 ```{r}
 oakland_pumas <- c(111, 112, 113, 123)
@@ -384,8 +382,6 @@ oak <- data %>%
 oak %>% head()
 ```
 
-But what do these data actually represent?
-
 ## Granularity in ACS microdata
 
 Each row in the ACS microdata is an individual, identified by a unique
@@ -394,17 +390,18 @@ combination of `SERIAL`, the unique identifier for their household, and
 identify units as follows:
 
 -   Households: The combination of `SAMPLE` and `SERIAL` provides a
-    unique identifier for every household in the IPUMS\
+    unique identifier for every household in the IPUMS
 -   Individuals: The combination of `SAMPLE`, `SERIAL`, and `PERNUM`
     provides a unique identifier for every person in the IPUMS
 
-Where `SAMPLE` defines when the inidividual was surveyed (in the 1-year
-ACS it's the same for all rows) [See
+Note that `SAMPLE` defines the year when the individual was surveyed (in
+the 1-year ACS it's the same for all rows) [See
 [SERIAL](https://usa.ipums.org/usa-action/variables/SERIAL) in
 @ruggles_ipums_2024].
 
 We can group by these variable combinations and see how many individuals
-and households surveyed across PUMAs in Oakland for the 2022 1-year ACS:
+and households were surveyed across PUMAs in Oakland for the 2022 1-year
+ACS:
 
 ```{r}
 #| label: tbl-granularity
@@ -420,7 +417,10 @@ Let's randomly select a household in the data and see what such a unit
 looks like in practice.
 
 ```{r}
+#| label: tbl-example-hh
+#| tbl-cap: "An example household"
 #| code-fold: true
+
 household_serials <- oak %>%
   group_by(SERIAL) %>%
   count() %>%
@@ -429,12 +429,6 @@ household_serials <- oak %>%
 set.seed(2)
 sample_household <- sample(household_serials, 1)
 n <- oak %>% filter(SERIAL == sample_household) %>% dim() %>% .[1]
-```
-
-```{r}
-#| label: tbl-example-hh
-#| tbl-cap: "An example household"
-#| 
 oak %>% filter(SERIAL == sample_household) %>% 
   select(c(SERIAL, PERNUM, AGE, SEX, HHINCOME, INCTOT))
 ```
@@ -464,7 +458,8 @@ incomes:
 
 Given what we know about the unique identifier for households, and the
 `HHINCOME` variable, we can construct the appropriate dataset for
-answering our motivating question:
+answering our motivating question – every household in Oakland that had
+household income.
 
 ```{r}
 oak_households <- oak %>%
@@ -474,9 +469,11 @@ households_w_income <- oak_households %>%
   filter(HHINCOME != 9999999, HHINCOME >= 0)
 ```
 
-It seems we can proceed to simply calculate the median of the `HHINCOME` column? Not so fast... Data in the ACS microdata are not what they seem. Before we do any analysis, we have to account for **sample weights**.
+It seems we can proceed to simply calculate the median of the `HHINCOME`
+column? Not so fast... Data in the ACS microdata are not what they seem.
+Before we do any analysis, we have to account for **sample weights**.
 
-### Sample weights in the ACS
+## Applying sample weights in the ACS
 
 Let's return to our sample family from above, but also examine the
 variables `PERWT` and `HHWT`.
@@ -493,26 +490,28 @@ household, the 31 year old woman with an individual income of \$9,300
 represents 62 individuals in the PUMA. `HHWT` gives the number of
 households in the general population represented by each household in
 the sample, thus this household is representative of 62 households in
-the PUMA.
+that PUMA.
 
 Any person-level analysis of ACS microdata should be weighted by
 `PERWT`, and household-level analysis should be weighted by `HHWT` [See
 [Sample Weights](https://usa.ipums.org/usa/intro.shtml#weights) in
 @ruggles_ipums_2024]. We'll use the
 [srvyr](http://gdfe.co/srvyr/reference/index.html) package for easily
-defining the survey weights and using them in calculating summary
+defining the survey weights and using them to calculate summary
 statistics. Here we'll finally address the motivating question. The
-median household income in Oakland in 2022 was as follows:
+median household income in Oakland in 2022 as measured in the IPUMS
+microdata was as follows:
 
 ```{r}
 households_w_income %>%
   as_survey(weights=HHWT) %>%
   summarise(weighted_median = survey_median(HHINCOME)) %>% 
-  .$weighted_median
+  select(weighted_median)
 ```
 
-Let's do a quick compare that to the aggregate census data we retrieved
-in the first section. Here are our IPUMS results:
+Let's do a quick comparison of our IPUMS results to the aggregate census
+data we retrieved in the first section. Here are our full IPUMS results
+for median household income and population:
 
 ```{r}
 #| code-fold: true
@@ -538,52 +537,146 @@ bind_rows(count_table, median_table)%>%
 Here are our results from the aggregate data:
 
 ```{r}
-oakland_stats %>% select(c(variable, estimate))
+oakland_stats %>%
+  select(c(variable, estimate)) %>%
+  rename(aggregate_estimate = estimate)
 ```
 
-These are... Clearly different. What gives?
+These are.. Clearly different. What gives? Unfortunately, summary
+statistics calculated using IPUMS data typically cannot match aggregate
+ACS figures! One major reason for this is **added sampling error**.
+Recall that the American Community Survey is a sample. A given one-year
+ACS is typically a 1% sample of the U.S. population, with associated
+sampling error. When the census makes microdata available, such as the
+data we have from IPUMS, they create a sample of that sample -- we do
+not get the full 1%. This second sampling process introduces further
+sampling error that is not reflected in figures sourced from aggregate
+ACS data, which are calculated using the full ACS sample [[See
+ACS](https://usa.ipums.org/usa/chapter2/chapter2.shtml#ACS) in
+@ruggles_ipums_2024]. This introduces its own, additional sampling
+error, that's not present in the aggregate ACS figures.
 
-> The public use samples of the ACS and PRCS are extracted from the
-> Census Bureau's larger internal data files and are thus subject to
-> additional sampling error and further data processing (such as
-> imputation and allocation). \[...\] individual variables, such as
-> income and housing values, are Top coded. \[...\] Weights included
-> with the ACS PUMS for the household and person-level data adjust for
-> the mixed geographic sampling rates, nonresponse adjustments, and
-> individual sampling probabilities. Estimates from the ACS IPUMS
-> samples may not be consistent with summary table ACS estimates due to
-> the additional sampling error.
->
-> -- \[[See ACS](https://usa.ipums.org/usa/chapter2/chapter2.shtml#ACS)
-> in @ruggles_ipums_2024\]
+Beyond that sampling error, microdata estimates will also be different
+because the census applies various other additional data processing
+steps to microdata to ensure privacy and accuracy. For example, in
+microdata income variables are "top-coded," meaning that particularly
+extreme or specific income values are clipped to ensure privacy [[See
+ACS](https://usa.ipums.org/usa/chapter2/chapter2.shtml#ACS) in
+@ruggles_ipums_2024].
 
 So at the end of the day, due to the way that the census processes ACS
-microdata beofore releasing it to the public, this is as close as we are
+microdata before releasing it to the public, this is as close as we are
 going to get.
 
-## Estimation with Replicate Weights
+## Accurate Standard Errors with Replicate Weights
 
+If we stopped at this point, we would be able to use census microdata to
+accurately calculate all sorts of interesting quantities. However, there
+is one more subtlety to the microdata that becomes important
+specifically when we are calculating the standard errors of those
+quantities: **replicate weights**.
 
-In theory, the standard error of an estimate measures the variation of a statistic across multiple samples of a given population. Thus the true standard error of any characteristic calculated from a single sample can never be known with certainty; sample standard errors are simply estimated. Replicate weights allow a single sample to simulate multiple samples, thus generating more informed standard error estimates that mimic the theoretical basis of standard errors while retaining all information about the complex sample design. These standard errors can then be used to obtain more precise confidence intervals and significance tests.
+When we calculate the median household income in Oakland using the
+household weights, we get the standard error (se) below:
 
-In IPUMS testing of ACS/PRCS data, replicate weights usually increase standard errors. This increase is generally not large enough to alter the significance level of coefficients, though marginally significant coefficients may become clearly nonsignificant. The more obvious effect of using replicate weights is on the width of confidence intervals, which can change substantially.
+```{r}
+households_w_income %>%
+  as_survey(weights=HHWT) %>%
+  summarise(weighted_mean = survey_mean(HHINCOME))
+```
+
+That is a "sample standard error" -- it's an estimate of the population
+standard error, based on this one sample we have. In theory, the
+standard error of an estimate measures the variation of a statistic
+across multiple samples of a given population. Our sample standard
+error, calculated using just the one sample, is an estimate of that
+theoretical standard error.
+
+Replicate weights allow a single sample to simulate multiple samples,
+thus generating more informed standard error estimates that mimic the
+theoretical basis of standard errors while retaining all information
+about the complex sample design. These standard errors can then be used
+to obtain more precise confidence intervals and significance tests.
+https://usa.ipums.org/usa/repwt.shtml#q70
+
+Here we can see what replicate weights (in this case, household
+replicate weights) look like in our data. Each of `REPWT`, 1 through 80,
+is a set of alternative household weights, slightly different from the
+"production weight," `HHWT`.
+
+```{r}
+households_w_income %>%
+  select(c(HHINCOME, HHWT, REPWT1, REPWT2, REPWT3, REPWT80)) %>% 
+  head()
+```
+
+If we calculate a statistic of interest with the production weights,
+then measure the deviations between that production weighted estimate
+and the weighted estimates we would produce with each replicate weight,
+we can calculate the following: $$
+SE(X) = \sqrt{\frac{4}{80} \sum_{r=1}^{80} (X_r - X)^2}
+$$ This is a standard error, which is based on the successive difference
+replication variance, leverages the replicate weights.[@workede2019]
+
+```{r}
+# Calculate X_r
+X_r <- vector()
+for (r in 1:80){
+  X_r[r] <- households_w_income %>%
+    as_survey(weights=glue("REPWT", r)) %>%
+    summarise(weighted_mean = survey_mean(HHINCOME)) %>% 
+    .$weighted_mean
+}
+# Calculate X
+X <- households_w_income %>%
+    as_survey(weights=HHWT) %>%
+    summarise(weighted_mean = survey_mean(HHINCOME)) %>% 
+    .$weighted_mean
+# Sum over r
+sqrt( (4/80) * sum( (X_r - X)^2 ) )
+```
+
+To be clear, we don't have to ever do that manually -- `survey` supports
+specifying survey designs with replicate weights. Here we can
 
 ```{r}
 oak_hh_svy <- as_survey_rep(
   households_w_income,
   weight = HHWT ,
-  repweights = matches("REPWTP[0-9]+"),
+  repweights = matches("REPWT[0-9]+"),
+  type = "successive-difference")
+
+oak_hh_svy %>% summarise(mean_hh_income = survey_mean(HHINCOME))
+```
+
+In IPUMS testing of ACS/PRCS data, replicate weights usually increase
+standard errors. This increase is generally not large enough to alter
+the significance level of coefficients, though marginally significant
+coefficients may become clearly nonsignificant. The more obvious effect
+of using replicate weights is on the width of confidence intervals,
+which can change substantially.
+
+IPUMS' documentation reccomends the following specification for the
+replicate weights, where the standard errors are calculated via the
+[jacknife
+procedure](https://en.wikipedia.org/wiki/Jackknife_resampling).
+
+Households:
+
+```{r}
+
+oak_hh_svy <- as_survey_rep(
+  households_w_income,
+  weight = HHWT ,
+  repweights = matches("REPWT[0-9]+"),
   type = "JK1",
-  scale = 4/ 80 ,
+  scale = 4 / 80 ,
   rscales = rep(1, 80),
   mse = TRUE)
 
-oak_hh_svy %>% summarise(median_hh_income = survey_median(HHINCOME))
 ```
 
-
 ## Analyzing ACS microdata
-
 
 ```{r}
 individuals_w_income <- oak %>%
@@ -606,6 +699,7 @@ individuals_w_income <- oak %>%
   )
 ```
 
+Individuals:
 
 ```{r}
 oak_indiv_svy <- as_survey_rep(
@@ -618,8 +712,8 @@ oak_indiv_svy <- as_survey_rep(
   mse = TRUE)
 ```
 
-
-Here we can see the unadjusted gender earnings gap in Oakland, where men on earn about $20k more than women on average:
+Here we can see the un-adjusted gender earnings gap in Oakland, where
+men on earn about \$20k more than women on average:
 
 ```{r}
 oak_indiv_svy %>%
@@ -627,7 +721,13 @@ oak_indiv_svy %>%
   summarize(mean_income = survey_mean(INCTOT))
 ```
 
-Note that we are using `oak_indiv_svy` and by extension the replicate weights to produce those standard errors. If we instead used `individuals_w_income`, we would get the same estimates, but likely smaller standard errors. Indeed, lets explicitly look at the equivalent regressions specification (though with log income as the outcome to more accurately model the income distribution), once using only the sample weights, and once using the replicate weights:
+Note that we are using `oak_indiv_svy` and by extension the replicate
+weights to produce those standard errors. If we instead used
+`individuals_w_income`, we would get the same estimates, but likely
+smaller standard errors. Indeed, lets explicitly look at the equivalent
+regressions specification (though with log income as the outcome to more
+accurately model the income distribution), once using only the sample
+weights, and once using the replicate weights:
 
 ```{r}
 model_ols1 <- lm(log(INCTOT) ~ factor(SEX),
@@ -651,9 +751,16 @@ modelsummary(
 )
 ```
 
-Note that using replicate weights slightly enlarged our standard errors, as described in the IPUMS documentation.
+Note that using replicate weights slightly enlarged our standard errors,
+as described in the IPUMS documentation.
 
-Lets explore a couple other dynamics related to earnings in Oakland and practice making visualizations and estimating regressions with the data. Here's the income distribution across different levels of highest education earned. Note here that I'm not using the replicate weights (I'm just using the `individuals_w_income` object), since I'm not estimating anything. `ggplot` does take a weight argument, for which I've supplied the `PERWT` sample weights.
+Lets explore a couple other dynamics related to earnings in Oakland and
+practice making visualizations and estimating regressions with the data.
+Here's the income distribution across different levels of highest
+education earned. Note here that I'm not using the replicate weights
+(I'm just using the `individuals_w_income` object), since I'm not
+estimating anything. `ggplot` does take a weight argument, for which
+I've supplied the `PERWT` sample weights.
 
 <https://www.andrewheiss.com/blog/2022/06/23/long-labels-ggplot/index.html>
 
@@ -702,7 +809,11 @@ ggplot(individuals_w_income, aes(
     panel.background = element_rect("white")
   )
 ```
-The plot shows that individuals with bachelor's and graduate degrees generally have higher incomes in Oakland. Let's seen how bachelor and graduate degree attainment differs across sex. Again, I'm using the `individuals_w_income` object as I have no need to replicate weights.
+
+The plot shows that individuals with bachelor's and graduate degrees
+generally have higher incomes in Oakland. Let's seen how bachelor and
+graduate degree attainment differs across sex. Again, I'm using the
+`individuals_w_income` object as I have no need to replicate weights.
 
 ```{r}
 #| warning: false
@@ -746,11 +857,15 @@ ggplot(individuals_w_income,
   )
 ```
 
+So bachelor and graduate degree holders generally earn more, and women
+are more likely than men to have bachelor and graduate degrees in
+Oakland. This should imply that if we adjust for education when
+estimating the gender-earnings gap in Oakland, thus only comparing men
+and women in the same education levels, we should see the gap increase.
 
-
-So bachelor and graduate degree holders generally earn more, and women are more likely than men to have bachelor and graduate degrees in Oakland. This should imply that if we adjust for education when estimating the gender-earnings gap in Oakland, thus only comparing men and women in the same education levels, we should see the gap increase.
-
-We again use `svyglm` to estimate the regression, and `oak_indiv_svy` as the data/survey design so as to use the replicate weights for our standard errors.
+We again use `svyglm` to estimate the regression, and `oak_indiv_svy` as
+the data/survey design so as to use the replicate weights for our
+standard errors.
 
 ```{r}
 model_ols2 <- svyglm(log(INCTOT) ~ factor(SEX), oak_indiv_svy)
@@ -770,6 +885,4 @@ modelsummary(
 )
 ```
 
-
-
-
+Fun!
