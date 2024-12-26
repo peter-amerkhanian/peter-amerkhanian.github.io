@@ -3,7 +3,7 @@ title: "Working with IPUMS microdata"
 bibliography: "../../blog.bib"
 author: "Peter Amerkhanian"
 date: "2024-9-1"
-draft: false
+draft: true
 image: thumbnail.png
 engine: knitr
 execute: 
@@ -23,22 +23,20 @@ editor:
 
 ```{r}
 #| output: false
-pacman::p_load(
-  dplyr,
-  ggplot2,
-  # Statistics
-  modelsummary,
-  srvyr,
-  survey,
-  # Webscraping
-  httr,
-  rvest,
-  readr,
-  glue,
-  # Census
-  tidycensus,
-  ipumsr
-)
+pacman::p_load(dplyr,
+               ggplot2,
+               # Statistics
+               modelsummary,
+               srvyr,
+               survey,
+               # Webscraping
+               httr,
+               rvest,
+               readr,
+               glue,
+               # Census
+               tidycensus,
+               ipumsr)
 ```
 
 In this post, I'm going to write up how to use American Community Survey
@@ -87,7 +85,7 @@ the total population variable for good measure:
 
 [^2]: See the [full variable list for the 2022 1-year
     ACS](https://api.census.gov/data/2022/acs/acs1/variables.html) for
-    the available variables.
+    the available variables, and see the [Census Place table](https://www.census.gov/library/reference/code-lists/ansi.html#place) for looking up GEOIDs
 
 ```{r}
 #| warning: false
@@ -115,7 +113,7 @@ comprehensive treatment of use cases of aggregate census data.
 What if instead of the median, I wanted a different quantile of
 household income? What if I wanted to run a regression and find the
 association between sex and individual income while adjusting for
-education? These statistics are not obviously available as aggregate
+education? These statistics are not available as aggregate
 measures in the Census API. Indeed, if I want them, I need to calculate
 them myself using either *individual or household level* census data,
 as-in, data where each row is an individual person or an individual
@@ -139,9 +137,7 @@ set_ipums_api_key(Sys.getenv("ipums_api_key"))
 The [`ipumsr` website](https://tech.popdata.org/ipumsr/) provides
 details on what degree of support the package has for various IPUMS
 products, though it's also possible to check for support using the
-`ipums_data_collections()` function. I prefer the function so that I can
-see exactly what code I'll need to plug into the API (see
-`code_for_api`). The following are the survey products that currently
+`ipums_data_collections()` function. The following are the survey products that currently
 have API support:
 
 ```{r}
@@ -150,11 +146,9 @@ ipums_data_collections() %>%
   arrange(desc(collection_type))
 ```
 
-For any analysis of populations in the U.S., the IPUMS USA and IPUMS CPS
-(a [monthly survey](https://www.census.gov/programs-surveys/acs)
-product) collections are of particular interest. I'll look at IPUMS USA
+For any analysis of populations in the U.S., the IPUMS USA and IPUMS [CPS](https://www.census.gov/programs-surveys/acs) collections are of particular interest. I'll look at IPUMS USA
 since my motivating question involves median household income for a year
-(2022), and IPUMS USA offers annual data, including decennial censuses
+(2022), and IPUMS USA offers annual data via decennial censuses
 from 1790 to 2010 and American Community Surveys (ACS) from 2000 to the
 present [@ruggles_ipums_2024]. We can check out the newest products they
 have in the USA collection as follows:
@@ -165,34 +159,7 @@ get_sample_info(collection="usa") %>%
   head(5)
 ```
 
-Some things to note about these collections:
-
--   **ACS vs. PRCS**: The ACS (American Community Survey) collects
-    detailed population and housing information for the 50 U.S. states
-    and The District of Columbia, whereas the PRCS (Puerto Rico
-    Community Survey) functions as an ACS equivalent specifically
-    tailored to collect data in Puerto Rico.
-
--   **One-Year vs. Five-Year Estimates**:
-
-    -   One-Year Estimates (e.g. "2022 ACS") are based on data collected
-        over a single year; they provide timely information for areas
-        with populations of 65,000 or more (this excludes some small
-        geographies)[^3] but may have higher margins of error for
-        smaller areas.
-
-    -   Five-Year Estimates (e.g. "2018-2022, ACS 5-Year") represent a
-        moving average of data collected over a 5-year period and cover
-        geographies down to the Census block group. The 5-year window
-        creates a larger sample size and offers more reliable and
-        detailed information for all population sizes, including small
-        areas, but data are less timely than in one-year estimates
-        [@walker_analyzing_2023].
-
-[^3]: See [census
-    hierarchies](https://walker-data.com/census-r/the-united-states-census-and-the-r-programming-language.html#census-hierarchies)
-    in [@walker_analyzing_2023] for a nice explanation of distinct
-    geographical units in Census products.
+Note that PRCS refers to the Puerto Rico Community Survey and functions as an ACS equivalent specifically tailored to collect data in Puerto Rico. We are principally interested in the ACS, which comes with either one-year or five-year estimates. The differences between these two estimates are described in the "[Census Data: An Overview](https://walker-data.com/census-r/the-united-states-census-and-the-r-programming-language.html#census-data-an-overview)" in [@walker_analyzing_2023]. Broadly speaking, one-year estimates come from smaller, but more contemporary samples. In our case we'll use the one-year to get the best sense of the 2022 income dynamics.
 
 ## Retrieving data from IPUMS USA
 
@@ -274,7 +241,7 @@ Here's the resulting data, the 2022 1-year ACS for California.
 data %>% head()
 ```
 
-## Using Geocorr to Identify Geographies
+## Using Geocorr to Identify Geography in ACS Microdata
 
 We now have microdata for all of California, but we need to filter down
 to just Oakland. Unfortunately, this isn't as simple as just running
@@ -371,8 +338,7 @@ that PUMA.[^5]
     individuals from that PUMA and include them in my Oakland sample.
 
 Filtering to those PUMAs gets us the 2022 1-year ACS microdata for the
-City of Oakland. We'll proceed to discuss what each row of the data
-represent.
+City of Oakland.
 
 ```{r}
 oakland_pumas <- c(111, 112, 113, 123)
@@ -389,9 +355,9 @@ combination of `SERIAL`, the unique identifier for their household, and
 `PERNUM`, their unique identifier within their household. Thus, we can
 identify units as follows:
 
--   Households: The combination of `SAMPLE` and `SERIAL` provides a
+-   **Households**: The combination of `SAMPLE` and `SERIAL` provides a
     unique identifier for every household in the IPUMS
--   Individuals: The combination of `SAMPLE`, `SERIAL`, and `PERNUM`
+-   **Individuals**: The combination of `SAMPLE`, `SERIAL`, and `PERNUM`
     provides a unique identifier for every person in the IPUMS
 
 Note that `SAMPLE` defines the year when the individual was surveyed (in
@@ -473,7 +439,7 @@ It seems we can proceed to simply calculate the median of the `HHINCOME`
 column? Not so fast... Data in the ACS microdata are not what they seem.
 Before we do any analysis, we have to account for **sample weights**.
 
-## Applying sample weights in the ACS
+### Sample weights in the ACS
 
 Let's return to our sample family from above, but also examine the
 variables `PERWT` and `HHWT`.
@@ -572,9 +538,9 @@ going to get.
 
 If we stopped at this point, we would be able to use census microdata to
 accurately calculate all sorts of interesting quantities. However, there
-is one more subtlety to the microdata that becomes important
-specifically when we are calculating the standard errors of those
-quantities: **replicate weights**.
+is one more subtlety to ACS microdata that becomes important when we are
+calculating the standard errors of those quantities: **replicate
+weights**.
 
 When we calculate the median household income in Oakland using the
 household weights, we get the standard error (se) below:
@@ -585,19 +551,23 @@ households_w_income %>%
   summarise(weighted_mean = survey_mean(HHINCOME))
 ```
 
-That is a "sample standard error" -- it's an estimate of the population
-standard error, based on this one sample we have. In theory, the
-standard error of an estimate measures the variation of a statistic
-across multiple samples of a given population. Our sample standard
-error, calculated using just the one sample, is an estimate of that
-theoretical standard error.
+That is the sample mean and accompanying sample standard error, derived
+as follows:
 
+$$
+\bar{x}_w = \frac{\sum_{i=1}^{n}w_ix_i}{\sum_{i=1}^{n}w_i} \\ 
+SE(\bar{x}_w) = \sqrt{\frac{1}{\sqrt{n}} \sum_{i=1}^{n} (x_iw_i - \bar{x}_w)^2}
+$$
+
+The sample standard error is an estimate of the population standard
+error, based on the sample we have. In theory, the standard error of an
+estimate measures the variation of a statistic across multiple samples
+of a given population. Our sample standard error, calculated using just
+the one sample, is an estimate of that theoretical standard error.
 Replicate weights allow a single sample to simulate multiple samples,
 thus generating more informed standard error estimates that mimic the
-theoretical basis of standard errors while retaining all information
-about the complex sample design. These standard errors can then be used
-to obtain more precise confidence intervals and significance tests.
-https://usa.ipums.org/usa/repwt.shtml#q70
+theoretical basis of standard errors while retaining information about
+sample design. https://usa.ipums.org/usa/repwt.shtml#q70
 
 Here we can see what replicate weights (in this case, household
 replicate weights) look like in our data. Each of `REPWT`, 1 through 80,
@@ -606,17 +576,26 @@ is a set of alternative household weights, slightly different from the
 
 ```{r}
 households_w_income %>%
-  select(c(HHINCOME, HHWT, REPWT1, REPWT2, REPWT3, REPWT80)) %>% 
+  mutate(` ` = "...") %>% 
+  select(c(HHINCOME, HHWT, REPWT1, REPWT2, ` `, REPWT79, REPWT80)) %>% 
   head()
 ```
 
-If we calculate a statistic of interest with the production weights,
-then measure the deviations between that production weighted estimate
-and the weighted estimates we would produce with each replicate weight,
-we can calculate the following: $$
-SE(X) = \sqrt{\frac{4}{80} \sum_{r=1}^{80} (X_r - X)^2}
+We can use replicate weights in a variety of alternative variance
+estimates in the calculation of "successive difference replication (SDR)
+variance," an alternative to the standard variance of an estimate. We
+obtain SDR variance by calculating a statistic of interest with the
+production weights (e.g. `HHWT`), then sum the squared deviations
+between that production weighted estimate and the weighted estimates we
+obtain with each replicate weight (e.g. `REPWT1`). We are specifically
+interested in the standard error, $$
+\begin{align*}
+\bar{x}_w &= \frac{\sum_{i=1}^{n}w_ix_i}{\sum_{i=1}^{n}w_i} \\ 
+\bar{x}_r &= \frac{\sum_{i=1}^{n}r_ix_i}{\sum_{i=1}^{n}r_i} \\ 
+SE(\bar{x}_w) &= \sqrt{\frac{4}{80} \sum_{r=1}^{80} (\bar{x}_r - \bar{x}_w)^2}
+\end{align*}
 $$ This is a standard error, which is based on the successive difference
-replication variance, leverages the replicate weights.[@workede2019]
+replication variance, leverages the replicate weights [@workede2019].
 
 ```{r}
 # Calculate X_r
@@ -652,16 +631,14 @@ oak_hh_svy %>% summarise(mean_hh_income = survey_mean(HHINCOME))
 In IPUMS testing of ACS/PRCS data, replicate weights usually increase
 standard errors. This increase is generally not large enough to alter
 the significance level of coefficients, though marginally significant
-coefficients may become clearly nonsignificant. The more obvious effect
+coefficients may become clearly non-significant. The more obvious effect
 of using replicate weights is on the width of confidence intervals,
 which can change substantially.
 
-IPUMS' documentation reccomends the following specification for the
-replicate weights, where the standard errors are calculated via the
-[jacknife
-procedure](https://en.wikipedia.org/wiki/Jackknife_resampling).
-
-Households:
+IPUMS' documentation recommends the following specification for the
+replicate weights, where the standard errors are calculated via a
+[jacknife](https://en.wikipedia.org/wiki/Jackknife_resampling) (see
+`type = 'JK1'`).
 
 ```{r}
 
@@ -731,8 +708,8 @@ weights, and once using the replicate weights:
 
 ```{r}
 model_ols1 <- lm(log(INCTOT) ~ factor(SEX),
-                 data = individuals_w_income,
-                 weights = individuals_w_income$PERWT)
+                 data = oak_indiv_svy,
+                 weights = PERWT)
 model_ols2 <- svyglm(log(INCTOT) ~ factor(SEX), oak_indiv_svy)
 
 gof_stuff <- tribble(

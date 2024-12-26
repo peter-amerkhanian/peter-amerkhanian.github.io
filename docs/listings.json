@@ -1,9 +1,15 @@
 [
   {
+    "listing": "/memos.html",
+    "items": [
+      "/memos/SF-Arrests/index.html",
+      "/memos/SIR/index.html"
+    ]
+  },
+  {
     "listing": "/blog.html",
     "items": [
       "/posts/sql-count-cases/index.html",
-      "/posts/ipums-wth-r/index.html",
       "/posts/time-series-matplotlib/index.html",
       "/posts/covariance-matrices/index.html",
       "/posts/multiple-integration/index.html",
@@ -17,13 +23,6 @@
       "/posts/simple-constrained-optimization/index.html",
       "/posts/rent-vs-buy/index.html",
       "/posts/pdf-scraping/index.html"
-    ]
-  },
-  {
-    "listing": "/memos.html",
-    "items": [
-      "/memos/SF-Arrests/index.html",
-      "/memos/SIR/index.html"
     ]
   }
 ]
