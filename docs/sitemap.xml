@@ -38,7 +38,7 @@
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/memos/SF-Arrests/index.html</loc>
-    <lastmod>2024-12-26T22:28:14.223Z</lastmod>
+    <lastmod>2024-12-26T22:41:33.382Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/memos/SIR/index.html</loc>
@@ -79,5 +79,9 @@
   <url>
     <loc>https://peter-amerkhanian.com/posts/multiple-integration/index.html</loc>
     <lastmod>2024-11-17T21:58:58.821Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/ipums-wth-r/index.html</loc>
+    <lastmod>2024-12-27T20:08:25.750Z</lastmod>
   </url>
 </urlset>
