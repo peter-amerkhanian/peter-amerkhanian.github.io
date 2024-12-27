@@ -7,6 +7,7 @@ project:
     - "!in-progress/"
 
 website:
+  draft-mode: unlinked
   favicon: "profile.jpg"
   google-analytics: "G-V95HGLKTEB"
   title: "Home"
