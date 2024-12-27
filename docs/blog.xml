@@ -15,7 +15,7 @@
   <title>Working with ACS microdata in R</title>
   <dc:creator>Peter Amerkhanian</dc:creator>
   <link>https://peter-amerkhanian.com/posts/ipums-wth-r/</link>
-  <description><![CDATA[ In this post, I’m going to cover how to use American Community Survey (ACS) microdata, leveraging the University of Minnesota’s Integrated Public Use Microdata Series (IPUMS).<sup>1</sup> I’ll cover: ]]></description>
+  <description><![CDATA[ A general overview of retrieving and working with IPUMS data in R. ]]></description>
   <category>R</category>
   <category>Data Management</category>
   <guid>https://peter-amerkhanian.com/posts/ipums-wth-r/</guid>

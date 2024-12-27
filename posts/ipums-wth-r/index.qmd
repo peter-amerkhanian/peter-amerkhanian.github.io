@@ -694,6 +694,13 @@ oak_indiv_svy %>%
 ```
 
 
+```{r}
+#| warning: false
+#| output: false
+#| echo: false
+library(reticulate)
+use_condaenv('base')
+```
 
 ```{python}
 #| output: false
