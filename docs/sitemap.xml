@@ -66,7 +66,7 @@
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/index.html</loc>
-    <lastmod>2024-11-24T18:30:18.461Z</lastmod>
+    <lastmod>2025-01-24T17:16:07.126Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/pdf-scraping/index.html</loc>
@@ -79,5 +79,9 @@
   <url>
     <loc>https://peter-amerkhanian.com/posts/multiple-integration/index.html</loc>
     <lastmod>2024-11-17T21:58:58.821Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/ipums-wth-r/index.html</loc>
+    <lastmod>2025-01-23T16:55:25.657Z</lastmod>
   </url>
 </urlset>
