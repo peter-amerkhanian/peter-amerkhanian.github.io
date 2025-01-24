@@ -10,18 +10,7 @@
 <atom:link href="https://peter-amerkhanian.com/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Peter Amerkhanian&#39;s Blog</description>
 <generator>quarto-1.5.57</generator>
-<lastBuildDate>Sun, 29 Dec 2024 08:00:00 GMT</lastBuildDate>
-<item>
-  <title>Working with ACS microdata in R</title>
-  <dc:creator>Peter Amerkhanian</dc:creator>
-  <link>https://peter-amerkhanian.com/posts/ipums-wth-r/</link>
-  <description><![CDATA[ A general overview of retrieving and working with IPUMS data in R using ipumsr and survey. ]]></description>
-  <category>R</category>
-  <category>Data Management</category>
-  <guid>https://peter-amerkhanian.com/posts/ipums-wth-r/</guid>
-  <pubDate>Sun, 29 Dec 2024 08:00:00 GMT</pubDate>
-  <media:content url="https://peter-amerkhanian.com/posts/ipums-wth-r/thumbnail.png" medium="image" type="image/png" height="144" width="144"/>
-</item>
+<lastBuildDate>Wed, 20 Nov 2024 08:00:00 GMT</lastBuildDate>
 <item>
   <title>Grouping Problems with SQL</title>
   <dc:creator>Peter Amerkhanian</dc:creator>

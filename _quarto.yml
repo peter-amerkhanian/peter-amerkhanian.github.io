@@ -20,7 +20,6 @@ website:
       - blog.qmd
       - memos.qmd
       - projects.qmd
-
   page-footer: "Copyright 2024, Peter Amerkhanian"
 
 
