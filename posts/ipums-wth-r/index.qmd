@@ -509,7 +509,7 @@ bind_rows(count_table, median_table) %>%
 
 ```
 
-These are.. Clearly different. What gives? Unfortunately, **summary
+These are clearly different. What gives? Unfortunately, **summary
 statistics calculated using IPUMS data typically cannot match aggregate
 ACS figures!**
 
@@ -533,11 +533,11 @@ error.[^5]
 
 ### Step 5: Calculating Standard Errors
 
-Now we have estimates derived from the ACS microdata, but how do we communicate the uncertainty around those estimates? Recall that this is survey data -- we are working with a small sample of Oakland's population. We know that our estimates are going to be wrong, so accurately communicating uncertainty via good standard errors will be important.  
+Now we have estimates derived from the ACS microdata, but recall that this is survey data. We are working with a small sample of Oakland's population, so we would assume that our estimates are likely going to be wrong by some degree, so accurately communicating uncertainty via good standard errors will be important.  
 
 For the sake of this example, let's explore the problem of standard errors via a slightly different motivating question -- **what was the average household income in Oakland in 2022**? I'm switching to the average because we are about to calculate some standard errors from-scratch, and that's much more clear-cut for linear statistics like the average than for non-linear statistics like the median. We will return to the median at the end of this section, but rely on a package implementation and not do anything from-scratch.
 
-Anyways, let's calculate the average household income in Oakland using the sample household weights. The formula for the weighted average is: 
+Anyways, let's calculate the average household income in Oakland using the sample household weights. The [formula for the weighted average](https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Mathematical_definition) is: 
 $$
 \bar{X}_w = \frac{\sum_{i=1}^{n}w_ix_i}{\sum_{i=1}^{n}w_i}
 $$
@@ -549,8 +549,7 @@ weighted_mean <- (
   )
 weighted_mean
 ```
-Now, let's get a standard error for that estimate. The first issue we encounter here is that there is no analytical route for finding the variance (and by extension, the standard error) of the weighted mean.
-We want the standard error of that weighted average, but there is no analytical solution to finding the variance (and by extension standard error) for the weighted mean estimator. However, since the estimator is still a differentiable function, one common workaround is to compute the first-order [Taylor series approximation](https://en.wikipedia.org/wiki/Taylor_series) of the estimator, then use the variance of that approximation. Indeed
+Now, let's get a standard error for that estimate. Correctly utilizing the sample weights in the variance calculation is [a little tricky](https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Variance) and there are a few different approaches. Most packages (e.g. [SAS](https://documentation.sas.com/doc/en/statug/latest/statug_surveymeans_details06.htm#statug.surveymeans.variancedetails), [Stata](https://www.stata.com/manuals/svyvarianceestimation.pdf), and R's [`survey` package](https://r-survey.r-forge.r-project.org/survey/#:~:text=Variances%20by%20Taylor%20linearization)) default to using "linearized variance." In short, this entails calculating the first-order Taylor series approximation of the weighted mean formula above, then finding the variance of that approximation. Wikipedia has a nice [walkthrough of that calculation](https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Variance_of_the_weighted_mean_(%CF%80-estimator_for_ratio-mean)), but the details are beyond the scope of this post -- we will just work with the resulting formula, the variance and standard error of the first-order linear approximation of the weighted mean:
 
 $$
 \begin{align*}

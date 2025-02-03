@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://peter-amerkhanian.com/posts/minima-3d/index.html</loc>
-    <lastmod>2024-11-18T17:35:33.378Z</lastmod>
+    <lastmod>2025-01-26T21:15:51.724Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/projects.html</loc>
@@ -26,7 +26,7 @@
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/newtons-method/index.html</loc>
-    <lastmod>2024-11-17T21:58:58.832Z</lastmod>
+    <lastmod>2025-01-26T21:15:51.739Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/iterated-expectations/index.html</loc>
@@ -50,7 +50,7 @@
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/linear-approximation-3d/index.html</loc>
-    <lastmod>2024-11-17T21:58:58.812Z</lastmod>
+    <lastmod>2025-01-26T21:15:51.718Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/overfitting/index.html</loc>
@@ -58,7 +58,7 @@
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/simple-constrained-optimization/index.html</loc>
-    <lastmod>2024-11-21T22:21:49.692Z</lastmod>
+    <lastmod>2025-01-26T21:15:51.751Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/time-series-matplotlib/index.html</loc>
@@ -74,10 +74,14 @@
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/lagrange-cobb-douglas/index.html</loc>
-    <lastmod>2024-11-17T21:58:58.800Z</lastmod>
+    <lastmod>2025-01-26T21:15:51.705Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/multiple-integration/index.html</loc>
-    <lastmod>2024-11-17T21:58:58.821Z</lastmod>
+    <lastmod>2025-01-26T21:15:51.730Z</lastmod>
+  </url>
+  <url>
+    <loc>https://peter-amerkhanian.com/posts/ipums-wth-r/index.html</loc>
+    <lastmod>2025-02-03T18:46:52.609Z</lastmod>
   </url>
 </urlset>

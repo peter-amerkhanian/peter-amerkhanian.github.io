@@ -3969,14 +3969,14 @@ Table&nbsp;8: IPUMS versus ACS aggregate results
 </figure>
 </div>
 </div>
-<p>These are.. Clearly different. What gives? Unfortunately, <strong>summary statistics calculated using IPUMS data typically cannot match aggregate ACS figures!</strong></p>
+<p>These are clearly different. What gives? Unfortunately, <strong>summary statistics calculated using IPUMS data typically cannot match aggregate ACS figures!</strong></p>
 <p>One major reason for this gap is additional sampling error. Recall that the American Community Survey is a sample. A given one-year ACS is typically a 1% sample of the U.S. population, with associated sampling error. When the census makes microdata available, they create a sample of that sample – we do not get the full 1%. This second sampling process introduces further sampling error in the microdata that is not reflected in figures sourced from aggregate ACS data, which are calculated using the full ACS sample <span class="citation" data-cites="ruggles_ipums_2024">(<a href="https://usa.ipums.org/usa/chapter2/chapter2.shtml#ACS" role="doc-biblioref">See ACS</a> in <a href="#ref-ruggles_ipums_2024" role="doc-biblioref">Ruggles et al. 2024</a>)</span>. This introduces its own, additional sampling error.<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a></p>
 </section>
 <section id="step-5-calculating-standard-errors" class="level3">
 <h3 class="anchored" data-anchor-id="step-5-calculating-standard-errors">Step 5: Calculating Standard Errors</h3>
-<p>Now we have estimates derived from the ACS microdata, but how do we communicate the uncertainty around those estimates? Recall that this is survey data – we are working with a small sample of Oakland’s population. We know that our estimates are going to be wrong, so accurately communicating uncertainty via good standard errors will be important.</p>
+<p>Now we have estimates derived from the ACS microdata, but recall that this is survey data. We are working with a small sample of Oakland’s population, so we would assume that our estimates are likely going to be wrong by some degree, so accurately communicating uncertainty via good standard errors will be important.</p>
 <p>For the sake of this example, let’s explore the problem of standard errors via a slightly different motivating question – <strong>what was the average household income in Oakland in 2022</strong>? I’m switching to the average because we are about to calculate some standard errors from-scratch, and that’s much more clear-cut for linear statistics like the average than for non-linear statistics like the median. We will return to the median at the end of this section, but rely on a package implementation and not do anything from-scratch.</p>
-<p>Anyways, let’s calculate the average household income in Oakland using the sample household weights. The formula for the weighted average is: <span class="math display">\[
+<p>Anyways, let’s calculate the average household income in Oakland using the sample household weights. The <a href="https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Mathematical_definition">formula for the weighted average</a> is: <span class="math display">\[
 \bar{X}_w = \frac{\sum_{i=1}^{n}w_ix_i}{\sum_{i=1}^{n}w_i}
 \]</span> We’ll put that into code and get the following estimate of the average household income in Oakland:</p>
 <div class="cell">
@@ -3989,7 +3989,7 @@ Table&nbsp;8: IPUMS versus ACS aggregate results
 <pre><code>[1] 141001.2</code></pre>
 </div>
 </div>
-<p>Now, let’s get a standard error for that estimate. The first issue we encounter here is that there is no analytical route for finding the variance (and by extension, the standard error) of the weighted mean. We want the standard error of that weighted average, but there is no analytical solution to finding the variance (and by extension standard error) for the weighted mean estimator. However, since the estimator is still a differentiable function, one common workaround is to compute the first-order <a href="https://en.wikipedia.org/wiki/Taylor_series">Taylor series approximation</a> of the estimator, then use the variance of that approximation. Indeed</p>
+<p>Now, let’s get a standard error for that estimate. Correctly utilizing the sample weights in the variance calculation is <a href="https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Variance">a little tricky</a> and there are a few different approaches. Most packages (e.g.&nbsp;<a href="https://documentation.sas.com/doc/en/statug/latest/statug_surveymeans_details06.htm#statug.surveymeans.variancedetails">SAS</a>, <a href="https://www.stata.com/manuals/svyvarianceestimation.pdf">Stata</a>, and R’s <a href="https://r-survey.r-forge.r-project.org/survey/#:~:text=Variances%20by%20Taylor%20linearization"><code>survey</code> package</a>) default to using “linearized variance.” In short, this entails calculating the first-order Taylor series approximation of the weighted mean formula above, then finding the variance of that approximation. Wikipedia has a nice <a href="https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Variance_of_the_weighted_mean_(%CF%80-estimator_for_ratio-mean)">walkthrough of that calculation</a>, but the details are beyond the scope of this post – we will just work with the resulting formula, the variance and standard error of the first-order linear approximation of the weighted mean:</p>
 <p>$$ <span class="math display">\[\begin{align*}
 \hat{\text{Var}}(\bar{X}_w) &amp;= \frac{\sum w_i^2 (x_i - \bar{X}_w)^2}{\left(\sum w_i\right)^2} \\
 \hat{\text{SE}}(\bar{X}_w) &amp;= \sqrt{\hat{\text{Var}}(\bar{X}_w)}
@@ -4431,9 +4431,16 @@ SE(\bar{x}_w) &amp;= \sqrt{\frac{4}{80} \sum_{r=1}^{80} (\bar{x}_r - \bar{x}_w)^
 <!-- preamble start -->
 
     <script>
+
       function styleCell_385vecy7vcg48ezgfka8(i, j, css_id) {
-        var table = document.getElementById("tinytable_385vecy7vcg48ezgfka8");
-        table.rows[i].cells[j].classList.add(css_id);
+          var table = document.getElementById("tinytable_385vecy7vcg48ezgfka8");
+          var cell = table.rows[i]?.cells[j];  // Safe navigation to avoid errors
+          if (cell) {
+              console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
+              cell.classList.add(css_id);
+          } else {
+              console.warn(`Cell at (${i}, ${j}) not found.`);
+          }
       }
       function insertSpanRow(i, colspan, content) {
         var table = document.getElementById('tinytable_385vecy7vcg48ezgfka8');
@@ -4471,84 +4478,39 @@ SE(\bar{x}_w) &amp;= \sqrt{\frac{4}{80} \sum_{r=1}^{80} (\bar{x}_r - \bar{x}_w)^
         targetCell.rowSpan = rowspan;
         targetCell.colSpan = colspan;
       }
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(0, 0, 'tinytable_css_idbp3kl56jkm9yddf2dmko') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(0, 1, 'tinytable_css_id53hy7ssaznavl8elhqdz') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(0, 2, 'tinytable_css_id53hy7ssaznavl8elhqdz') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(1, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(1, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(1, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(2, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(2, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(2, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(3, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(3, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(3, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(4, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(4, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(4, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(5, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(5, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(5, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(6, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(6, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(6, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(7, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(7, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(7, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(8, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(8, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(8, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(9, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(9, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(9, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(10, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(10, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(10, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(11, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(11, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(11, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(12, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(12, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(12, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(13, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(13, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(13, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(14, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(14, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(14, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(15, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(15, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(15, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(16, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(16, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(16, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(17, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(17, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(17, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(18, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(18, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(18, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(19, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(19, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(19, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(20, 0, 'tinytable_css_idq48nyufbrg2zk3byau5m') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(20, 1, 'tinytable_css_id9580mdyr03x4bu0bl7cw') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(20, 2, 'tinytable_css_id9580mdyr03x4bu0bl7cw') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(21, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(21, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(21, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(22, 0, 'tinytable_css_id0bipq2oc1isjvn6p8uit') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(22, 1, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
-window.addEventListener('load', function () { styleCell_385vecy7vcg48ezgfka8(22, 2, 'tinytable_css_idp8b8t1vnhnwsdfnp8oqr') })
+      // tinytable span after
+      window.addEventListener('load', function () {
+          var cellsToStyle = [
+            // tinytable style arrays after
+          { positions: [ { i: 0, j: 1 }, { i: 0, j: 2 },  ], css_id: 'tinytable_css_n5oulf5ntayq56h7mz0z',}, 
+          { positions: [ { i: 22, j: 0 },  ], css_id: 'tinytable_css_fdb2hvyh1dxktbqaylod',}, 
+          { positions: [ { i: 0, j: 0 },  ], css_id: 'tinytable_css_edboomrj03lnsmr6ijkc',}, 
+          { positions: [ { i: 20, j: 2 }, { i: 20, j: 1 },  ], css_id: 'tinytable_css_bp3kl56jkm9yddf2dmko',}, 
+          { positions: [ { i: 1, j: 1 }, { i: 3, j: 1 }, { i: 4, j: 1 }, { i: 5, j: 1 }, { i: 2, j: 1 }, { i: 7, j: 1 }, { i: 8, j: 1 }, { i: 9, j: 1 }, { i: 6, j: 1 }, { i: 11, j: 1 }, { i: 12, j: 1 }, { i: 13, j: 1 }, { i: 14, j: 1 }, { i: 15, j: 1 }, { i: 16, j: 1 }, { i: 17, j: 1 }, { i: 18, j: 1 }, { i: 19, j: 1 }, { i: 10, j: 2 }, { i: 21, j: 1 }, { i: 12, j: 2 }, { i: 10, j: 1 }, { i: 1, j: 2 }, { i: 2, j: 2 }, { i: 3, j: 2 }, { i: 4, j: 2 }, { i: 5, j: 2 }, { i: 6, j: 2 }, { i: 7, j: 2 }, { i: 8, j: 2 }, { i: 9, j: 2 }, { i: 14, j: 2 }, { i: 11, j: 2 }, { i: 16, j: 2 }, { i: 13, j: 2 }, { i: 18, j: 2 }, { i: 15, j: 2 }, { i: 17, j: 2 }, { i: 19, j: 2 }, { i: 21, j: 2 },  ], css_id: 'tinytable_css_92dgcpa2j7cv97hbjts2',}, 
+          { positions: [ { i: 1, j: 0 }, { i: 2, j: 0 }, { i: 3, j: 0 }, { i: 4, j: 0 }, { i: 5, j: 0 }, { i: 6, j: 0 }, { i: 7, j: 0 }, { i: 8, j: 0 }, { i: 9, j: 0 }, { i: 10, j: 0 }, { i: 11, j: 0 }, { i: 12, j: 0 }, { i: 13, j: 0 }, { i: 14, j: 0 }, { i: 15, j: 0 }, { i: 16, j: 0 }, { i: 17, j: 0 }, { i: 18, j: 0 }, { i: 19, j: 0 }, { i: 21, j: 0 },  ], css_id: 'tinytable_css_84pyqvwdoa4y201vgm47',}, 
+          { positions: [ { i: 20, j: 0 },  ], css_id: 'tinytable_css_3tx7cgzsn7pwqsjhjbtl',}, 
+          { positions: [ { i: 22, j: 1 }, { i: 22, j: 2 },  ], css_id: 'tinytable_css_0bipq2oc1isjvn6p8uit',}, 
+          ];
+
+          // Loop over the arrays to style the cells
+          cellsToStyle.forEach(function (group) {
+              group.positions.forEach(function (cell) {
+                  styleCell_385vecy7vcg48ezgfka8(cell.i, cell.j, group.css_id);
+              });
+          });
+      });
     </script>
 
     <style>
-    .table td.tinytable_css_idbp3kl56jkm9yddf2dmko, .table th.tinytable_css_idbp3kl56jkm9yddf2dmko {  text-align: left;  border-bottom: solid 0.1em #d3d8dc; }
-    .table td.tinytable_css_id53hy7ssaznavl8elhqdz, .table th.tinytable_css_id53hy7ssaznavl8elhqdz {  text-align: center;  border-bottom: solid 0.1em #d3d8dc; }
-    .table td.tinytable_css_id0bipq2oc1isjvn6p8uit, .table th.tinytable_css_id0bipq2oc1isjvn6p8uit {  text-align: left; }
-    .table td.tinytable_css_idp8b8t1vnhnwsdfnp8oqr, .table th.tinytable_css_idp8b8t1vnhnwsdfnp8oqr {  text-align: center; }
-    .table td.tinytable_css_idq48nyufbrg2zk3byau5m, .table th.tinytable_css_idq48nyufbrg2zk3byau5m {  border-bottom: solid 0.05em black;  text-align: left; }
-    .table td.tinytable_css_id9580mdyr03x4bu0bl7cw, .table th.tinytable_css_id9580mdyr03x4bu0bl7cw {  border-bottom: solid 0.05em black;  text-align: center; }
+      /* tinytable css entries after */
+      .table td.tinytable_css_n5oulf5ntayq56h7mz0z, .table th.tinytable_css_n5oulf5ntayq56h7mz0z { text-align: center; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
+      .table td.tinytable_css_fdb2hvyh1dxktbqaylod, .table th.tinytable_css_fdb2hvyh1dxktbqaylod { text-align: left; border-bottom: solid #d3d8dc 0.1em; }
+      .table td.tinytable_css_edboomrj03lnsmr6ijkc, .table th.tinytable_css_edboomrj03lnsmr6ijkc { text-align: left; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
+      .table td.tinytable_css_bp3kl56jkm9yddf2dmko, .table th.tinytable_css_bp3kl56jkm9yddf2dmko { text-align: center; border-bottom: solid black 0.05em; }
+      .table td.tinytable_css_92dgcpa2j7cv97hbjts2, .table th.tinytable_css_92dgcpa2j7cv97hbjts2 { text-align: center; }
+      .table td.tinytable_css_84pyqvwdoa4y201vgm47, .table th.tinytable_css_84pyqvwdoa4y201vgm47 { text-align: left; }
+      .table td.tinytable_css_3tx7cgzsn7pwqsjhjbtl, .table th.tinytable_css_3tx7cgzsn7pwqsjhjbtl { text-align: left; border-bottom: solid black 0.05em; }
+      .table td.tinytable_css_0bipq2oc1isjvn6p8uit, .table th.tinytable_css_0bipq2oc1isjvn6p8uit { text-align: center; border-bottom: solid #d3d8dc 0.1em; }
     </style>
     <div class="container">
       <table class="table table-borderless" id="tinytable_385vecy7vcg48ezgfka8" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
@@ -5648,7 +5610,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb38-549"><a href="#cb38-549" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-550"><a href="#cb38-550" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb38-551"><a href="#cb38-551" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-552"><a href="#cb38-552" aria-hidden="true" tabindex="-1"></a>These are.. Clearly different. What gives? Unfortunately, **summary</span>
+<span id="cb38-552"><a href="#cb38-552" aria-hidden="true" tabindex="-1"></a>These are clearly different. What gives? Unfortunately, **summary</span>
 <span id="cb38-553"><a href="#cb38-553" aria-hidden="true" tabindex="-1"></a>statistics calculated using IPUMS data typically cannot match aggregate</span>
 <span id="cb38-554"><a href="#cb38-554" aria-hidden="true" tabindex="-1"></a>ACS figures!**</span>
 <span id="cb38-555"><a href="#cb38-555" aria-hidden="true" tabindex="-1"></a></span>
@@ -5672,11 +5634,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb38-573"><a href="#cb38-573" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-574"><a href="#cb38-574" aria-hidden="true" tabindex="-1"></a><span class="fu">### Step 5: Calculating Standard Errors</span></span>
 <span id="cb38-575"><a href="#cb38-575" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-576"><a href="#cb38-576" aria-hidden="true" tabindex="-1"></a>Now we have estimates derived from the ACS microdata, but how do we communicate the uncertainty around those estimates? Recall that this is survey data -- we are working with a small sample of Oakland's population. We know that our estimates are going to be wrong, so accurately communicating uncertainty via good standard errors will be important.  </span>
+<span id="cb38-576"><a href="#cb38-576" aria-hidden="true" tabindex="-1"></a>Now we have estimates derived from the ACS microdata, but recall that this is survey data. We are working with a small sample of Oakland's population, so we would assume that our estimates are likely going to be wrong by some degree, so accurately communicating uncertainty via good standard errors will be important.  </span>
 <span id="cb38-577"><a href="#cb38-577" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-578"><a href="#cb38-578" aria-hidden="true" tabindex="-1"></a>For the sake of this example, let's explore the problem of standard errors via a slightly different motivating question -- **what was the average household income in Oakland in 2022**? I'm switching to the average because we are about to calculate some standard errors from-scratch, and that's much more clear-cut for linear statistics like the average than for non-linear statistics like the median. We will return to the median at the end of this section, but rely on a package implementation and not do anything from-scratch.</span>
 <span id="cb38-579"><a href="#cb38-579" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-580"><a href="#cb38-580" aria-hidden="true" tabindex="-1"></a>Anyways, let's calculate the average household income in Oakland using the sample household weights. The formula for the weighted average is: </span>
+<span id="cb38-580"><a href="#cb38-580" aria-hidden="true" tabindex="-1"></a>Anyways, let's calculate the average household income in Oakland using the sample household weights. The <span class="co">[</span><span class="ot">formula for the weighted average</span><span class="co">](https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Mathematical_definition)</span> is: </span>
 <span id="cb38-581"><a href="#cb38-581" aria-hidden="true" tabindex="-1"></a>$$</span>
 <span id="cb38-582"><a href="#cb38-582" aria-hidden="true" tabindex="-1"></a>\bar{X}_w = \frac{\sum_{i=1}^{n}w_ix_i}{\sum_{i=1}^{n}w_i}</span>
 <span id="cb38-583"><a href="#cb38-583" aria-hidden="true" tabindex="-1"></a>$$</span>
@@ -5688,357 +5650,356 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb38-591"><a href="#cb38-591" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb38-592"><a href="#cb38-592" aria-hidden="true" tabindex="-1"></a>weighted_mean</span>
 <span id="cb38-593"><a href="#cb38-593" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb38-594"><a href="#cb38-594" aria-hidden="true" tabindex="-1"></a>Now, let's get a standard error for that estimate. The first issue we encounter here is that there is no analytical route for finding the variance (and by extension, the standard error) of the weighted mean.</span>
-<span id="cb38-595"><a href="#cb38-595" aria-hidden="true" tabindex="-1"></a>We want the standard error of that weighted average, but there is no analytical solution to finding the variance (and by extension standard error) for the weighted mean estimator. However, since the estimator is still a differentiable function, one common workaround is to compute the first-order <span class="co">[</span><span class="ot">Taylor series approximation</span><span class="co">](https://en.wikipedia.org/wiki/Taylor_series)</span> of the estimator, then use the variance of that approximation. Indeed</span>
-<span id="cb38-596"><a href="#cb38-596" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-597"><a href="#cb38-597" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb38-598"><a href="#cb38-598" aria-hidden="true" tabindex="-1"></a>\begin{align*}</span>
-<span id="cb38-599"><a href="#cb38-599" aria-hidden="true" tabindex="-1"></a>\hat{\text{Var}}(\bar{X}_w) &amp;= \frac{\sum w_i^2 (x_i - \bar{X}_w)^2}{\left(\sum w_i\right)^2} <span class="sc">\\</span></span>
-<span id="cb38-600"><a href="#cb38-600" aria-hidden="true" tabindex="-1"></a>\hat{\text{SE}}(\bar{X}_w) &amp;= \sqrt{\hat{\text{Var}}(\bar{X}_w)}</span>
-<span id="cb38-601"><a href="#cb38-601" aria-hidden="true" tabindex="-1"></a>\end{align*}</span>
-<span id="cb38-602"><a href="#cb38-602" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-603"><a href="#cb38-603" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb38-604"><a href="#cb38-604" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-607"><a href="#cb38-607" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb38-608"><a href="#cb38-608" aria-hidden="true" tabindex="-1"></a>numerator <span class="ot">&lt;-</span> <span class="fu">sum</span>(households_w_income<span class="sc">$</span>HHWT<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> (households_w_income<span class="sc">$</span>HHINCOME <span class="sc">-</span> weighted_mean)<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb38-609"><a href="#cb38-609" aria-hidden="true" tabindex="-1"></a>denominator <span class="ot">&lt;-</span> <span class="fu">sum</span>(households_w_income<span class="sc">$</span>HHWT)<span class="sc">^</span><span class="dv">2</span></span>
-<span id="cb38-610"><a href="#cb38-610" aria-hidden="true" tabindex="-1"></a>variance <span class="ot">&lt;-</span> numerator <span class="sc">/</span> denominator</span>
-<span id="cb38-611"><a href="#cb38-611" aria-hidden="true" tabindex="-1"></a>se <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(variance)</span>
-<span id="cb38-612"><a href="#cb38-612" aria-hidden="true" tabindex="-1"></a>se</span>
-<span id="cb38-613"><a href="#cb38-613" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-594"><a href="#cb38-594" aria-hidden="true" tabindex="-1"></a>Now, let's get a standard error for that estimate. Correctly utilizing the sample weights in the variance calculation is <span class="co">[</span><span class="ot">a little tricky</span><span class="co">](https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Variance)</span> and there are a few different approaches. Most packages (e.g. <span class="co">[</span><span class="ot">SAS</span><span class="co">](https://documentation.sas.com/doc/en/statug/latest/statug_surveymeans_details06.htm#statug.surveymeans.variancedetails)</span>, <span class="co">[</span><span class="ot">Stata</span><span class="co">](https://www.stata.com/manuals/svyvarianceestimation.pdf)</span>, and R's <span class="co">[</span><span class="ot">`survey` package</span><span class="co">](https://r-survey.r-forge.r-project.org/survey/#:~:text=Variances%20by%20Taylor%20linearization)</span>) default to using "linearized variance." In short, this entails calculating the first-order Taylor series approximation of the weighted mean formula above, then finding the variance of that approximation. Wikipedia has a nice <span class="co">[</span><span class="ot">walkthrough of that calculation</span><span class="co">]</span>(https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Variance_of_the_weighted_mean_(%CF%80-estimator_for_ratio-mean)), but the details are beyond the scope of this post -- we will just work with the resulting formula, the variance and standard error of the first-order linear approximation of the weighted mean:</span>
+<span id="cb38-595"><a href="#cb38-595" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-596"><a href="#cb38-596" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb38-597"><a href="#cb38-597" aria-hidden="true" tabindex="-1"></a>\begin{align*}</span>
+<span id="cb38-598"><a href="#cb38-598" aria-hidden="true" tabindex="-1"></a>\hat{\text{Var}}(\bar{X}_w) &amp;= \frac{\sum w_i^2 (x_i - \bar{X}_w)^2}{\left(\sum w_i\right)^2} <span class="sc">\\</span></span>
+<span id="cb38-599"><a href="#cb38-599" aria-hidden="true" tabindex="-1"></a>\hat{\text{SE}}(\bar{X}_w) &amp;= \sqrt{\hat{\text{Var}}(\bar{X}_w)}</span>
+<span id="cb38-600"><a href="#cb38-600" aria-hidden="true" tabindex="-1"></a>\end{align*}</span>
+<span id="cb38-601"><a href="#cb38-601" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-602"><a href="#cb38-602" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb38-603"><a href="#cb38-603" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-606"><a href="#cb38-606" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-607"><a href="#cb38-607" aria-hidden="true" tabindex="-1"></a>numerator <span class="ot">&lt;-</span> <span class="fu">sum</span>(households_w_income<span class="sc">$</span>HHWT<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> (households_w_income<span class="sc">$</span>HHINCOME <span class="sc">-</span> weighted_mean)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb38-608"><a href="#cb38-608" aria-hidden="true" tabindex="-1"></a>denominator <span class="ot">&lt;-</span> <span class="fu">sum</span>(households_w_income<span class="sc">$</span>HHWT)<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb38-609"><a href="#cb38-609" aria-hidden="true" tabindex="-1"></a>variance <span class="ot">&lt;-</span> numerator <span class="sc">/</span> denominator</span>
+<span id="cb38-610"><a href="#cb38-610" aria-hidden="true" tabindex="-1"></a>se <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(variance)</span>
+<span id="cb38-611"><a href="#cb38-611" aria-hidden="true" tabindex="-1"></a>se</span>
+<span id="cb38-612"><a href="#cb38-612" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-613"><a href="#cb38-613" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-614"><a href="#cb38-614" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-615"><a href="#cb38-615" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-616"><a href="#cb38-616" aria-hidden="true" tabindex="-1"></a>That is the weighted sample mean and its accompanying weighted, sample standard error.</span>
-<span id="cb38-619"><a href="#cb38-619" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb38-620"><a href="#cb38-620" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-wrong-se</span></span>
-<span id="cb38-621"><a href="#cb38-621" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: "Standard Error via Sample Weights"</span></span>
-<span id="cb38-622"><a href="#cb38-622" aria-hidden="true" tabindex="-1"></a>households_w_income <span class="sc">%&gt;%</span></span>
-<span id="cb38-623"><a href="#cb38-623" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_survey</span>(<span class="at">weights=</span>HHWT) <span class="sc">%&gt;%</span></span>
-<span id="cb38-624"><a href="#cb38-624" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">weighted_mean =</span> <span class="fu">survey_mean</span>(HHINCOME))</span>
-<span id="cb38-625"><a href="#cb38-625" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-626"><a href="#cb38-626" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-615"><a href="#cb38-615" aria-hidden="true" tabindex="-1"></a>That is the weighted sample mean and its accompanying weighted, sample standard error.</span>
+<span id="cb38-618"><a href="#cb38-618" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-619"><a href="#cb38-619" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tbl-wrong-se</span></span>
+<span id="cb38-620"><a href="#cb38-620" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: "Standard Error via Sample Weights"</span></span>
+<span id="cb38-621"><a href="#cb38-621" aria-hidden="true" tabindex="-1"></a>households_w_income <span class="sc">%&gt;%</span></span>
+<span id="cb38-622"><a href="#cb38-622" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_survey</span>(<span class="at">weights=</span>HHWT) <span class="sc">%&gt;%</span></span>
+<span id="cb38-623"><a href="#cb38-623" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">weighted_mean =</span> <span class="fu">survey_mean</span>(HHINCOME))</span>
+<span id="cb38-624"><a href="#cb38-624" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-625"><a href="#cb38-625" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-626"><a href="#cb38-626" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-627"><a href="#cb38-627" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-628"><a href="#cb38-628" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-629"><a href="#cb38-629" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-630"><a href="#cb38-630" aria-hidden="true" tabindex="-1"></a>In theory, the standard error of an estimate measures the variation of a</span>
-<span id="cb38-631"><a href="#cb38-631" aria-hidden="true" tabindex="-1"></a>statistic across multiple samples of a given population. Our sample</span>
-<span id="cb38-632"><a href="#cb38-632" aria-hidden="true" tabindex="-1"></a>standard error above, calculated using just the one sample, is just an</span>
-<span id="cb38-633"><a href="#cb38-633" aria-hidden="true" tabindex="-1"></a>estimate of that theoretical standard error. We can get a better estimate of that theoretical standard error using replicate weights.</span>
-<span id="cb38-634"><a href="#cb38-634" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-635"><a href="#cb38-635" aria-hidden="true" tabindex="-1"></a>Replicate weights allow a single sample to simulate multiple samples, thus generating more</span>
-<span id="cb38-636"><a href="#cb38-636" aria-hidden="true" tabindex="-1"></a>informed standard error estimates that more closely mimic the</span>
-<span id="cb38-637"><a href="#cb38-637" aria-hidden="true" tabindex="-1"></a>theoretical basis of standard errors.</span>
-<span id="cb38-638"><a href="#cb38-638" aria-hidden="true" tabindex="-1"></a>https://usa.ipums.org/usa/repwt.shtml#q70</span>
-<span id="cb38-639"><a href="#cb38-639" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-640"><a href="#cb38-640" aria-hidden="true" tabindex="-1"></a>Here we can see what replicate weights (in this case, individual</span>
-<span id="cb38-641"><a href="#cb38-641" aria-hidden="true" tabindex="-1"></a>replicate weights) look like in our data. Each of <span class="in">`REPWTP`</span>, 1 through 80,</span>
-<span id="cb38-642"><a href="#cb38-642" aria-hidden="true" tabindex="-1"></a>is a set of alternative individual weights, slightly different from the</span>
-<span id="cb38-643"><a href="#cb38-643" aria-hidden="true" tabindex="-1"></a>"production weight," <span class="in">`PERWT`</span>.</span>
-<span id="cb38-644"><a href="#cb38-644" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-647"><a href="#cb38-647" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb38-648"><a href="#cb38-648" aria-hidden="true" tabindex="-1"></a>households_w_income <span class="sc">%&gt;%</span></span>
-<span id="cb38-649"><a href="#cb38-649" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at"> </span><span class="st">`</span> <span class="ot">=</span> <span class="st">"..."</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb38-650"><a href="#cb38-650" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(HHINCOME, HHWT, REPWT1, REPWT2, <span class="st">`</span><span class="at"> </span><span class="st">`</span>, REPWT79, REPWT80)) <span class="sc">%&gt;%</span> </span>
-<span id="cb38-651"><a href="#cb38-651" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>()</span>
-<span id="cb38-652"><a href="#cb38-652" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb38-653"><a href="#cb38-653" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-654"><a href="#cb38-654" aria-hidden="true" tabindex="-1"></a>We can use replicate weights in a variety of alternative variance</span>
-<span id="cb38-655"><a href="#cb38-655" aria-hidden="true" tabindex="-1"></a>estimates in the calculation of "successive difference replication (SDR)</span>
-<span id="cb38-656"><a href="#cb38-656" aria-hidden="true" tabindex="-1"></a>variance," an alternative to the standard variance of an estimate. We</span>
-<span id="cb38-657"><a href="#cb38-657" aria-hidden="true" tabindex="-1"></a>obtain SDR variance by calculating a statistic of interest with the</span>
-<span id="cb38-658"><a href="#cb38-658" aria-hidden="true" tabindex="-1"></a>production weights (e.g. <span class="in">`HHWT`</span>), then sum the squared deviations</span>
-<span id="cb38-659"><a href="#cb38-659" aria-hidden="true" tabindex="-1"></a>between that production weighted estimate and the weighted estimates we</span>
-<span id="cb38-660"><a href="#cb38-660" aria-hidden="true" tabindex="-1"></a>obtain with each replicate weight (e.g. <span class="in">`REPWT1`</span>). Specifically:</span>
-<span id="cb38-661"><a href="#cb38-661" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb38-662"><a href="#cb38-662" aria-hidden="true" tabindex="-1"></a>\begin{align*}</span>
-<span id="cb38-663"><a href="#cb38-663" aria-hidden="true" tabindex="-1"></a>\bar{x}_w &amp;= \frac{\sum_{i=1}^{n}w_ix_i}{\sum_{i=1}^{n}w_i} <span class="sc">\\</span> </span>
-<span id="cb38-664"><a href="#cb38-664" aria-hidden="true" tabindex="-1"></a>\bar{x}_r &amp;= \frac{\sum_{i=1}^{n}r_ix_i}{\sum_{i=1}^{n}r_i} <span class="sc">\\</span> </span>
-<span id="cb38-665"><a href="#cb38-665" aria-hidden="true" tabindex="-1"></a>SE(\bar{x}_w) &amp;= \sqrt{\frac{4}{80} \sum_{r=1}^{80} (\bar{x}_r - \bar{x}_w)^2}</span>
-<span id="cb38-666"><a href="#cb38-666" aria-hidden="true" tabindex="-1"></a>\end{align*}</span>
-<span id="cb38-667"><a href="#cb38-667" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb38-668"><a href="#cb38-668" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-669"><a href="#cb38-669" aria-hidden="true" tabindex="-1"></a>Where $w$ represents the production weights, $r$ represents each</span>
-<span id="cb38-670"><a href="#cb38-670" aria-hidden="true" tabindex="-1"></a>replicate weight. There are a few ways you can rationalize this equation to yourself.</span>
-<span id="cb38-671"><a href="#cb38-671" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-672"><a href="#cb38-672" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>It's equivalent to using <span class="co">[</span><span class="ot">Fay's Balanced Repeated Replication method</span><span class="co">](https://documentation.sas.com/doc/en/statug/15.2/statug_surveyphreg_details29.htm#:~:text=the%20following%20section.-,Fay%E2%80%99s%20BRR%20Method,-The%20traditional%20BRR)</span> with the Faye coefficient set to $\epsilon=.5$.</span>
-<span id="cb38-673"><a href="#cb38-673" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-676"><a href="#cb38-676" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb38-677"><a href="#cb38-677" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate X_r</span></span>
-<span id="cb38-678"><a href="#cb38-678" aria-hidden="true" tabindex="-1"></a>X_r <span class="ot">&lt;-</span> <span class="fu">vector</span>()</span>
-<span id="cb38-679"><a href="#cb38-679" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (r <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">80</span>){</span>
-<span id="cb38-680"><a href="#cb38-680" aria-hidden="true" tabindex="-1"></a>  X_r[r] <span class="ot">&lt;-</span> households_w_income <span class="sc">%&gt;%</span></span>
-<span id="cb38-681"><a href="#cb38-681" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_survey</span>(<span class="at">weights=</span><span class="fu">glue</span>(<span class="st">"REPWT"</span>, r)) <span class="sc">%&gt;%</span></span>
-<span id="cb38-682"><a href="#cb38-682" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">weighted_mean =</span> <span class="fu">survey_mean</span>(HHINCOME)) <span class="sc">%&gt;%</span> </span>
-<span id="cb38-683"><a href="#cb38-683" aria-hidden="true" tabindex="-1"></a>    .<span class="sc">$</span>weighted_mean</span>
-<span id="cb38-684"><a href="#cb38-684" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb38-685"><a href="#cb38-685" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate X</span></span>
-<span id="cb38-686"><a href="#cb38-686" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> households_w_income <span class="sc">%&gt;%</span></span>
-<span id="cb38-687"><a href="#cb38-687" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_survey</span>(<span class="at">weights=</span>HHWT) <span class="sc">%&gt;%</span></span>
-<span id="cb38-688"><a href="#cb38-688" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">weighted_mean =</span> <span class="fu">survey_mean</span>(HHINCOME)) <span class="sc">%&gt;%</span> </span>
-<span id="cb38-689"><a href="#cb38-689" aria-hidden="true" tabindex="-1"></a>    .<span class="sc">$</span>weighted_mean</span>
+<span id="cb38-629"><a href="#cb38-629" aria-hidden="true" tabindex="-1"></a>In theory, the standard error of an estimate measures the variation of a</span>
+<span id="cb38-630"><a href="#cb38-630" aria-hidden="true" tabindex="-1"></a>statistic across multiple samples of a given population. Our sample</span>
+<span id="cb38-631"><a href="#cb38-631" aria-hidden="true" tabindex="-1"></a>standard error above, calculated using just the one sample, is just an</span>
+<span id="cb38-632"><a href="#cb38-632" aria-hidden="true" tabindex="-1"></a>estimate of that theoretical standard error. We can get a better estimate of that theoretical standard error using replicate weights.</span>
+<span id="cb38-633"><a href="#cb38-633" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-634"><a href="#cb38-634" aria-hidden="true" tabindex="-1"></a>Replicate weights allow a single sample to simulate multiple samples, thus generating more</span>
+<span id="cb38-635"><a href="#cb38-635" aria-hidden="true" tabindex="-1"></a>informed standard error estimates that more closely mimic the</span>
+<span id="cb38-636"><a href="#cb38-636" aria-hidden="true" tabindex="-1"></a>theoretical basis of standard errors.</span>
+<span id="cb38-637"><a href="#cb38-637" aria-hidden="true" tabindex="-1"></a>https://usa.ipums.org/usa/repwt.shtml#q70</span>
+<span id="cb38-638"><a href="#cb38-638" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-639"><a href="#cb38-639" aria-hidden="true" tabindex="-1"></a>Here we can see what replicate weights (in this case, individual</span>
+<span id="cb38-640"><a href="#cb38-640" aria-hidden="true" tabindex="-1"></a>replicate weights) look like in our data. Each of <span class="in">`REPWTP`</span>, 1 through 80,</span>
+<span id="cb38-641"><a href="#cb38-641" aria-hidden="true" tabindex="-1"></a>is a set of alternative individual weights, slightly different from the</span>
+<span id="cb38-642"><a href="#cb38-642" aria-hidden="true" tabindex="-1"></a>"production weight," <span class="in">`PERWT`</span>.</span>
+<span id="cb38-643"><a href="#cb38-643" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-646"><a href="#cb38-646" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-647"><a href="#cb38-647" aria-hidden="true" tabindex="-1"></a>households_w_income <span class="sc">%&gt;%</span></span>
+<span id="cb38-648"><a href="#cb38-648" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at"> </span><span class="st">`</span> <span class="ot">=</span> <span class="st">"..."</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-649"><a href="#cb38-649" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(HHINCOME, HHWT, REPWT1, REPWT2, <span class="st">`</span><span class="at"> </span><span class="st">`</span>, REPWT79, REPWT80)) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-650"><a href="#cb38-650" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>()</span>
+<span id="cb38-651"><a href="#cb38-651" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-652"><a href="#cb38-652" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-653"><a href="#cb38-653" aria-hidden="true" tabindex="-1"></a>We can use replicate weights in a variety of alternative variance</span>
+<span id="cb38-654"><a href="#cb38-654" aria-hidden="true" tabindex="-1"></a>estimates in the calculation of "successive difference replication (SDR)</span>
+<span id="cb38-655"><a href="#cb38-655" aria-hidden="true" tabindex="-1"></a>variance," an alternative to the standard variance of an estimate. We</span>
+<span id="cb38-656"><a href="#cb38-656" aria-hidden="true" tabindex="-1"></a>obtain SDR variance by calculating a statistic of interest with the</span>
+<span id="cb38-657"><a href="#cb38-657" aria-hidden="true" tabindex="-1"></a>production weights (e.g. <span class="in">`HHWT`</span>), then sum the squared deviations</span>
+<span id="cb38-658"><a href="#cb38-658" aria-hidden="true" tabindex="-1"></a>between that production weighted estimate and the weighted estimates we</span>
+<span id="cb38-659"><a href="#cb38-659" aria-hidden="true" tabindex="-1"></a>obtain with each replicate weight (e.g. <span class="in">`REPWT1`</span>). Specifically:</span>
+<span id="cb38-660"><a href="#cb38-660" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb38-661"><a href="#cb38-661" aria-hidden="true" tabindex="-1"></a>\begin{align*}</span>
+<span id="cb38-662"><a href="#cb38-662" aria-hidden="true" tabindex="-1"></a>\bar{x}_w &amp;= \frac{\sum_{i=1}^{n}w_ix_i}{\sum_{i=1}^{n}w_i} <span class="sc">\\</span> </span>
+<span id="cb38-663"><a href="#cb38-663" aria-hidden="true" tabindex="-1"></a>\bar{x}_r &amp;= \frac{\sum_{i=1}^{n}r_ix_i}{\sum_{i=1}^{n}r_i} <span class="sc">\\</span> </span>
+<span id="cb38-664"><a href="#cb38-664" aria-hidden="true" tabindex="-1"></a>SE(\bar{x}_w) &amp;= \sqrt{\frac{4}{80} \sum_{r=1}^{80} (\bar{x}_r - \bar{x}_w)^2}</span>
+<span id="cb38-665"><a href="#cb38-665" aria-hidden="true" tabindex="-1"></a>\end{align*}</span>
+<span id="cb38-666"><a href="#cb38-666" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb38-667"><a href="#cb38-667" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-668"><a href="#cb38-668" aria-hidden="true" tabindex="-1"></a>Where $w$ represents the production weights, $r$ represents each</span>
+<span id="cb38-669"><a href="#cb38-669" aria-hidden="true" tabindex="-1"></a>replicate weight. There are a few ways you can rationalize this equation to yourself.</span>
+<span id="cb38-670"><a href="#cb38-670" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-671"><a href="#cb38-671" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>It's equivalent to using <span class="co">[</span><span class="ot">Fay's Balanced Repeated Replication method</span><span class="co">](https://documentation.sas.com/doc/en/statug/15.2/statug_surveyphreg_details29.htm#:~:text=the%20following%20section.-,Fay%E2%80%99s%20BRR%20Method,-The%20traditional%20BRR)</span> with the Faye coefficient set to $\epsilon=.5$.</span>
+<span id="cb38-672"><a href="#cb38-672" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-675"><a href="#cb38-675" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-676"><a href="#cb38-676" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate X_r</span></span>
+<span id="cb38-677"><a href="#cb38-677" aria-hidden="true" tabindex="-1"></a>X_r <span class="ot">&lt;-</span> <span class="fu">vector</span>()</span>
+<span id="cb38-678"><a href="#cb38-678" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (r <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">80</span>){</span>
+<span id="cb38-679"><a href="#cb38-679" aria-hidden="true" tabindex="-1"></a>  X_r[r] <span class="ot">&lt;-</span> households_w_income <span class="sc">%&gt;%</span></span>
+<span id="cb38-680"><a href="#cb38-680" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_survey</span>(<span class="at">weights=</span><span class="fu">glue</span>(<span class="st">"REPWT"</span>, r)) <span class="sc">%&gt;%</span></span>
+<span id="cb38-681"><a href="#cb38-681" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">weighted_mean =</span> <span class="fu">survey_mean</span>(HHINCOME)) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-682"><a href="#cb38-682" aria-hidden="true" tabindex="-1"></a>    .<span class="sc">$</span>weighted_mean</span>
+<span id="cb38-683"><a href="#cb38-683" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb38-684"><a href="#cb38-684" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate X</span></span>
+<span id="cb38-685"><a href="#cb38-685" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> households_w_income <span class="sc">%&gt;%</span></span>
+<span id="cb38-686"><a href="#cb38-686" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_survey</span>(<span class="at">weights=</span>HHWT) <span class="sc">%&gt;%</span></span>
+<span id="cb38-687"><a href="#cb38-687" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">weighted_mean =</span> <span class="fu">survey_mean</span>(HHINCOME)) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-688"><a href="#cb38-688" aria-hidden="true" tabindex="-1"></a>    .<span class="sc">$</span>weighted_mean</span>
+<span id="cb38-689"><a href="#cb38-689" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-690"><a href="#cb38-690" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-691"><a href="#cb38-691" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-692"><a href="#cb38-692" aria-hidden="true" tabindex="-1"></a><span class="co"># Sum over r</span></span>
-<span id="cb38-693"><a href="#cb38-693" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>( (<span class="dv">4</span><span class="sc">/</span><span class="dv">80</span>) <span class="sc">*</span> <span class="fu">sum</span>( (X_r <span class="sc">-</span> <span class="fu">mean</span>(X_r))<span class="sc">^</span><span class="dv">2</span> ) )</span>
-<span id="cb38-694"><a href="#cb38-694" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb38-695"><a href="#cb38-695" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-696"><a href="#cb38-696" aria-hidden="true" tabindex="-1"></a>To be clear, we don't have to ever do that manually -- <span class="in">`survey`</span> supports</span>
-<span id="cb38-697"><a href="#cb38-697" aria-hidden="true" tabindex="-1"></a>specifying survey designs with replicate weights. Here we can</span>
-<span id="cb38-698"><a href="#cb38-698" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-701"><a href="#cb38-701" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb38-702"><a href="#cb38-702" aria-hidden="true" tabindex="-1"></a>households_w_income <span class="sc">%&gt;%</span> </span>
-<span id="cb38-703"><a href="#cb38-703" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_survey_rep</span>(</span>
-<span id="cb38-704"><a href="#cb38-704" aria-hidden="true" tabindex="-1"></a>  <span class="at">weight =</span> HHWT ,</span>
-<span id="cb38-705"><a href="#cb38-705" aria-hidden="true" tabindex="-1"></a>  <span class="at">repweights =</span> <span class="fu">matches</span>(<span class="st">"REPWT[0-9]+"</span>),</span>
-<span id="cb38-706"><a href="#cb38-706" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">"Fay"</span>,</span>
-<span id="cb38-707"><a href="#cb38-707" aria-hidden="true" tabindex="-1"></a>  <span class="at">rho=</span>.<span class="dv">5</span>,</span>
-<span id="cb38-708"><a href="#cb38-708" aria-hidden="true" tabindex="-1"></a>  <span class="at">mse =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb38-709"><a href="#cb38-709" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">mean_female_income =</span> <span class="fu">survey_mean</span>(HHINCOME))</span>
-<span id="cb38-710"><a href="#cb38-710" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-691"><a href="#cb38-691" aria-hidden="true" tabindex="-1"></a><span class="co"># Sum over r</span></span>
+<span id="cb38-692"><a href="#cb38-692" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>( (<span class="dv">4</span><span class="sc">/</span><span class="dv">80</span>) <span class="sc">*</span> <span class="fu">sum</span>( (X_r <span class="sc">-</span> <span class="fu">mean</span>(X_r))<span class="sc">^</span><span class="dv">2</span> ) )</span>
+<span id="cb38-693"><a href="#cb38-693" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-694"><a href="#cb38-694" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-695"><a href="#cb38-695" aria-hidden="true" tabindex="-1"></a>To be clear, we don't have to ever do that manually -- <span class="in">`survey`</span> supports</span>
+<span id="cb38-696"><a href="#cb38-696" aria-hidden="true" tabindex="-1"></a>specifying survey designs with replicate weights. Here we can</span>
+<span id="cb38-697"><a href="#cb38-697" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-700"><a href="#cb38-700" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-701"><a href="#cb38-701" aria-hidden="true" tabindex="-1"></a>households_w_income <span class="sc">%&gt;%</span> </span>
+<span id="cb38-702"><a href="#cb38-702" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_survey_rep</span>(</span>
+<span id="cb38-703"><a href="#cb38-703" aria-hidden="true" tabindex="-1"></a>  <span class="at">weight =</span> HHWT ,</span>
+<span id="cb38-704"><a href="#cb38-704" aria-hidden="true" tabindex="-1"></a>  <span class="at">repweights =</span> <span class="fu">matches</span>(<span class="st">"REPWT[0-9]+"</span>),</span>
+<span id="cb38-705"><a href="#cb38-705" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">"Fay"</span>,</span>
+<span id="cb38-706"><a href="#cb38-706" aria-hidden="true" tabindex="-1"></a>  <span class="at">rho=</span>.<span class="dv">5</span>,</span>
+<span id="cb38-707"><a href="#cb38-707" aria-hidden="true" tabindex="-1"></a>  <span class="at">mse =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb38-708"><a href="#cb38-708" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">mean_female_income =</span> <span class="fu">survey_mean</span>(HHINCOME))</span>
+<span id="cb38-709"><a href="#cb38-709" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-710"><a href="#cb38-710" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-711"><a href="#cb38-711" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-712"><a href="#cb38-712" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-715"><a href="#cb38-715" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb38-716"><a href="#cb38-716" aria-hidden="true" tabindex="-1"></a>households_w_income <span class="sc">%&gt;%</span> </span>
-<span id="cb38-717"><a href="#cb38-717" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_survey_rep</span>(</span>
-<span id="cb38-718"><a href="#cb38-718" aria-hidden="true" tabindex="-1"></a>  <span class="at">weight =</span> HHWT ,</span>
-<span id="cb38-719"><a href="#cb38-719" aria-hidden="true" tabindex="-1"></a>  <span class="at">repweights =</span> <span class="fu">matches</span>(<span class="st">"REPWT[0-9]+"</span>),</span>
-<span id="cb38-720"><a href="#cb38-720" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">"successive-difference"</span>,</span>
-<span id="cb38-721"><a href="#cb38-721" aria-hidden="true" tabindex="-1"></a>  <span class="at">mse =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb38-722"><a href="#cb38-722" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">mean_female_income =</span> <span class="fu">survey_mean</span>(HHINCOME))</span>
-<span id="cb38-723"><a href="#cb38-723" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb38-726"><a href="#cb38-726" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb38-727"><a href="#cb38-727" aria-hidden="true" tabindex="-1"></a>households_w_income <span class="sc">%&gt;%</span> </span>
-<span id="cb38-728"><a href="#cb38-728" aria-hidden="true" tabindex="-1"></a><span class="fu">as_survey_rep</span>(</span>
-<span id="cb38-729"><a href="#cb38-729" aria-hidden="true" tabindex="-1"></a>  <span class="at">weight =</span> HHWT,</span>
-<span id="cb38-730"><a href="#cb38-730" aria-hidden="true" tabindex="-1"></a>  <span class="at">repweights =</span> <span class="fu">matches</span>(<span class="st">"REPWTP[0-9]+"</span>),</span>
-<span id="cb38-731"><a href="#cb38-731" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">"JK1"</span>,</span>
-<span id="cb38-732"><a href="#cb38-732" aria-hidden="true" tabindex="-1"></a>  <span class="at">scale =</span> <span class="dv">4</span> <span class="sc">/</span> <span class="dv">80</span> ,</span>
-<span id="cb38-733"><a href="#cb38-733" aria-hidden="true" tabindex="-1"></a>  <span class="at">rscales =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">80</span>),</span>
-<span id="cb38-734"><a href="#cb38-734" aria-hidden="true" tabindex="-1"></a>  <span class="at">mse =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">mean_female_income =</span> <span class="fu">survey_mean</span>(HHINCOME))</span>
-<span id="cb38-735"><a href="#cb38-735" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-714"><a href="#cb38-714" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-715"><a href="#cb38-715" aria-hidden="true" tabindex="-1"></a>households_w_income <span class="sc">%&gt;%</span> </span>
+<span id="cb38-716"><a href="#cb38-716" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_survey_rep</span>(</span>
+<span id="cb38-717"><a href="#cb38-717" aria-hidden="true" tabindex="-1"></a>  <span class="at">weight =</span> HHWT ,</span>
+<span id="cb38-718"><a href="#cb38-718" aria-hidden="true" tabindex="-1"></a>  <span class="at">repweights =</span> <span class="fu">matches</span>(<span class="st">"REPWT[0-9]+"</span>),</span>
+<span id="cb38-719"><a href="#cb38-719" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">"successive-difference"</span>,</span>
+<span id="cb38-720"><a href="#cb38-720" aria-hidden="true" tabindex="-1"></a>  <span class="at">mse =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb38-721"><a href="#cb38-721" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">mean_female_income =</span> <span class="fu">survey_mean</span>(HHINCOME))</span>
+<span id="cb38-722"><a href="#cb38-722" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-725"><a href="#cb38-725" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-726"><a href="#cb38-726" aria-hidden="true" tabindex="-1"></a>households_w_income <span class="sc">%&gt;%</span> </span>
+<span id="cb38-727"><a href="#cb38-727" aria-hidden="true" tabindex="-1"></a><span class="fu">as_survey_rep</span>(</span>
+<span id="cb38-728"><a href="#cb38-728" aria-hidden="true" tabindex="-1"></a>  <span class="at">weight =</span> HHWT,</span>
+<span id="cb38-729"><a href="#cb38-729" aria-hidden="true" tabindex="-1"></a>  <span class="at">repweights =</span> <span class="fu">matches</span>(<span class="st">"REPWTP[0-9]+"</span>),</span>
+<span id="cb38-730"><a href="#cb38-730" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">"JK1"</span>,</span>
+<span id="cb38-731"><a href="#cb38-731" aria-hidden="true" tabindex="-1"></a>  <span class="at">scale =</span> <span class="dv">4</span> <span class="sc">/</span> <span class="dv">80</span> ,</span>
+<span id="cb38-732"><a href="#cb38-732" aria-hidden="true" tabindex="-1"></a>  <span class="at">rscales =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">80</span>),</span>
+<span id="cb38-733"><a href="#cb38-733" aria-hidden="true" tabindex="-1"></a>  <span class="at">mse =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">mean_female_income =</span> <span class="fu">survey_mean</span>(HHINCOME))</span>
+<span id="cb38-734"><a href="#cb38-734" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-735"><a href="#cb38-735" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-736"><a href="#cb38-736" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-737"><a href="#cb38-737" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-738"><a href="#cb38-738" aria-hidden="true" tabindex="-1"></a>In IPUMS testing of ACS/PRCS data, replicate weights usually increase</span>
-<span id="cb38-739"><a href="#cb38-739" aria-hidden="true" tabindex="-1"></a>standard errors. This increase is generally not large enough to alter</span>
-<span id="cb38-740"><a href="#cb38-740" aria-hidden="true" tabindex="-1"></a>the significance level of coefficients, though marginally significant</span>
-<span id="cb38-741"><a href="#cb38-741" aria-hidden="true" tabindex="-1"></a>coefficients may become clearly non-significant. The more obvious effect</span>
-<span id="cb38-742"><a href="#cb38-742" aria-hidden="true" tabindex="-1"></a>of using replicate weights is on the width of confidence intervals,</span>
-<span id="cb38-743"><a href="#cb38-743" aria-hidden="true" tabindex="-1"></a>which can change substantially.</span>
-<span id="cb38-744"><a href="#cb38-744" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-745"><a href="#cb38-745" aria-hidden="true" tabindex="-1"></a>IPUMS' documentation recommends the following specification for the</span>
-<span id="cb38-746"><a href="#cb38-746" aria-hidden="true" tabindex="-1"></a>replicate weights, where the standard errors are calculated via a</span>
-<span id="cb38-747"><a href="#cb38-747" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">jacknife</span><span class="co">](https://en.wikipedia.org/wiki/Jackknife_resampling)</span> (see</span>
-<span id="cb38-748"><a href="#cb38-748" aria-hidden="true" tabindex="-1"></a><span class="in">`type = 'JK1'`</span>).</span>
+<span id="cb38-737"><a href="#cb38-737" aria-hidden="true" tabindex="-1"></a>In IPUMS testing of ACS/PRCS data, replicate weights usually increase</span>
+<span id="cb38-738"><a href="#cb38-738" aria-hidden="true" tabindex="-1"></a>standard errors. This increase is generally not large enough to alter</span>
+<span id="cb38-739"><a href="#cb38-739" aria-hidden="true" tabindex="-1"></a>the significance level of coefficients, though marginally significant</span>
+<span id="cb38-740"><a href="#cb38-740" aria-hidden="true" tabindex="-1"></a>coefficients may become clearly non-significant. The more obvious effect</span>
+<span id="cb38-741"><a href="#cb38-741" aria-hidden="true" tabindex="-1"></a>of using replicate weights is on the width of confidence intervals,</span>
+<span id="cb38-742"><a href="#cb38-742" aria-hidden="true" tabindex="-1"></a>which can change substantially.</span>
+<span id="cb38-743"><a href="#cb38-743" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-744"><a href="#cb38-744" aria-hidden="true" tabindex="-1"></a>IPUMS' documentation recommends the following specification for the</span>
+<span id="cb38-745"><a href="#cb38-745" aria-hidden="true" tabindex="-1"></a>replicate weights, where the standard errors are calculated via a</span>
+<span id="cb38-746"><a href="#cb38-746" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">jacknife</span><span class="co">](https://en.wikipedia.org/wiki/Jackknife_resampling)</span> (see</span>
+<span id="cb38-747"><a href="#cb38-747" aria-hidden="true" tabindex="-1"></a><span class="in">`type = 'JK1'`</span>).</span>
+<span id="cb38-748"><a href="#cb38-748" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-749"><a href="#cb38-749" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-750"><a href="#cb38-750" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-751"><a href="#cb38-751" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-752"><a href="#cb38-752" aria-hidden="true" tabindex="-1"></a><span class="fu">### Analyzing ACS microdata</span></span>
-<span id="cb38-753"><a href="#cb38-753" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-754"><a href="#cb38-754" aria-hidden="true" tabindex="-1"></a>Here we can see the un-adjusted gender earnings gap in Oakland, where</span>
-<span id="cb38-755"><a href="#cb38-755" aria-hidden="true" tabindex="-1"></a>men on earn about \$20k more than women on average:</span>
-<span id="cb38-758"><a href="#cb38-758" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb38-759"><a href="#cb38-759" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
-<span id="cb38-760"><a href="#cb38-760" aria-hidden="true" tabindex="-1"></a>individuals_w_income <span class="ot">&lt;-</span> oak <span class="sc">%&gt;%</span></span>
-<span id="cb38-761"><a href="#cb38-761" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Find adult earners</span></span>
-<span id="cb38-762"><a href="#cb38-762" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(INCTOT <span class="sc">!=</span> <span class="dv">9999999</span>, INCTOT <span class="sc">&gt;</span> <span class="dv">0</span>, AGE <span class="sc">&gt;=</span> <span class="dv">18</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb38-763"><a href="#cb38-763" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb38-764"><a href="#cb38-764" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Label sex</span></span>
-<span id="cb38-765"><a href="#cb38-765" aria-hidden="true" tabindex="-1"></a>    <span class="at">SEX =</span> <span class="fu">case_when</span>(SEX <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">'Male'</span>, <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">'Female'</span>),</span>
-<span id="cb38-766"><a href="#cb38-766" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Label education</span></span>
-<span id="cb38-767"><a href="#cb38-767" aria-hidden="true" tabindex="-1"></a>    <span class="at">educ_attain =</span> <span class="fu">case_when</span>(</span>
-<span id="cb38-768"><a href="#cb38-768" aria-hidden="true" tabindex="-1"></a>      EDUC <span class="sc">==</span> <span class="dv">10</span> <span class="sc">~</span> <span class="st">"Bachelor's degree"</span>,</span>
-<span id="cb38-769"><a href="#cb38-769" aria-hidden="true" tabindex="-1"></a>      EDUC <span class="sc">==</span> <span class="dv">11</span> <span class="sc">~</span> <span class="st">"Graduate degree"</span>,</span>
-<span id="cb38-770"><a href="#cb38-770" aria-hidden="true" tabindex="-1"></a>      EDUCD <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">63</span>, <span class="dv">65</span>, <span class="dv">64</span>) <span class="sc">~</span> <span class="st">"Highschool diploma"</span>,</span>
-<span id="cb38-771"><a href="#cb38-771" aria-hidden="true" tabindex="-1"></a>      EDUCD <span class="sc">==</span> <span class="dv">71</span> <span class="sc">~</span> <span class="st">"Some college"</span>,</span>
-<span id="cb38-772"><a href="#cb38-772" aria-hidden="true" tabindex="-1"></a>      EDUC <span class="sc">==</span> <span class="dv">8</span> <span class="sc">~</span> <span class="st">"Associate's degree"</span>,</span>
-<span id="cb38-773"><a href="#cb38-773" aria-hidden="true" tabindex="-1"></a>      EDUC <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"No schooling"</span>,</span>
-<span id="cb38-774"><a href="#cb38-774" aria-hidden="true" tabindex="-1"></a>      EDUCD <span class="sc">==</span> <span class="dv">61</span> <span class="sc">~</span> <span class="st">"Some school"</span>,</span>
-<span id="cb38-775"><a href="#cb38-775" aria-hidden="true" tabindex="-1"></a>      EDUC <span class="sc">&lt;</span> <span class="dv">6</span> <span class="sc">~</span> <span class="st">"Some school"</span>,</span>
-<span id="cb38-776"><a href="#cb38-776" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> <span class="fu">as.factor</span>()</span>
-<span id="cb38-777"><a href="#cb38-777" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb38-778"><a href="#cb38-778" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb38-779"><a href="#cb38-779" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-782"><a href="#cb38-782" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb38-783"><a href="#cb38-783" aria-hidden="true" tabindex="-1"></a>oak_indiv_svy <span class="ot">&lt;-</span> <span class="fu">as_survey_rep</span>(</span>
-<span id="cb38-784"><a href="#cb38-784" aria-hidden="true" tabindex="-1"></a>  individuals_w_income,</span>
-<span id="cb38-785"><a href="#cb38-785" aria-hidden="true" tabindex="-1"></a>  <span class="at">weight =</span> PERWT ,</span>
-<span id="cb38-786"><a href="#cb38-786" aria-hidden="true" tabindex="-1"></a>  <span class="at">repweights =</span> <span class="fu">matches</span>(<span class="st">"REPWTP[0-9]+"</span>),</span>
-<span id="cb38-787"><a href="#cb38-787" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">"JK1"</span>,</span>
-<span id="cb38-788"><a href="#cb38-788" aria-hidden="true" tabindex="-1"></a>  <span class="at">scale =</span> <span class="dv">4</span> <span class="sc">/</span> <span class="dv">80</span> ,</span>
-<span id="cb38-789"><a href="#cb38-789" aria-hidden="true" tabindex="-1"></a>  <span class="at">rscales =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">80</span>),</span>
-<span id="cb38-790"><a href="#cb38-790" aria-hidden="true" tabindex="-1"></a>  <span class="at">mse =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb38-791"><a href="#cb38-791" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb38-792"><a href="#cb38-792" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-795"><a href="#cb38-795" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb38-796"><a href="#cb38-796" aria-hidden="true" tabindex="-1"></a>oak_indiv_svy <span class="sc">%&gt;%</span></span>
-<span id="cb38-797"><a href="#cb38-797" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(SEX) <span class="sc">%&gt;%</span></span>
-<span id="cb38-798"><a href="#cb38-798" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_income =</span> <span class="fu">survey_mean</span>(INCTOT))</span>
-<span id="cb38-799"><a href="#cb38-799" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-751"><a href="#cb38-751" aria-hidden="true" tabindex="-1"></a><span class="fu">### Analyzing ACS microdata</span></span>
+<span id="cb38-752"><a href="#cb38-752" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-753"><a href="#cb38-753" aria-hidden="true" tabindex="-1"></a>Here we can see the un-adjusted gender earnings gap in Oakland, where</span>
+<span id="cb38-754"><a href="#cb38-754" aria-hidden="true" tabindex="-1"></a>men on earn about \$20k more than women on average:</span>
+<span id="cb38-757"><a href="#cb38-757" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-758"><a href="#cb38-758" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb38-759"><a href="#cb38-759" aria-hidden="true" tabindex="-1"></a>individuals_w_income <span class="ot">&lt;-</span> oak <span class="sc">%&gt;%</span></span>
+<span id="cb38-760"><a href="#cb38-760" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Find adult earners</span></span>
+<span id="cb38-761"><a href="#cb38-761" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(INCTOT <span class="sc">!=</span> <span class="dv">9999999</span>, INCTOT <span class="sc">&gt;</span> <span class="dv">0</span>, AGE <span class="sc">&gt;=</span> <span class="dv">18</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb38-762"><a href="#cb38-762" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb38-763"><a href="#cb38-763" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Label sex</span></span>
+<span id="cb38-764"><a href="#cb38-764" aria-hidden="true" tabindex="-1"></a>    <span class="at">SEX =</span> <span class="fu">case_when</span>(SEX <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">'Male'</span>, <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">'Female'</span>),</span>
+<span id="cb38-765"><a href="#cb38-765" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Label education</span></span>
+<span id="cb38-766"><a href="#cb38-766" aria-hidden="true" tabindex="-1"></a>    <span class="at">educ_attain =</span> <span class="fu">case_when</span>(</span>
+<span id="cb38-767"><a href="#cb38-767" aria-hidden="true" tabindex="-1"></a>      EDUC <span class="sc">==</span> <span class="dv">10</span> <span class="sc">~</span> <span class="st">"Bachelor's degree"</span>,</span>
+<span id="cb38-768"><a href="#cb38-768" aria-hidden="true" tabindex="-1"></a>      EDUC <span class="sc">==</span> <span class="dv">11</span> <span class="sc">~</span> <span class="st">"Graduate degree"</span>,</span>
+<span id="cb38-769"><a href="#cb38-769" aria-hidden="true" tabindex="-1"></a>      EDUCD <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">63</span>, <span class="dv">65</span>, <span class="dv">64</span>) <span class="sc">~</span> <span class="st">"Highschool diploma"</span>,</span>
+<span id="cb38-770"><a href="#cb38-770" aria-hidden="true" tabindex="-1"></a>      EDUCD <span class="sc">==</span> <span class="dv">71</span> <span class="sc">~</span> <span class="st">"Some college"</span>,</span>
+<span id="cb38-771"><a href="#cb38-771" aria-hidden="true" tabindex="-1"></a>      EDUC <span class="sc">==</span> <span class="dv">8</span> <span class="sc">~</span> <span class="st">"Associate's degree"</span>,</span>
+<span id="cb38-772"><a href="#cb38-772" aria-hidden="true" tabindex="-1"></a>      EDUC <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"No schooling"</span>,</span>
+<span id="cb38-773"><a href="#cb38-773" aria-hidden="true" tabindex="-1"></a>      EDUCD <span class="sc">==</span> <span class="dv">61</span> <span class="sc">~</span> <span class="st">"Some school"</span>,</span>
+<span id="cb38-774"><a href="#cb38-774" aria-hidden="true" tabindex="-1"></a>      EDUC <span class="sc">&lt;</span> <span class="dv">6</span> <span class="sc">~</span> <span class="st">"Some school"</span>,</span>
+<span id="cb38-775"><a href="#cb38-775" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> <span class="fu">as.factor</span>()</span>
+<span id="cb38-776"><a href="#cb38-776" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb38-777"><a href="#cb38-777" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-778"><a href="#cb38-778" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-781"><a href="#cb38-781" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-782"><a href="#cb38-782" aria-hidden="true" tabindex="-1"></a>oak_indiv_svy <span class="ot">&lt;-</span> <span class="fu">as_survey_rep</span>(</span>
+<span id="cb38-783"><a href="#cb38-783" aria-hidden="true" tabindex="-1"></a>  individuals_w_income,</span>
+<span id="cb38-784"><a href="#cb38-784" aria-hidden="true" tabindex="-1"></a>  <span class="at">weight =</span> PERWT ,</span>
+<span id="cb38-785"><a href="#cb38-785" aria-hidden="true" tabindex="-1"></a>  <span class="at">repweights =</span> <span class="fu">matches</span>(<span class="st">"REPWTP[0-9]+"</span>),</span>
+<span id="cb38-786"><a href="#cb38-786" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">"JK1"</span>,</span>
+<span id="cb38-787"><a href="#cb38-787" aria-hidden="true" tabindex="-1"></a>  <span class="at">scale =</span> <span class="dv">4</span> <span class="sc">/</span> <span class="dv">80</span> ,</span>
+<span id="cb38-788"><a href="#cb38-788" aria-hidden="true" tabindex="-1"></a>  <span class="at">rscales =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">80</span>),</span>
+<span id="cb38-789"><a href="#cb38-789" aria-hidden="true" tabindex="-1"></a>  <span class="at">mse =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb38-790"><a href="#cb38-790" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-791"><a href="#cb38-791" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-794"><a href="#cb38-794" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-795"><a href="#cb38-795" aria-hidden="true" tabindex="-1"></a>oak_indiv_svy <span class="sc">%&gt;%</span></span>
+<span id="cb38-796"><a href="#cb38-796" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(SEX) <span class="sc">%&gt;%</span></span>
+<span id="cb38-797"><a href="#cb38-797" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_income =</span> <span class="fu">survey_mean</span>(INCTOT))</span>
+<span id="cb38-798"><a href="#cb38-798" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-799"><a href="#cb38-799" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-800"><a href="#cb38-800" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-801"><a href="#cb38-801" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-804"><a href="#cb38-804" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb38-805"><a href="#cb38-805" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb38-806"><a href="#cb38-806" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: false</span></span>
-<span id="cb38-807"><a href="#cb38-807" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb38-808"><a href="#cb38-808" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reticulate)</span>
-<span id="cb38-809"><a href="#cb38-809" aria-hidden="true" tabindex="-1"></a><span class="fu">use_condaenv</span>(<span class="st">'base'</span>)</span>
-<span id="cb38-810"><a href="#cb38-810" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb38-811"><a href="#cb38-811" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-814"><a href="#cb38-814" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb38-815"><a href="#cb38-815" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: false</span></span>
-<span id="cb38-816"><a href="#cb38-816" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb38-817"><a href="#cb38-817" aria-hidden="true" tabindex="-1"></a><span class="co">#| </span></span>
-<span id="cb38-818"><a href="#cb38-818" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb38-819"><a href="#cb38-819" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb38-820"><a href="#cb38-820" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
-<span id="cb38-821"><a href="#cb38-821" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-822"><a href="#cb38-822" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(r[<span class="st">'individuals_w_income'</span>])</span>
-<span id="cb38-823"><a href="#cb38-823" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-824"><a href="#cb38-824" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">3</span>, <span class="dv">3</span>))</span>
-<span id="cb38-825"><a href="#cb38-825" aria-hidden="true" tabindex="-1"></a>sns.kdeplot(data<span class="op">=</span>df, x<span class="op">=</span><span class="st">'INCTOT'</span>, y<span class="op">=</span><span class="st">"AGE"</span>, weights<span class="op">=</span><span class="st">"PERWT"</span>, ax<span class="op">=</span>ax, fill<span class="op">=</span><span class="va">True</span>, alpha<span class="op">=</span><span class="fl">.5</span>, log_scale<span class="op">=</span><span class="va">True</span>, legend<span class="op">=</span><span class="va">False</span>, cmap<span class="op">=</span><span class="st">"coolwarm"</span>)</span>
-<span id="cb38-826"><a href="#cb38-826" aria-hidden="true" tabindex="-1"></a>ax.set_axis_off()</span>
-<span id="cb38-827"><a href="#cb38-827" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="fl">10e2</span>, <span class="fl">10e5</span>)</span>
-<span id="cb38-828"><a href="#cb38-828" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
-<span id="cb38-829"><a href="#cb38-829" aria-hidden="true" tabindex="-1"></a>fig.savefig(<span class="st">"thumbnail.png"</span>, dpi<span class="op">=</span><span class="dv">300</span>)</span>
-<span id="cb38-830"><a href="#cb38-830" aria-hidden="true" tabindex="-1"></a>plt.show()<span class="op">;</span></span>
-<span id="cb38-831"><a href="#cb38-831" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-803"><a href="#cb38-803" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-804"><a href="#cb38-804" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb38-805"><a href="#cb38-805" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: false</span></span>
+<span id="cb38-806"><a href="#cb38-806" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb38-807"><a href="#cb38-807" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reticulate)</span>
+<span id="cb38-808"><a href="#cb38-808" aria-hidden="true" tabindex="-1"></a><span class="fu">use_condaenv</span>(<span class="st">'base'</span>)</span>
+<span id="cb38-809"><a href="#cb38-809" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-810"><a href="#cb38-810" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-813"><a href="#cb38-813" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb38-814"><a href="#cb38-814" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: false</span></span>
+<span id="cb38-815"><a href="#cb38-815" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb38-816"><a href="#cb38-816" aria-hidden="true" tabindex="-1"></a><span class="co">#| </span></span>
+<span id="cb38-817"><a href="#cb38-817" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb38-818"><a href="#cb38-818" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb38-819"><a href="#cb38-819" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb38-820"><a href="#cb38-820" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-821"><a href="#cb38-821" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(r[<span class="st">'individuals_w_income'</span>])</span>
+<span id="cb38-822"><a href="#cb38-822" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-823"><a href="#cb38-823" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">3</span>, <span class="dv">3</span>))</span>
+<span id="cb38-824"><a href="#cb38-824" aria-hidden="true" tabindex="-1"></a>sns.kdeplot(data<span class="op">=</span>df, x<span class="op">=</span><span class="st">'INCTOT'</span>, y<span class="op">=</span><span class="st">"AGE"</span>, weights<span class="op">=</span><span class="st">"PERWT"</span>, ax<span class="op">=</span>ax, fill<span class="op">=</span><span class="va">True</span>, alpha<span class="op">=</span><span class="fl">.5</span>, log_scale<span class="op">=</span><span class="va">True</span>, legend<span class="op">=</span><span class="va">False</span>, cmap<span class="op">=</span><span class="st">"coolwarm"</span>)</span>
+<span id="cb38-825"><a href="#cb38-825" aria-hidden="true" tabindex="-1"></a>ax.set_axis_off()</span>
+<span id="cb38-826"><a href="#cb38-826" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="fl">10e2</span>, <span class="fl">10e5</span>)</span>
+<span id="cb38-827"><a href="#cb38-827" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb38-828"><a href="#cb38-828" aria-hidden="true" tabindex="-1"></a>fig.savefig(<span class="st">"thumbnail.png"</span>, dpi<span class="op">=</span><span class="dv">300</span>)</span>
+<span id="cb38-829"><a href="#cb38-829" aria-hidden="true" tabindex="-1"></a>plt.show()<span class="op">;</span></span>
+<span id="cb38-830"><a href="#cb38-830" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-831"><a href="#cb38-831" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-832"><a href="#cb38-832" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-833"><a href="#cb38-833" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-834"><a href="#cb38-834" aria-hidden="true" tabindex="-1"></a>Lets explore a couple other dynamics related to earnings in Oakland and</span>
-<span id="cb38-835"><a href="#cb38-835" aria-hidden="true" tabindex="-1"></a>practice making visualizations and estimating regressions with the data.</span>
-<span id="cb38-836"><a href="#cb38-836" aria-hidden="true" tabindex="-1"></a>Here's the income distribution across different levels of highest</span>
-<span id="cb38-837"><a href="#cb38-837" aria-hidden="true" tabindex="-1"></a>education earned. Note here that I'm not using the replicate weights</span>
-<span id="cb38-838"><a href="#cb38-838" aria-hidden="true" tabindex="-1"></a>(I'm just using the <span class="in">`individuals_w_income`</span> object), since I'm not</span>
-<span id="cb38-839"><a href="#cb38-839" aria-hidden="true" tabindex="-1"></a>estimating anything. <span class="in">`ggplot`</span> does take a weight argument, for which</span>
-<span id="cb38-840"><a href="#cb38-840" aria-hidden="true" tabindex="-1"></a>I've supplied the <span class="in">`PERWT`</span> sample weights.</span>
-<span id="cb38-841"><a href="#cb38-841" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-842"><a href="#cb38-842" aria-hidden="true" tabindex="-1"></a><span class="ot">&lt;https://www.andrewheiss.com/blog/2022/06/23/long-labels-ggplot/index.html&gt;</span></span>
-<span id="cb38-843"><a href="#cb38-843" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-846"><a href="#cb38-846" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb38-847"><a href="#cb38-847" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb38-848"><a href="#cb38-848" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
-<span id="cb38-849"><a href="#cb38-849" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-850"><a href="#cb38-850" aria-hidden="true" tabindex="-1"></a>order <span class="ot">&lt;-</span> individuals_w_income <span class="sc">%&gt;%</span></span>
-<span id="cb38-851"><a href="#cb38-851" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(EDUC, educ_attain) <span class="sc">%&gt;%</span></span>
-<span id="cb38-852"><a href="#cb38-852" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(EDUC) <span class="sc">%&gt;%</span></span>
-<span id="cb38-853"><a href="#cb38-853" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(educ_attain) <span class="sc">%&gt;%</span></span>
-<span id="cb38-854"><a href="#cb38-854" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>()</span>
-<span id="cb38-855"><a href="#cb38-855" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-856"><a href="#cb38-856" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(individuals_w_income, <span class="fu">aes</span>(</span>
-<span id="cb38-857"><a href="#cb38-857" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">factor</span>(educ_attain, <span class="at">levels =</span> order),</span>
-<span id="cb38-858"><a href="#cb38-858" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> INCTOT,</span>
-<span id="cb38-859"><a href="#cb38-859" aria-hidden="true" tabindex="-1"></a>  <span class="at">weight =</span> PERWT</span>
-<span id="cb38-860"><a href="#cb38-860" aria-hidden="true" tabindex="-1"></a>)) <span class="sc">+</span></span>
-<span id="cb38-861"><a href="#cb38-861" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(</span>
-<span id="cb38-862"><a href="#cb38-862" aria-hidden="true" tabindex="-1"></a>    <span class="at">position =</span> <span class="fu">position_jitter</span>(<span class="at">width =</span> .<span class="dv">2</span>),</span>
-<span id="cb38-863"><a href="#cb38-863" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.6</span>,</span>
-<span id="cb38-864"><a href="#cb38-864" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"grey"</span>,</span>
-<span id="cb38-865"><a href="#cb38-865" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="fl">1.2</span></span>
-<span id="cb38-866"><a href="#cb38-866" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb38-867"><a href="#cb38-867" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(</span>
-<span id="cb38-868"><a href="#cb38-868" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.9</span>,</span>
-<span id="cb38-869"><a href="#cb38-869" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"black"</span>,</span>
-<span id="cb38-870"><a href="#cb38-870" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> .<span class="dv">9</span>,</span>
-<span id="cb38-871"><a href="#cb38-871" aria-hidden="true" tabindex="-1"></a>    <span class="at">outliers =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb38-872"><a href="#cb38-872" aria-hidden="true" tabindex="-1"></a>    <span class="at">linewidth =</span> .<span class="dv">8</span></span>
-<span id="cb38-873"><a href="#cb38-873" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb38-874"><a href="#cb38-874" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
-<span id="cb38-875"><a href="#cb38-875" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">label_currency</span>(<span class="at">scale_cut =</span> scales<span class="sc">::</span><span class="fu">cut_short_scale</span>()),</span>
-<span id="cb38-876"><a href="#cb38-876" aria-hidden="true" tabindex="-1"></a>    <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">500000</span>),</span>
-<span id="cb38-877"><a href="#cb38-877" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">500000</span>, <span class="dv">100000</span>)</span>
-<span id="cb38-878"><a href="#cb38-878" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb38-879"><a href="#cb38-879" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">label_wrap</span>(<span class="dv">10</span>)) <span class="sc">+</span></span>
-<span id="cb38-880"><a href="#cb38-880" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Income by Education Level"</span>, <span class="at">y =</span> <span class="st">"Income"</span>, <span class="at">x =</span> <span class="st">"Education Level"</span>) <span class="sc">+</span></span>
-<span id="cb38-881"><a href="#cb38-881" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb38-882"><a href="#cb38-882" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb38-883"><a href="#cb38-883" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid =</span> <span class="fu">element_line</span>(</span>
-<span id="cb38-884"><a href="#cb38-884" aria-hidden="true" tabindex="-1"></a>      <span class="at">color =</span> <span class="st">"lightgrey"</span>,</span>
-<span id="cb38-885"><a href="#cb38-885" aria-hidden="true" tabindex="-1"></a>      <span class="at">size =</span> .<span class="dv">2</span>,</span>
-<span id="cb38-886"><a href="#cb38-886" aria-hidden="true" tabindex="-1"></a>      <span class="at">linetype =</span> <span class="dv">1</span></span>
-<span id="cb38-887"><a href="#cb38-887" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb38-888"><a href="#cb38-888" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="st">"white"</span>)</span>
-<span id="cb38-889"><a href="#cb38-889" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb38-890"><a href="#cb38-890" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-833"><a href="#cb38-833" aria-hidden="true" tabindex="-1"></a>Lets explore a couple other dynamics related to earnings in Oakland and</span>
+<span id="cb38-834"><a href="#cb38-834" aria-hidden="true" tabindex="-1"></a>practice making visualizations and estimating regressions with the data.</span>
+<span id="cb38-835"><a href="#cb38-835" aria-hidden="true" tabindex="-1"></a>Here's the income distribution across different levels of highest</span>
+<span id="cb38-836"><a href="#cb38-836" aria-hidden="true" tabindex="-1"></a>education earned. Note here that I'm not using the replicate weights</span>
+<span id="cb38-837"><a href="#cb38-837" aria-hidden="true" tabindex="-1"></a>(I'm just using the <span class="in">`individuals_w_income`</span> object), since I'm not</span>
+<span id="cb38-838"><a href="#cb38-838" aria-hidden="true" tabindex="-1"></a>estimating anything. <span class="in">`ggplot`</span> does take a weight argument, for which</span>
+<span id="cb38-839"><a href="#cb38-839" aria-hidden="true" tabindex="-1"></a>I've supplied the <span class="in">`PERWT`</span> sample weights.</span>
+<span id="cb38-840"><a href="#cb38-840" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-841"><a href="#cb38-841" aria-hidden="true" tabindex="-1"></a><span class="ot">&lt;https://www.andrewheiss.com/blog/2022/06/23/long-labels-ggplot/index.html&gt;</span></span>
+<span id="cb38-842"><a href="#cb38-842" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-845"><a href="#cb38-845" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-846"><a href="#cb38-846" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb38-847"><a href="#cb38-847" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb38-848"><a href="#cb38-848" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-849"><a href="#cb38-849" aria-hidden="true" tabindex="-1"></a>order <span class="ot">&lt;-</span> individuals_w_income <span class="sc">%&gt;%</span></span>
+<span id="cb38-850"><a href="#cb38-850" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(EDUC, educ_attain) <span class="sc">%&gt;%</span></span>
+<span id="cb38-851"><a href="#cb38-851" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(EDUC) <span class="sc">%&gt;%</span></span>
+<span id="cb38-852"><a href="#cb38-852" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(educ_attain) <span class="sc">%&gt;%</span></span>
+<span id="cb38-853"><a href="#cb38-853" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>()</span>
+<span id="cb38-854"><a href="#cb38-854" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-855"><a href="#cb38-855" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(individuals_w_income, <span class="fu">aes</span>(</span>
+<span id="cb38-856"><a href="#cb38-856" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">factor</span>(educ_attain, <span class="at">levels =</span> order),</span>
+<span id="cb38-857"><a href="#cb38-857" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> INCTOT,</span>
+<span id="cb38-858"><a href="#cb38-858" aria-hidden="true" tabindex="-1"></a>  <span class="at">weight =</span> PERWT</span>
+<span id="cb38-859"><a href="#cb38-859" aria-hidden="true" tabindex="-1"></a>)) <span class="sc">+</span></span>
+<span id="cb38-860"><a href="#cb38-860" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(</span>
+<span id="cb38-861"><a href="#cb38-861" aria-hidden="true" tabindex="-1"></a>    <span class="at">position =</span> <span class="fu">position_jitter</span>(<span class="at">width =</span> .<span class="dv">2</span>),</span>
+<span id="cb38-862"><a href="#cb38-862" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.6</span>,</span>
+<span id="cb38-863"><a href="#cb38-863" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"grey"</span>,</span>
+<span id="cb38-864"><a href="#cb38-864" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="fl">1.2</span></span>
+<span id="cb38-865"><a href="#cb38-865" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb38-866"><a href="#cb38-866" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(</span>
+<span id="cb38-867"><a href="#cb38-867" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.9</span>,</span>
+<span id="cb38-868"><a href="#cb38-868" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"black"</span>,</span>
+<span id="cb38-869"><a href="#cb38-869" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> .<span class="dv">9</span>,</span>
+<span id="cb38-870"><a href="#cb38-870" aria-hidden="true" tabindex="-1"></a>    <span class="at">outliers =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb38-871"><a href="#cb38-871" aria-hidden="true" tabindex="-1"></a>    <span class="at">linewidth =</span> .<span class="dv">8</span></span>
+<span id="cb38-872"><a href="#cb38-872" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb38-873"><a href="#cb38-873" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
+<span id="cb38-874"><a href="#cb38-874" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">label_currency</span>(<span class="at">scale_cut =</span> scales<span class="sc">::</span><span class="fu">cut_short_scale</span>()),</span>
+<span id="cb38-875"><a href="#cb38-875" aria-hidden="true" tabindex="-1"></a>    <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">500000</span>),</span>
+<span id="cb38-876"><a href="#cb38-876" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">500000</span>, <span class="dv">100000</span>)</span>
+<span id="cb38-877"><a href="#cb38-877" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb38-878"><a href="#cb38-878" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">label_wrap</span>(<span class="dv">10</span>)) <span class="sc">+</span></span>
+<span id="cb38-879"><a href="#cb38-879" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Income by Education Level"</span>, <span class="at">y =</span> <span class="st">"Income"</span>, <span class="at">x =</span> <span class="st">"Education Level"</span>) <span class="sc">+</span></span>
+<span id="cb38-880"><a href="#cb38-880" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb38-881"><a href="#cb38-881" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb38-882"><a href="#cb38-882" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid =</span> <span class="fu">element_line</span>(</span>
+<span id="cb38-883"><a href="#cb38-883" aria-hidden="true" tabindex="-1"></a>      <span class="at">color =</span> <span class="st">"lightgrey"</span>,</span>
+<span id="cb38-884"><a href="#cb38-884" aria-hidden="true" tabindex="-1"></a>      <span class="at">size =</span> .<span class="dv">2</span>,</span>
+<span id="cb38-885"><a href="#cb38-885" aria-hidden="true" tabindex="-1"></a>      <span class="at">linetype =</span> <span class="dv">1</span></span>
+<span id="cb38-886"><a href="#cb38-886" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb38-887"><a href="#cb38-887" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="st">"white"</span>)</span>
+<span id="cb38-888"><a href="#cb38-888" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb38-889"><a href="#cb38-889" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-890"><a href="#cb38-890" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-891"><a href="#cb38-891" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-892"><a href="#cb38-892" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-893"><a href="#cb38-893" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-894"><a href="#cb38-894" aria-hidden="true" tabindex="-1"></a>The plot shows that individuals with bachelor's and graduate degrees</span>
-<span id="cb38-895"><a href="#cb38-895" aria-hidden="true" tabindex="-1"></a>generally have higher incomes in Oakland. Let's seen how bachelor and</span>
-<span id="cb38-896"><a href="#cb38-896" aria-hidden="true" tabindex="-1"></a>graduate degree attainment differs across sex. Again, I'm using the</span>
-<span id="cb38-897"><a href="#cb38-897" aria-hidden="true" tabindex="-1"></a><span class="in">`individuals_w_income`</span> object as I have no need to replicate weights.</span>
-<span id="cb38-898"><a href="#cb38-898" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-901"><a href="#cb38-901" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb38-902"><a href="#cb38-902" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb38-903"><a href="#cb38-903" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
-<span id="cb38-904"><a href="#cb38-904" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-905"><a href="#cb38-905" aria-hidden="true" tabindex="-1"></a>colors <span class="ot">&lt;-</span> RColorBrewer<span class="sc">::</span><span class="fu">brewer.pal</span>(<span class="at">n =</span> <span class="dv">5</span>, <span class="st">"Set1"</span>)[<span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">2</span>)]</span>
-<span id="cb38-906"><a href="#cb38-906" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-907"><a href="#cb38-907" aria-hidden="true" tabindex="-1"></a>order <span class="ot">&lt;-</span> individuals_w_income <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(EDUC, educ_attain) <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(EDUC)) <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(educ_attain) <span class="sc">%&gt;%</span> <span class="fu">pull</span>()</span>
-<span id="cb38-908"><a href="#cb38-908" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-909"><a href="#cb38-909" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(individuals_w_income,</span>
-<span id="cb38-910"><a href="#cb38-910" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(</span>
-<span id="cb38-911"><a href="#cb38-911" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="fu">factor</span>(educ_attain, <span class="at">level =</span> order),</span>
-<span id="cb38-912"><a href="#cb38-912" aria-hidden="true" tabindex="-1"></a>         <span class="at">color =</span> <span class="fu">factor</span>(SEX),</span>
-<span id="cb38-913"><a href="#cb38-913" aria-hidden="true" tabindex="-1"></a>         <span class="at">fill =</span> <span class="fu">factor</span>(SEX),</span>
-<span id="cb38-914"><a href="#cb38-914" aria-hidden="true" tabindex="-1"></a>         <span class="at">weight =</span> PERWT</span>
-<span id="cb38-915"><a href="#cb38-915" aria-hidden="true" tabindex="-1"></a>       )) <span class="sc">+</span></span>
-<span id="cb38-916"><a href="#cb38-916" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(</span>
-<span id="cb38-917"><a href="#cb38-917" aria-hidden="true" tabindex="-1"></a>    <span class="at">position =</span> <span class="st">"dodge"</span>,</span>
-<span id="cb38-918"><a href="#cb38-918" aria-hidden="true" tabindex="-1"></a>    <span class="at">boundary =</span> <span class="dv">0</span>,</span>
-<span id="cb38-919"><a href="#cb38-919" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.9</span>,</span>
-<span id="cb38-920"><a href="#cb38-920" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> (..count..) <span class="sc">/</span> <span class="fu">sum</span>(..count..))</span>
-<span id="cb38-921"><a href="#cb38-921" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb38-922"><a href="#cb38-922" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> colors) <span class="sc">+</span></span>
-<span id="cb38-923"><a href="#cb38-923" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> colors) <span class="sc">+</span></span>
-<span id="cb38-924"><a href="#cb38-924" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">label_percent</span>(), ) <span class="sc">+</span></span>
-<span id="cb38-925"><a href="#cb38-925" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb38-926"><a href="#cb38-926" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Distribution of Highest Education Level by Sex"</span>,</span>
-<span id="cb38-927"><a href="#cb38-927" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Percent of earners"</span>,</span>
-<span id="cb38-928"><a href="#cb38-928" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Education"</span>,</span>
-<span id="cb38-929"><a href="#cb38-929" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Sex"</span>,</span>
-<span id="cb38-930"><a href="#cb38-930" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Sex"</span></span>
-<span id="cb38-931"><a href="#cb38-931" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb38-932"><a href="#cb38-932" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb38-933"><a href="#cb38-933" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb38-934"><a href="#cb38-934" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid =</span> <span class="fu">element_line</span>(</span>
-<span id="cb38-935"><a href="#cb38-935" aria-hidden="true" tabindex="-1"></a>      <span class="at">color =</span> <span class="st">"lightgrey"</span>,</span>
-<span id="cb38-936"><a href="#cb38-936" aria-hidden="true" tabindex="-1"></a>      <span class="at">size =</span> .<span class="dv">2</span>,</span>
-<span id="cb38-937"><a href="#cb38-937" aria-hidden="true" tabindex="-1"></a>      <span class="at">linetype =</span> <span class="dv">1</span></span>
-<span id="cb38-938"><a href="#cb38-938" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb38-939"><a href="#cb38-939" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="st">"white"</span>)</span>
-<span id="cb38-940"><a href="#cb38-940" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb38-941"><a href="#cb38-941" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-893"><a href="#cb38-893" aria-hidden="true" tabindex="-1"></a>The plot shows that individuals with bachelor's and graduate degrees</span>
+<span id="cb38-894"><a href="#cb38-894" aria-hidden="true" tabindex="-1"></a>generally have higher incomes in Oakland. Let's seen how bachelor and</span>
+<span id="cb38-895"><a href="#cb38-895" aria-hidden="true" tabindex="-1"></a>graduate degree attainment differs across sex. Again, I'm using the</span>
+<span id="cb38-896"><a href="#cb38-896" aria-hidden="true" tabindex="-1"></a><span class="in">`individuals_w_income`</span> object as I have no need to replicate weights.</span>
+<span id="cb38-897"><a href="#cb38-897" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-900"><a href="#cb38-900" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-901"><a href="#cb38-901" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb38-902"><a href="#cb38-902" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb38-903"><a href="#cb38-903" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-904"><a href="#cb38-904" aria-hidden="true" tabindex="-1"></a>colors <span class="ot">&lt;-</span> RColorBrewer<span class="sc">::</span><span class="fu">brewer.pal</span>(<span class="at">n =</span> <span class="dv">5</span>, <span class="st">"Set1"</span>)[<span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">2</span>)]</span>
+<span id="cb38-905"><a href="#cb38-905" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-906"><a href="#cb38-906" aria-hidden="true" tabindex="-1"></a>order <span class="ot">&lt;-</span> individuals_w_income <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(EDUC, educ_attain) <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(EDUC)) <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(educ_attain) <span class="sc">%&gt;%</span> <span class="fu">pull</span>()</span>
+<span id="cb38-907"><a href="#cb38-907" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-908"><a href="#cb38-908" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(individuals_w_income,</span>
+<span id="cb38-909"><a href="#cb38-909" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(</span>
+<span id="cb38-910"><a href="#cb38-910" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="fu">factor</span>(educ_attain, <span class="at">level =</span> order),</span>
+<span id="cb38-911"><a href="#cb38-911" aria-hidden="true" tabindex="-1"></a>         <span class="at">color =</span> <span class="fu">factor</span>(SEX),</span>
+<span id="cb38-912"><a href="#cb38-912" aria-hidden="true" tabindex="-1"></a>         <span class="at">fill =</span> <span class="fu">factor</span>(SEX),</span>
+<span id="cb38-913"><a href="#cb38-913" aria-hidden="true" tabindex="-1"></a>         <span class="at">weight =</span> PERWT</span>
+<span id="cb38-914"><a href="#cb38-914" aria-hidden="true" tabindex="-1"></a>       )) <span class="sc">+</span></span>
+<span id="cb38-915"><a href="#cb38-915" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(</span>
+<span id="cb38-916"><a href="#cb38-916" aria-hidden="true" tabindex="-1"></a>    <span class="at">position =</span> <span class="st">"dodge"</span>,</span>
+<span id="cb38-917"><a href="#cb38-917" aria-hidden="true" tabindex="-1"></a>    <span class="at">boundary =</span> <span class="dv">0</span>,</span>
+<span id="cb38-918"><a href="#cb38-918" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.9</span>,</span>
+<span id="cb38-919"><a href="#cb38-919" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> (..count..) <span class="sc">/</span> <span class="fu">sum</span>(..count..))</span>
+<span id="cb38-920"><a href="#cb38-920" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb38-921"><a href="#cb38-921" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> colors) <span class="sc">+</span></span>
+<span id="cb38-922"><a href="#cb38-922" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> colors) <span class="sc">+</span></span>
+<span id="cb38-923"><a href="#cb38-923" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">label_percent</span>(), ) <span class="sc">+</span></span>
+<span id="cb38-924"><a href="#cb38-924" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb38-925"><a href="#cb38-925" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Distribution of Highest Education Level by Sex"</span>,</span>
+<span id="cb38-926"><a href="#cb38-926" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Percent of earners"</span>,</span>
+<span id="cb38-927"><a href="#cb38-927" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Education"</span>,</span>
+<span id="cb38-928"><a href="#cb38-928" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Sex"</span>,</span>
+<span id="cb38-929"><a href="#cb38-929" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Sex"</span></span>
+<span id="cb38-930"><a href="#cb38-930" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb38-931"><a href="#cb38-931" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb38-932"><a href="#cb38-932" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb38-933"><a href="#cb38-933" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid =</span> <span class="fu">element_line</span>(</span>
+<span id="cb38-934"><a href="#cb38-934" aria-hidden="true" tabindex="-1"></a>      <span class="at">color =</span> <span class="st">"lightgrey"</span>,</span>
+<span id="cb38-935"><a href="#cb38-935" aria-hidden="true" tabindex="-1"></a>      <span class="at">size =</span> .<span class="dv">2</span>,</span>
+<span id="cb38-936"><a href="#cb38-936" aria-hidden="true" tabindex="-1"></a>      <span class="at">linetype =</span> <span class="dv">1</span></span>
+<span id="cb38-937"><a href="#cb38-937" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb38-938"><a href="#cb38-938" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="st">"white"</span>)</span>
+<span id="cb38-939"><a href="#cb38-939" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb38-940"><a href="#cb38-940" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-941"><a href="#cb38-941" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-942"><a href="#cb38-942" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-943"><a href="#cb38-943" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-944"><a href="#cb38-944" aria-hidden="true" tabindex="-1"></a>So bachelor and graduate degree holders generally earn more, and women</span>
-<span id="cb38-945"><a href="#cb38-945" aria-hidden="true" tabindex="-1"></a>are more likely than men to have bachelor and graduate degrees in</span>
-<span id="cb38-946"><a href="#cb38-946" aria-hidden="true" tabindex="-1"></a>Oakland. This should imply that if we adjust for education when</span>
-<span id="cb38-947"><a href="#cb38-947" aria-hidden="true" tabindex="-1"></a>estimating the gender-earnings gap in Oakland, thus only comparing men</span>
-<span id="cb38-948"><a href="#cb38-948" aria-hidden="true" tabindex="-1"></a>and women in the same education levels, we should see the gap increase.</span>
-<span id="cb38-949"><a href="#cb38-949" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-950"><a href="#cb38-950" aria-hidden="true" tabindex="-1"></a>We again use <span class="in">`svyglm`</span> to estimate the regression, and <span class="in">`oak_indiv_svy`</span> as</span>
-<span id="cb38-951"><a href="#cb38-951" aria-hidden="true" tabindex="-1"></a>the data/survey design so as to use the replicate weights for our</span>
-<span id="cb38-952"><a href="#cb38-952" aria-hidden="true" tabindex="-1"></a>standard errors.</span>
-<span id="cb38-953"><a href="#cb38-953" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-956"><a href="#cb38-956" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb38-957"><a href="#cb38-957" aria-hidden="true" tabindex="-1"></a>model_ols2 <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">log</span>(INCTOT) <span class="sc">~</span> <span class="fu">factor</span>(SEX), oak_indiv_svy)</span>
-<span id="cb38-958"><a href="#cb38-958" aria-hidden="true" tabindex="-1"></a>model_ols3 <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(</span>
-<span id="cb38-959"><a href="#cb38-959" aria-hidden="true" tabindex="-1"></a>  <span class="fu">log</span>(INCTOT) <span class="sc">~</span> <span class="fu">factor</span>(SEX) <span class="sc">+</span></span>
-<span id="cb38-960"><a href="#cb38-960" aria-hidden="true" tabindex="-1"></a>    AGE <span class="sc">+</span> <span class="fu">I</span>(AGE <span class="sc">^</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb38-961"><a href="#cb38-961" aria-hidden="true" tabindex="-1"></a>    <span class="fu">relevel</span>(educ_attain, <span class="at">ref =</span><span class="st">"Highschool diploma"</span>),</span>
-<span id="cb38-962"><a href="#cb38-962" aria-hidden="true" tabindex="-1"></a>  oak_indiv_svy</span>
-<span id="cb38-963"><a href="#cb38-963" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb38-964"><a href="#cb38-964" aria-hidden="true" tabindex="-1"></a><span class="fu">modelsummary</span>(</span>
-<span id="cb38-965"><a href="#cb38-965" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
-<span id="cb38-966"><a href="#cb38-966" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Earnings gap, no covariates"</span> <span class="ot">=</span> model_ols2,</span>
-<span id="cb38-967"><a href="#cb38-967" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Earnings gap, adjusted for age and education"</span> <span class="ot">=</span> model_ols3</span>
-<span id="cb38-968"><a href="#cb38-968" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb38-969"><a href="#cb38-969" aria-hidden="true" tabindex="-1"></a>  <span class="at">gof_map =</span> gof_stuff,</span>
-<span id="cb38-970"><a href="#cb38-970" aria-hidden="true" tabindex="-1"></a>  <span class="at">exponentiate =</span> <span class="cn">TRUE</span></span>
-<span id="cb38-971"><a href="#cb38-971" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb38-972"><a href="#cb38-972" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb38-973"><a href="#cb38-973" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-974"><a href="#cb38-974" aria-hidden="true" tabindex="-1"></a>Fun!</span>
+<span id="cb38-943"><a href="#cb38-943" aria-hidden="true" tabindex="-1"></a>So bachelor and graduate degree holders generally earn more, and women</span>
+<span id="cb38-944"><a href="#cb38-944" aria-hidden="true" tabindex="-1"></a>are more likely than men to have bachelor and graduate degrees in</span>
+<span id="cb38-945"><a href="#cb38-945" aria-hidden="true" tabindex="-1"></a>Oakland. This should imply that if we adjust for education when</span>
+<span id="cb38-946"><a href="#cb38-946" aria-hidden="true" tabindex="-1"></a>estimating the gender-earnings gap in Oakland, thus only comparing men</span>
+<span id="cb38-947"><a href="#cb38-947" aria-hidden="true" tabindex="-1"></a>and women in the same education levels, we should see the gap increase.</span>
+<span id="cb38-948"><a href="#cb38-948" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-949"><a href="#cb38-949" aria-hidden="true" tabindex="-1"></a>We again use <span class="in">`svyglm`</span> to estimate the regression, and <span class="in">`oak_indiv_svy`</span> as</span>
+<span id="cb38-950"><a href="#cb38-950" aria-hidden="true" tabindex="-1"></a>the data/survey design so as to use the replicate weights for our</span>
+<span id="cb38-951"><a href="#cb38-951" aria-hidden="true" tabindex="-1"></a>standard errors.</span>
+<span id="cb38-952"><a href="#cb38-952" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-955"><a href="#cb38-955" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-956"><a href="#cb38-956" aria-hidden="true" tabindex="-1"></a>model_ols2 <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(<span class="fu">log</span>(INCTOT) <span class="sc">~</span> <span class="fu">factor</span>(SEX), oak_indiv_svy)</span>
+<span id="cb38-957"><a href="#cb38-957" aria-hidden="true" tabindex="-1"></a>model_ols3 <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(</span>
+<span id="cb38-958"><a href="#cb38-958" aria-hidden="true" tabindex="-1"></a>  <span class="fu">log</span>(INCTOT) <span class="sc">~</span> <span class="fu">factor</span>(SEX) <span class="sc">+</span></span>
+<span id="cb38-959"><a href="#cb38-959" aria-hidden="true" tabindex="-1"></a>    AGE <span class="sc">+</span> <span class="fu">I</span>(AGE <span class="sc">^</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb38-960"><a href="#cb38-960" aria-hidden="true" tabindex="-1"></a>    <span class="fu">relevel</span>(educ_attain, <span class="at">ref =</span><span class="st">"Highschool diploma"</span>),</span>
+<span id="cb38-961"><a href="#cb38-961" aria-hidden="true" tabindex="-1"></a>  oak_indiv_svy</span>
+<span id="cb38-962"><a href="#cb38-962" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb38-963"><a href="#cb38-963" aria-hidden="true" tabindex="-1"></a><span class="fu">modelsummary</span>(</span>
+<span id="cb38-964"><a href="#cb38-964" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb38-965"><a href="#cb38-965" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Earnings gap, no covariates"</span> <span class="ot">=</span> model_ols2,</span>
+<span id="cb38-966"><a href="#cb38-966" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Earnings gap, adjusted for age and education"</span> <span class="ot">=</span> model_ols3</span>
+<span id="cb38-967"><a href="#cb38-967" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb38-968"><a href="#cb38-968" aria-hidden="true" tabindex="-1"></a>  <span class="at">gof_map =</span> gof_stuff,</span>
+<span id="cb38-969"><a href="#cb38-969" aria-hidden="true" tabindex="-1"></a>  <span class="at">exponentiate =</span> <span class="cn">TRUE</span></span>
+<span id="cb38-970"><a href="#cb38-970" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb38-971"><a href="#cb38-971" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-972"><a href="#cb38-972" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-973"><a href="#cb38-973" aria-hidden="true" tabindex="-1"></a>Fun!</span>
 </code></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

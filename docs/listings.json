@@ -9,6 +9,7 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/posts/ipums-wth-r/index.html",
       "/posts/sql-count-cases/index.html",
       "/posts/time-series-matplotlib/index.html",
       "/posts/covariance-matrices/index.html",
