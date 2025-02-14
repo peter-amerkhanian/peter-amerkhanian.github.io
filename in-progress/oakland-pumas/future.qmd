@@ -1,0 +1,206 @@
+### Analyzing ACS microdata
+
+What was the gender wage-gap in Oakland in
+
+```{r}
+#| code-fold: true
+individuals_w_income <- oak %>%
+  # Find adult earners
+  filter(INCTOT != 9999999, INCTOT > 0, AGE >= 18) %>%
+  mutate(
+    # Label sex
+    SEX = case_when(SEX == 1 ~ 'Male', TRUE ~ 'Female'),
+    # Label education
+    educ_attain = case_when(
+      EDUC == 10 ~ "Bachelor's degree",
+      EDUC == 11 ~ "Graduate degree",
+      EDUCD %in% c(63, 65, 64) ~ "Highschool diploma",
+      EDUCD == 71 ~ "Some college",
+      EDUC == 8 ~ "Associate's degree",
+      EDUC == 0 ~ "No schooling",
+      EDUCD == 61 ~ "Some school",
+      EDUC < 6 ~ "Some school",
+    ) %>% as.factor()
+  )
+
+gof_stuff <- tribble(
+  ~ raw, ~ clean, ~ fmt,
+  "nobs", "N", 0,
+  "r.squared", "R²", 3
+  )
+```
+
+```{r}
+oak_indiv_svy <- as_survey_rep(
+  individuals_w_income,
+  weight = PERWT ,
+  repweights = matches("REPWTP[0-9]+"),
+  type = "ACS",
+  mse = TRUE)
+```
+
+```{r}
+oak_indiv_svy %>%
+  group_by(SEX) %>%
+  summarize(mean_income = survey_mean(INCTOT))
+```
+
+```{r}
+#| warning: false
+#| output: false
+#| echo: false
+library(reticulate)
+use_condaenv('base')
+```
+
+```{python}
+#| output: false
+#| echo: false
+#| 
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df = pd.DataFrame(r['individuals_w_income'])
+
+fig, ax = plt.subplots(figsize=(3, 3))
+sns.kdeplot(data=df, x='INCTOT', y="AGE", weights="PERWT", ax=ax, fill=True, alpha=.5, log_scale=True, legend=False, cmap="coolwarm")
+ax.set_axis_off()
+ax.set_xlim(10e2, 10e5)
+fig.tight_layout()
+fig.savefig("thumbnail.png", dpi=300)
+plt.show();
+```
+
+Lets explore a couple other dynamics related to earnings in Oakland and
+practice making visualizations and estimating regressions with the data.
+Here's the income distribution across different levels of highest
+education earned. Note here that I'm not using the replicate weights
+(I'm just using the `individuals_w_income` object), since I'm not
+estimating anything. `ggplot` does take a weight argument, for which
+I've supplied the `PERWT` sample weights.
+
+<https://www.andrewheiss.com/blog/2022/06/23/long-labels-ggplot/index.html>
+
+```{r}
+#| warning: false
+#| code-fold: true
+
+order <- individuals_w_income %>%
+  distinct(EDUC, educ_attain) %>%
+  arrange(EDUC) %>%
+  distinct(educ_attain) %>%
+  pull()
+
+ggplot(individuals_w_income, aes(
+  x = factor(educ_attain, levels = order),
+  y = INCTOT,
+  weight = PERWT
+)) +
+  geom_jitter(
+    position = position_jitter(width = .2),
+    alpha = 0.6,
+    color = "grey",
+    size = 1.2
+  ) +
+  geom_boxplot(
+    alpha = 0.9,
+    color = "black",
+    size = .9,
+    outliers = FALSE,
+    linewidth = .8
+  ) +
+  scale_y_continuous(
+    labels = scales::label_currency(scale_cut = scales::cut_short_scale()),
+    limits = c(0, 500000),
+    breaks = seq(0, 500000, 100000)
+  ) +
+  scale_x_discrete(labels = scales::label_wrap(10)) +
+  labs(title = "Income by Education Level", y = "Income", x = "Education Level") +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid = element_line(
+      color = "lightgrey",
+      size = .2,
+      linetype = 1
+    ),
+    panel.background = element_rect("white")
+  )
+```
+
+The plot shows that individuals with bachelor's and graduate degrees
+generally have higher incomes in Oakland. Let's seen how bachelor and
+graduate degree attainment differs across sex. Again, I'm using the
+`individuals_w_income` object as I have no need for replicate weights.
+
+```{r}
+#| warning: false
+#| code-fold: true
+
+colors <- RColorBrewer::brewer.pal(n = 5, "Set1")[c(5, 2)]
+
+order <- individuals_w_income %>% distinct(EDUC, educ_attain) %>% arrange(desc(EDUC)) %>% distinct(educ_attain) %>% pull()
+
+ggplot(individuals_w_income,
+       aes(
+         y = factor(educ_attain, level = order),
+         color = factor(SEX),
+         fill = factor(SEX),
+         weight = PERWT
+       )) +
+  geom_bar(
+    position = "dodge",
+    boundary = 0,
+    alpha = 0.9,
+    aes(x = (..count..) / sum(..count..))
+  ) +
+  scale_color_manual(values = colors) +
+  scale_fill_manual(values = colors) +
+  scale_x_continuous(labels = scales::label_percent(), ) +
+  labs(
+    title = "Distribution of Highest Education Level by Sex",
+    x = "Percent of earners",
+    y = "Education",
+    color = "Sex",
+    fill = "Sex"
+  ) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid = element_line(
+      color = "lightgrey",
+      size = .2,
+      linetype = 1
+    ),
+    panel.background = element_rect("white")
+  )
+```
+
+So bachelor and graduate degree holders generally earn more, and women
+are more likely than men to have bachelor and graduate degrees in
+Oakland. This should imply that if we adjust for education when
+estimating the gender-earnings gap in Oakland, thus only comparing men
+and women in the same education levels, we should see the gap increase.
+
+We again use `svyglm` to estimate the regression, and `oak_indiv_svy` as
+the data/survey design so as to use the replicate weights for our
+standard errors.
+
+```{r}
+model_ols2 <- svyglm(log(INCTOT) ~ factor(SEX), oak_indiv_svy)
+model_ols3 <- svyglm(
+  log(INCTOT) ~ factor(SEX) +
+    AGE + I(AGE ^ 2) +
+    relevel(educ_attain, ref ="Highschool diploma"),
+  oak_indiv_svy
+)
+modelsummary(
+  list(
+    "Earnings gap, no covariates" = model_ols2,
+    "Earnings gap, adjusted for age and education" = model_ols3
+  ),
+  gof_map = gof_stuff,
+  exponentiate = TRUE
+)
+```
+
+Fun!
