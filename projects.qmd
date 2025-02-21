@@ -90,7 +90,7 @@ Peter Amerkhanian (2023)
 Workshop designed and taught for the UC Berkeley D-Lab.  
 [Code](https://github.com/dlab-berkeley/HAAS-Python-Workshop/tree/72a719d13a974806d57a5278748f1083159ebf2e){.btn .btn-outline-primary .btn-sm role="button"}
 
-**Summary**: I designed this one and a half hour workshop and taught it to students at MBA students at UC Berkeley's Haas Business School. The course directly connects `pandas` functions to equivalent workflows an intermediate Excel user would be familiar with.
+**Summary**: I designed this one and a half hour workshop and taught it to MBA students at UC Berkeley's Haas Business School. The course directly connects `pandas` functions to equivalent workflows an intermediate Excel user would be familiar with.
 
 
 

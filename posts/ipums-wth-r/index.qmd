@@ -2,9 +2,9 @@
 title: "Working with ACS microdata in R"
 bibliography: "../../blog.bib"
 author: "Peter Amerkhanian"
-date: "2024-12-29"
+date: "2025-02-20"
 description: "Using `ipumsr`, geocorr, and `survey` to analyze a small-geography in IPUMS data."
-draft: true
+draft: false
 image: thumbnail.png
 engine: knitr
 execute: 
@@ -190,12 +190,12 @@ median household income in Oakland, California in 2022?**
 
 To answer that we will:
 
-1.  Get income data from the 2022 1-year ACS (Step 1).
-2.  Filter our data down to households in the city of Oakland (Steps 2
-    and 3).
-3.  Calculate the median (Steps 4 and 5).
+1.  Get income data from the 2022 1-year ACS (@sec-step-1).
+2.  Filter our data down to households in the city of Oakland (@sec-step-2
+    and @sec-step-3).
+3.  Calculate the median (@sec-step-4 and @sec-step-5).
 
-## Step 1: Retrieving data
+## Step 1: Retrieving data {#sec-step-1}
 
 For the first task, I'll define several helper functions:
 
@@ -303,7 +303,7 @@ Here are the resulting data, the 2022 1-year ACS for California.
 data %>% head()
 ```
 
-## Step 2: Using Geocorr to identify small geographies
+## Step 2: Using Geocorr to identify small geographies {#sec-step-2}
 
 We now have microdata for all of California, but we need to filter down
 to just Oakland. Unfortunately, this isn't as simple as just running
@@ -328,14 +328,13 @@ in @walker_analyzing_2023, chapter 1].
 library(tigris)
 library(sf)
 library(cowplot)
-options(tigris_use_cache = TRUE) # Cache data for faster retrieval
-# Define Bay Area counties
+options(tigris_use_cache = TRUE)
+
 bay_area_counties <- c(
   "Alameda", "Contra Costa", "Marin", "Napa",
   "San Francisco", "San Mateo", "Santa Clara", "Solano", "Sonoma"
 )
 
-# Retrieve county boundaries
 bay_area <- counties(state = "CA", class = "sf", year=2022) %>%
   filter(NAME %in% bay_area_counties) %>%
   st_union()  # Merge counties into a single boundary
@@ -347,7 +346,6 @@ pumas <- pumas(state = "CA", class = "sf",  year=2022)
 places_bay <- places[st_intersects(places, bay_area, sparse = FALSE), ]
 pumas_bay <- pumas[st_intersects(pumas, bay_area, sparse = FALSE), ]
 
-# Determine the bounding box of PUMAs in Alameda County
 pumas_bbox <- st_bbox(bay_area)
 
 crop_theme <- theme(
@@ -447,13 +445,15 @@ source area contained in the target area -- in this case the proportion
 of the PUMA population that belongs to Oakland. In this case, 100% of
 the populations in PUMAs 111, 112, 113, and 123 belong to Oakland, and
 0% of PUMA 114. GEOCORR does believe that 9 individuals from 114 live in
-Oakland, but based on the AFACT of 0, I'll feel comfortable dropping
-that PUMA.[^5] Notes that when you plot place to PUMA equivalence, you
+Oakland, but based on the AFACT of 0 and the fact that I know the PUMA overlays the neighboring city of Piedmont, I'll feel comfortable dropping
+that PUMA.[^5]
+
+Note that when you plot place to PUMA equivalence, you
 may find slight differences due to the fact that places can include
 un-populated areas, such as bodies of water [in the case of
 Oakland](https://www.google.com/maps/place/Oakland,+CA/@37.7831602,-122.3045548,11z/data=!4m6!3m5!1s0x80857d8b28aaed03:0x71b415d535759367!8m2!3d37.8043514!4d-122.2711639!16zL20vMGRjOTU?entry=ttu&g_ep=EgoyMDI1MDIxMi4wIKXMDSoJLDEwMjExNDU1SAFQAw%3D%3D).
 
-[^5]: Were the AFACT higher, e.g. 1%, I would randomly sample 1% of the
+[^5]: Were the AFACT higher, e.g. 1%, I could randomly sample 1% of the
     individuals from that PUMA and include them in my Oakland sample.
 
 ```{r fig.asp = .58}
@@ -502,7 +502,7 @@ plot_grid(map_places, map_pumas, nrow = 1, align = "h", axis = "t", vjust = 0)
 ```
 
 Filtering to those PUMAs gets us the 2022 1-year ACS microdata for the
-City of Oakland (note the use of `haven::zap_labels()` is just to remove
+City of Oakland (I use `haven::zap_labels()` just to remove
 some unnecessary formatting that comes with the data).
 
 ```{r}
@@ -515,7 +515,7 @@ oak <- data %>%
 oak %>% head()
 ```
 
-## Step 3: Filtering to desired granularity
+## Step 3: Units of Analysis {#sec-step-3}
 
 Each row in the ACS microdata is an individual, identified by a unique
 combination of `SAMPLE`, which defines the year when the individual was
@@ -601,7 +601,7 @@ It seems we can proceed to simply calculate the median of the `HHINCOME`
 column? Not so fast... Data in the ACS microdata are not what they seem.
 Before we do any analysis, we have to account for **sample weights**.
 
-## Step 4: Applying sample weights
+## Step 4: Applying sample weights {#sec-step-4}
 
 Let's return to our sample family from above, but also examine the
 variables `PERWT` and `HHWT`.
@@ -705,17 +705,14 @@ calculated using the full ACS sample [[See
 ACS](https://usa.ipums.org/usa/chapter2/chapter2.shtml#ACS) in
 @ruggles_ipums_2024].
 
-## Step 5: Calculating standard errors
+## Step 5: Calculating standard errors {#sec-step-5}
 
-Now we have estimates derived from the ACS microdata, how do we
-communicate uncertainty around those estimates? Since we are working
-with a small sample of Oakland's population, we would assume that our
-estimates are likely going to be wrong by some degree, so accurately
-communicating uncertainty via good standard errors will be important.
-
-For the sake of this example, let's explore the problem of standard
+Now we have estimates derived from the ACS microdata, but how do we
+communicate uncertainty around those estimates? For the sake of this example, let's explore the problem of standard
 errors via a slightly different motivating question -- **what was the
-average household income in Oakland in 2022**? I'm switching to the
+average household income in Oakland in 2022**?  
+
+I'm switching to the
 average because we are about to calculate some standard errors
 from-scratch, and that's much more clear-cut for linear statistics like
 the average than for non-linear statistics like the median. We will
@@ -756,7 +753,7 @@ R's [`survey`
 package](https://r-survey.r-forge.r-project.org/survey/#:~:text=Variances%20by%20Taylor%20linearization))
 default to using the Taylor series method for variance estimation of
 weighted statistics. This is because weighted statistics, like the
-average above, are typically nonlinear, making analytical calculation of
+average above, are not linear with respect to the weights, making analytical calculation of
 the variance difficult or else undefined [@lohr_sampling_2021]. The
 Taylor series method entails calculating the first-order linear
 approximation of the statistic (e.g. the linear approximation of the
@@ -807,7 +804,7 @@ replication weights method when working with ACS microdata.
 
 ### Replication weights
 
-In theory, the standard error of an estimate measures the variation of a
+In theory, the [standard error](https://en.wikipedia.org/wiki/Standard_error) of an estimate measures the variation of a
 statistic across multiple samples from a given population. Our sample
 standard error above, calculated using just the one sample, is an
 estimate of that theoretical standard error.
@@ -818,9 +815,7 @@ multiple samples from the population to construct a variance estimator,
 one may simply resample from the full, original sample to mimic the
 theoretical basis of standard errors [@lohr_sampling_2021, chap 9.1].
 
-Replicate weights thus allow a single sample to simulate multiple
-samples, generating more informed standard error estimates that more
-closely mimic the theoretical basis of standard errors. Here we can see
+In practice, we don't explicitly do any resampling, instead relying on "replicate weights" that the census pre-computes. Here we can see
 what replicate weights (in this case, household replicate weights) look
 like in our data. Each of `REPWT`, 1 through 80, is a set of alternative
 household weights, slightly different from the "production weight,"
@@ -858,8 +853,8 @@ Specifically: $$
 \end{align*}
 $$
 
-[@fay_aspects_1995] initially proposed that variance estimator and their
-paper gives the full derivation. The standard error is once again just
+[@fay_aspects_1995] initially proposed that variance estimator and [their
+paper](https://www.census.gov/content/dam/Census/library/working-papers/1995/demo/faytrain95.pdf) gives the full derivation. The standard error is once again just
 the square root of that variance.
 
 $$
@@ -1039,6 +1034,7 @@ fig, ax = plt.subplots(figsize=(3, 3))
 sns.kdeplot(data=df, x='HHINCOME', weights="HHWT", ax=ax, fill=True, alpha=.5, log_scale=True, legend=False, cmap="coolwarm")
 ax.set_axis_off()
 ax.set_xlim(8e2, 10e6)
+#ax.set_xlim(-1, 1e6)
 fig.tight_layout()
 fig.savefig("thumbnail.png", dpi=300)
 plt.show();

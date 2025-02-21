@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://peter-amerkhanian.com/posts/ipums-wth-r/index.html</loc>
+    <lastmod>2025-02-20T17:33:24.147Z</lastmod>
+  </url>
+  <url>
     <loc>https://peter-amerkhanian.com/posts/minima-3d/index.html</loc>
     <lastmod>2025-01-26T21:15:51.724Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/projects.html</loc>
-    <lastmod>2024-11-21T22:21:49.696Z</lastmod>
+    <lastmod>2025-02-20T18:34:50.247Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/memos.html</loc>
-    <lastmod>2024-11-22T02:43:55.563Z</lastmod>
+    <lastmod>2025-02-20T18:36:47.706Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/blog.html</loc>
@@ -22,7 +26,7 @@
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/rent-vs-buy/index.html</loc>
-    <lastmod>2024-11-21T22:21:49.688Z</lastmod>
+    <lastmod>2025-02-21T04:06:29.799Z</lastmod>
   </url>
   <url>
     <loc>https://peter-amerkhanian.com/posts/newtons-method/index.html</loc>
