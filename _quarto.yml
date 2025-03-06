@@ -8,13 +8,13 @@ project:
 
 website:
   draft-mode: unlinked
-  favicon: "profile.jpg"
+  favicon: "profile_backup.jpg"
   google-analytics: "G-V95HGLKTEB"
   title: "Home"
   site-url: https://peter-amerkhanian.com
   description: "Peter Amerkhanian's Blog"
   navbar:
-    logo: "profile.jpg"
+    logo: "profile_backup.jpg"
     search: true
     right:
       - blog.qmd
