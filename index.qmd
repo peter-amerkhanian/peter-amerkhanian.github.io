@@ -2,7 +2,7 @@
 title: "Peter Amerkhanian"
 title-prefix: "Peter Amerkhanian"
 pagetitle: "Home"
-image: profile.jpg
+image: profile_backup.jpg
 about:
   id: hero-heading
   template: trestles

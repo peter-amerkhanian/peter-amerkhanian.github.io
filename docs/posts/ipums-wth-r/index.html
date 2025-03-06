@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.57">
+<meta name="generator" content="quarto-1.6.40">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -87,16 +87,16 @@ div.csl-indent {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../profile.jpg" rel="icon" type="image/jpeg">
+<link href="../../profile_backup.jpg" rel="icon" type="image/jpeg">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-1092c56c6cadf2eb47b1bc8063ab382a.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-5d17cd34d2e348db00e20f83fc65b062.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -175,7 +175,7 @@ window.Quarto = {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../profile.jpg" alt="" class="navbar-logo">
+    <img src="../../profile_backup.jpg" alt="" class="navbar-logo">
     </a>
     <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Home</span>
@@ -265,6 +265,12 @@ window.Quarto = {
     </ul></li>
     <li><a href="#a-production-workflow" id="toc-a-production-workflow" class="nav-link" data-scroll-target="#a-production-workflow">A Production Workflow</a></li>
     </ul>
+    <div class="quarto-alternate-formats">
+    <ul><li>
+    <a id="github" href="#" target="_blank"><i class="bi bi-github"></i>Source Code</a>
+  </li></ul>
+</div>
+
   </nav>
     </div>
 <!-- main -->
@@ -276,6 +282,9 @@ window.Quarto = {
 
 
 <script>
+  var githubLink = document.getElementById("github");
+  var currentPath = window.location.pathname;
+  githubLink.href = "https://github.com/peter-amerkhanian/peter-amerkhanian.github.io/blob/master" + currentPath;
   document.getElementById('toc-title').addEventListener('click', function(event) {
   event.preventDefault(); // Prevent default behavior of anchor tag
   const firstHeader = document.querySelector('body'); // Select the first h2 element
@@ -2105,7 +2114,7 @@ Table&nbsp;4: Unfiltered 2022 1-year ACS data for California
 <section id="sec-step-2" class="level2">
 <h2 class="anchored" data-anchor-id="sec-step-2">Step 2: Using Geocorr to identify small geographies</h2>
 <p>We now have microdata for all of California, but we need to filter down to just Oakland. Unfortunately, this isn’t as simple as just running <code>filter(CITY == 'Oakland')</code> – ACS microdata does not include a field for explicitly identifying cities (note that a city is typically referred to as a “place” in census data).</p>
-<p>The smallest geographic area explicitly identified in the microdata is something called a public use microdata area (PUMA) <span class="citation" data-cites="pastoor_how_2024">(<a href="#ref-pastoor_how_2024" role="doc-biblioref">Pastoor 2024</a>)</span>. PUMAS are unique geographies that always aggregate to the state-level (e.g.&nbsp;California can be constructed with a collection of PUMAs), but only sometimes aggregate to other small geographic areas, such as city, metro area, and county <span class="citation" data-cites="walker_analyzing_2023">(See <a href="https://walker-data.com/census-r/the-united-states-census-and-the-r-programming-language.html#census-hierarchies" role="doc-biblioref">Census Hierarchies</a> in <a href="#ref-walker_analyzing_2023" role="doc-biblioref">Walker 2023, chap. 1</a>)</span>.</p>
+<p>The smallest geographic area explicitly identified in the microdata is something called a public use microdata area (PUMA) <span class="citation" data-cites="pastoor_how_2024">(<a href="#ref-pastoor_how_2024" role="doc-biblioref">Pastoor 2024</a>)</span>. PUMAS are unique geographies that always aggregate to the state-level (e.g.&nbsp;California can be constructed with a collection of PUMAs), but only sometimes aggregate to other small geographic areas, such as city, metro area, and county <span class="citation" data-cites="walker_analyzing_2023">(See <a href="https://walker-data.com/census-r/the-united-states-census-and-the-r-programming-language.html#census-hierarchies">Census Hierarchies</a> in <a href="#ref-walker_analyzing_2023" role="doc-biblioref">Walker 2023, chap. 1</a>)</span>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -3968,8 +3977,8 @@ Table&nbsp;8: An example household with income data
 <p>Here we can see that this household, with <code>SERIAL</code> 211975 has 4 members, each with a unique <code>PERNUM</code>.</p>
 <p>Let’s return to the motivating question – <strong>what was the median household income in Oakland, California in 2022?</strong> Note the income variables we observe for this family:</p>
 <ol type="1">
-<li><p><code>INCTOT</code> reports each respondent’s total pre-tax personal income or losses from all sources for the previous year. <code>9999999</code> is code to denote that the value is missing, which makes sense given that the missing values above correspond to children in the household <span class="citation" data-cites="ruggles_ipums_2024">(See <a href="https://usa.ipums.org/usa-action/variables/INCTOT" role="doc-biblioref">INCTOT</a> in <a href="#ref-ruggles_ipums_2024" role="doc-biblioref">Ruggles et al. 2024</a>)</span>.</p></li>
-<li><p><code>HHINCOME</code> reports the total money income of all household members age 15+ during the previous year. The amount should equal the sum of all household members’ individual incomes, as recorded in the person-record variable INCTOT <span class="citation" data-cites="ruggles_ipums_2024">(See <a href="https://usa.ipums.org/usa-action/variables/HHINCOME" role="doc-biblioref">HHINCOME</a> in <a href="#ref-ruggles_ipums_2024" role="doc-biblioref">Ruggles et al. 2024</a>)</span></p></li>
+<li><p><code>INCTOT</code> reports each respondent’s total pre-tax personal income or losses from all sources for the previous year. <code>9999999</code> is code to denote that the value is missing, which makes sense given that the missing values above correspond to children in the household <span class="citation" data-cites="ruggles_ipums_2024">(See <a href="https://usa.ipums.org/usa-action/variables/INCTOT">INCTOT</a> in <a href="#ref-ruggles_ipums_2024" role="doc-biblioref">Ruggles et al. 2024</a>)</span>.</p></li>
+<li><p><code>HHINCOME</code> reports the total money income of all household members age 15+ during the previous year. The amount should equal the sum of all household members’ individual incomes, as recorded in the person-record variable INCTOT <span class="citation" data-cites="ruggles_ipums_2024">(See <a href="https://usa.ipums.org/usa-action/variables/HHINCOME">HHINCOME</a> in <a href="#ref-ruggles_ipums_2024" role="doc-biblioref">Ruggles et al. 2024</a>)</span></p></li>
 </ol>
 <p>Given what we know about the unique identifier for households, and the <code>HHINCOME</code> variable, we can construct the appropriate dataset for answering our motivating question – every household in Oakland that had household income.</p>
 <div class="cell">
@@ -4050,7 +4059,7 @@ Table&nbsp;9: An example household with weight data
 <li><code>PERWT</code> gives the population represented by each individual in the sample, thus in the first row of the sample household, the 31 year old woman with an individual income of $9,300 represents 62 individuals in the PUMA.</li>
 <li><code>HHWT</code> gives the number of households in the general population represented by each household in the sample, thus this household is representative of 62 households in that PUMA.</li>
 </ul>
-<p>Any analysis or visualization of ACS microdata should be weighted by <code>PERWT</code> for work at the person-level, and <code>HHWT</code> for the household-level <span class="citation" data-cites="ruggles_ipums_2024">(See <a href="https://usa.ipums.org/usa/intro.shtml#weights" role="doc-biblioref">Sample Weights</a> in <a href="#ref-ruggles_ipums_2024" role="doc-biblioref">Ruggles et al. 2024</a>)</span>.</p>
+<p>Any analysis or visualization of ACS microdata should be weighted by <code>PERWT</code> for work at the person-level, and <code>HHWT</code> for the household-level <span class="citation" data-cites="ruggles_ipums_2024">(See <a href="https://usa.ipums.org/usa/intro.shtml#weights">Sample Weights</a> in <a href="#ref-ruggles_ipums_2024" role="doc-biblioref">Ruggles et al. 2024</a>)</span>.</p>
 <p>For visualizations, we pass the weights to the plotting API. For example, in <code>ggplot</code> many chart types support a <code>weight</code> argument.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(households_w_income, <span class="fu">aes</span>(<span class="at">x =</span> HHINCOME, <span class="at">weight =</span> HHWT)) <span class="sc">+</span></span>
@@ -4169,7 +4178,7 @@ Table&nbsp;11: IPUMS versus ACS aggregate results
 </div>
 </div>
 <p>These are clearly different. What gives? Unfortunately, <strong>summary statistics calculated using IPUMS data typically cannot match aggregate ACS figures!</strong></p>
-<p>One major reason for this gap is additional sampling error. Recall that the American Community Survey is a sample. A given one-year ACS is typically a 1% sample of the U.S. population, with associated sampling error. When the census makes microdata available, they create a sample of that sample – we do not get the full 1%. This second sampling process introduces further sampling error in the microdata that is not reflected in figures sourced from aggregate ACS data, which are calculated using the full ACS sample <span class="citation" data-cites="ruggles_ipums_2024">(<a href="https://usa.ipums.org/usa/chapter2/chapter2.shtml#ACS" role="doc-biblioref">See ACS</a> in <a href="#ref-ruggles_ipums_2024" role="doc-biblioref">Ruggles et al. 2024</a>)</span>.</p>
+<p>One major reason for this gap is additional sampling error. Recall that the American Community Survey is a sample. A given one-year ACS is typically a 1% sample of the U.S. population, with associated sampling error. When the census makes microdata available, they create a sample of that sample – we do not get the full 1%. This second sampling process introduces further sampling error in the microdata that is not reflected in figures sourced from aggregate ACS data, which are calculated using the full ACS sample <span class="citation" data-cites="ruggles_ipums_2024">(<a href="https://usa.ipums.org/usa/chapter2/chapter2.shtml#ACS">See ACS</a> in <a href="#ref-ruggles_ipums_2024" role="doc-biblioref">Ruggles et al. 2024</a>)</span>.</p>
 </section>
 <section id="sec-step-5" class="level2">
 <h2 class="anchored" data-anchor-id="sec-step-5">Step 5: Calculating standard errors</h2>
@@ -4823,7 +4832,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {
