@@ -3,9 +3,18 @@
     <h2 id="$idprefix$toc-title"><a href="#" class="nav-link">$title$</a></h2>
     $endif$ 
     $table-of-contents$
+    <div class="quarto-alternate-formats">
+    <ul><li>
+    <a id="github" href="#" target="_blank"><i class="bi bi-github"></i>Source Code</a>
+  </li></ul>
+</div>
+
   </nav>
 
 <script>
+  var githubLink = document.getElementById("github");
+  var currentPath = window.location.pathname;
+  githubLink.href = "https://github.com/peter-amerkhanian/peter-amerkhanian.github.io/blob/master" + currentPath;
   document.getElementById('$idprefix$toc-title').addEventListener('click', function(event) {
   event.preventDefault(); // Prevent default behavior of anchor tag
   const firstHeader = document.querySelector('body'); // Select the first h2 element

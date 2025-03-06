@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.57">
+<meta name="generator" content="quarto-1.6.40">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -93,10 +93,10 @@ div.csl-indent {
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-1092c56c6cadf2eb47b1bc8063ab382a.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-5d17cd34d2e348db00e20f83fc65b062.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -262,6 +262,12 @@ window.Quarto = {
     </ul></li>
     <li><a href="#the-law-of-iterated-expectations" id="toc-the-law-of-iterated-expectations" class="nav-link" data-scroll-target="#the-law-of-iterated-expectations">The Law of Iterated Expectations</a></li>
     </ul>
+    <div class="quarto-alternate-formats">
+    <ul><li>
+    <a id="github" href="#" target="_blank"><i class="bi bi-github"></i>Source Code</a>
+  </li></ul>
+</div>
+
   </nav>
     </div>
 <!-- main -->
@@ -273,6 +279,9 @@ window.Quarto = {
 
 
 <script>
+  var githubLink = document.getElementById("github");
+  var currentPath = window.location.pathname;
+  githubLink.href = "https://github.com/peter-amerkhanian/peter-amerkhanian.github.io/blob/master" + currentPath;
   document.getElementById('toc-title').addEventListener('click', function(event) {
   event.preventDefault(); // Prevent default behavior of anchor tag
   const firstHeader = document.querySelector('body'); // Select the first h2 element
@@ -311,7 +320,7 @@ window.Quarto = {
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th">Age</th>
 </tr>
-<tr class="odd">
+<tr class="even">
 <th data-quarto-table-cell-role="th">Person_ID</th>
 <th data-quarto-table-cell-role="th"></th>
 </tr>
@@ -459,7 +468,7 @@ E(\text{Age}) = &amp;\text{Age}_1P(\text{Age}=\text{Age}_1) + \\
 <th data-quarto-table-cell-role="th">Age</th>
 <th data-quarto-table-cell-role="th">Gender</th>
 </tr>
-<tr class="odd">
+<tr class="even">
 <th data-quarto-table-cell-role="th">Person_ID</th>
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th"></th>
@@ -644,7 +653,7 @@ E(\text{Age}) &amp;=E( \underbrace{E(\text{Age} \mid \text{Gender}=\text{Gender}
 <th data-quarto-table-cell-role="th">Female</th>
 <th data-quarto-table-cell-role="th">Male</th>
 </tr>
-<tr class="odd">
+<tr class="even">
 <th data-quarto-table-cell-role="th">Age</th>
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th"></th>
@@ -755,7 +764,7 @@ E(\text{Age})  &amp;= \sum_{i} \text{Age}_i \sum_j P(\text{Age}=\text{Age}_i, \t
 <th data-quarto-table-cell-role="th">Female</th>
 <th data-quarto-table-cell-role="th">Male</th>
 </tr>
-<tr class="odd">
+<tr class="even">
 <th data-quarto-table-cell-role="th">Age</th>
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th"></th>
@@ -1017,7 +1026,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {

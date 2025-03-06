@@ -15,6 +15,10 @@ bibliography: biblio.bib
 execute:
   freeze: auto 
 # jupyter: python3
+website:
+  repo-url: "https://github.com/peter-amerkhanian/peter-amerkhanian.github.io"
+  repo-branch: "master"
+
 image: thumbnail.png
 format:
   html:
@@ -24,3 +28,4 @@ format:
     code-fold: false
     code-tools: true
     fig-cap-location: top
+  
