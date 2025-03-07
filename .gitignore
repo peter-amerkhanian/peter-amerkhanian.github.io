@@ -6,3 +6,4 @@
 *.Rproj
 .Renviron
 .RData
+/in-progress/reno-model

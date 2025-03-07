@@ -5,7 +5,7 @@ title-prefix: "Peter Amerkhanian"
 title-block-banner: true
 format:
   html:
-    toc: true
+    toc: false
     toc-depth: 3
 ---  
 
