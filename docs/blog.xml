@@ -111,6 +111,16 @@
   <media:content url="https://peter-amerkhanian.com/posts/linear-approximation-3d/thumbnail.png" medium="image" type="image/png" height="143" width="144"/>
 </item>
 <item>
+  <title>Law Enforcement Activity in San Francisco, 2018-2024</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
+  <link>https://peter-amerkhanian.com/posts/SF-Arrests/</link>
+  <description><![CDATA[ In this memo I analyze trends in law enforcement actions – police incident reports that result in arrest or citation – in San Francisco before, during, and after the COVID-19 Pandemic (2018-2024). Enforcement actions decreased before the pandemic, sharply dropped at the outset of the pandemic, and have been consistently low in the post-pandemic. ]]></description>
+  <category>Policy Analysis</category>
+  <guid>https://peter-amerkhanian.com/posts/SF-Arrests/</guid>
+  <pubDate>Sat, 17 Feb 2024 08:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/SF-Arrests/thumbnail.png" medium="image" type="image/png" height="150" width="144"/>
+</item>
+<item>
   <title>Overfitting and The Train-Test Split</title>
   <dc:creator>Peter Amerkhanian</dc:creator>
   <link>https://peter-amerkhanian.com/posts/overfitting/</link>
@@ -153,6 +163,16 @@
   <guid>https://peter-amerkhanian.com/posts/simple-constrained-optimization/</guid>
   <pubDate>Tue, 04 Jul 2023 07:00:00 GMT</pubDate>
   <media:content url="https://peter-amerkhanian.com/posts/simple-constrained-optimization/thumbnail.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>Policy Responses to a Coronavirus Pandemic</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
+  <link>https://peter-amerkhanian.com/posts/SIR/</link>
+  <description><![CDATA[ During the COVID-19 pandemic, policy makers around the world have developed a variety of tools for combating the virus: lockdowns and strategic re-openings, testing, contact-tracing, masking, and vaccination, to name a few <span class="citation" data-cites="brooks_hammer_2020">(Brooks 2020)</span>. In this memo, I will examine the effectiveness of lockdowns and vaccination specifically, with an eye towards how they might be used during future pandemics. I find that lockdowns are an effective pandemic response in so far as they considerably reduce infections. I also find that a vaccine that provides temporary immunity cannot effectively end a pandemic with only one vaccination campaign. During future pandemics, policy makers should be ready to institute lockdowns, especially early in the pandemic, and prepare the public for yearly vaccine boosters once a vaccine has been developed. ]]></description>
+  <category>Policy Analysis</category>
+  <guid>https://peter-amerkhanian.com/posts/SIR/</guid>
+  <pubDate>Thu, 15 Dec 2022 08:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/SIR/thumbnail.png" medium="image" type="image/png" height="143" width="144"/>
 </item>
 <item>
   <title>Buy vs. Rent, A Financial Modeling Workflow in Python</title>

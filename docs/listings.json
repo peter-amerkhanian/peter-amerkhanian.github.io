@@ -1,10 +1,7 @@
 [
   {
     "listing": "/memos.html",
-    "items": [
-      "/memos/SF-Arrests/index.html",
-      "/memos/SIR/index.html"
-    ]
+    "items": []
   },
   {
     "listing": "/blog.html",
@@ -18,10 +15,12 @@
       "/posts/lagrange-cobb-douglas/index.html",
       "/posts/minima-3d/index.html",
       "/posts/linear-approximation-3d/index.html",
+      "/posts/SF-Arrests/index.html",
       "/posts/overfitting/index.html",
       "/posts/iterated-expectations/index.html",
       "/posts/newtons-method/index.html",
       "/posts/simple-constrained-optimization/index.html",
+      "/posts/SIR/index.html",
       "/posts/rent-vs-buy/index.html",
       "/posts/pdf-scraping/index.html"
     ]

@@ -157,10 +157,6 @@ window.Quarto = {
 <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../memos.html"> 
-<span class="menu-text">Memos</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="../../projects.html"> 
 <span class="menu-text">Professional</span></a>
   </li>  
@@ -176,7 +172,10 @@ window.Quarto = {
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
       <div class="quarto-title-block"><div><h1 class="title">Policy Responses to a Coronavirus Pandemic</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source" data-quarto-source-url="https://github.com/peter-amerkhanian/peter-amerkhanian.github.io"><i class="bi"></i> Memo Code</button></div></div>
-                      </div>
+                                <div class="quarto-categories">
+                <div class="quarto-category">Policy Analysis</div>
+              </div>
+                  </div>
   </div>
     
   
@@ -202,7 +201,7 @@ window.Quarto = {
   <div>
     <div class="abstract">
       <div class="block-title">Abstract</div>
-      I develop a mathematical model to analyze the effects of lock-down and vaccination policies during a Coronavirus pandemic.
+      I develop a mathematical model to analyze the effects of policy interventions during a Coronavirus pandemic.
     </div>
   </div>
   
@@ -307,7 +306,7 @@ S_t &amp;= 1 - I_t - R_t
 <section id="scenario-1-lockdowns-no-vaccination" class="level1">
 <h1>Scenario 1: Lockdowns, No Vaccination</h1>
 <p>The first scenario I examine is the use of rolling lockdowns, motivated by infections growing beyond a 5% threshold. In this scenario a vaccine is never developed, so lockdowns are essentially the only tool available to policy makers.</p>
-<div id="cell-fig-lockdown-no-vac" class="cell" data-outputid="3fdb4604-9ddf-4c1f-f01d-de3e33cd5abb" data-tags="[]" data-execution_count="6">
+<div id="cell-fig-lockdown-no-vac" class="cell" data-outputid="3fdb4604-9ddf-4c1f-f01d-de3e33cd5abb" data-tags="[]" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div id="fig-lockdown-no-vac" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -322,7 +321,7 @@ Figure&nbsp;1: Lockdowns (No Vaccine)
 </div>
 </div>
 <p><a href="#fig-lockdown-no-vac" class="quarto-xref">Figure&nbsp;1</a> shows the outcome of this scenario. As infection transmission passes the threshold, the government calls for a lockdown, which promptly reduces infections. However, transmission has enough momentum to quickly grow again, triggering a series of lockdowns with diminishing effect. The policy does largely keep the infected population below 5%, and after the initial wave of infections subside the government doesn’t have to call for any more lockdowns. The population experiences a much smaller second wave before the pandemic settles into a sort of equilibrium. About 2.5% of the population stays infected as different individuals contract the disease, recover, gain immunity, and slowly lose that immunity. This equilibrium is unfortunate - the pandemic doesn’t really end in this scenario. However, this strategy is effective, and we can see that most clearly by comparing it to the alternative in which no lockdowns are instituted.</p>
-<div id="cell-fig-lockdown-v-no" class="cell" data-outputid="6900c247-6940-474a-8c28-9e095da3bef0" data-tags="[]" data-execution_count="8">
+<div id="cell-fig-lockdown-v-no" class="cell" data-outputid="6900c247-6940-474a-8c28-9e095da3bef0" data-tags="[]" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div id="fig-lockdown-v-no" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -336,8 +335,8 @@ Figure&nbsp;2: Lockdowns vs.&nbsp;No Lockdowns (No Vaccine)
 </div>
 </div>
 </div>
-<div id="bf6860df-46eb-40e9-8ec5-122ce9d8a6a7" class="cell" data-outputid="1564534e-7a2d-48a2-f900-54bbce58fd75" data-tags="[]" data-execution_count="10">
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="10">
+<div id="bf6860df-46eb-40e9-8ec5-122ce9d8a6a7" class="cell" data-outputid="1564534e-7a2d-48a2-f900-54bbce58fd75" data-tags="[]" data-execution_count="11">
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="11">
 <p><a href="#fig-lockdown-v-no" class="quarto-xref">Figure&nbsp;2</a> shows that in the absence of any lockdowns, infections grow over 3 times as high during the first wave, and the population later experiences more pronounced second and third waves of infection. One might think that lockdowns merely displace infections, and in Figure 2 we can see a number of areas where the no-lockdowns approach has fewer infections. However, if we compare the sum of infections over this full time period, we see that lockdowns lead to 44% fewer infections.</p>
 </div>
 </div>
@@ -345,7 +344,7 @@ Figure&nbsp;2: Lockdowns vs.&nbsp;No Lockdowns (No Vaccine)
 <section id="scenario-2-lockdowns-vaccination" class="level1">
 <h1>Scenario 2: Lockdowns, Vaccination</h1>
 <p>The second scenario I examine again involves the use of rolling lockdowns with a 5% threshold, but now a vaccine is introduced one year into the pandemic. The government’s vaccination campaign is able to vaccinate 1% of the susceptible population each day and once 100% of the susceptible population is vaccinated the government ceases their campaign. Immunity through vaccination wears off after 6 months.</p>
-<div id="cell-fig-lockdown-v-no-vac" class="cell" data-outputid="55d268d9-f58e-4872-82bb-1d4da35ef2e5" data-tags="[]" data-execution_count="13">
+<div id="cell-fig-lockdown-v-no-vac" class="cell" data-outputid="55d268d9-f58e-4872-82bb-1d4da35ef2e5" data-tags="[]" data-execution_count="14">
 <div class="cell-output cell-output-display">
 <div id="fig-lockdown-v-no-vac" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -360,8 +359,8 @@ Figure&nbsp;3: Lockdowns vs.&nbsp;No Lockdowns, 12 months to Vaccine
 </div>
 </div>
 <p><a href="#fig-lockdown-v-no-vac" class="quarto-xref">Figure&nbsp;3</a> shows that the virus initially grows as previously shown in Figures 1 and 2, but once the vaccine is released in early 2021, the pandemic begins to subside fairly quickly. By late 2021 the pandemic is effectively over. However, vaccine immunity wears off, and given no future vaccination campaigns, there is eventually another wave of infections, This time, repeated lockdowns have diminished the intervention’s effect, so infections rise to their highest point of the entire pandemic so far. After this 2022 wave infections diminish and settle into an equilibrium around 2.5%, as in previous models.</p>
-<div id="5f91e77d-a962-463a-a383-2f828cbe31b5" class="cell" data-outputid="e5c24836-5874-47eb-ebe2-ac80126df6bf" data-tags="[]" data-execution_count="14">
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="14">
+<div id="5f91e77d-a962-463a-a383-2f828cbe31b5" class="cell" data-outputid="e5c24836-5874-47eb-ebe2-ac80126df6bf" data-tags="[]" data-execution_count="15">
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="15">
 <p>In this scenario, I find that lockdowns lead to 37% fewer new infections. This is a smaller effect than with no vaccine, largely because with or without lockdowns the vaccine has a large impact on reducing infections.</p>
 </div>
 </div>
@@ -387,7 +386,19 @@ Brooks, Chris. 2020. <span>“The <span>Hammer</span> and the <span>Dance</span>
 <ol>
 <li id="fn1"><p>The <em>reproduction rate</em>, <span class="math inline">\(\beta\)</span>, is the product of the number of interactions between infected individuals and susceptible individuals each day and the percentage of those interactions that will result in disease transmission.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
-</section></div></main> <!-- /main -->
+</section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{amerkhanian2022,
+  author = {Amerkhanian, Peter},
+  title = {Policy {Responses} to a {Coronavirus} {Pandemic}},
+  date = {2022-12-15},
+  url = {https://peter-amerkhanian.com/posts/SIR/},
+  langid = {en},
+  abstract = {I develop a mathematical model to analyze the effects of
+    policy interventions during a Coronavirus pandemic.}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-amerkhanian2022" class="csl-entry quarto-appendix-citeas" role="listitem">
+Amerkhanian, Peter. 2022. <span>“Policy Responses to a Coronavirus
+Pandemic.”</span> December 15, 2022. <a href="https://peter-amerkhanian.com/posts/SIR/">https://peter-amerkhanian.com/posts/SIR/</a>.
+</div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

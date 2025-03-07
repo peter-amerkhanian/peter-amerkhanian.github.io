@@ -22,6 +22,7 @@ page-layout: full
 title-block-banner: true
 ---
 
-The following are a collection of my informal notes and tutorials on topics in programming, math, statistics, and policy analysis. If you find errors or else find them helpful, I'd love to hear from you.  
+The following are a collection of my informal notes on topics in programming, math, statistics, and policy analysis. Note that these posts do not reflect the views of my employer. If you find errors or else find them helpful, I'd love to hear from you!  
+
 [**Subscribe** for Email Updates](https://forms.gle/46GfR514MXh1BwYt6){.btn .btn-outline-primary .btn-sm role="button"} [<i class="bi bi-rss"></i> RSS](blog.xml){.btn .btn-outline-primary .btn-sm role="button"}  
 <hr>
