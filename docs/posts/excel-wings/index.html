@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Peter Amerkhanian">
+<meta name="dcterms.date" content="2025-03-12">
+<meta name="description" content="Programmatically interact with Excel using pandas, xlwings, and pywin32.">
+
+<title>Using The Excel Object Model in Python – Peter Amerkhanian</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../profile_backup.jpg" rel="icon" type="image/jpeg">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-V95HGLKTEB"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<meta name="quarto:status" content="draft">
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner"><div id="quarto-draft-alert" class="alert alert-warning"><i class="bi bi-pencil-square"></i>Draft</div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../profile_backup.jpg" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Home</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Professional</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <div class="quarto-title-block"><div><h1 class="title">Using The Excel Object Model in Python</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
+                  <div>
+        <div class="description">
+          Programmatically interact with Excel using <code>pandas</code>, <code>xlwings</code>, and <code>pywin32</code>.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">Python</div>
+                <div class="quarto-category">Data Management</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Peter Amerkhanian </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">March 12, 2025</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+        <h2 id="toc-title"><a href="#" class="nav-link">Using The Excel Object Model in Python</a></h2>
+     
+    <ul>
+    <li><a href="#problem-setup" id="toc-problem-setup" class="nav-link active" data-scroll-target="#problem-setup">Problem Setup</a></li>
+    <li><a href="#writing-data-to-excel" id="toc-writing-data-to-excel" class="nav-link" data-scroll-target="#writing-data-to-excel">Writing data to Excel</a></li>
+    <li><a href="#interacting-with-the-excel-object-model" id="toc-interacting-with-the-excel-object-model" class="nav-link" data-scroll-target="#interacting-with-the-excel-object-model">Interacting with the Excel Object Model</a>
+    <ul class="collapse">
+    <li><a href="#package-approach" id="toc-package-approach" class="nav-link" data-scroll-target="#package-approach">Package approach</a></li>
+    </ul></li>
+    <li><a href="#complex-tables" id="toc-complex-tables" class="nav-link" data-scroll-target="#complex-tables">Complex Tables</a></li>
+    </ul>
+    <div class="quarto-alternate-formats">
+    <ul><li>
+    <a id="github" href="#" target="_blank"><i class="bi bi-github"></i>Source Code</a>
+  </li></ul>
+</div>
+
+  </nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+
+<script>
+  var githubLink = document.getElementById("github");
+  var currentPath = window.location.pathname;
+  githubLink.href = "https://github.com/peter-amerkhanian/peter-amerkhanian.github.io/blob/master" + currentPath;
+  document.getElementById('toc-title').addEventListener('click', function(event) {
+  event.preventDefault(); // Prevent default behavior of anchor tag
+  const firstHeader = document.querySelector('body'); // Select the first h2 element
+  if (firstHeader) {
+    firstHeader.scrollIntoView({ behavior: 'smooth', block: "start", inline: "nearest"}); // Scroll to the first header smoothly
+  }
+});
+</script>
+<div id="cell-1" class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> xlwings <span class="im">as</span> xw</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span></code></pre></div>
+</div>
+<p>In this post, I’m going to overview how to use Python’s <code>xlwings</code> and <code>pywin32</code> libraries to produce customizable, human-readable tables in a spreadsheet application (e.g.&nbsp;Excel, Google Sheets, Calc, etc.). Beyond basic uses of <code>xlwings</code>, I’ll also overview how to leverage <code>pywin32</code> and the <code>.api</code> attribute to interact directly with the Excel object model using VBA-like Python code. The result is highly custommizable Excel output that should satisfy most spreadsheet users you work with.</p>
+<p>Alongside this blog post, I’ve been developing an <code>excel</code> submodule in my <code>swiss-code</code> package, with various wrapper functions for <code>xlwings</code> and <code>pywin32</code>. I’ll showcase some of those functions here as well.</p>
+<p>https://pandas.pydata.org/docs/reference/api/pandas.ExcelWriter.html</p>
+<section id="problem-setup" class="level2">
+<h2 class="anchored" data-anchor-id="problem-setup">Problem Setup</h2>
+<div id="cell-4" class="cell" data-execution_count="30">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> simulate_df(num_transactions<span class="op">=</span><span class="dv">1000</span>):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    np.random.seed(<span class="dv">1</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    customer_ids <span class="op">=</span> np.random.randint(<span class="dv">1000</span>, <span class="dv">5000</span>, num_transactions)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    transaction_amounts <span class="op">=</span> np.<span class="bu">round</span>(np.random.uniform(<span class="dv">5</span>, <span class="dv">500</span>, num_transactions), <span class="dv">2</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    payment_methods <span class="op">=</span> np.random.choice([<span class="st">"Credit Card"</span>, <span class="st">"Debit Card"</span>, <span class="st">"PayPal"</span>, <span class="st">"Cash"</span>], num_transactions)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    categories <span class="op">=</span> np.random.choice([<span class="st">"Electronics"</span>, <span class="st">"Clothing"</span>, <span class="st">"Groceries"</span>, <span class="st">"Entertainment"</span>], num_transactions)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    transaction_dates <span class="op">=</span> pd.date_range(start<span class="op">=</span><span class="st">"2024-01-01"</span>, periods<span class="op">=</span>num_transactions, freq<span class="op">=</span><span class="st">"D"</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> {</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"transaction_id"</span>: <span class="bu">range</span>(<span class="dv">1</span>, num_transactions <span class="op">+</span> <span class="dv">1</span>),</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"customer_id"</span>: customer_ids,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"amount"</span>: transaction_amounts,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"payment_method"</span>: payment_methods,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">"category"</span>: categories,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"date"</span>: transaction_dates</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> pd.DataFrame(data)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df</span></code></pre></div>
+</details>
+</div>
+<p>Say we have a dataset of customer transactions at a department store. I simulated this data arbitrarily.</p>
+<div id="cell-6" class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> simulate_df()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="31">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">transaction_id</th>
+<th data-quarto-table-cell-role="th">customer_id</th>
+<th data-quarto-table-cell-role="th">amount</th>
+<th data-quarto-table-cell-role="th">payment_method</th>
+<th data-quarto-table-cell-role="th">category</th>
+<th data-quarto-table-cell-role="th">date</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1</td>
+<td>2061</td>
+<td>177.75</td>
+<td>Debit Card</td>
+<td>Electronics</td>
+<td>2024-01-01</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2</td>
+<td>1235</td>
+<td>33.20</td>
+<td>Credit Card</td>
+<td>Clothing</td>
+<td>2024-01-02</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>3</td>
+<td>4980</td>
+<td>118.26</td>
+<td>Credit Card</td>
+<td>Groceries</td>
+<td>2024-01-03</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>4</td>
+<td>2096</td>
+<td>333.73</td>
+<td>Debit Card</td>
+<td>Entertainment</td>
+<td>2024-01-04</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>5</td>
+<td>4839</td>
+<td>251.14</td>
+<td>Credit Card</td>
+<td>Electronics</td>
+<td>2024-01-05</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Let’s imagine the case where a stakeholder asks for a report on total dollars transacted, broken down by key categories and payment method. It’s fairly straightforward to use <code>pandas</code> to make an attractive pivot table that can serve as such a report, complete with human-readable, title-cased indices and columns. In this case, I’ve aggregated the total dollars spent, dissagregated by payment method and category of good.</p>
+<div id="cell-8" class="cell" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dollars_by_method <span class="op">=</span> df.pivot_table(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span><span class="st">"payment_method"</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span><span class="st">"category"</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    values<span class="op">=</span><span class="st">"amount"</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    aggfunc<span class="op">=</span><span class="st">"sum"</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>dollars_by_method.index.name <span class="op">=</span> <span class="st">"Payment Method"</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>dollars_by_method.columns.name <span class="op">=</span> <span class="st">'Category'</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>dollars_by_method</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="32">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Category</th>
+<th data-quarto-table-cell-role="th">Clothing</th>
+<th data-quarto-table-cell-role="th">Electronics</th>
+<th data-quarto-table-cell-role="th">Entertainment</th>
+<th data-quarto-table-cell-role="th">Groceries</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Payment Method</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Cash</td>
+<td>15016.00</td>
+<td>17026.47</td>
+<td>18208.16</td>
+<td>18242.88</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Credit Card</td>
+<td>16074.92</td>
+<td>10960.64</td>
+<td>16052.85</td>
+<td>20187.25</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Debit Card</td>
+<td>14032.23</td>
+<td>17325.96</td>
+<td>14363.99</td>
+<td>17188.67</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">PayPal</td>
+<td>14143.84</td>
+<td>15108.84</td>
+<td>16852.17</td>
+<td>12065.14</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>I’ve observed that many users of tables like this prefer the pivot table to also include subtotals. We can flexibly add those for both independent variables by leveraging the axis argument in <code>df.sum()</code></p>
+<div id="cell-10" class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>dollars_by_method.loc[:, <span class="st">'Total'</span>] <span class="op">=</span> dollars_by_method.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>dollars_by_method.loc[<span class="st">'Total'</span>, :] <span class="op">=</span> dollars_by_method.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>dollars_by_method</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="33">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Category</th>
+<th data-quarto-table-cell-role="th">Clothing</th>
+<th data-quarto-table-cell-role="th">Electronics</th>
+<th data-quarto-table-cell-role="th">Entertainment</th>
+<th data-quarto-table-cell-role="th">Groceries</th>
+<th data-quarto-table-cell-role="th">Total</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Payment Method</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Cash</td>
+<td>15016.00</td>
+<td>17026.47</td>
+<td>18208.16</td>
+<td>18242.88</td>
+<td>68493.51</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Credit Card</td>
+<td>16074.92</td>
+<td>10960.64</td>
+<td>16052.85</td>
+<td>20187.25</td>
+<td>63275.66</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Debit Card</td>
+<td>14032.23</td>
+<td>17325.96</td>
+<td>14363.99</td>
+<td>17188.67</td>
+<td>62910.85</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">PayPal</td>
+<td>14143.84</td>
+<td>15108.84</td>
+<td>16852.17</td>
+<td>12065.14</td>
+<td>58169.99</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Total</td>
+<td>59266.99</td>
+<td>60421.91</td>
+<td>65477.17</td>
+<td>67683.94</td>
+<td>252850.01</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>That’s a fine-enough <code>pandas</code> dataframe, but now the question arises of how to best serve this data to the end-user.</p>
+<p>There are several options – lately I’ve been using Quarto reports or else Tableau dashboards for these sorts of analytics projects. However, those formats are very “finalized” and can be a little unsatisfying for end-users who want to further filter or modify table output. These users may be confident working with data, but using their spreadsheet application of choice rather than R/Python, and thus wouldn’t want access to underlying <code>.ipynb</code> or <code>.qmd</code> files. This is the case where I think that <code>xlwings</code> and computational production of formatted Excel worksheets can be very potent.</p>
+</section>
+<section id="writing-data-to-excel" class="level2">
+<h2 class="anchored" data-anchor-id="writing-data-to-excel">Writing data to Excel</h2>
+<p>To write a table out to Excel, we’ll first establish an <code>xw.Book</code> object, which either creates or opens an existing excel file, in this case <code>test.xlsx</code>.</p>
+<div id="cell-15" class="cell" data-execution_count="179">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">"test.xlsx"</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.path.exists(filename):</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        wb <span class="op">=</span> xw.Book(filename)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    wb <span class="op">=</span> xw.Book()</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    wb.save(filename)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>wb</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="179">
+<pre><code>&lt;Book [test.xlsx]&gt;</code></pre>
+</div>
+</div>
+<p>Next, we establish a sheet within that <code>xw.Book</code>, in this case <code>first_test</code>.</p>
+<div id="cell-17" class="cell" data-execution_count="180">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sheet_name <span class="op">=</span> <span class="st">'first_test'</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    sheet_new <span class="op">=</span> wb.sheets.add(sheet_name) </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">ValueError</span>:</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    sheet_new <span class="op">=</span> wb.sheets[sheet_name]</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>sheet_new</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="180">
+<pre><code>&lt;Sheet [test.xlsx]first_test&gt;</code></pre>
+</div>
+</div>
+<p>At this point, we can select the sheet, <code>sheet_new</code>, select a start range, <code>A1</code>, then set it’s value with our dataframe object, <code>dollars_by_method</code>. This will export the full dataframe into the spreadsheet.</p>
+<div id="cell-19" class="cell" data-execution_count="181">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>sheet_new.<span class="bu">range</span>(<span class="st">"A1"</span>).options(index<span class="op">=</span><span class="va">True</span>, header<span class="op">=</span><span class="va">True</span>).value <span class="op">=</span> dollars_by_method</span></code></pre></div>
+</div>
+<p>Then, when we save the book, we can inspect the output.</p>
+<div id="cell-21" class="cell" data-execution_count="182">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
+</div>
+<p><img src="1.png" class="img-fluid"></p>
+<p>This is a fairly unattractive table, with no formatting and with poorly fitted columns. This is also equivalent to what we could get if we simply used the <code>df.to_excel()</code> method within <code>pandas</code>. We’ll proceed to formatting this table, where we get the real value out of <code>xlwings</code>.</p>
+</section>
+<section id="interacting-with-the-excel-object-model" class="level2">
+<h2 class="anchored" data-anchor-id="interacting-with-the-excel-object-model">Interacting with the Excel Object Model</h2>
+<p>The most powerful aspect of <code>xlwings</code> is easily interacting with the Excel object model – an API that allows for programmatically editing Excel spreadsheets. One would typically interact with Excel’s object model via VBA code, but <code>xlwings</code> and <code>pywin32</code> together allow for us to use Python instead. Microsoft provides a clear overview of the object model concept <a href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#vba-programming-101">in the “VBA Programming 101”</a> section of the Official VBA Reference, and a complete reference for the <a href="https://learn.microsoft.com/en-us/office/vba/api/overview/excel/object-model">Excel object model</a> in the Excel VBA Reference.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<figcaption>Excel Object Model for VBA Reference</figcaption>
+<p><img src="object_model.png" class="img-fluid figure-img" style="width:80.0%"></p>
+</figure>
+</div>
+<p>For example, here I’ll call the <code>.api</code> attribute for the whole sheet:</p>
+<div id="cell-28" class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>sheet_new.api</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>&lt;win32com.gen_py.Microsoft Excel 16.0 Object Library._Worksheet instance at 0x2439468126800&gt;</code></pre>
+</div>
+</div>
+<p>This is an instance of the Worksheet object, which has <a href="https://learn.microsoft.com/en-us/office/vba/api/excel.worksheet">a documentation page in Excel’s VBA reference</a>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<figcaption>The Worksheet Object</figcaption>
+<p><img src="worksheet.png" class="img-fluid figure-img" style="width:80.0%"></p>
+</figure>
+</div>
+<p>The Worksheet object has a property, UsedRange, which is the range</p>
+<div id="cell-30" class="cell" data-execution_count="55">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>sheet_new.api.UsedRange</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="55">
+<pre><code>&lt;win32com.gen_py.Microsoft Excel 16.0 Object Library.Range instance at 0x2439468123728&gt;</code></pre>
+</div>
+</div>
+<p>The UsedRange https://learn.microsoft.com/en-us/office/vba/api/excel.range.entirecolumn</p>
+<div id="cell-32" class="cell" data-execution_count="56">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>sheet_new.api.UsedRange.EntireColumn</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="56">
+<pre><code>&lt;win32com.gen_py.Microsoft Excel 16.0 Object Library.Range instance at 0x2438157079552&gt;</code></pre>
+</div>
+</div>
+<p>https://learn.microsoft.com/en-us/office/vba/api/excel.range.autofit</p>
+<div id="cell-34" class="cell" data-execution_count="58">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>sheet_new.api.UsedRange.EntireColumn.AutoFit()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="58">
+<pre><code>True</code></pre>
+</div>
+</div>
+<div id="cell-35" class="cell" data-execution_count="61">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>sheet_new.used_range</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="61">
+<pre><code>&lt;Range [test.xlsx]first_test!$A$1:$F$6&gt;</code></pre>
+</div>
+</div>
+<div id="cell-36" class="cell" data-execution_count="40">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>sheet_new.used_range.api.EntireColumn.AutoFit()</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>sheet_new.used_range.api.EntireRow.AutoFit()</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
+</div>
+<p><img src="2.png" class="img-fluid"></p>
+<div id="cell-38" class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>headers <span class="op">=</span> sheet_new.<span class="bu">range</span>(<span class="st">"A1"</span>).expand(<span class="st">"right"</span>).value</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>headers</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>['Payment Method',
+ 'Clothing',
+ 'Electronics',
+ 'Entertainment',
+ 'Groceries',
+ 'Total']</code></pre>
+</div>
+</div>
+<div id="cell-39" class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>col_index <span class="op">=</span> headers.index(<span class="st">'Clothing'</span>) <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>col_letter <span class="op">=</span> xw.utils.col_name(col_index) </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>col_letter</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<pre><code>'B'</code></pre>
+</div>
+</div>
+<div id="cell-40" class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>(sheet_new</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a> .<span class="bu">range</span>(<span class="ss">f"</span><span class="sc">{</span>col_letter<span class="sc">}</span><span class="ss">2:</span><span class="sc">{</span>col_letter<span class="sc">}</span><span class="ss">1048576"</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a> .number_format) <span class="op">=</span> <span class="st">"$#,##0.00"</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
+</div>
+<p><img src="3.png" class="img-fluid"></p>
+<div id="cell-42" class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> dollars_by_method.columns:</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    col_index <span class="op">=</span> headers.index(col) <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    col_letter <span class="op">=</span> xw.utils.col_name(col_index)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    (sheet_new</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>     .<span class="bu">range</span>(<span class="ss">f"</span><span class="sc">{</span>col_letter<span class="sc">}</span><span class="ss">2:</span><span class="sc">{</span>col_letter<span class="sc">}</span><span class="ss">1048576"</span>)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>     .number_format) <span class="op">=</span> <span class="st">"$#,##0.00"</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
+</div>
+<p><img src="4.png" class="img-fluid"></p>
+<div id="cell-44" class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> string</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>string.ascii_uppercase</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<pre><code>'ABCDEFGHIJKLMNOPQRSTUVWXYZ'</code></pre>
+</div>
+</div>
+<div id="cell-45" class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>end_col <span class="op">=</span> string.ascii_uppercase[dollars_by_method.reset_index().shape[<span class="dv">1</span>]<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>header_range <span class="op">=</span> sheet_new.<span class="bu">range</span>(<span class="ss">f"A1:</span><span class="sc">{</span>end_col<span class="sc">}</span><span class="ss">1"</span>)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>header_range.font.bold <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
+</div>
+<p><img src="5.png" class="img-fluid"></p>
+<div id="cell-47" class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>end_row <span class="op">=</span> dollars_by_method.reset_index().shape[<span class="dv">0</span>] <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>header_range <span class="op">=</span> sheet_new.<span class="bu">range</span>(<span class="ss">f"A1:A</span><span class="sc">{</span>end_row<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>header_range.font.bold <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
+</div>
+<p><img src="6.png" class="img-fluid"></p>
+<div id="cell-49" class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>sheet_new.<span class="bu">range</span>(<span class="ss">f"</span><span class="sc">{</span>end_col<span class="sc">}</span><span class="ss">1:</span><span class="sc">{</span>end_col<span class="sc">}{</span>end_row<span class="sc">}</span><span class="ss">"</span>).color <span class="op">=</span> (<span class="dv">242</span>, <span class="dv">242</span>, <span class="dv">242</span>)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>sheet_new.<span class="bu">range</span>(<span class="ss">f"A</span><span class="sc">{</span>end_row<span class="sc">}</span><span class="ss">:</span><span class="sc">{</span>end_col<span class="sc">}{</span>end_row<span class="sc">}</span><span class="ss">"</span>).color <span class="op">=</span> (<span class="dv">242</span>, <span class="dv">242</span>, <span class="dv">242</span>)</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
+</div>
+<p><img src="7.png" class="img-fluid"></p>
+<div id="cell-51" class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>used_range <span class="op">=</span> sheet_new.used_range</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>used_range</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<pre><code>&lt;Range [test.xlsx]first_test!$A$1:$F$6&gt;</code></pre>
+</div>
+</div>
+<div id="cell-52" class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>used_range.api.Borders.LineStyle <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>used_range.api.Borders.Weight <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
+</div>
+<p>https://stackoverflow.com/a/73015199</p>
+<p><img src="8.png" class="img-fluid"></p>
+<section id="package-approach" class="level3">
+<h3 class="anchored" data-anchor-id="package-approach">Package approach</h3>
+<div id="cell-56" class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>sys.path.append(<span class="st">'../../../swiss-code/src'</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> swiss_code.excel <span class="im">import</span> excel</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>load_ext autoreload</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>autoreload <span class="dv">2</span></span></code></pre></div>
+</div>
+<div id="cell-57" class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>wb <span class="op">=</span> excel.get_or_create_workbook(<span class="st">"test.xlsx"</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>function_sheet <span class="op">=</span> excel.select_sheet(<span class="st">'function_sheet'</span>, wb)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>excel.write_df_to_excel(dollars_by_method, function_sheet, bold_indexes<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> dollars_by_method.columns:</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    excel.format_dollar_column(function_sheet, col)</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>excel.make_borders(function_sheet)</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> excel.get_data_bounds(function_sheet)</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>grey_rgb <span class="op">=</span> (<span class="dv">242</span>, <span class="dv">242</span>, <span class="dv">242</span>)</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>function_sheet.<span class="bu">range</span>(<span class="ss">f"</span><span class="sc">{</span>b[<span class="st">'end_col'</span>]<span class="sc">}</span><span class="ss">1:</span><span class="sc">{</span>b[<span class="st">'end_col'</span>]<span class="sc">}{</span>b[<span class="st">'end_row'</span>]<span class="sc">}</span><span class="ss">"</span>).color <span class="op">=</span> grey_rgb</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>function_sheet.<span class="bu">range</span>(<span class="ss">f"A</span><span class="sc">{</span>b[<span class="st">'end_row'</span>]<span class="sc">}</span><span class="ss">:</span><span class="sc">{</span>b[<span class="st">'end_col'</span>]<span class="sc">}{</span>b[<span class="st">'end_row'</span>]<span class="sc">}</span><span class="ss">"</span>).color <span class="op">=</span> grey_rgb</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>excel.close_out_book(wb)</span></code></pre></div>
+</div>
+</section>
+</section>
+<section id="complex-tables" class="level2">
+<h2 class="anchored" data-anchor-id="complex-tables">Complex Tables</h2>
+<div id="cell-59" class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'Year'</span>] <span class="op">=</span> df[<span class="st">'date'</span>].dt.year.astype(<span class="bu">str</span>)</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"class"</span>] <span class="op">=</span> df[<span class="st">"category"</span>].<span class="bu">map</span>(</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Clothing"</span>: <span class="st">"Necessity"</span>,</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Groceries"</span>: <span class="st">"Necessity"</span>,</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Electronics"</span>: <span class="st">"Discretionary"</span>,</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Entertainment"</span>: <span class="st">"Discretionary"</span>,</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="cell-60" class="cell" data-execution_count="157">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>dollars_by_method_yr <span class="op">=</span> df.pivot_table(</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>[<span class="st">"Year"</span>, <span class="st">"payment_method"</span>], </span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[<span class="st">"class"</span>, <span class="st">"category"</span>],</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    values<span class="op">=</span><span class="st">"amount"</span>,</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    aggfunc<span class="op">=</span><span class="st">"sum"</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>dollars_by_method_yr.index.names <span class="op">=</span> [<span class="st">"Year"</span>, <span class="st">"Payment Method"</span>]</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>dollars_by_method_yr.columns.names <span class="op">=</span> [<span class="st">'Class'</span>, <span class="st">'Category'</span>]</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>dollars_by_method_yr <span class="op">=</span> dollars_by_method_yr.fillna(<span class="dv">0</span>)</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>dollars_by_method_yr</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="157">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Class</th>
+<th colspan="2" data-quarto-table-cell-role="th" data-halign="left">Discretionary</th>
+<th colspan="2" data-quarto-table-cell-role="th" data-halign="left">Necessity</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Category</th>
+<th data-quarto-table-cell-role="th">Electronics</th>
+<th data-quarto-table-cell-role="th">Entertainment</th>
+<th data-quarto-table-cell-role="th">Clothing</th>
+<th data-quarto-table-cell-role="th">Groceries</th>
+</tr>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Year</th>
+<th data-quarto-table-cell-role="th">Payment Method</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td rowspan="4" data-quarto-table-cell-role="th" data-valign="top">2024</td>
+<td data-quarto-table-cell-role="th">Cash</td>
+<td>5182.41</td>
+<td>8661.28</td>
+<td>5709.71</td>
+<td>6552.53</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Credit Card</td>
+<td>2976.99</td>
+<td>5334.29</td>
+<td>5846.53</td>
+<td>7983.28</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Debit Card</td>
+<td>6997.97</td>
+<td>4998.41</td>
+<td>4887.89</td>
+<td>5603.41</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">PayPal</td>
+<td>5649.27</td>
+<td>7034.34</td>
+<td>5225.22</td>
+<td>3945.90</td>
+</tr>
+<tr class="odd">
+<td rowspan="4" data-quarto-table-cell-role="th" data-valign="top">2025</td>
+<td data-quarto-table-cell-role="th">Cash</td>
+<td>6148.02</td>
+<td>5110.80</td>
+<td>4651.67</td>
+<td>7717.81</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Credit Card</td>
+<td>4618.44</td>
+<td>5946.31</td>
+<td>6843.13</td>
+<td>5828.80</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Debit Card</td>
+<td>6606.99</td>
+<td>7087.51</td>
+<td>5801.20</td>
+<td>4554.53</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">PayPal</td>
+<td>5220.53</td>
+<td>5592.94</td>
+<td>6203.22</td>
+<td>3442.25</td>
+</tr>
+<tr class="odd">
+<td rowspan="4" data-quarto-table-cell-role="th" data-valign="top">2026</td>
+<td data-quarto-table-cell-role="th">Cash</td>
+<td>5696.04</td>
+<td>4436.08</td>
+<td>4654.62</td>
+<td>3972.54</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Credit Card</td>
+<td>3365.21</td>
+<td>4772.25</td>
+<td>3385.26</td>
+<td>6375.17</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Debit Card</td>
+<td>3721.00</td>
+<td>2278.07</td>
+<td>3343.14</td>
+<td>7030.73</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">PayPal</td>
+<td>4239.04</td>
+<td>4224.89</td>
+<td>2715.40</td>
+<td>4676.99</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{amerkhanian2025,
+  author = {Amerkhanian, Peter},
+  title = {Using {The} {Excel} {Object} {Model} in {Python}},
+  date = {2025-03-12},
+  url = {https://peter-amerkhanian.com/posts/excel-wings/},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-amerkhanian2025" class="csl-entry quarto-appendix-citeas" role="listitem">
+Amerkhanian, Peter. 2025. <span>“Using The Excel Object Model in
+Python.”</span> March 12, 2025. <a href="https://peter-amerkhanian.com/posts/excel-wings/">https://peter-amerkhanian.com/posts/excel-wings/</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/peter-amerkhanian\.com");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Copyright 2024, Peter Amerkhanian</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
