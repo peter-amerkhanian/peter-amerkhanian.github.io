@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.57">
+<meta name="generator" content="quarto-1.6.40">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -73,10 +73,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-1092c56c6cadf2eb47b1bc8063ab382a.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-5d17cd34d2e348db00e20f83fc65b062.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -118,6 +118,35 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 <meta name="quarto:status" content="draft">
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -204,11 +233,15 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
      
     <ul>
     <li><a href="#problem-setup" id="toc-problem-setup" class="nav-link active" data-scroll-target="#problem-setup">Problem Setup</a></li>
-    <li><a href="#writing-data-to-excel" id="toc-writing-data-to-excel" class="nav-link" data-scroll-target="#writing-data-to-excel">Writing data to Excel</a></li>
+    <li><a href="#getting-connected-to-excel" id="toc-getting-connected-to-excel" class="nav-link" data-scroll-target="#getting-connected-to-excel">Getting connected to Excel</a></li>
     <li><a href="#interacting-with-the-excel-object-model" id="toc-interacting-with-the-excel-object-model" class="nav-link" data-scroll-target="#interacting-with-the-excel-object-model">Interacting with the Excel Object Model</a>
     <ul class="collapse">
-    <li><a href="#package-approach" id="toc-package-approach" class="nav-link" data-scroll-target="#package-approach">Package approach</a></li>
+    <li><a href="#autofit" id="toc-autofit" class="nav-link" data-scroll-target="#autofit">AutoFit</a></li>
+    <li><a href="#number-formatting" id="toc-number-formatting" class="nav-link" data-scroll-target="#number-formatting">Number Formatting</a></li>
+    <li><a href="#text-formatting" id="toc-text-formatting" class="nav-link" data-scroll-target="#text-formatting">Text Formatting</a></li>
+    <li><a href="#shading-and-borders" id="toc-shading-and-borders" class="nav-link" data-scroll-target="#shading-and-borders">Shading and Borders</a></li>
     </ul></li>
+    <li><a href="#a-package-approach" id="toc-a-package-approach" class="nav-link" data-scroll-target="#a-package-approach">A Package approach</a></li>
     <li><a href="#complex-tables" id="toc-complex-tables" class="nav-link" data-scroll-target="#complex-tables">Complex Tables</a></li>
     </ul>
     <div class="quarto-alternate-formats">
@@ -239,20 +272,19 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
   }
 });
 </script>
-<div id="cell-1" class="cell" data-execution_count="29">
+<div id="cell-1" class="cell" data-execution_count="337">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> xlwings <span class="im">as</span> xw</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span></code></pre></div>
 </div>
-<p>In this post, I’m going to overview how to use Python’s <code>xlwings</code> and <code>pywin32</code> libraries to produce customizable, human-readable tables in a spreadsheet application (e.g.&nbsp;Excel, Google Sheets, Calc, etc.). Beyond basic uses of <code>xlwings</code>, I’ll also overview how to leverage <code>pywin32</code> and the <code>.api</code> attribute to interact directly with the Excel object model using VBA-like Python code. The result is highly custommizable Excel output that should satisfy most spreadsheet users you work with.</p>
+<p>In this post, I’m going to overview how to use Python’s <code>xlwings</code> and <code>pywin32</code> libraries to produce formatted, human-readable tables in Excel. Beyond basic uses of <code>xlwings</code>, I’ll overview how to leverage <code>pywin32</code> and the <code>.api</code> attribute to interact directly with the Excel object model using VBA-like Python code. The apporach allows one to produce highly custommizable Excel tables that should satisfy any audience that prefers formatted spreadsheet output.</p>
 <p>Alongside this blog post, I’ve been developing an <code>excel</code> submodule in my <code>swiss-code</code> package, with various wrapper functions for <code>xlwings</code> and <code>pywin32</code>. I’ll showcase some of those functions here as well.</p>
-<p>https://pandas.pydata.org/docs/reference/api/pandas.ExcelWriter.html</p>
 <section id="problem-setup" class="level2">
 <h2 class="anchored" data-anchor-id="problem-setup">Problem Setup</h2>
-<div id="cell-4" class="cell" data-execution_count="30">
+<div id="cell-4" class="cell" data-execution_count="338">
 <details class="code-fold">
-<summary>Code</summary>
+<summary>Code for dataset generation</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> simulate_df(num_transactions<span class="op">=</span><span class="dv">1000</span>):</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    np.random.seed(<span class="dv">1</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    customer_ids <span class="op">=</span> np.random.randint(<span class="dv">1000</span>, <span class="dv">5000</span>, num_transactions)</span>
@@ -274,10 +306,10 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </details>
 </div>
 <p>Say we have a dataset of customer transactions at a department store. I simulated this data arbitrarily.</p>
-<div id="cell-6" class="cell" data-execution_count="31">
+<div id="cell-6" class="cell" data-execution_count="339">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> simulate_df()</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="31">
+<div class="cell-output cell-output-display" data-execution_count="339">
 <div>
 
 
@@ -346,78 +378,20 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Let’s imagine the case where a stakeholder asks for a report on total dollars transacted, broken down by key categories and payment method. It’s fairly straightforward to use <code>pandas</code> to make an attractive pivot table that can serve as such a report, complete with human-readable, title-cased indices and columns. In this case, I’ve aggregated the total dollars spent, dissagregated by payment method and category of good.</p>
-<div id="cell-8" class="cell" data-execution_count="32">
+<p>Some users may prefer that the pivot table also include subtotals, and we can flexibly add those with <code>margins=True</code>.</p>
+<div id="cell-8" class="cell" data-execution_count="340">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dollars_by_method <span class="op">=</span> df.pivot_table(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span><span class="st">"payment_method"</span>,</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span><span class="st">"category"</span>,</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    values<span class="op">=</span><span class="st">"amount"</span>,</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    aggfunc<span class="op">=</span><span class="st">"sum"</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>dollars_by_method.index.name <span class="op">=</span> <span class="st">"Payment Method"</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>dollars_by_method.columns.name <span class="op">=</span> <span class="st">'Category'</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>dollars_by_method</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="32">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th">Category</th>
-<th data-quarto-table-cell-role="th">Clothing</th>
-<th data-quarto-table-cell-role="th">Electronics</th>
-<th data-quarto-table-cell-role="th">Entertainment</th>
-<th data-quarto-table-cell-role="th">Groceries</th>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">Payment Method</th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">Cash</td>
-<td>15016.00</td>
-<td>17026.47</td>
-<td>18208.16</td>
-<td>18242.88</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">Credit Card</td>
-<td>16074.92</td>
-<td>10960.64</td>
-<td>16052.85</td>
-<td>20187.25</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">Debit Card</td>
-<td>14032.23</td>
-<td>17325.96</td>
-<td>14363.99</td>
-<td>17188.67</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">PayPal</td>
-<td>14143.84</td>
-<td>15108.84</td>
-<td>16852.17</td>
-<td>12065.14</td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
-</div>
-<p>I’ve observed that many users of tables like this prefer the pivot table to also include subtotals. We can flexibly add those for both independent variables by leveraging the axis argument in <code>df.sum()</code></p>
-<div id="cell-10" class="cell" data-execution_count="33">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>dollars_by_method.loc[:, <span class="st">'Total'</span>] <span class="op">=</span> dollars_by_method.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>dollars_by_method.loc[<span class="st">'Total'</span>, :] <span class="op">=</span> dollars_by_method.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>dollars_by_method</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="33">
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    aggfunc<span class="op">=</span><span class="st">"sum"</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    margins<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    margins_name<span class="op">=</span><span class="st">'Total'</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>dollars_by_method.index.name <span class="op">=</span> <span class="st">"Payment Method"</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>dollars_by_method.columns.name <span class="op">=</span> <span class="st">'Category'</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>dollars_by_method</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="340">
 <div>
 
 
@@ -431,7 +405,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <th data-quarto-table-cell-role="th">Groceries</th>
 <th data-quarto-table-cell-role="th">Total</th>
 </tr>
-<tr class="odd">
+<tr class="even">
 <th data-quarto-table-cell-role="th">Payment Method</th>
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th"></th>
@@ -488,106 +462,128 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </div>
 </div>
 <p>That’s a fine-enough <code>pandas</code> dataframe, but now the question arises of how to best serve this data to the end-user.</p>
-<p>There are several options – lately I’ve been using Quarto reports or else Tableau dashboards for these sorts of analytics projects. However, those formats are very “finalized” and can be a little unsatisfying for end-users who want to further filter or modify table output. These users may be confident working with data, but using their spreadsheet application of choice rather than R/Python, and thus wouldn’t want access to underlying <code>.ipynb</code> or <code>.qmd</code> files. This is the case where I think that <code>xlwings</code> and computational production of formatted Excel worksheets can be very potent.</p>
+<p>There are several options – lately I’ve been using Quarto reports or else Tableau dashboards for these sorts of analytics projects. However, those formats are very “finalized” and can be a little unsatisfying for end-users who want to further filter or modify table output. If that audience doesn’t use R/Python, access to underlying <code>.ipynb</code> or <code>.qmd</code> files will not be helpful. This is the case where I think that spreadsheet output, and specifically reproducible, formatted Excel worksheets, can be very potent.</p>
 </section>
-<section id="writing-data-to-excel" class="level2">
-<h2 class="anchored" data-anchor-id="writing-data-to-excel">Writing data to Excel</h2>
-<p>To write a table out to Excel, we’ll first establish an <code>xw.Book</code> object, which either creates or opens an existing excel file, in this case <code>test.xlsx</code>.</p>
-<div id="cell-15" class="cell" data-execution_count="179">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">"test.xlsx"</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.path.exists(filename):</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        wb <span class="op">=</span> xw.Book(filename)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    wb <span class="op">=</span> xw.Book()</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    wb.save(filename)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>wb</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="179">
+<section id="getting-connected-to-excel" class="level2">
+<h2 class="anchored" data-anchor-id="getting-connected-to-excel">Getting connected to Excel</h2>
+<p>To write a <code>pandas</code> dataframe out to Excel, we’ll work through the Excel/<code>xlwings</code> <a href="https://docs.xlwings.org/en/stable/syntax_overview.html#object-hierarchy">object hierarchy</a>:</p>
+<ul>
+<li>Application<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> <span class="math inline">\(\rightarrow\)</span> Work Book <span class="math inline">\(\rightarrow\)</span> Sheet <span class="math inline">\(\rightarrow\)</span> Range.</li>
+</ul>
+<p>In <code>xlwings</code> we’ll establish a <code>xw.Book</code> object, which either creates or opens an existing excel file, in this case <code>test.xlsx</code>.</p>
+<div id="cell-13" class="cell" data-execution_count="342">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">"test.xlsx"</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.path.exists(filename):</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        wb <span class="op">=</span> xw.Book(filename)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    wb <span class="op">=</span> xw.Book()</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    wb.save(filename)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>wb</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="342">
 <pre><code>&lt;Book [test.xlsx]&gt;</code></pre>
 </div>
 </div>
-<p>Next, we establish a sheet within that <code>xw.Book</code>, in this case <code>first_test</code>.</p>
-<div id="cell-17" class="cell" data-execution_count="180">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sheet_name <span class="op">=</span> <span class="st">'first_test'</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    sheet_new <span class="op">=</span> wb.sheets.add(sheet_name) </span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">ValueError</span>:</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    sheet_new <span class="op">=</span> wb.sheets[sheet_name]</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>sheet_new</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="180">
+<p>Next, we establish an <code>xw.Sheet</code> within that <code>xw.Book</code> object, in this case <code>first_test</code>.</p>
+<div id="cell-15" class="cell" data-execution_count="343">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>sheet_name <span class="op">=</span> <span class="st">'first_test'</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    sheet_new <span class="op">=</span> wb.sheets.add(sheet_name) </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">ValueError</span>:</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    sheet_new <span class="op">=</span> wb.sheets[sheet_name]</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>sheet_new</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="343">
 <pre><code>&lt;Sheet [test.xlsx]first_test&gt;</code></pre>
 </div>
 </div>
-<p>At this point, we can select the sheet, <code>sheet_new</code>, select a start range, <code>A1</code>, then set it’s value with our dataframe object, <code>dollars_by_method</code>. This will export the full dataframe into the spreadsheet.</p>
-<div id="cell-19" class="cell" data-execution_count="181">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>sheet_new.<span class="bu">range</span>(<span class="st">"A1"</span>).options(index<span class="op">=</span><span class="va">True</span>, header<span class="op">=</span><span class="va">True</span>).value <span class="op">=</span> dollars_by_method</span></code></pre></div>
+<p>At this point, we can select the sheet, <code>sheet_new</code>, select a start range, “A1”, then set it’s value with our dataframe object, <code>dollars_by_method</code>. This will export the full dataframe into the spreadsheet.</p>
+<div id="cell-17" class="cell" data-execution_count="344">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>sheet_new.<span class="bu">range</span>(<span class="st">"A1"</span>).options(index<span class="op">=</span><span class="va">True</span>, header<span class="op">=</span><span class="va">True</span>).value <span class="op">=</span> dollars_by_method</span></code></pre></div>
 </div>
-<p>Then, when we save the book, we can inspect the output.</p>
-<div id="cell-21" class="cell" data-execution_count="182">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
+<p>Then, when we save the book, we can inspect the output. Note that the data were entered into cell <code>A1</code> and expanded as needed.</p>
+<div id="cell-19" class="cell" data-execution_count="345">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
 </div>
 <p><img src="1.png" class="img-fluid"></p>
 <p>This is a fairly unattractive table, with no formatting and with poorly fitted columns. This is also equivalent to what we could get if we simply used the <code>df.to_excel()</code> method within <code>pandas</code>. We’ll proceed to formatting this table, where we get the real value out of <code>xlwings</code>.</p>
 </section>
 <section id="interacting-with-the-excel-object-model" class="level2">
 <h2 class="anchored" data-anchor-id="interacting-with-the-excel-object-model">Interacting with the Excel Object Model</h2>
-<p>The most powerful aspect of <code>xlwings</code> is easily interacting with the Excel object model – an API that allows for programmatically editing Excel spreadsheets. One would typically interact with Excel’s object model via VBA code, but <code>xlwings</code> and <code>pywin32</code> together allow for us to use Python instead. Microsoft provides a clear overview of the object model concept <a href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#vba-programming-101">in the “VBA Programming 101”</a> section of the Official VBA Reference, and a complete reference for the <a href="https://learn.microsoft.com/en-us/office/vba/api/overview/excel/object-model">Excel object model</a> in the Excel VBA Reference.</p>
+<p>The most powerful aspect of <code>xlwings</code> is that it allows for interacting with the Excel object model – an API for programmatically editing Excel spreadsheets. One would typically interact with Excel’s object model via VBA code, but <code>xlwings</code> and <code>pywin32</code> together allow for us to use Python for a conceptually similar workflow.</p>
+<p>Note that Microsoft provides a few key pieces of documentation that augment <a href="https://docs.xlwings.org/en/stable/api/index.html">the <code>xlwings</code>’ own API reference</a>.</p>
+<ol type="1">
+<li>An overview of the object model concept and typical VBA workflows in <a href="https://learn.microsoft.com/en-us/office/vba/library-reference/concepts/getting-started-with-vba-in-office#vba-programming-101">in the “VBA Programming 101”</a> section of the Official VBA Reference, and,</li>
+<li>A complete reference for the <a href="https://learn.microsoft.com/en-us/office/vba/api/overview/excel/object-model">Excel object model</a> in the Excel VBA Reference.</li>
+</ol>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <figcaption>Excel Object Model for VBA Reference</figcaption>
 <p><img src="object_model.png" class="img-fluid figure-img" style="width:80.0%"></p>
 </figure>
 </div>
-<p>For example, here I’ll call the <code>.api</code> attribute for the whole sheet:</p>
-<div id="cell-28" class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>sheet_new.api</span></code></pre></div>
-<div class="cell-output cell-output-display">
-<pre><code>&lt;win32com.gen_py.Microsoft Excel 16.0 Object Library._Worksheet instance at 0x2439468126800&gt;</code></pre>
+<p>We can access the object model API from an <code>xw.Sheet</code> object by calling the <code>.api</code> attribute:</p>
+<div id="cell-26" class="cell" data-execution_count="346">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>sheet_new.api</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="346">
+<pre><code>&lt;win32com.gen_py.Microsoft Excel 16.0 Object Library._Worksheet instance at 0x2119765775552&gt;</code></pre>
 </div>
 </div>
-<p>This is an instance of the Worksheet object, which has <a href="https://learn.microsoft.com/en-us/office/vba/api/excel.worksheet">a documentation page in Excel’s VBA reference</a>.</p>
+<p>This is an instance of VBA’s Worksheet object, which has <a href="https://learn.microsoft.com/en-us/office/vba/api/excel.worksheet">a documentation page in Excel’s VBA reference</a>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <figcaption>The Worksheet Object</figcaption>
 <p><img src="worksheet.png" class="img-fluid figure-img" style="width:80.0%"></p>
 </figure>
 </div>
-<p>The Worksheet object has a property, UsedRange, which is the range</p>
-<div id="cell-30" class="cell" data-execution_count="55">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>sheet_new.api.UsedRange</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="55">
-<pre><code>&lt;win32com.gen_py.Microsoft Excel 16.0 Object Library.Range instance at 0x2439468123728&gt;</code></pre>
+<p>Where python objects have attributes and methods, The VBA Worksheet object has properties and methods. One particularly useful property is <code>UsedRange</code>, which stores the range of cells that have data.</p>
+<section id="autofit" class="level3">
+<h3 class="anchored" data-anchor-id="autofit">AutoFit</h3>
+<div id="cell-29" class="cell" data-execution_count="347">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sheet_new.api.UsedRange</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="347">
+<pre><code>&lt;win32com.gen_py.Microsoft Excel 16.0 Object Library.Range instance at 0x2119974654112&gt;</code></pre>
 </div>
 </div>
-<p>The UsedRange https://learn.microsoft.com/en-us/office/vba/api/excel.range.entirecolumn</p>
-<div id="cell-32" class="cell" data-execution_count="56">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>sheet_new.api.UsedRange.EntireColumn</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="56">
-<pre><code>&lt;win32com.gen_py.Microsoft Excel 16.0 Object Library.Range instance at 0x2438157079552&gt;</code></pre>
-</div>
-</div>
-<p>https://learn.microsoft.com/en-us/office/vba/api/excel.range.autofit</p>
-<div id="cell-34" class="cell" data-execution_count="58">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>sheet_new.api.UsedRange.EntireColumn.AutoFit()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="58">
-<pre><code>True</code></pre>
-</div>
-</div>
-<div id="cell-35" class="cell" data-execution_count="61">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>sheet_new.used_range</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="61">
+<p>For very popular properties and methods, such as <code>UsedRange</code>, the <code>xlwings</code> api has simplified python attributes and methods that allow one to avoid explicity access the object model api. E.g. we can call <code>xw.Sheet.used_range</code></p>
+<div id="cell-31" class="cell" data-execution_count="348">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>sheet_new.used_range</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="348">
 <pre><code>&lt;Range [test.xlsx]first_test!$A$1:$F$6&gt;</code></pre>
 </div>
 </div>
-<div id="cell-36" class="cell" data-execution_count="40">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>sheet_new.used_range.api.EntireColumn.AutoFit()</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>sheet_new.used_range.api.EntireRow.AutoFit()</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
+<p>I’ll stick with the former approach for now.</p>
+<p>From the <code>UsedRange</code> attribute, which is a <code>Range</code> object, we can access the <a href="https://learn.microsoft.com/en-us/office/vba/api/excel.range.entirecolumn"><code>EntireColumn</code></a> attribute, which selects the entire columns for a given range.</p>
+<div id="cell-34" class="cell" data-execution_count="349">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>sheet_new.api.UsedRange.EntireColumn</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="349">
+<pre><code>&lt;win32com.gen_py.Microsoft Excel 16.0 Object Library.Range instance at 0x2120021827200&gt;</code></pre>
 </div>
+</div>
+<p>This is equivalent to the following selection:</p>
+<p><img src="1.5.png" class="img-fluid"></p>
+<p>For that <code>Range</code> object, we will now call the <a href="https://learn.microsoft.com/en-us/office/vba/api/excel.range.autofit"><code>Autofit()</code> method</a>.</p>
+<div id="cell-38" class="cell" data-execution_count="350">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>sheet_new.api.UsedRange.EntireColumn.AutoFit()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="350">
+<pre><code>True</code></pre>
+</div>
+</div>
+<p>We get the following in Excel:</p>
 <p><img src="2.png" class="img-fluid"></p>
-<div id="cell-38" class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>headers <span class="op">=</span> sheet_new.<span class="bu">range</span>(<span class="st">"A1"</span>).expand(<span class="st">"right"</span>).value</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>headers</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="13">
+<div id="cell-41" class="cell" data-execution_count="351">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>sheet_new.api.UsedRange.EntireColumn.AutoFit()</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>sheet_new.api.UsedRange.EntireRow.AutoFit()</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
+</div>
+</section>
+<section id="number-formatting" class="level3">
+<h3 class="anchored" data-anchor-id="number-formatting">Number Formatting</h3>
+<p>Now we’ll move onto formatting the data, which represent dollar totals. I’ll be using a mix of <code>xlwings</code> wrapper methods/attributes, and explicit calls to the Excel object model via <code>.api</code> with no real commitment as to when to use which. Given that we get equivalent results, I’m of the mind that it doesn’t particularly matter.</p>
+<p>We can apply dollar formatting to any range in Excel via the <a href="https://learn.microsoft.com/en-us/office/vba/api/excel.range.numberformat">NumberFormat</a> property – <a href="https://docs.xlwings.org/en/stable/api/range.html#xlwings.Range.number_format"><code>number_format</code></a> in <code>xlwings</code>. But to do that, we’ll first need to define a range that captures exactly where there is numerical data.</p>
+<p>To do that, I’ll first select the top row of the sheet and retrieve its values, which are the column headers:</p>
+<div id="cell-44" class="cell" data-execution_count="352">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>headers <span class="op">=</span> sheet_new.<span class="bu">range</span>(<span class="st">"A1"</span>).expand(<span class="st">"right"</span>).value</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>headers</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="352">
 <pre><code>['Payment Method',
  'Clothing',
  'Electronics',
@@ -596,121 +592,197 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
  'Total']</code></pre>
 </div>
 </div>
-<div id="cell-39" class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>col_index <span class="op">=</span> headers.index(<span class="st">'Clothing'</span>) <span class="op">+</span> <span class="dv">1</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>col_letter <span class="op">=</span> xw.utils.col_name(col_index) </span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>col_letter</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="14">
+<p>We now want to access those columns that actually contain data (Payment Method is the index title and doesn’t contain data). We’ll do this by taking the index of Clothing, the first column with data, adding one (Excel indexes from 1 whereas python indexes from 0, so adding 1 will be common in a lot of these workflows), then retrieving the letter that corresponds to that index:</p>
+<div id="cell-46" class="cell" data-execution_count="353">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>col_index <span class="op">=</span> headers.index(<span class="st">'Clothing'</span>) <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>col_letter <span class="op">=</span> xw.utils.col_name(col_index) </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>col_letter</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="353">
 <pre><code>'B'</code></pre>
 </div>
 </div>
-<div id="cell-40" class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>(sheet_new</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a> .<span class="bu">range</span>(<span class="ss">f"</span><span class="sc">{</span>col_letter<span class="sc">}</span><span class="ss">2:</span><span class="sc">{</span>col_letter<span class="sc">}</span><span class="ss">1048576"</span>)</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a> .number_format) <span class="op">=</span> <span class="st">"$#,##0.00"</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
+<p>Given the column letter, we can now select all of the data in that column, then set the number format:</p>
+<div id="cell-48" class="cell" data-execution_count="354">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>selection <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>col_letter<span class="sc">}</span><span class="ss">2:</span><span class="sc">{</span>col_letter<span class="sc">}</span><span class="ss">1048576"</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>selection</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="354">
+<pre><code>'B2:B1048576'</code></pre>
+</div>
+</div>
+<div id="cell-49" class="cell" data-execution_count="355">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>sheet_new.<span class="bu">range</span>(selection).number_format <span class="op">=</span> <span class="st">"$#,###.##"</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
 </div>
 <p><img src="3.png" class="img-fluid"></p>
-<div id="cell-42" class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> dollars_by_method.columns:</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    col_index <span class="op">=</span> headers.index(col) <span class="op">+</span> <span class="dv">1</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    col_letter <span class="op">=</span> xw.utils.col_name(col_index)</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    (sheet_new</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>     .<span class="bu">range</span>(<span class="ss">f"</span><span class="sc">{</span>col_letter<span class="sc">}</span><span class="ss">2:</span><span class="sc">{</span>col_letter<span class="sc">}</span><span class="ss">1048576"</span>)</span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>     .number_format) <span class="op">=</span> <span class="st">"$#,##0.00"</span></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
+<p>To format all of the data, we’ll just iterate through the columns and execute that same chunk of code:</p>
+<div id="cell-52" class="cell" data-execution_count="356">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> dollars_by_method.columns:</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    col_index <span class="op">=</span> headers.index(col) <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    col_letter <span class="op">=</span> xw.utils.col_name(col_index)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    selection <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>col_letter<span class="sc">}</span><span class="ss">2:</span><span class="sc">{</span>col_letter<span class="sc">}</span><span class="ss">1048576"</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    sheet_new.<span class="bu">range</span>(selection).number_format <span class="op">=</span> <span class="st">"$#,###.##"</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
 </div>
 <p><img src="4.png" class="img-fluid"></p>
-<div id="cell-44" class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> string</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>string.ascii_uppercase</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="17">
-<pre><code>'ABCDEFGHIJKLMNOPQRSTUVWXYZ'</code></pre>
+</section>
+<section id="text-formatting" class="level3">
+<h3 class="anchored" data-anchor-id="text-formatting">Text Formatting</h3>
+<p>We’ll use a similar process to make the column and index headers bold. I’ll translate the dataframe’s headers into an Excel range as follows:</p>
+<div id="cell-56" class="cell" data-execution_count="357">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>last_column_index <span class="op">=</span> dollars_by_method.reset_index().shape[<span class="dv">1</span>]</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>end_col <span class="op">=</span> xw.utils.col_name(last_column_index)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>selection <span class="op">=</span> <span class="ss">f"A1:</span><span class="sc">{</span>end_col<span class="sc">}</span><span class="ss">1"</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>selection</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="357">
+<pre><code>'A1:F1'</code></pre>
 </div>
 </div>
-<div id="cell-45" class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>end_col <span class="op">=</span> string.ascii_uppercase[dollars_by_method.reset_index().shape[<span class="dv">1</span>]<span class="op">-</span><span class="dv">1</span>]</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>header_range <span class="op">=</span> sheet_new.<span class="bu">range</span>(<span class="ss">f"A1:</span><span class="sc">{</span>end_col<span class="sc">}</span><span class="ss">1"</span>)</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>header_range.font.bold <span class="op">=</span> <span class="va">True</span></span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
+<p>With that range selection, we can access the <a href="https://docs.xlwings.org/en/stable/api/font.html"><code>.font</code> attribute in <code>xlwings</code></a>, which corresponds to the <a href="https://learn.microsoft.com/en-us/office/vba/api/excel.font(object)">Font object</a> in the Excel object model, and set <code>bold = True</code>.</p>
+<div id="cell-58" class="cell" data-execution_count="358">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>header_range <span class="op">=</span> sheet_new.<span class="bu">range</span>(<span class="ss">f"A1:</span><span class="sc">{</span>end_col<span class="sc">}</span><span class="ss">1"</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>header_range.font.bold <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
 </div>
 <p><img src="5.png" class="img-fluid"></p>
-<div id="cell-47" class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>end_row <span class="op">=</span> dollars_by_method.reset_index().shape[<span class="dv">0</span>] <span class="op">+</span> <span class="dv">1</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>header_range <span class="op">=</span> sheet_new.<span class="bu">range</span>(<span class="ss">f"A1:A</span><span class="sc">{</span>end_row<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>header_range.font.bold <span class="op">=</span> <span class="va">True</span></span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
+<p>I’ll do the same with the index, capturing its range then setting <code>bold = True</code></p>
+<div id="cell-61" class="cell" data-execution_count="359">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>end_row <span class="op">=</span> dollars_by_method.reset_index().shape[<span class="dv">0</span>] <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>selection <span class="op">=</span> <span class="ss">f"A1:A</span><span class="sc">{</span>end_row<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>selection</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="359">
+<pre><code>'A1:A6'</code></pre>
+</div>
+</div>
+<div id="cell-62" class="cell" data-execution_count="360">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>header_range <span class="op">=</span> sheet_new.<span class="bu">range</span>(selection)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>header_range.font.bold <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
 </div>
 <p><img src="6.png" class="img-fluid"></p>
-<div id="cell-49" class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>sheet_new.<span class="bu">range</span>(<span class="ss">f"</span><span class="sc">{</span>end_col<span class="sc">}</span><span class="ss">1:</span><span class="sc">{</span>end_col<span class="sc">}{</span>end_row<span class="sc">}</span><span class="ss">"</span>).color <span class="op">=</span> (<span class="dv">242</span>, <span class="dv">242</span>, <span class="dv">242</span>)</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>sheet_new.<span class="bu">range</span>(<span class="ss">f"A</span><span class="sc">{</span>end_row<span class="sc">}</span><span class="ss">:</span><span class="sc">{</span>end_col<span class="sc">}{</span>end_row<span class="sc">}</span><span class="ss">"</span>).color <span class="op">=</span> (<span class="dv">242</span>, <span class="dv">242</span>, <span class="dv">242</span>)</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
+</section>
+<section id="shading-and-borders" class="level3">
+<h3 class="anchored" data-anchor-id="shading-and-borders">Shading and Borders</h3>
+<p>We’ll be doing much the same when it comes to shading in rows/columns – we define a range that captures an entire target row/column, then access the appropriate object to format that range.</p>
+<div id="cell-66" class="cell" data-execution_count="361">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>total_col <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>end_col<span class="sc">}</span><span class="ss">1:</span><span class="sc">{</span>end_col<span class="sc">}{</span>end_row<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>total_col</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="361">
+<pre><code>'F1:F6'</code></pre>
+</div>
+</div>
+<p>In excel, we set colors using RGB codes, which I like to get from <a href="https://htmlcolorcodes.com/">https://htmlcolorcodes.com/</a>, though any color-swatch site shoudl suffice.</p>
+<div id="cell-68" class="cell" data-execution_count="362">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>total_col <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>end_col<span class="sc">}</span><span class="ss">1:</span><span class="sc">{</span>end_col<span class="sc">}{</span>end_row<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>sheet_new.<span class="bu">range</span>(total_col).color <span class="op">=</span> (<span class="dv">242</span>, <span class="dv">242</span>, <span class="dv">242</span>)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>total_row <span class="op">=</span> <span class="ss">f"A</span><span class="sc">{</span>end_row<span class="sc">}</span><span class="ss">:</span><span class="sc">{</span>end_col<span class="sc">}{</span>end_row<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>sheet_new.<span class="bu">range</span>(total_row).color <span class="op">=</span> (<span class="dv">242</span>, <span class="dv">242</span>, <span class="dv">242</span>)</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Total Column:"</span>, total_col, <span class="st">"</span><span class="ch">\n</span><span class="st">Total Row:"</span>, total_row)</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Total Column: F1:F6 
+Total Row: A6:F6</code></pre>
+</div>
 </div>
 <p><img src="7.png" class="img-fluid"></p>
-<div id="cell-51" class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>used_range <span class="op">=</span> sheet_new.used_range</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>used_range</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="21">
-<pre><code>&lt;Range [test.xlsx]first_test!$A$1:$F$6&gt;</code></pre>
+<p>For defining borders, we’ll just access the <a href="https://learn.microsoft.com/en-us/office/vba/api/excel.borders">Borders object</a> from the UsedRange, which will apply the borders only where there is currently data. We set two properties for the Border:</p>
+<ul>
+<li><a href="https://learn.microsoft.com/en-us/office/vba/api/excel.xllinestyle">LineStyle</a>, e.g.&nbsp;solid versus dashed.</li>
+<li><a href="https://learn.microsoft.com/en-us/office/vba/api/excel.xlborderweight">Weight</a>, e.g.&nbsp;hairline versus thick.</li>
+<li>There are several other properties we can change as needed in the <a href="https://learn.microsoft.com/en-us/office/vba/api/excel.borders#properties">Border object’s properties</a>, but I typically just focus on style and weight.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></li>
+</ul>
+<div id="cell-71" class="cell" data-execution_count="363">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>sheet_new.used_range.api.Borders.LineStyle <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>sheet_new.used_range.api.Borders.Weight <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
 </div>
-</div>
-<div id="cell-52" class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>used_range.api.Borders.LineStyle <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>used_range.api.Borders.Weight <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>wb.save()</span></code></pre></div>
-</div>
-<p>https://stackoverflow.com/a/73015199</p>
 <p><img src="8.png" class="img-fluid"></p>
-<section id="package-approach" class="level3">
-<h3 class="anchored" data-anchor-id="package-approach">Package approach</h3>
-<div id="cell-56" class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>sys.path.append(<span class="st">'../../../swiss-code/src'</span>)</span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> swiss_code.excel <span class="im">import</span> excel</span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>load_ext autoreload</span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>autoreload <span class="dv">2</span></span></code></pre></div>
-</div>
-<div id="cell-57" class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>wb <span class="op">=</span> excel.get_or_create_workbook(<span class="st">"test.xlsx"</span>)</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>function_sheet <span class="op">=</span> excel.select_sheet(<span class="st">'function_sheet'</span>, wb)</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>excel.write_df_to_excel(dollars_by_method, function_sheet, bold_indexes<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> dollars_by_method.columns:</span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    excel.format_dollar_column(function_sheet, col)</span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>excel.make_borders(function_sheet)</span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> excel.get_data_bounds(function_sheet)</span>
-<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>grey_rgb <span class="op">=</span> (<span class="dv">242</span>, <span class="dv">242</span>, <span class="dv">242</span>)</span>
-<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>function_sheet.<span class="bu">range</span>(<span class="ss">f"</span><span class="sc">{</span>b[<span class="st">'end_col'</span>]<span class="sc">}</span><span class="ss">1:</span><span class="sc">{</span>b[<span class="st">'end_col'</span>]<span class="sc">}{</span>b[<span class="st">'end_row'</span>]<span class="sc">}</span><span class="ss">"</span>).color <span class="op">=</span> grey_rgb</span>
-<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>function_sheet.<span class="bu">range</span>(<span class="ss">f"A</span><span class="sc">{</span>b[<span class="st">'end_row'</span>]<span class="sc">}</span><span class="ss">:</span><span class="sc">{</span>b[<span class="st">'end_col'</span>]<span class="sc">}{</span>b[<span class="st">'end_row'</span>]<span class="sc">}</span><span class="ss">"</span>).color <span class="op">=</span> grey_rgb</span>
-<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>excel.close_out_book(wb)</span></code></pre></div>
-</div>
 </section>
+</section>
+<section id="a-package-approach" class="level2">
+<h2 class="anchored" data-anchor-id="a-package-approach">A Package approach</h2>
+<p><code>xlwings</code> is great, but sometimes it can be a little involved to bridge the gap between working on a <code>pandas</code> dataframe and an Excel object. For example, formatting a column requires finding that column within Excel then programatically defining its range. This can require a lot of code, so I defined a set of wrapper functions, and eventually an entire class, <code>ExcelDataFrame</code>, to facilitate moving between <code>pandas</code> and Excel. This class is part of the submodule, <code>swiss_code.excel</code>, which is a part of my <a href="https://github.com/peter-amerkhanian/swiss-code">larger <code>swiss_code</code> package</a>.</p>
+<p>You can download as follows:</p>
+<pre><code>pip install git+https://github.com/peter-amerkhanian/swiss-code.git@main</code></pre>
+<div id="cell-76" class="cell" data-execution_count="364">
+<details class="code-fold">
+<summary>Environment specific setup</summary>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>sys.path.append(<span class="st">'../../../swiss-code/src'</span>)</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>load_ext autoreload</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>autoreload <span class="dv">2</span></span></code></pre></div>
+</details>
+</div>
+<p>Once you have the package installed, you can import the <code>excel</code> submodule as follows:</p>
+<div id="cell-78" class="cell" data-execution_count="365">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> swiss_code.excel <span class="im">import</span> excel</span></code></pre></div>
+</div>
+<p>Given a <code>pandas</code> dataframe and an Excel sheet, we can establish an <code>ExcelDataFrame</code> object via the <code>excel.write_df_to_excel</code> function. This will write the <code>pandas</code> dataframe into the Excel sheet, and establish an object tha can be further manipulated.</p>
+<div id="cell-80" class="cell" data-execution_count="366">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>wb <span class="op">=</span> excel.get_or_create_workbook(<span class="st">"test.xlsx"</span>)</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>function_sheet <span class="op">=</span> excel.select_sheet(<span class="st">'function_sheet'</span>, wb)</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>edf <span class="op">=</span> excel.write_df_to_excel(df<span class="op">=</span>dollars_by_method,</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>                              sheet<span class="op">=</span>function_sheet,</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>                              cell_start<span class="op">=</span><span class="st">"A1"</span>)</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>edf</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="366">
+<pre><code>ACTIVE ExcelDataFrame(sheet=function_sheet, range=$A$1:$F$6, df_shape=(5, 5))</code></pre>
+</div>
+</div>
+<p>We’ll now complete all the same formatting tasks as before via method calls:</p>
+<div id="cell-82" class="cell" data-execution_count="367">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> edf.df.columns:</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>    edf.number_format_column(col, <span class="bu">format</span><span class="op">=</span><span class="st">"$#,###.##"</span>)</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>edf.make_borders()</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>edf.format_indices(bold<span class="op">=</span><span class="va">True</span>, color<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>edf.format_row(<span class="st">'Total'</span>, bold<span class="op">=</span><span class="st">"ignore"</span>, color<span class="op">=</span><span class="st">"light_grey"</span>)</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>edf.format_column(<span class="st">'Total'</span>, bold<span class="op">=</span><span class="st">"ignore"</span>, color<span class="op">=</span><span class="st">"light_grey"</span>)</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>excel.close_out_book(wb)</span></code></pre></div>
+</div>
+<p>Once <code>excel.close_out_book(wb)</code> has been called, the <code>edf</code> no longer has an active connection to any workbook.</p>
+<div id="cell-84" class="cell" data-execution_count="368">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>edf</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="368">
+<pre><code> DISCONNECTED ExcelDataFrame(sheet=NA, range=NA, df_shape=(5, 5))</code></pre>
+</div>
+</div>
 </section>
 <section id="complex-tables" class="level2">
 <h2 class="anchored" data-anchor-id="complex-tables">Complex Tables</h2>
-<div id="cell-59" class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'Year'</span>] <span class="op">=</span> df[<span class="st">'date'</span>].dt.year.astype(<span class="bu">str</span>)</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"class"</span>] <span class="op">=</span> df[<span class="st">"category"</span>].<span class="bu">map</span>(</span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Clothing"</span>: <span class="st">"Necessity"</span>,</span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Groceries"</span>: <span class="st">"Necessity"</span>,</span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Electronics"</span>: <span class="st">"Discretionary"</span>,</span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Entertainment"</span>: <span class="st">"Discretionary"</span>,</span>
-<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div id="cell-86" class="cell" data-execution_count="369">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'Year'</span>] <span class="op">=</span> df[<span class="st">'date'</span>].dt.year.astype(<span class="bu">str</span>)</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"class"</span>] <span class="op">=</span> df[<span class="st">"category"</span>].<span class="bu">map</span>(</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Clothing"</span>: <span class="st">"Necessity"</span>,</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Groceries"</span>: <span class="st">"Necessity"</span>,</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Electronics"</span>: <span class="st">"Discretionary"</span>,</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Entertainment"</span>: <span class="st">"Discretionary"</span>,</span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
-<div id="cell-60" class="cell" data-execution_count="157">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>dollars_by_method_yr <span class="op">=</span> df.pivot_table(</span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>[<span class="st">"Year"</span>, <span class="st">"payment_method"</span>], </span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[<span class="st">"class"</span>, <span class="st">"category"</span>],</span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    values<span class="op">=</span><span class="st">"amount"</span>,</span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    aggfunc<span class="op">=</span><span class="st">"sum"</span></span>
-<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>dollars_by_method_yr.index.names <span class="op">=</span> [<span class="st">"Year"</span>, <span class="st">"Payment Method"</span>]</span>
-<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>dollars_by_method_yr.columns.names <span class="op">=</span> [<span class="st">'Class'</span>, <span class="st">'Category'</span>]</span>
-<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>dollars_by_method_yr <span class="op">=</span> dollars_by_method_yr.fillna(<span class="dv">0</span>)</span>
-<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>dollars_by_method_yr</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="157">
+<div id="cell-87" class="cell" data-execution_count="370">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>dollars_by_method_yr <span class="op">=</span> pd.concat(</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>    [df[df[<span class="st">'Year'</span>] <span class="op">==</span> year].pivot_table(index<span class="op">=</span>[<span class="st">"payment_method"</span>], </span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>                                        columns<span class="op">=</span>[<span class="st">"class"</span>, <span class="st">"category"</span>],</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>                                        values<span class="op">=</span><span class="st">"amount"</span>,</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>                                        aggfunc<span class="op">=</span><span class="st">"sum"</span>,</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>                                        margins<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>                                        margins_name<span class="op">=</span><span class="st">"Total"</span>)</span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>                                        .reset_index()</span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>                                        .assign(Year<span class="op">=</span>year)</span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>                                        .set_index([<span class="st">'Year'</span>, <span class="st">'payment_method'</span>])</span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a>                                        <span class="cf">for</span> year <span class="kw">in</span> [<span class="st">'2024'</span>, <span class="st">'2025'</span>, <span class="st">'2026'</span>]],</span>
+<span id="cb50-12"><a href="#cb50-12" aria-hidden="true" tabindex="-1"></a>                                        axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb50-13"><a href="#cb50-13" aria-hidden="true" tabindex="-1"></a>dollars_by_method_yr.index.names <span class="op">=</span> [<span class="st">"Year"</span>, <span class="st">"Payment Method"</span>]</span>
+<span id="cb50-14"><a href="#cb50-14" aria-hidden="true" tabindex="-1"></a>dollars_by_method_yr.columns.names <span class="op">=</span> [<span class="st">'Class'</span>, <span class="st">'Category'</span>]</span>
+<span id="cb50-15"><a href="#cb50-15" aria-hidden="true" tabindex="-1"></a>dollars_by_method_yr <span class="op">=</span> dollars_by_method_yr.fillna(<span class="dv">0</span>)</span>
+<span id="cb50-16"><a href="#cb50-16" aria-hidden="true" tabindex="-1"></a>dollars_by_method_yr.loc[(<span class="st">"Grand Total"</span>, <span class="st">""</span>), :] <span class="op">=</span> df.pivot_table(</span>
+<span id="cb50-17"><a href="#cb50-17" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>[<span class="st">"class"</span>, <span class="st">"category"</span>],</span>
+<span id="cb50-18"><a href="#cb50-18" aria-hidden="true" tabindex="-1"></a>    values<span class="op">=</span><span class="st">"amount"</span>,</span>
+<span id="cb50-19"><a href="#cb50-19" aria-hidden="true" tabindex="-1"></a>    aggfunc<span class="op">=</span><span class="st">"sum"</span>,</span>
+<span id="cb50-20"><a href="#cb50-20" aria-hidden="true" tabindex="-1"></a>    margins<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb50-21"><a href="#cb50-21" aria-hidden="true" tabindex="-1"></a>    margins_name<span class="op">=</span><span class="st">"Total"</span>)[<span class="st">"amount"</span>]</span>
+<span id="cb50-22"><a href="#cb50-22" aria-hidden="true" tabindex="-1"></a>dollars_by_method_yr</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="370">
 <div>
 
 
@@ -721,14 +793,16 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <th data-quarto-table-cell-role="th">Class</th>
 <th colspan="2" data-quarto-table-cell-role="th" data-halign="left">Discretionary</th>
 <th colspan="2" data-quarto-table-cell-role="th" data-halign="left">Necessity</th>
+<th data-quarto-table-cell-role="th">Total</th>
 </tr>
-<tr class="odd">
+<tr class="even">
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th">Category</th>
 <th data-quarto-table-cell-role="th">Electronics</th>
 <th data-quarto-table-cell-role="th">Entertainment</th>
 <th data-quarto-table-cell-role="th">Clothing</th>
 <th data-quarto-table-cell-role="th">Groceries</th>
+<th data-quarto-table-cell-role="th"></th>
 </tr>
 <tr class="header">
 <th data-quarto-table-cell-role="th">Year</th>
@@ -737,16 +811,18 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td rowspan="4" data-quarto-table-cell-role="th" data-valign="top">2024</td>
+<td rowspan="5" data-quarto-table-cell-role="th" data-valign="top">2024</td>
 <td data-quarto-table-cell-role="th">Cash</td>
 <td>5182.41</td>
 <td>8661.28</td>
 <td>5709.71</td>
 <td>6552.53</td>
+<td>26105.93</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Credit Card</td>
@@ -754,6 +830,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <td>5334.29</td>
 <td>5846.53</td>
 <td>7983.28</td>
+<td>22141.09</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Debit Card</td>
@@ -761,6 +838,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <td>4998.41</td>
 <td>4887.89</td>
 <td>5603.41</td>
+<td>22487.68</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">PayPal</td>
@@ -768,43 +846,65 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <td>7034.34</td>
 <td>5225.22</td>
 <td>3945.90</td>
+<td>21854.73</td>
 </tr>
 <tr class="odd">
-<td rowspan="4" data-quarto-table-cell-role="th" data-valign="top">2025</td>
+<td data-quarto-table-cell-role="th">Total</td>
+<td>20806.64</td>
+<td>26028.32</td>
+<td>21669.35</td>
+<td>24085.12</td>
+<td>92589.43</td>
+</tr>
+<tr class="even">
+<td rowspan="5" data-quarto-table-cell-role="th" data-valign="top">2025</td>
 <td data-quarto-table-cell-role="th">Cash</td>
 <td>6148.02</td>
 <td>5110.80</td>
 <td>4651.67</td>
 <td>7717.81</td>
+<td>23628.30</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td data-quarto-table-cell-role="th">Credit Card</td>
 <td>4618.44</td>
 <td>5946.31</td>
 <td>6843.13</td>
 <td>5828.80</td>
+<td>23236.68</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td data-quarto-table-cell-role="th">Debit Card</td>
 <td>6606.99</td>
 <td>7087.51</td>
 <td>5801.20</td>
 <td>4554.53</td>
+<td>24050.23</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td data-quarto-table-cell-role="th">PayPal</td>
 <td>5220.53</td>
 <td>5592.94</td>
 <td>6203.22</td>
 <td>3442.25</td>
+<td>20458.94</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Total</td>
+<td>22593.98</td>
+<td>23737.56</td>
+<td>23499.22</td>
+<td>21543.39</td>
+<td>91374.15</td>
 </tr>
 <tr class="odd">
-<td rowspan="4" data-quarto-table-cell-role="th" data-valign="top">2026</td>
+<td rowspan="5" data-quarto-table-cell-role="th" data-valign="top">2026</td>
 <td data-quarto-table-cell-role="th">Cash</td>
 <td>5696.04</td>
 <td>4436.08</td>
 <td>4654.62</td>
 <td>3972.54</td>
+<td>18759.28</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Credit Card</td>
@@ -812,6 +912,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <td>4772.25</td>
 <td>3385.26</td>
 <td>6375.17</td>
+<td>17897.89</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Debit Card</td>
@@ -819,6 +920,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <td>2278.07</td>
 <td>3343.14</td>
 <td>7030.73</td>
+<td>16372.94</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">PayPal</td>
@@ -826,6 +928,24 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <td>4224.89</td>
 <td>2715.40</td>
 <td>4676.99</td>
+<td>15856.32</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Total</td>
+<td>17021.29</td>
+<td>15711.29</td>
+<td>14098.42</td>
+<td>22055.43</td>
+<td>68886.43</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Grand Total</td>
+<td data-quarto-table-cell-role="th"></td>
+<td>60421.91</td>
+<td>65477.17</td>
+<td>59266.99</td>
+<td>67683.94</td>
+<td>252850.01</td>
 </tr>
 </tbody>
 </table>
@@ -833,11 +953,37 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </div>
 </div>
 </div>
+<div id="cell-88" class="cell" data-execution_count="371">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>wb <span class="op">=</span> excel.get_or_create_workbook(<span class="st">"test.xlsx"</span>)</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>complex_sheet <span class="op">=</span> excel.select_sheet(<span class="st">'complex_sheet'</span>, wb)</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>edf <span class="op">=</span> excel.write_df_to_excel(dollars_by_method_yr,</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>                              complex_sheet,</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>                              cell_start<span class="op">=</span><span class="st">"A1"</span>)</span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>edf.merge_axis(index<span class="op">=</span><span class="dv">1</span>, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>edf.merge_axis(index<span class="op">=</span><span class="dv">1</span>, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>edf.format_indices(bold<span class="op">=</span><span class="va">True</span>, color<span class="op">=</span><span class="st">"light_grey"</span>)</span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> edf.df.columns:</span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>    edf.number_format_column(col, <span class="bu">format</span><span class="op">=</span><span class="st">"$#,###.##"</span>)</span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year <span class="kw">in</span> df[<span class="st">'Year'</span>].unique():</span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a>    edf.format_row((year, <span class="st">'Total'</span>), bold<span class="op">=</span><span class="va">True</span>, color<span class="op">=</span><span class="st">"light_grey"</span>)</span>
+<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a>edf.format_row((<span class="st">'Grand Total'</span>, <span class="st">''</span>), bold<span class="op">=</span><span class="va">True</span>, color<span class="op">=</span><span class="st">"light_grey"</span>)</span>
+<span id="cb51-14"><a href="#cb51-14" aria-hidden="true" tabindex="-1"></a>edf.format_column((<span class="st">'Total'</span>, <span class="st">''</span>), bold<span class="op">=</span><span class="va">True</span>, color<span class="op">=</span><span class="st">"light_grey"</span>)</span>
+<span id="cb51-15"><a href="#cb51-15" aria-hidden="true" tabindex="-1"></a>edf.make_borders()</span>
+<span id="cb51-16"><a href="#cb51-16" aria-hidden="true" tabindex="-1"></a>excel.close_out_book(wb)</span></code></pre></div>
+</div>
+<p><img src="complex.png" class="img-fluid"></p>
 
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{amerkhanian2025,
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>Dealing with the Application in <code>xlwings</code> is optional, and the workflow outlined in this blog just ignores it.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>I found out about these pages through this <a href="https://stackoverflow.com/questions/73014614/win32com-linestyle-excel/73015199#73015199">excellent stackoverflow answer</a><a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{amerkhanian2025,
   author = {Amerkhanian, Peter},
   title = {Using {The} {Excel} {Object} {Model} in {Python}},
   date = {2025-03-12},
@@ -1035,7 +1181,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {
