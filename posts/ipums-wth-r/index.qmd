@@ -191,8 +191,8 @@ median household income in Oakland, California in 2022?**
 To answer that we will:
 
 1.  Get income data from the 2022 1-year ACS (@sec-step-1).
-2.  Filter our data down to households in the city of Oakland (@sec-step-2
-    and @sec-step-3).
+2.  Filter our data down to households in the city of Oakland
+    (@sec-step-2 and @sec-step-3).
 3.  Calculate the median (@sec-step-4 and @sec-step-5).
 
 ## Step 1: Retrieving data {#sec-step-1}
@@ -445,16 +445,17 @@ source area contained in the target area -- in this case the proportion
 of the PUMA population that belongs to Oakland. In this case, 100% of
 the populations in PUMAs 111, 112, 113, and 123 belong to Oakland, and
 0% of PUMA 114. GEOCORR does believe that 9 individuals from 114 live in
-Oakland, but based on the AFACT of 0 and the fact that I know the PUMA overlays the neighboring city of Piedmont, I'll feel comfortable dropping
-that PUMA.[^5]
-
-Note that when you plot place to PUMA equivalence, you
-may find slight differences due to the fact that places can include
-un-populated areas, such as bodies of water [in the case of
-Oakland](https://www.google.com/maps/place/Oakland,+CA/@37.7831602,-122.3045548,11z/data=!4m6!3m5!1s0x80857d8b28aaed03:0x71b415d535759367!8m2!3d37.8043514!4d-122.2711639!16zL20vMGRjOTU?entry=ttu&g_ep=EgoyMDI1MDIxMi4wIKXMDSoJLDEwMjExNDU1SAFQAw%3D%3D).
+Oakland, but based on the AFACT of 0 and the fact that I know the PUMA
+overlays the neighboring city of Piedmont, I'll feel comfortable
+dropping that PUMA.[^5]
 
 [^5]: Were the AFACT higher, e.g. 1%, I could randomly sample 1% of the
     individuals from that PUMA and include them in my Oakland sample.
+
+Note that when you plot place to PUMA equivalence, you may find slight
+differences due to the fact that places can include un-populated areas,
+such as bodies of water [in the case of
+Oakland](https://www.google.com/maps/place/Oakland,+CA/@37.7831602,-122.3045548,11z/data=!4m6!3m5!1s0x80857d8b28aaed03:0x71b415d535759367!8m2!3d37.8043514!4d-122.2711639!16zL20vMGRjOTU?entry=ttu&g_ep=EgoyMDI1MDIxMi4wIKXMDSoJLDEwMjExNDU1SAFQAw%3D%3D).
 
 ```{r fig.asp = .58}
 #| code-fold: true
@@ -502,8 +503,8 @@ plot_grid(map_places, map_pumas, nrow = 1, align = "h", axis = "t", vjust = 0)
 ```
 
 Filtering to those PUMAs gets us the 2022 1-year ACS microdata for the
-City of Oakland (I use `haven::zap_labels()` just to remove
-some unnecessary formatting that comes with the data).
+City of Oakland (I use `haven::zap_labels()` just to remove some
+unnecessary formatting that comes with the data).
 
 ```{r}
 #| label: tbl-oakland-raw
@@ -517,35 +518,65 @@ oak %>% head()
 
 ## Step 3: Units of Analysis {#sec-step-3}
 
-Each row in the ACS microdata is an individual, identified by a unique
-combination of `SAMPLE`, which defines the year when the individual was
-surveyed, `SERIAL`, a unique identifier for that individual's household,
-and `PERNUM`, a unique identifier for the individual within their
-household [@ruggles_ipums_2024]. Thus, we can identify units as follows:
+Each row in the ACS microdata represents an individual, identified by a
+unique combination of `SAMPLE`, which defines the year when the
+individual was surveyed, `SERIAL`, a unique identifier for that
+individual's household, and `PERNUM`, a unique identifier for the
+individual within their household [@ruggles_ipums_2024]. Given that, we
+can define a straightforward definition for unique individuals in the
+ACS:
 
--   **Households**: The combination of `SAMPLE` and `SERIAL` provides a
-    unique identifier for every household in the IPUMS
 -   **Individuals**: The combination of `SAMPLE`, `SERIAL`, and `PERNUM`
-    provides a unique identifier for every person in the IPUMS
+    provides a unique identifier for every person in the IPUMS. ACS
+    microdata is typically individual-level, so this filtering should
+    not be necessary.
 
-We can group by these variable combinations and see how many individuals
-and households were surveyed across PUMAs in Oakland for the 2022 1-year
-ACS. We can see that each row in the data represents an individual
-(`n_rows` equals `n_individuals`) and, as we would expect, the number of
-households is much lower than the number of individuals.
+Defining a household is slightly more complex.
+
+-   **Housing Units**: The combination of `SAMPLE` and `SERIAL` provides
+    a unique identifier for every housing unit in the IPUMS. However,
+    this includes both households and general group quarter housing,
+    e.g. correctional facilities. Housing units are further categorized
+    using the
+    [`GQ`]((https://usa.ipums.org/usa-action/variables/GQ#description_section))
+    variable.
+-   **Households**: Non group quarter housing units, defined by
+    filtering housing units to those where `GQ`, is 1 or 2
+    [@bloem_matching_2018]. The [comparability
+    section](https://usa.ipums.org/usa-action/variables/GQ#comparability_section)
+    of the `GQ` variable documentation explains this choice in greater
+    detail, but in short it represents non-institutional housing-units
+    where 9 or fewer people unrelated to the head-of-household reside.
+
+We can group/filter by these variable combinations and see how many
+individuals, housing units, and households were surveyed across PUMAs in
+Oakland for the 2022 1-year ACS.
 
 ```{r}
 #| label: tbl-granularity
 #| tbl-cap: "Oakland Dataset Granularity by PUMA"
-oak %>% group_by(PUMA) %>% summarise(
-  n_rows = n(),
-  n_individuals = n_distinct(SAMPLE, SERIAL, PERNUM),
-  n_households = n_distinct(SAMPLE, SERIAL)
-  )
+oak %>%
+  group_by(PUMA) %>%
+  summarise(
+    n_rows = n(),
+    n_individuals = n_distinct(SAMPLE, SERIAL, PERNUM),
+    n_housing_units = n_distinct(SAMPLE, SERIAL)) %>%
+  inner_join(oak %>%
+               filter(GQ <= 2) %>%
+               group_by(PUMA) %>%
+               summarise(n_households = n_distinct(SAMPLE, SERIAL)),
+             by = join_by(PUMA))
 ```
 
-I'll also randomly select a household in the data to see what such a
-unit looks like in practice.
+We see that each row in the data represents an individual (`n_rows`
+equals `n_individuals`) and, as we would expect, the number of housing
+units and households are successively lower than the number of
+individuals.
+
+### Households, group quarters, and institutions
+
+I'll randomly select a household in the data to see what such a unit
+looks like in practice.
 
 ```{r}
 #| label: tbl-example-hh
@@ -553,20 +584,87 @@ unit looks like in practice.
 #| code-fold: true
 
 household_serials <- oak %>%
+  filter(GQ <= 2) %>%
   group_by(SERIAL) %>%
   count() %>%
   filter(n > 1) %>%
   pull(SERIAL)
-set.seed(2)
-sample_household <- sample(household_serials, 1)
-n <- oak %>% filter(SERIAL == sample_household) %>% dim() %>% .[1]
-oak %>% filter(SERIAL == sample_household) %>% 
-  select(c(SERIAL, PERNUM, AGE, SEX, HHINCOME, INCTOT))
+set.seed(5)
+sample_household_true <- sample(household_serials, 1)
+n <- oak %>% filter(SERIAL == sample_household_true) %>% dim() %>% .[1]
+oak %>% filter(SERIAL == sample_household_true) %>% 
+  select(c(SERIAL, GQ, PERNUM, RELATE, AGE, SEX, HHINCOME, INCTOT))
 ```
 
-Here we can see that this household, with `SERIAL`
-`{r} format(sample_household, scientific=FALSE)` has `{r} n` members,
-each with a unique `PERNUM`.
+This household, with `SERIAL`
+`{r} format(sample_household_true, scientific=FALSE)` has `{r} n` members,
+each with a unique `PERNUM`. To identify household members' relationship
+to the head-of-household, [we reference
+`RELATE`](https://usa.ipums.org/usa-action/variables/RELATE#codes_section).
+The first row, where `RELATE==1` denotes a 41 year old female (`SEX==2`)
+head-of-household. The second, where `RELATE==2` denotes their spouse,
+in this case a 40 year old male. This couple has two children
+(`RELATE==3`) and the husband's mother (`RELATE==6`), also living in the
+household.
+
+We can contrast that fairly "nuclear family" household with a
+non-institutional group-quarters housing unit in Oakland:
+
+```{r}
+#| tbl-cap: "An example group quarters unit with income data"
+#| code-fold: true
+#| label: tbl-example-gq
+household_serials <- oak %>%
+  filter(GQ == 5) %>%
+  pull(SERIAL)
+set.seed(6)
+sample_household <- sample(household_serials, 1)
+sampled_data <- oak %>% 
+  filter(SERIAL == sample_household) %>% 
+  select(SERIAL, PUMA, GQ, PERNUM, RELATE, AGE, SEX, HHINCOME, INCTOT)
+sampled_data
+```
+
+We see that there is a head-of-household, a 26 year old male, but all 10
+other housing unit members are "partners, friends, \[or\] visitors"
+(`RELATE==11`). These are largely adults with earnings, so this group
+quarters unit would have a very high "household income" were it included
+for that calculation.
+
+Group quarters also include institutional housing units, such as
+correctional facilities.
+
+```{r}
+#| tbl-cap: "An example institutional housing unit with income data"
+#| code-fold: true
+#| label: tbl-example-ih
+household_serials <- oak %>%
+  filter(GQ == 3) %>%
+  pull(SERIAL)
+set.seed(1)
+sample_household <- sample(household_serials, 1)
+sampled_data <- oak %>% 
+  filter(SERIAL == sample_household) %>% 
+  select(SERIAL, PUMA, GQ, PERNUM, RELATE, AGE, SEX, HHINCOME, INCTOT)
+sampled_data
+```
+
+This housing unit only includes one member, an 86 year old woman who is
+an "institutional inmate" (`RELATE==13`) with no income.
+
+So, given that our motivating question concerns household income, we can
+apply the following filtering and isolate just the heads of all the
+households in Oakland.
+
+```{r}
+households <- oak %>%
+  filter(
+    PERNUM == 1,
+    GQ <= 2
+    )
+```
+
+### Household Income in the ACS
 
 Let's return to the motivating question – **what was the median
 household income in Oakland, California in 2022?** Note the income
@@ -592,9 +690,11 @@ answering our motivating question – every household in Oakland that had
 household income.
 
 ```{r}
-households_w_income <- oak %>%
-  distinct(SAMPLE, SERIAL, .keep_all = TRUE) %>% 
-  filter(HHINCOME != 9999999, HHINCOME > 0)
+households_w_income <- households %>%
+  filter(
+    HHINCOME != 9999999,
+    HHINCOME >= 0,
+    )
 ```
 
 It seems we can proceed to simply calculate the median of the `HHINCOME`
@@ -609,22 +709,28 @@ variables `PERWT` and `HHWT`.
 ```{r}
 #| label: tbl-example-hh-weights
 #| tbl-cap: "An example household with weight data"
-oak %>% filter(SERIAL == sample_household) %>% 
+oak %>% filter(SERIAL == sample_household_true) %>% 
   select(c(AGE, SEX, HHINCOME, INCTOT, PERWT, HHWT))
 ```
 
 These are the two primary sample weights in ACS microdata, and they can
-be interpreted fairly directly.  
+be interpreted fairly directly.
 
-- `PERWT` gives the population represented by each individual in the sample, thus in the first row of the sample household, the 31 year old woman with an individual income of \$9,300 represents 62 individuals in the PUMA.
-- `HHWT` gives the number of households in the general population represented by each household in the sample, thus this household is representative of 62 households in that PUMA.
+-   `PERWT` gives the population represented by each individual in the
+    sample, thus in the first row of the sample household, the 41 year
+    old woman with an individual income of \$104,500 represents 51
+    individuals in the PUMA.
+-   `HHWT` gives the number of households in the general population
+    represented by each household in the sample, thus this household is
+    representative of 51 households in that PUMA.
 
 Any analysis or visualization of ACS microdata should be weighted by
-`PERWT` for work at the person-level, and `HHWT` for the household-level [See
-[Sample Weights](https://usa.ipums.org/usa/intro.shtml#weights) in
+`PERWT` for work at the person-level, and `HHWT` for the household-level
+[See [Sample Weights](https://usa.ipums.org/usa/intro.shtml#weights) in
 @ruggles_ipums_2024].
 
-For visualizations, we pass the weights to the plotting API. For example, in `ggplot` many chart types support a `weight` argument.
+For visualizations, we pass the weights to the plotting API. For
+example, in `ggplot` many chart types support a `weight` argument.
 
 ```{r fig.asp = .5}
 #| fig-cap: "Household Income Distribution in Oakland (with household weights)"
@@ -644,11 +750,12 @@ ggplot(households_w_income, aes(x = HHINCOME, weight = HHWT)) +
   labs(x = "Household Income", y = "Number of Households")
 ```
 
-For analysis, we use the [`srvyr`](http://gdfe.co/srvyr/reference/index.html)
-package to define the survey weights before using them to
-calculate statistics. For example, here we'll finally address the motivating question. **The median
-household income in Oakland in 2022** as measured in the IPUMS microdata
-was as follows:
+For analysis, we use the
+[`srvyr`](http://gdfe.co/srvyr/reference/index.html) package to define
+the survey weights before using them to calculate statistics. For
+example, here we'll finally address the motivating question. **The
+median household income in Oakland in 2022** as measured in the IPUMS
+microdata was as follows:
 
 ```{r}
 #| label: tbl-answer
@@ -708,16 +815,16 @@ ACS](https://usa.ipums.org/usa/chapter2/chapter2.shtml#ACS) in
 ## Step 5: Calculating standard errors {#sec-step-5}
 
 Now we have estimates derived from the ACS microdata, but how do we
-communicate uncertainty around those estimates? For the sake of this example, let's explore the problem of standard
-errors via a slightly different motivating question -- **what was the
-average household income in Oakland in 2022**?  
+communicate uncertainty around those estimates? For the sake of this
+example, let's explore the problem of standard errors via a slightly
+different motivating question -- **what was the average household income
+in Oakland in 2022**?
 
-I'm switching to the
-average because we are about to calculate some standard errors
-from-scratch, and that's much more clear-cut for linear statistics like
-the average than for non-linear statistics like the median. We will
-return to the median at the end of this section, but rely on a package
-implementation and not do anything from-scratch.
+I'm switching to the average because we are about to calculate some
+standard errors from-scratch, and that's much more clear-cut for linear
+statistics like the average than for non-linear statistics like the
+median. We will return to the median at the end of this section, but
+rely on a package implementation and not do anything from-scratch.
 
 Anyways, let's calculate the average household income in Oakland using
 the sample household weights. The [formula for the weighted
@@ -753,14 +860,14 @@ R's [`survey`
 package](https://r-survey.r-forge.r-project.org/survey/#:~:text=Variances%20by%20Taylor%20linearization))
 default to using the Taylor series method for variance estimation of
 weighted statistics. This is because weighted statistics, like the
-average above, are not linear with respect to the weights, making analytical calculation of
-the variance difficult or else undefined [@lohr_sampling_2021]. The
-Taylor series method entails calculating the first-order linear
-approximation of the statistic (e.g. the linear approximation of the
-weighted mean formula above), then finding the variance of that
-approximation. The details of those calculations are beyond the scope of
-this post, but [@lohr_sampling_2021, chap 9.1] covers the process in
-detail, and Wikipedia has a nice
+average above, are not linear with respect to the weights, making
+analytical calculation of the variance difficult or else undefined
+[@lohr_sampling_2021]. The Taylor series method entails calculating the
+first-order linear approximation of the statistic (e.g. the linear
+approximation of the weighted mean formula above), then finding the
+variance of that approximation. The details of those calculations are
+beyond the scope of this post, but [@lohr_sampling_2021, chap 9.1]
+covers the process in detail, and Wikipedia has a nice
 [walkthrough](https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Variance_of_the_weighted_mean_(%CF%80-estimator_for_ratio-mean))
 as well. We will just work with the formula for linearized variance that
 is arrived at in the Wikipedia post:
@@ -804,10 +911,11 @@ replication weights method when working with ACS microdata.
 
 ### Replication weights
 
-In theory, the [standard error](https://en.wikipedia.org/wiki/Standard_error) of an estimate measures the variation of a
-statistic across multiple samples from a given population. Our sample
-standard error above, calculated using just the one sample, is an
-estimate of that theoretical standard error.
+In theory, the [standard
+error](https://en.wikipedia.org/wiki/Standard_error) of an estimate
+measures the variation of a statistic across multiple samples from a
+given population. Our sample standard error above, calculated using just
+the one sample, is an estimate of that theoretical standard error.
 
 Replicate methods operate under the assumption that one sample can be
 conceived of as a miniature version of the population. Instead of taking
@@ -815,9 +923,10 @@ multiple samples from the population to construct a variance estimator,
 one may simply resample from the full, original sample to mimic the
 theoretical basis of standard errors [@lohr_sampling_2021, chap 9.1].
 
-In practice, we don't explicitly do any resampling, instead relying on "replicate weights" that the census pre-computes. Here we can see
-what replicate weights (in this case, household replicate weights) look
-like in our data. Each of `REPWT`, 1 through 80, is a set of alternative
+In practice, we don't explicitly do any resampling, instead relying on
+"replicate weights" that the census pre-computes. Here we can see what
+replicate weights (in this case, household replicate weights) look like
+in our data. Each of `REPWT`, 1 through 80, is a set of alternative
 household weights, slightly different from the "production weight,"
 `HHWT`.
 
@@ -835,8 +944,8 @@ estimates. In the IPUMS documentation on ACS replicate weights, they
 outline a [variance estimation
 procedure](https://usa.ipums.org/usa/repwt.shtml#:~:text=can%20change%20substantially.-,HOW%20DO%20I%20OBTAIN%20REPLICATE%20STANDARD%20ERRORS%20FROM%20IPUMS%2DUSA%20DATA%3F,-There%20are%203)
 that matches the "successive difference replication (SDR) variance"
-method. We obtain SDR variance by calculating our statistic
-of interest with the production weights (e.g. `HHWT`) as follows:\
+method. We obtain SDR variance by calculating our statistic of interest
+with the production weights (e.g. `HHWT`) as follows:\
 $$
 \bar{X}_w = \frac{\sum_{i=1}^{n}\text{HHWT}_ix_i}{\sum_{i=1}^{n}\text{HHWT}_i}
 $$
@@ -853,9 +962,11 @@ Specifically: $$
 \end{align*}
 $$
 
-[@fay_aspects_1995] initially proposed that variance estimator and [their
-paper](https://www.census.gov/content/dam/Census/library/working-papers/1995/demo/faytrain95.pdf) gives the full derivation. The standard error is once again just
-the square root of that variance.
+[@fay_aspects_1995] initially proposed that variance estimator and
+[their
+paper](https://www.census.gov/content/dam/Census/library/working-papers/1995/demo/faytrain95.pdf)
+gives the full derivation. The standard error is once again just the
+square root of that variance.
 
 $$
 \hat{\text{SE}}(\bar{X}_w) = \sqrt{\hat{\text{Var}}(\bar{X}_w)}
@@ -1028,7 +1139,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-df = pd.DataFrame(r['households_w_income'])
+df = pd.DataFrame(r['oak_hh_w_inc'])
 
 fig, ax = plt.subplots(figsize=(3, 3))
 sns.kdeplot(data=df, x='HHINCOME', weights="HHWT", ax=ax, fill=True, alpha=.5, log_scale=True, legend=False, cmap="coolwarm")
