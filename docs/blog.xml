@@ -9,8 +9,19 @@
 <link>https://peter-amerkhanian.com/blog.html</link>
 <atom:link href="https://peter-amerkhanian.com/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Peter Amerkhanian&#39;s Blog</description>
-<generator>quarto-1.5.57</generator>
-<lastBuildDate>Thu, 20 Feb 2025 08:00:00 GMT</lastBuildDate>
+<generator>quarto-1.6.40</generator>
+<lastBuildDate>Wed, 12 Mar 2025 07:00:00 GMT</lastBuildDate>
+<item>
+  <title>Using The Excel Object Model in Python</title>
+  <dc:creator>Peter Amerkhanian</dc:creator>
+  <link>https://peter-amerkhanian.com/posts/excel-wings/</link>
+  <description><![CDATA[ Programmatically interact with Excel using xlwings and pywin32 to produce formatted tables. ]]></description>
+  <category>Python</category>
+  <category>Data Management</category>
+  <guid>https://peter-amerkhanian.com/posts/excel-wings/</guid>
+  <pubDate>Wed, 12 Mar 2025 07:00:00 GMT</pubDate>
+  <media:content url="https://peter-amerkhanian.com/posts/excel-wings/thumbnail.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
 <item>
   <title>Working with ACS microdata in R</title>
   <dc:creator>Peter Amerkhanian</dc:creator>
