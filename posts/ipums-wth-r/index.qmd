@@ -597,7 +597,8 @@ households <- oak %>%
     )
 ```
 
-But to build a little intuition around that selection, let's also look at what different housing units look like, and *why* the household definition is restrictive. 
+But to build a little intuition around that selection, let's also look at what different housing units look like, and *why* the household definition is restrictive.  
+
 #### A household
 I'll randomly select a household in the data to see what such a unit
 looks like in practice.
