@@ -61,8 +61,13 @@ Use Microdata Series (IPUMS).[^1] I cover:
     replication weights for accurate analysis and uncertainty
     estimation.
 
-I'll start with a motivating question: **What was the median household
-income in Oakland, California in 2022?**
+I'll start with a motivating question:  
+
+::: {.callout-tip}
+## Motivating Question
+**What was the median household
+income in Oakland, California in 2022?**  
+:::
 
 ## Aggregate data with `tidycensus`
 
@@ -185,8 +190,13 @@ estimates come from a smaller, but more contemporary sample. In our case
 we'll use the one-year to get the best sense of the 2022 income
 dynamics.
 
-Let's return to the motivating question for this post: **What was the
-median household income in Oakland, California in 2022?**
+Let's return to the motivating question for this post:  
+
+::: {.callout-tip}
+## Motivating Question
+**What was the median household
+income in Oakland, California in 2022?**  
+:::
 
 To answer that we will:
 
@@ -516,7 +526,7 @@ oak <- data %>%
 oak %>% head()
 ```
 
-## Step 3: Units of Analysis {#sec-step-3}
+## Step 3: Specify the unit of analysis {#sec-step-3}
 
 Each row in the ACS microdata represents an individual, identified by a
 unique combination of `SAMPLE`, which defines the year when the
@@ -540,13 +550,14 @@ Defining a household is slightly more complex.
     using the
     [`GQ`]((https://usa.ipums.org/usa-action/variables/GQ#description_section))
     variable.
--   **Households**: Non group quarter housing units, defined by
-    filtering housing units to those where `GQ`, is 1 or 2
-    [@bloem_matching_2018]. The [comparability
-    section](https://usa.ipums.org/usa-action/variables/GQ#comparability_section)
-    of the `GQ` variable documentation explains this choice in greater
-    detail, but in short it represents non-institutional housing-units
-    where 9 or fewer people unrelated to the head-of-household reside.
+    -   **Households**: Non group quarter housing units, defined by
+        filtering housing units to those where `GQ`, is 1 or 2
+        [@bloem_matching_2018]. The [comparability
+        section](https://usa.ipums.org/usa-action/variables/GQ#comparability_section)
+        of the `GQ` variable documentation explains this choice in
+        greater detail, but in short it represents non-institutional
+        housing-units where 9 or fewer people unrelated to the
+        head-of-household reside.
 
 We can group/filter by these variable combinations and see how many
 individuals, housing units, and households were surveyed across PUMAs in
@@ -575,6 +586,19 @@ individuals.
 
 ### Households, group quarters, and institutions
 
+So, given that our motivating question concerns household income, we can
+apply the following filtering, per [@bloem_matching_2018], and isolate just the heads of all the households in Oakland.
+
+```{r}
+households <- oak %>%
+  filter(
+    PERNUM == 1,
+    GQ <= 2
+    )
+```
+
+But to build a little intuition around that selection, let's also look at what different housing units look like, and *why* the household definition is restrictive. 
+#### A household
 I'll randomly select a household in the data to see what such a unit
 looks like in practice.
 
@@ -597,9 +621,9 @@ oak %>% filter(SERIAL == sample_household_true) %>%
 ```
 
 This household, with `SERIAL`
-`{r} format(sample_household_true, scientific=FALSE)` has `{r} n` members,
-each with a unique `PERNUM`. To identify household members' relationship
-to the head-of-household, [we reference
+`{r} format(sample_household_true, scientific=FALSE)` has `{r} n`
+members, each with a unique `PERNUM`. To identify household members'
+relationship to the head-of-household, [we reference
 `RELATE`](https://usa.ipums.org/usa-action/variables/RELATE#codes_section).
 The first row, where `RELATE==1` denotes a 41 year old female (`SEX==2`)
 head-of-household. The second, where `RELATE==2` denotes their spouse,
@@ -607,6 +631,7 @@ in this case a 40 year old male. This couple has two children
 (`RELATE==3`) and the husband's mother (`RELATE==6`), also living in the
 household.
 
+#### Non-institutional group-quarters
 We can contrast that fairly "nuclear family" household with a
 non-institutional group-quarters housing unit in Oakland:
 
@@ -628,9 +653,10 @@ sampled_data
 We see that there is a head-of-household, a 26 year old male, but all 10
 other housing unit members are "partners, friends, \[or\] visitors"
 (`RELATE==11`). These are largely adults with earnings, so this group
-quarters unit would have a very high "household income" were it included
+quarters unit would have a very high "household income" and bias the estimated median income up were it included
 for that calculation.
 
+#### Institutional housing units
 Group quarters also include institutional housing units, such as
 correctional facilities.
 
@@ -650,24 +676,19 @@ sampled_data
 ```
 
 This housing unit only includes one member, an 86 year old woman who is
-an "institutional inmate" (`RELATE==13`) with no income.
-
-So, given that our motivating question concerns household income, we can
-apply the following filtering and isolate just the heads of all the
-households in Oakland.
-
-```{r}
-households <- oak %>%
-  filter(
-    PERNUM == 1,
-    GQ <= 2
-    )
-```
+an "institutional inmate" (`RELATE==13`) with no income. This unit would likely bias median household income down, were it included.
 
 ### Household Income in the ACS
 
-Let's return to the motivating question – **what was the median
-household income in Oakland, California in 2022?** Note the income
+Let's return to the motivating question:  
+
+::: {.callout-tip}
+## Motivating Question
+**What was the median household
+income in Oakland, California in 2022?**  
+:::  
+
+Note the income
 variables we observe for this family:
 
 1.  `INCTOT` reports each respondent's total pre-tax personal income or
@@ -753,9 +774,16 @@ ggplot(households_w_income, aes(x = HHINCOME, weight = HHWT)) +
 For analysis, we use the
 [`srvyr`](http://gdfe.co/srvyr/reference/index.html) package to define
 the survey weights before using them to calculate statistics. For
-example, here we'll finally address the motivating question. **The
-median household income in Oakland in 2022** as measured in the IPUMS
-microdata was as follows:
+example, here we'll finally address the motivating question.  
+
+::: {.callout-tip}
+## Motivating Question
+**What was the median household
+income in Oakland, California in 2022?**  
+:::
+
+The answer, as measured in the IPUMS
+microdata is as follows:
 
 ```{r}
 #| label: tbl-answer
