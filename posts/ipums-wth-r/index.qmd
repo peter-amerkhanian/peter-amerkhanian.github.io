@@ -3,7 +3,7 @@ title: "Working with ACS microdata in R"
 bibliography: "../../blog.bib"
 author: "Peter Amerkhanian"
 date: "2025-02-20"
-description: "Using `ipumsr`, geocorr, and `survey` to analyze a small-geography in IPUMS data."
+description: "What's the median household income in Oakland? Using `ipumsr`, geocorr, and `survey` to analyze census micro-data for a small-geography."
 draft: false
 image: thumbnail.png
 engine: knitr

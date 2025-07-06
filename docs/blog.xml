@@ -15,7 +15,7 @@
   <title>Using The Excel Object Model in Python</title>
   <dc:creator>Peter Amerkhanian</dc:creator>
   <link>https://peter-amerkhanian.com/posts/excel-wings/</link>
-  <description><![CDATA[ Programmatically interact with Excel using xlwings and pywin32 to produce formatted tables. ]]></description>
+  <description><![CDATA[ Replace VBA with Python. Interacting with Excel using xlwings/pywin32 to produce formatted tables. ]]></description>
   <category>Python</category>
   <category>Data Management</category>
   <guid>https://peter-amerkhanian.com/posts/excel-wings/</guid>
@@ -26,7 +26,7 @@
   <title>Working with ACS microdata in R</title>
   <dc:creator>Peter Amerkhanian</dc:creator>
   <link>https://peter-amerkhanian.com/posts/ipums-wth-r/</link>
-  <description><![CDATA[ Using ipumsr, geocorr, and survey to analyze a small-geography in IPUMS data. ]]></description>
+  <description><![CDATA[ What’s the median household income in Oakland? Use ipumsr, geocorr, and survey to analyze a small-geography in IPUMS data. ]]></description>
   <category>R</category>
   <category>Data Management</category>
   <guid>https://peter-amerkhanian.com/posts/ipums-wth-r/</guid>

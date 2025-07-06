@@ -1,0 +1,28 @@
+
+
+```{r}
+pacman::p_load(DBI, RMySQL)
+con <- dbConnect(
+  drv = RMySQL::MySQL(),
+  user = Sys.getenv("MYSQL_USER"),
+  password = Sys.getenv("MYSQL_PASSWORD"),
+  host = Sys.getenv("MYSQL_HOST"),
+  port = as.integer(Sys.getenv("MYSQL_PORT"))
+)
+dbs <- dbGetQuery(con, "SHOW DATABASES;")
+knitr::opts_chunk$set(connection = con)
+# dbDisconnect(con)
+
+```
+
+
+```{sql}
+SHOW DATABASES;
+```
+```{sql}
+use megastore;
+```
+```{sql}
+show tables;
+```
+

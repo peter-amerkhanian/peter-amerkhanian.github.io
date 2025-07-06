@@ -1,0 +1,15 @@
+{
+  "hash": "9119c90cfd260d5589ea9065512efd55",
+  "result": {
+    "engine": "knitr",
+    "markdown": "::: {.cell}\n\n```{.r .cell-code}\npacman::p_load(DBI, RMySQL)\ncon <- dbConnect(\n  drv = RMySQL::MySQL(),\n  user = Sys.getenv(\"MYSQL_USER\"),\n  password = Sys.getenv(\"MYSQL_PASSWORD\"),\n  host = Sys.getenv(\"MYSQL_HOST\"),\n  port = as.integer(Sys.getenv(\"MYSQL_PORT\"))\n)\ndbs <- dbGetQuery(con, \"SHOW DATABASES;\")\nknitr::opts_chunk$set(connection = con)\n# dbDisconnect(con)\n```\n:::\n\n::: {.cell}\n\n```{.sql .cell-code}\nSHOW DATABASES;\n```\n\n\n<div class=\"knitsql-table\">\n\n\nTable: 8 records\n\n|Database           |\n|:------------------|\n|information_schema |\n|megastore          |\n|movieco            |\n|mysql              |\n|performance_schema |\n|sakila             |\n|sys                |\n|world              |\n\n</div>\n:::\n\n::: {.cell}\n\n```{.sql .cell-code}\nuse megastore;\n```\n:::\n\n::: {.cell}\n\n```{.sql .cell-code}\nshow tables;\n```\n\n\n<div class=\"knitsql-table\">\n\n\nTable: Displaying records 1 - 10\n\n|Tables_in_megastore |\n|:-------------------|\n|categories          |\n|credit_ratings      |\n|cust_address        |\n|customers           |\n|departments         |\n|employees           |\n|inventory           |\n|jobs                |\n|locations           |\n|order_details       |\n\n</div>\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
