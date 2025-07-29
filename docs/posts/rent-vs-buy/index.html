@@ -297,27 +297,20 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="environmentpackages">Environment/Packages</h3>
 <p>I built this notebook in a Google Colab instance, which seems to include most major Python libraries (<a href="https://stackoverflow.com/questions/47109539/what-are-the-available-libraries-within-google-colaboratory">more info</a>).</p>
 <p>You’ll probably have to download <code>numpy-financial</code> (it’s not included in Anaconda as far as I know), which you can accomplish within any notebook-like environment using the following command:</p>
-<div id="d3f1860b" class="cell" data-execution_count="1269">
+<div id="d3f1860b" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span> pip install numpy<span class="op">-</span>financial</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Requirement already satisfied: numpy-financial in c:\users\peteramerkhanian\anaconda3\lib\site-packages (1.0.0)
-Requirement already satisfied: numpy&gt;=1.15 in c:\users\peteramerkhanian\anaconda3\lib\site-packages (from numpy-financial) (1.23.5)</code></pre>
+<pre><code>^C</code></pre>
 </div>
 </div>
 <p>You’ll want to load the usual suspects - <code>pandas</code>, <code>numpy</code>, <code>seaborn</code>, <code>matplotlib</code>. I also run <code>from datetime import datetime</code> since we will be working with ranges of dates, and I run <code>sns.set_style()</code> to get my seaborn plots looking a bit more aesthetically pleasing - read more on themes <a href="https://seaborn.pydata.org/generated/seaborn.set_theme.html#seaborn.set_theme">here</a>.</p>
-<div id="53acff51" class="cell" data-execution_count="1270">
+<div id="53acff51" class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy_financial <span class="im">as</span> npf</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># set seaborn style</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>sns.set_style(<span class="st">"white"</span>)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Set Matplotlib font size</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>plt.rcParams.update({<span class="st">'font.size'</span>: <span class="dv">14</span>})</span></code></pre></div>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code></pre></div>
 </div>
 </section>
 </section>
@@ -327,7 +320,7 @@ Requirement already satisfied: numpy&gt;=1.15 in c:\users\peteramerkhanian\anaco
 <h3 class="anchored" data-anchor-id="definining-constants">Definining Constants</h3>
 <p>I’ll run this as a comparison between buying an apartment that costs $<b></b>700,000 with a 20% downpayment, versus renting a home for $2,600 a month. This is meant to approximate buying versus renting a two-bed one-bath apartment.</p>
 <p>Buying fees are defined at 4%, the homeowners association fees are defined as $700 monthly.</p>
-<div id="6ce4bf03" class="cell" data-execution_count="1271">
+<div id="6ce4bf03" class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Buying Constants</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>interest_rate <span class="op">=</span> <span class="fl">0.065</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>cost <span class="op">=</span> <span class="dv">700000</span></span>
@@ -340,9 +333,9 @@ Requirement already satisfied: numpy&gt;=1.15 in c:\users\peteramerkhanian\anaco
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>rent <span class="op">=</span> <span class="dv">2600</span></span></code></pre></div>
 </div>
 <p><code>npf.pmt()</code> can be used to generate a monthly mortgage payment given those buying constants:</p>
-<div id="831397a1" class="cell" data-execution_count="1272">
+<div id="831397a1" class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>npf.pmt(interest_rate<span class="op">/</span><span class="dv">12</span>, <span class="dv">12</span><span class="op">*</span><span class="dv">30</span>, principal)</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="1272">
+<div class="cell-output cell-output-display" data-execution_count="23">
 <pre><code>-3539.580931560606</code></pre>
 </div>
 </div>
@@ -352,27 +345,432 @@ Requirement already satisfied: numpy&gt;=1.15 in c:\users\peteramerkhanian\anaco
 <h3 class="anchored" data-anchor-id="defining-random-variables">Defining Random Variables</h3>
 <p>I’ll make the simplifying assumption that both “annual home appreciation” and “annual stock appreciation” are generated from normal distributions. This is a kind of strong assumption, but one that seems to be routinely made at least with regards to stock market returns, even if there might be better distribution choices out there (<a href="https://arxiv.org/ftp/arxiv/papers/1906/1906.10325.pdf">more here</a>).</p>
 <p>Here’s a look at how we’ll draw from a normal distribution. Given an average annual return, <span class="math inline">\(\mu = 0.0572\)</span> (<span class="math inline">\(\mu\)</span>, or, mu, is a common variable name for average) and a standard deviation <span class="math inline">\(\sigma = 0.1042\)</span> (<span class="math inline">\(\sigma\)</span>, or, sigma, is the common variable name for standard deviation), we can draw one sample from a normal distribution as follows:</p>
-<div id="07110a4a" class="cell" data-execution_count="1273">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set a random seed for stability of results</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">30</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>mean <span class="op">=</span> <span class="fl">.0572</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>standard_deviation <span class="op">=</span> <span class="fl">.1042</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>samples <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Draw the sample</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>np.random.normal(mean, standard_deviation, samples)</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="1273">
-<pre><code>array([-0.07451429])</code></pre>
+<div id="79f781cf" class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>True</code></pre>
+</div>
+</div>
+<div id="b7398231" class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> yfinance <span class="im">as</span> yf</span></code></pre></div>
+</div>
+<div id="ca040854" class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Download S&amp;P 500 data</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>sp500 <span class="op">=</span> yf.download(<span class="st">"AAPL"</span>, start<span class="op">=</span><span class="st">"1950-01-01"</span>)[<span class="st">"Adj Close"</span>].dropna()</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>sp500 <span class="op">=</span> sp500.dropna()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[*********************100%***********************]  1 of 1 completed</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ERROR 
+1 Failed download:
+ERROR ['AAPL']: Exception('AAPL: No price data found, symbol may be delisted (1d 1950-01-01 -&gt; 2025-05-31)')</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code></code></pre>
+</div>
+</div>
+<div id="197e00b4" class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fredapi <span class="im">import</span> Fred</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>fred <span class="op">=</span> Fred(api_key<span class="op">=</span>os.environ.get(<span class="st">'fred_api'</span>))</span></code></pre></div>
+</div>
+<div id="18c1a052" class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>sf_home <span class="op">=</span> fred.get_series(<span class="st">'SFXRSA'</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>sf_home <span class="op">=</span> sf_home.dropna()</span></code></pre></div>
+</div>
+<div id="d1012585" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>sf_home.plot()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-11-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="adfa73a6" class="cell" data-execution_count="80">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>log_prices <span class="op">=</span> np.log(sf_home)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>log_prices.plot()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-12-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="a09c8c3b" class="cell" data-execution_count="81">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.tsa.seasonal <span class="im">import</span> STL</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># -- STL DECOMPOSITION --</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>stl <span class="op">=</span> STL(log_prices, period<span class="op">=</span><span class="dv">36</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> stl.fit()</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>trend <span class="op">=</span> res.trend</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>resid <span class="op">=</span> res.resid</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co"># === 1. Plot log prices with trend ===</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>plt.plot(log_prices, label<span class="op">=</span><span class="st">'Log(Index)'</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>plt.plot(trend, label<span class="op">=</span><span class="st">'STL Trend'</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Log-transformed SF Housing Index with STL Trend'</span>)</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-13-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="3ca37ed6" class="cell" data-execution_count="82">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># === 2. Residual diagnostics ===</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>plt.plot(resid, label<span class="op">=</span><span class="st">'STL Residuals'</span>, color<span class="op">=</span><span class="st">'orange'</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>plt.axhline(<span class="dv">0</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, color<span class="op">=</span><span class="st">'gray'</span>)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'STL Residuals (Detrended Log Prices)'</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-14-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="57dbaa36" class="cell" data-execution_count="83">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> timedelta</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>future_months <span class="op">=</span> <span class="dv">120</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>block_size <span class="op">=</span> <span class="dv">12</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>n_simulations <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>N_years <span class="op">=</span> <span class="dv">10</span></span></code></pre></div>
+</div>
+<div id="7c0056c9" class="cell" data-execution_count="84">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># === 3. Fit linear model to trend (last N years) ===</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>trend_recent <span class="op">=</span> trend.last(<span class="ss">f'</span><span class="sc">{</span>N_years<span class="sc">}</span><span class="ss">Y'</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.arange(<span class="bu">len</span>(trend_recent)).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> trend_recent.values</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> LinearRegression().fit(X, y)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>X_future <span class="op">=</span> np.arange(<span class="bu">len</span>(X), <span class="bu">len</span>(X) <span class="op">+</span> future_months).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>trend_forecast <span class="op">=</span> model.predict(X_future)</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>C:\Users\peteramerkhanian\AppData\Local\Temp\ipykernel_66512\1996583068.py:2: FutureWarning: last is deprecated and will be removed in a future version. Please create a mask and filter using `.loc` instead
+  trend_recent = trend.last(f'{N_years}Y')
+C:\Users\peteramerkhanian\AppData\Local\Temp\ipykernel_66512\1996583068.py:2: FutureWarning: 'Y' is deprecated and will be removed in a future version, please use 'YE' instead.
+  trend_recent = trend.last(f'{N_years}Y')</code></pre>
+</div>
+</div>
+<div id="7049af9d" class="cell" data-execution_count="85">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot extrapolated trend</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>plt.plot(trend, label<span class="op">=</span><span class="st">'Observed Trend'</span>)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>plt.plot(</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    pd.date_range(trend.index[<span class="op">-</span><span class="dv">1</span>] <span class="op">+</span> timedelta(days<span class="op">=</span><span class="dv">30</span>), periods<span class="op">=</span>future_months, freq<span class="op">=</span><span class="st">'MS'</span>),</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    trend_forecast,</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">'red'</span>, label<span class="op">=</span><span class="st">'Forecasted Trend'</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'STL Trend + Linear Extrapolation'</span>)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-17-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="3e3cd870" class="cell" data-execution_count="97">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># === 4. Show example of block bootstrapped residuals ===</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> block_bootstrap(residuals, n_periods, block_size<span class="op">=</span><span class="dv">4</span>):</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    blocks <span class="op">=</span> []</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    n_blocks <span class="op">=</span> <span class="bu">int</span>(np.ceil(n_periods <span class="op">/</span> block_size))</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n_blocks):</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>        start <span class="op">=</span> np.random.randint(<span class="dv">0</span>, <span class="bu">len</span>(residuals) <span class="op">-</span> block_size)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>        blocks.extend(residuals[start:start <span class="op">+</span> block_size])</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(blocks[:n_periods])</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>sample_boot <span class="op">=</span> block_bootstrap(resid.dropna(), future_months, block_size)</span></code></pre></div>
+</div>
+<div id="60c3601d" class="cell" data-execution_count="98">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>plt.plot(sample_boot, color<span class="op">=</span><span class="st">'purple'</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>plt.axhline(<span class="dv">0</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, color<span class="op">=</span><span class="st">'gray'</span>)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Example: Block Bootstrapped Residuals (Simulated Noise)'</span>)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-19-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="c9315f9d" class="cell" data-execution_count="99">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot extrapolated trend</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>plt.plot(trend, label<span class="op">=</span><span class="st">'Observed Trend'</span>)</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>plt.plot(</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    pd.date_range(trend.index[<span class="op">-</span><span class="dv">1</span>] <span class="op">+</span> timedelta(days<span class="op">=</span><span class="dv">30</span>), periods<span class="op">=</span>future_months, freq<span class="op">=</span><span class="st">'MS'</span>),</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    (trend_forecast <span class="op">+</span> sample_boot),</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">'red'</span>, label<span class="op">=</span><span class="st">'Forecasted Trend'</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'STL Trend + Linear Extrapolation'</span>)</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-20-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="ace26978" class="cell" data-execution_count="91">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.tsa.regime_switching.markov_regression <span class="im">import</span> MarkovRegression</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1: Convert log prices to returns</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a> <span class="co"># insert your data here</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>returns <span class="op">=</span> np.diff(log_prices)  <span class="co"># log returns</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 2: Fit Markov Switching model (e.g., 2 regimes, AR(1) in each)</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> MarkovRegression(returns, k_regimes<span class="op">=</span><span class="dv">2</span>, trend<span class="op">=</span><span class="st">'c'</span>, switching_variance<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> model.fit()</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 3: Summary and regime probabilities</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result.summary())</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Smoothed regime probabilities</span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>smoothed_probs <span class="op">=</span> result.smoothed_marginal_probabilities</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>plt.plot(smoothed_probs)</span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                        Markov Switching Model Results                        
+==============================================================================
+Dep. Variable:                      y   No. Observations:                  458
+Model:               MarkovRegression   Log Likelihood                1485.238
+Date:                Sat, 31 May 2025   AIC                          -2958.477
+Time:                        12:27:11   BIC                          -2933.715
+Sample:                             0   HQIC                         -2948.724
+                                - 458                                         
+Covariance Type:               approx                                         
+                             Regime 0 parameters                              
+==============================================================================
+                 coef    std err          z      P&gt;|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+const          0.0009      0.001      1.472      0.141      -0.000       0.002
+sigma2      2.722e-05   3.31e-06      8.213      0.000    2.07e-05    3.37e-05
+                             Regime 1 parameters                              
+==============================================================================
+                 coef    std err          z      P&gt;|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+const          0.0082      0.001      7.744      0.000       0.006       0.010
+sigma2         0.0002   2.52e-05      8.680      0.000       0.000       0.000
+                         Regime transition parameters                         
+==============================================================================
+                 coef    std err          z      P&gt;|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+p[0-&gt;0]        0.9607      0.014     68.720      0.000       0.933       0.988
+p[1-&gt;0]        0.0410      0.016      2.640      0.008       0.011       0.071
+==============================================================================
+
+Warnings:
+[1] Covariance matrix calculated using numerical (complex-step) differentiation.</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-21-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="df8e9cb1" class="cell" data-execution_count="71">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> r2_score, mean_squared_error, mean_absolute_error</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Define split point</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>split_date <span class="op">=</span> <span class="st">'2013-01-01'</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>log_prices_train <span class="op">=</span> log_prices[:split_date]</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>log_prices_test <span class="op">=</span> log_prices[split_date:]</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>n_test <span class="op">=</span> <span class="bu">len</span>(log_prices_test)</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. STL on training data</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>stl_train <span class="op">=</span> STL(log_prices_train, period<span class="op">=</span><span class="dv">12</span>).fit()</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>trend_train <span class="op">=</span> stl_train.trend</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>resid_train <span class="op">=</span> stl_train.resid.dropna()</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Extrapolate trend linearly from last N years of training trend</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>trend_recent <span class="op">=</span> trend_train.last(<span class="st">'10Y'</span>)</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.arange(<span class="bu">len</span>(trend_recent)).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> trend_recent.values</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> LinearRegression().fit(X, y)</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>X_future <span class="op">=</span> np.arange(<span class="bu">len</span>(X), <span class="bu">len</span>(X) <span class="op">+</span> n_test).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>trend_forecast <span class="op">=</span> model.predict(X_future)</span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Bootstrap residuals and add to trend forecast</span></span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>sim_resid_stl <span class="op">=</span> block_bootstrap(resid_train, n_test, block_size)</span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>sim_log_stl <span class="op">=</span> trend_forecast <span class="op">+</span> sim_resid_stl</span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>sim_prices_stl <span class="op">=</span> np.exp(sim_log_stl)</span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Fit normal distribution to training log returns</span></span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>log_returns_train <span class="op">=</span> log_prices_train.diff().dropna()</span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>mu, sigma <span class="op">=</span> log_returns_train.mean(), log_returns_train.std()</span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulate log returns and add to final value of training log prices</span></span>
+<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a>sim_log_returns_normal <span class="op">=</span> np.random.normal(mu, sigma, size<span class="op">=</span>n_test)</span>
+<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a>sim_log_normal <span class="op">=</span> [log_prices_train.iloc[<span class="op">-</span><span class="dv">1</span>]]</span>
+<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> r <span class="kw">in</span> sim_log_returns_normal:</span>
+<span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a>    sim_log_normal.append(sim_log_normal[<span class="op">-</span><span class="dv">1</span>] <span class="op">+</span> r)</span>
+<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a>sim_log_normal <span class="op">=</span> sim_log_normal[<span class="dv">1</span>:]</span>
+<span id="cb29-37"><a href="#cb29-37" aria-hidden="true" tabindex="-1"></a>sim_prices_normal <span class="op">=</span> np.exp(sim_log_normal)</span>
+<span id="cb29-38"><a href="#cb29-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-39"><a href="#cb29-39" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. True test log prices</span></span>
+<span id="cb29-40"><a href="#cb29-40" aria-hidden="true" tabindex="-1"></a>true_log_prices <span class="op">=</span> log_prices_test[:n_test]</span>
+<span id="cb29-41"><a href="#cb29-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-42"><a href="#cb29-42" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Evaluation metrics</span></span>
+<span id="cb29-43"><a href="#cb29-43" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> evaluate(pred, truth, label):</span>
+<span id="cb29-44"><a href="#cb29-44" aria-hidden="true" tabindex="-1"></a>    r2 <span class="op">=</span> r2_score(truth, pred)</span>
+<span id="cb29-45"><a href="#cb29-45" aria-hidden="true" tabindex="-1"></a>    rmse <span class="op">=</span> mean_squared_error(truth, pred, squared<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb29-46"><a href="#cb29-46" aria-hidden="true" tabindex="-1"></a>    mae <span class="op">=</span> mean_absolute_error(truth, pred)</span>
+<span id="cb29-47"><a href="#cb29-47" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"📊 </span><span class="sc">{</span>label<span class="sc">}</span><span class="ss"> Forecast Performance"</span>)</span>
+<span id="cb29-48"><a href="#cb29-48" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"R²:   </span><span class="sc">{</span>r2<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb29-49"><a href="#cb29-49" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"RMSE: </span><span class="sc">{</span>rmse<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb29-50"><a href="#cb29-50" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"MAE:  </span><span class="sc">{</span>mae<span class="sc">:.4f}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb29-51"><a href="#cb29-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-52"><a href="#cb29-52" aria-hidden="true" tabindex="-1"></a>evaluate(sim_log_stl, true_log_prices, <span class="st">"STL + Bootstrap"</span>)</span>
+<span id="cb29-53"><a href="#cb29-53" aria-hidden="true" tabindex="-1"></a>evaluate(sim_log_normal, true_log_prices, <span class="st">"Normal Sim"</span>)</span>
+<span id="cb29-54"><a href="#cb29-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-55"><a href="#cb29-55" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. Plot for visual comparison</span></span>
+<span id="cb29-56"><a href="#cb29-56" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">5</span>))</span>
+<span id="cb29-57"><a href="#cb29-57" aria-hidden="true" tabindex="-1"></a>plt.plot(log_prices, label<span class="op">=</span><span class="st">'True Log Prices'</span>)</span>
+<span id="cb29-58"><a href="#cb29-58" aria-hidden="true" tabindex="-1"></a>plt.plot(log_prices_test.index, sim_log_stl, label<span class="op">=</span><span class="st">'STL + Bootstrap Forecast'</span>, color<span class="op">=</span><span class="st">'red'</span>)</span>
+<span id="cb29-59"><a href="#cb29-59" aria-hidden="true" tabindex="-1"></a>plt.plot(log_prices_test.index, sim_log_normal, label<span class="op">=</span><span class="st">'Normal Sim Forecast'</span>, color<span class="op">=</span><span class="st">'green'</span>)</span>
+<span id="cb29-60"><a href="#cb29-60" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Comparison of Forecast Methods (Log Prices)'</span>)</span>
+<span id="cb29-61"><a href="#cb29-61" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb29-62"><a href="#cb29-62" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb29-63"><a href="#cb29-63" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>C:\Users\peteramerkhanian\AppData\Local\Temp\ipykernel_66512\2205870326.py:15: FutureWarning: last is deprecated and will be removed in a future version. Please create a mask and filter using `.loc` instead
+  trend_recent = trend_train.last('10Y')
+C:\Users\peteramerkhanian\AppData\Local\Temp\ipykernel_66512\2205870326.py:15: FutureWarning: 'Y' is deprecated and will be removed in a future version, please use 'YE' instead.
+  trend_recent = trend_train.last('10Y')</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>📊 STL + Bootstrap Forecast Performance
+R²:   -22.5005
+RMSE: 1.1821
+MAE:  1.0954
+
+📊 Normal Sim Forecast Performance
+R²:   -1.2241
+RMSE: 0.3636
+MAE:  0.3324
+</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-22-output-3.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="837fb1dd" class="cell" data-execution_count="75">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.tsa.regime_switching.markov_regression <span class="im">import</span> MarkovRegression</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Markov switching model with 2 regimes: mean &amp; variance change</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> MarkovRegression(log_prices_train, k_regimes<span class="op">=</span><span class="dv">2</span>, trend<span class="op">=</span><span class="st">'c'</span>, switching_variance<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> model.fit()</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Forecast future values (in-sample first)</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>fitted <span class="op">=</span> res.fittedvalues</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot in-sample fit</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">4</span>))</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>plt.plot(log_prices_train, label<span class="op">=</span><span class="st">'True Log Prices'</span>)</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>plt.plot(fitted, label<span class="op">=</span><span class="st">'Fitted (Markov)'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>)</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Markov Switching Model Fit"</span>)</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Show smoothed regime probabilities</span></span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>res.smoothed_marginal_probabilities[<span class="dv">0</span>].plot(title<span class="op">=</span><span class="st">"Probability of Regime 0 (e.g. Boom)"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>c:\Users\peteramerkhanian\anaconda3\lib\site-packages\statsmodels\tsa\base\tsa_model.py:471: ValueWarning: No frequency information was provided, so inferred frequency MS will be used.
+  self._init_dates(dates, freq)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-23-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-23-output-3.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="d7657ebe" class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> yfinance <span class="im">as</span> yf</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fredapi <span class="im">import</span> Fred</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize FRED API (you need to get your own API key from https://fred.stlouisfed.org/)</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>fred <span class="op">=</span> Fred(api_key<span class="op">=</span>os.environ.get(<span class="st">'fred_api'</span>))</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Download S&amp;P 500 data</span></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>sp500 <span class="op">=</span> yf.download(<span class="st">'^GSPC'</span>, start<span class="op">=</span><span class="st">'2000-01-01'</span>, interval<span class="op">=</span><span class="st">'1mo'</span>)[<span class="st">'Adj Close'</span>]</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>sp500 <span class="op">=</span> sp500.dropna()</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Download San Francisco Home Price Index data</span></span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>sf_home <span class="op">=</span> fred.get_series(<span class="st">'SFXRSA'</span>)</span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>sf_home <span class="op">=</span> sf_home.dropna()</span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Align dates</span></span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.DataFrame({<span class="st">'SP500'</span>: sp500, <span class="st">'SF_Home'</span>: sf_home})</span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> data.dropna()</span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate monthly returns</span></span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>returns <span class="op">=</span> data.pct_change().dropna()</span></code></pre></div>
+</div>
+<div id="07110a4a" class="cell" data-execution_count="36">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set a random seed for stability of results</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">10</span>)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>mean <span class="op">=</span> <span class="fl">.0572</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>standard_deviation <span class="op">=</span> <span class="fl">.1042</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>samples <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Draw the sample</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>np.random.normal(mean, standard_deviation, samples)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="36">
+<pre><code>array([0.19595131])</code></pre>
 </div>
 </div>
 <p>We now simulate market returns for every month by supplying mean and standard deviation values for both home and stock market appreciation and drawing 360 samples (360 months in 30 years). For simplicity, we’ll just use world-wide aggregate values from <a href="https://www.frbsf.org/economic-research/wp-content/uploads/sites/4/wp2017-25.pdf">“The Rate of Return on Everything, 1870-2015”</a>.</p>
-<div id="b3271725" class="cell" data-execution_count="1274">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>mu_stock <span class="op">=</span> <span class="fl">.1081</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>sigma_stock <span class="op">=</span> <span class="fl">.2267</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>mu_home <span class="op">=</span> <span class="fl">.0572</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>sigma_home <span class="op">=</span> <span class="fl">.1042</span></span></code></pre></div>
+<div id="b3271725" class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>mu_stock <span class="op">=</span> <span class="fl">.1081</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>sigma_stock <span class="op">=</span> <span class="fl">.2267</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>mu_home <span class="op">=</span> <span class="fl">.0572</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>sigma_home <span class="op">=</span> <span class="fl">.1042</span></span></code></pre></div>
 </div>
 <p>Given that stock and home appreciation is probably correlated, I’ll have ti sample from a bivariate normal distribution using <code>numpy.random.Generator.multivariate_normal</code> - documentation <a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.Generator.multivariate_normal.html">here</a>, rather than the univariate distribution draw shown above. I am going to assume a correlation coefficient, <span class="math inline">\(\rho_{stock,home}\)</span> of 0.5 - a fairly clear correlation.<br>
 In order to use that numpy function, I’ll need to translate my correlation statistic into a covariance statistic, and I’ll use the following formula (<a href="https://en.wikipedia.org/wiki/Correlation">source</a>):<br>
@@ -381,10 +779,10 @@ cov_{stock,home} &amp;= \rho_{stock,home} \times \sigma_{stock} \sigma_{home} \\
 cov_{stock,home} &amp;= 0.5 \times .2267 \times .1042 \end{align*}
 \]</span></p>
 <p>I calculate covariance and confirm that the covariance and correlations match up below:</p>
-<div id="12197d34" class="cell" data-execution_count="1275">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>cov <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> sigma_stock <span class="op">*</span> sigma_home</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Covariance:"</span>, cov)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Back to correlation:"</span>, cov <span class="op">/</span> (sigma_stock <span class="op">*</span> sigma_home))</span></code></pre></div>
+<div id="12197d34" class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>cov <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> sigma_stock <span class="op">*</span> sigma_home</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Covariance:"</span>, cov)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Back to correlation:"</span>, cov <span class="op">/</span> (sigma_stock <span class="op">*</span> sigma_home))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Covariance: 0.01181107
 Back to correlation: 0.5</code></pre>
@@ -396,43 +794,43 @@ Back to correlation: 0.5</code></pre>
 \]</span></p>
 <p><em>Note, <span class="math inline">\(s\)</span> is shorthand for stock and <span class="math inline">\(h\)</span> is shorthand for home.</em></p>
 <p>Now I’ll code that in Python and confirm that the means and standard deviations of our samples match what we expect:</p>
-<div id="a0c82c6b" class="cell" data-execution_count="1276">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>cov_matrix <span class="op">=</span> np.array([[sigma_stock<span class="op">**</span><span class="dv">2</span>, cov],</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>              [cov, sigma_home<span class="op">**</span><span class="dv">2</span>]])</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>returns_df <span class="op">=</span> pd.DataFrame(np.random</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                          .default_rng(<span class="dv">30</span>)</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>                          .multivariate_normal([mu_stock, mu_home],</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>                                               cov_matrix,</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>                                               <span class="dv">360</span>),</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>                          columns<span class="op">=</span>[<span class="st">"Stock_Appreciation"</span>, <span class="st">"Home_Appreciation"</span>])</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Means:"</span>, returns_df.mean(axis<span class="op">=</span><span class="dv">0</span>).values)</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Std. Devs:"</span>, returns_df.std(axis<span class="op">=</span><span class="dv">0</span>).values)</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>returns_df <span class="op">=</span> (returns_df <span class="op">/</span> <span class="dv">12</span>)</span></code></pre></div>
+<div id="a0c82c6b" class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>cov_matrix <span class="op">=</span> np.array([[sigma_stock<span class="op">**</span><span class="dv">2</span>, cov],</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>              [cov, sigma_home<span class="op">**</span><span class="dv">2</span>]])</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>returns_df <span class="op">=</span> pd.DataFrame(np.random</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>                          .default_rng(<span class="dv">30</span>)</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>                          .multivariate_normal([mu_stock, mu_home],</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>                                               cov_matrix,</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>                                               <span class="dv">360</span>),</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>                          columns<span class="op">=</span>[<span class="st">"Stock_Appreciation"</span>, <span class="st">"Home_Appreciation"</span>])</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Means:"</span>, returns_df.mean(axis<span class="op">=</span><span class="dv">0</span>).values)</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Std. Devs:"</span>, returns_df.std(axis<span class="op">=</span><span class="dv">0</span>).values)</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>returns_df <span class="op">=</span> (returns_df <span class="op">/</span> <span class="dv">12</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Means: [0.10764063 0.05970695]
 Std. Devs: [0.22544095 0.10543034]</code></pre>
 </div>
 </div>
 <p>Plotting the simulated values, we can see that stock market returns are typically higher than home value appreciation.</p>
-<div id="28a3725d" class="cell" data-execution_count="1277">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>returns_df.add(<span class="dv">1</span>).cumprod().plot(figsize<span class="op">=</span>(<span class="dv">7</span>,<span class="dv">4</span>))</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Months"</span>)</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Money Multiplier"</span>)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Simulated Home/Stock Returns"</span>)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>sns.despine()<span class="op">;</span></span></code></pre></div>
+<div id="28a3725d" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>returns_df.add(<span class="dv">1</span>).cumprod().plot(figsize<span class="op">=</span>(<span class="dv">7</span>,<span class="dv">4</span>))</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Months"</span>)</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Money Multiplier"</span>)</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Simulated Home/Stock Returns"</span>)</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>sns.despine()<span class="op">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-10-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-29-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="b68d45fe" class="cell" data-execution_count="1279">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>home_performance <span class="op">=</span> returns_df.add(<span class="dv">1</span>).cumprod()[<span class="st">'Home_Appreciation'</span>]</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>stock_performance <span class="op">=</span> returns_df.add(<span class="dv">1</span>).cumprod()[<span class="st">'Stock_Appreciation'</span>]</span></code></pre></div>
+<div id="b68d45fe" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>home_performance <span class="op">=</span> returns_df.add(<span class="dv">1</span>).cumprod()[<span class="st">'Home_Appreciation'</span>]</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>stock_performance <span class="op">=</span> returns_df.add(<span class="dv">1</span>).cumprod()[<span class="st">'Stock_Appreciation'</span>]</span></code></pre></div>
 </div>
 <p>Now we can define two spread-sheet-like dataframes: - one that shows a mortgage amortization schedule for if you were to buy the $600,000 home, along with the home’s appreciation over time. - one that shows a table of rent payments and the stock market growth of what would have been your down payment (you can invest the down payment since you didn’t end up purchasing a house).</p>
 </section>
@@ -441,48 +839,48 @@ Std. Devs: [0.22544095 0.10543034]</code></pre>
 <h2 class="anchored" data-anchor-id="scenarios">Scenarios</h2>
 <section id="ownership-table" class="level3">
 <h3 class="anchored" data-anchor-id="ownership-table">Ownership Table</h3>
-<div id="63aaed89" class="cell" data-execution_count="1280">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Buying Table</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>df_own <span class="op">=</span> pd.DataFrame()</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"Period"</span>] <span class="op">=</span>  pd.Series(<span class="bu">range</span>(<span class="dv">12</span><span class="op">*</span><span class="dv">30</span>)) <span class="op">+</span> <span class="dv">1</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"Date"</span>] <span class="op">=</span> pd.date_range(start<span class="op">=</span>datetime.today(),</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>                           periods<span class="op">=</span><span class="dv">12</span><span class="op">*</span><span class="dv">30</span>,</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>                           freq<span class="op">=</span><span class="st">'MS'</span>,</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>                           name<span class="op">=</span><span class="st">"Date"</span>)</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"Principal_Paid"</span>] <span class="op">=</span> npf.ppmt(interest_rate<span class="op">/</span><span class="dv">12</span>,</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>                                    df_own[<span class="st">"Period"</span>],</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>                                    <span class="dv">12</span><span class="op">*</span><span class="dv">30</span>,</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>                                    principal)</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"Interest_Paid"</span>] <span class="op">=</span> npf.ipmt(interest_rate<span class="op">/</span><span class="dv">12</span>,</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>                                   df_own[<span class="st">"Period"</span>],</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>                                   <span class="dv">12</span><span class="op">*</span><span class="dv">30</span>,</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>                                   principal)</span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"HOA_Paid"</span>] <span class="op">=</span> hoa</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"HOA_Paid"</span>] <span class="op">=</span> df_own[<span class="st">"HOA_Paid"</span>].cumsum()</span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"Balance_Remaining"</span>] <span class="op">=</span> principal <span class="op">+</span> df_own[<span class="st">"Principal_Paid"</span>].cumsum()</span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"Home_Value"</span>] <span class="op">=</span> <span class="bu">round</span>(cost <span class="op">*</span> home_performance, <span class="dv">2</span>)</span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"PropTax_Paid"</span>] <span class="op">=</span> (df_own[<span class="st">"Period"</span>]</span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>                          .<span class="bu">apply</span>(<span class="kw">lambda</span> x:</span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>                                 (cost <span class="op">*</span> <span class="fl">1.02</span><span class="op">**</span>((x<span class="op">-</span><span class="dv">1</span>)<span class="op">/</span><span class="dv">12</span>) <span class="op">*</span> <span class="fl">0.01</span>)</span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>                                 <span class="cf">if</span> (x<span class="op">-</span><span class="dv">1</span>) <span class="kw">in</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">12</span><span class="op">*</span><span class="dv">1000</span>, <span class="dv">12</span>))</span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>                                 <span class="cf">else</span> <span class="dv">0</span>)</span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>                          .cumsum())</span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"Sale_Fees"</span>] <span class="op">=</span> df_own[<span class="st">"Home_Value"</span>] <span class="op">*</span> <span class="fl">.07</span></span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"Own_Profit"</span>] <span class="op">=</span> (df_own[<span class="st">"Home_Value"</span>] <span class="op">-</span></span>
-<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>                              df_own[<span class="st">"HOA_Paid"</span>] <span class="op">-</span></span>
-<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>                              df_own[<span class="st">"Balance_Remaining"</span>] <span class="op">-</span></span>
-<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>                              (buying_fees <span class="op">+</span> df_own[<span class="st">"Sale_Fees"</span>]) <span class="op">-</span></span>
-<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>                              df_own[<span class="st">"PropTax_Paid"</span>])</span>
-<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>df_own <span class="op">=</span> <span class="bu">round</span>(df_own, <span class="dv">2</span>)</span></code></pre></div>
+<div id="63aaed89" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Buying Table</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>df_own <span class="op">=</span> pd.DataFrame()</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"Period"</span>] <span class="op">=</span>  pd.Series(<span class="bu">range</span>(<span class="dv">12</span><span class="op">*</span><span class="dv">30</span>)) <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"Date"</span>] <span class="op">=</span> pd.date_range(start<span class="op">=</span>datetime.today(),</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>                           periods<span class="op">=</span><span class="dv">12</span><span class="op">*</span><span class="dv">30</span>,</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>                           freq<span class="op">=</span><span class="st">'MS'</span>,</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>                           name<span class="op">=</span><span class="st">"Date"</span>)</span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"Principal_Paid"</span>] <span class="op">=</span> npf.ppmt(interest_rate<span class="op">/</span><span class="dv">12</span>,</span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>                                    df_own[<span class="st">"Period"</span>],</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>                                    <span class="dv">12</span><span class="op">*</span><span class="dv">30</span>,</span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>                                    principal)</span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"Interest_Paid"</span>] <span class="op">=</span> npf.ipmt(interest_rate<span class="op">/</span><span class="dv">12</span>,</span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>                                   df_own[<span class="st">"Period"</span>],</span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>                                   <span class="dv">12</span><span class="op">*</span><span class="dv">30</span>,</span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a>                                   principal)</span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"HOA_Paid"</span>] <span class="op">=</span> hoa</span>
+<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"HOA_Paid"</span>] <span class="op">=</span> df_own[<span class="st">"HOA_Paid"</span>].cumsum()</span>
+<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"Balance_Remaining"</span>] <span class="op">=</span> principal <span class="op">+</span> df_own[<span class="st">"Principal_Paid"</span>].cumsum()</span>
+<span id="cb44-19"><a href="#cb44-19" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"Home_Value"</span>] <span class="op">=</span> <span class="bu">round</span>(cost <span class="op">*</span> home_performance, <span class="dv">2</span>)</span>
+<span id="cb44-20"><a href="#cb44-20" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"PropTax_Paid"</span>] <span class="op">=</span> (df_own[<span class="st">"Period"</span>]</span>
+<span id="cb44-21"><a href="#cb44-21" aria-hidden="true" tabindex="-1"></a>                          .<span class="bu">apply</span>(<span class="kw">lambda</span> x:</span>
+<span id="cb44-22"><a href="#cb44-22" aria-hidden="true" tabindex="-1"></a>                                 (cost <span class="op">*</span> <span class="fl">1.02</span><span class="op">**</span>((x<span class="op">-</span><span class="dv">1</span>)<span class="op">/</span><span class="dv">12</span>) <span class="op">*</span> <span class="fl">0.01</span>)</span>
+<span id="cb44-23"><a href="#cb44-23" aria-hidden="true" tabindex="-1"></a>                                 <span class="cf">if</span> (x<span class="op">-</span><span class="dv">1</span>) <span class="kw">in</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">12</span><span class="op">*</span><span class="dv">1000</span>, <span class="dv">12</span>))</span>
+<span id="cb44-24"><a href="#cb44-24" aria-hidden="true" tabindex="-1"></a>                                 <span class="cf">else</span> <span class="dv">0</span>)</span>
+<span id="cb44-25"><a href="#cb44-25" aria-hidden="true" tabindex="-1"></a>                          .cumsum())</span>
+<span id="cb44-26"><a href="#cb44-26" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"Sale_Fees"</span>] <span class="op">=</span> df_own[<span class="st">"Home_Value"</span>] <span class="op">*</span> <span class="fl">.07</span></span>
+<span id="cb44-27"><a href="#cb44-27" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"Own_Profit"</span>] <span class="op">=</span> (df_own[<span class="st">"Home_Value"</span>] <span class="op">-</span></span>
+<span id="cb44-28"><a href="#cb44-28" aria-hidden="true" tabindex="-1"></a>                              df_own[<span class="st">"HOA_Paid"</span>] <span class="op">-</span></span>
+<span id="cb44-29"><a href="#cb44-29" aria-hidden="true" tabindex="-1"></a>                              df_own[<span class="st">"Balance_Remaining"</span>] <span class="op">-</span></span>
+<span id="cb44-30"><a href="#cb44-30" aria-hidden="true" tabindex="-1"></a>                              (buying_fees <span class="op">+</span> df_own[<span class="st">"Sale_Fees"</span>]) <span class="op">-</span></span>
+<span id="cb44-31"><a href="#cb44-31" aria-hidden="true" tabindex="-1"></a>                              df_own[<span class="st">"PropTax_Paid"</span>])</span>
+<span id="cb44-32"><a href="#cb44-32" aria-hidden="true" tabindex="-1"></a>df_own <span class="op">=</span> <span class="bu">round</span>(df_own, <span class="dv">2</span>)</span></code></pre></div>
 </div>
 <p>Note this code, which is a bit of a monster:</p>
-<div id="46874cc0" class="cell" data-execution_count="1281">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"PropTax_Paid"</span>] <span class="op">=</span> (df_own[<span class="st">"Period"</span>]</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>                          .<span class="bu">apply</span>(<span class="kw">lambda</span> x:</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                                 (cost <span class="op">*</span> <span class="fl">1.02</span><span class="op">**</span>((x<span class="op">-</span><span class="dv">1</span>)<span class="op">/</span><span class="dv">12</span>) <span class="op">*</span> <span class="fl">0.01</span>)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                                 <span class="cf">if</span> (x<span class="op">-</span><span class="dv">1</span>) <span class="kw">in</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">12</span><span class="op">*</span><span class="dv">1000</span>, <span class="dv">12</span>))</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                                 <span class="cf">else</span> <span class="dv">0</span>)</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>                          .cumsum())</span></code></pre></div>
+<div id="46874cc0" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>df_own[<span class="st">"PropTax_Paid"</span>] <span class="op">=</span> (df_own[<span class="st">"Period"</span>]</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>                          .<span class="bu">apply</span>(<span class="kw">lambda</span> x:</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>                                 (cost <span class="op">*</span> <span class="fl">1.02</span><span class="op">**</span>((x<span class="op">-</span><span class="dv">1</span>)<span class="op">/</span><span class="dv">12</span>) <span class="op">*</span> <span class="fl">0.01</span>)</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>                                 <span class="cf">if</span> (x<span class="op">-</span><span class="dv">1</span>) <span class="kw">in</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">12</span><span class="op">*</span><span class="dv">1000</span>, <span class="dv">12</span>))</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>                                 <span class="cf">else</span> <span class="dv">0</span>)</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>                          .cumsum())</span></code></pre></div>
 </div>
 <p>What is happening here is a calculation of property assessed value and property tax according to California’s property assessment/tax regime (<a href="https://www.boe.ca.gov/proptaxes/pdf/pub29.pdf">more here)</a>. We’ll look at this in two pieces, first, assessed value. In California, once you purchase a property, its assessed value is set at the purchase price, then increases annually by the lower of 2% or the rate of inflation according to the California Consumer Price Index (CCPI). You could write out an equation for this as follows:</p>
 <p><span class="math display">\[
@@ -519,9 +917,9 @@ AssessedValue_y =
 \]</span></p>
 <p>There’s some elements added to the code to work between years and months, but that equation is the gist of it.<br>
 We end up with the following table for property ownership:</p>
-<div id="df1f7154" class="cell" data-execution_count="1282">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>df_own</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="1282">
+<div id="df1f7154" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>df_own</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
 <div>
 
 
@@ -545,7 +943,7 @@ We end up with the following table for property ownership:</p>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
 <td>1</td>
-<td>2025-03-01 20:03:45.953475</td>
+<td>2025-06-01 08:48:43.587964</td>
 <td>-506.25</td>
 <td>-3033.33</td>
 <td>700</td>
@@ -558,7 +956,7 @@ We end up with the following table for property ownership:</p>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
 <td>2</td>
-<td>2025-04-01 20:03:45.953475</td>
+<td>2025-07-01 08:48:43.587964</td>
 <td>-508.99</td>
 <td>-3030.59</td>
 <td>1400</td>
@@ -571,7 +969,7 @@ We end up with the following table for property ownership:</p>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>3</td>
-<td>2025-05-01 20:03:45.953475</td>
+<td>2025-08-01 08:48:43.587964</td>
 <td>-511.75</td>
 <td>-3027.83</td>
 <td>2100</td>
@@ -584,7 +982,7 @@ We end up with the following table for property ownership:</p>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
 <td>4</td>
-<td>2025-06-01 20:03:45.953475</td>
+<td>2025-09-01 08:48:43.587964</td>
 <td>-514.52</td>
 <td>-3025.06</td>
 <td>2800</td>
@@ -597,7 +995,7 @@ We end up with the following table for property ownership:</p>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
 <td>5</td>
-<td>2025-07-01 20:03:45.953475</td>
+<td>2025-10-01 08:48:43.587964</td>
 <td>-517.31</td>
 <td>-3022.28</td>
 <td>3500</td>
@@ -623,7 +1021,7 @@ We end up with the following table for property ownership:</p>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">355</td>
 <td>356</td>
-<td>2054-10-01 20:03:45.953475</td>
+<td>2055-01-01 08:48:43.587964</td>
 <td>-3445.26</td>
 <td>-94.33</td>
 <td>249200</td>
@@ -636,7 +1034,7 @@ We end up with the following table for property ownership:</p>
 <tr class="even">
 <td data-quarto-table-cell-role="th">356</td>
 <td>357</td>
-<td>2054-11-01 20:03:45.953475</td>
+<td>2055-02-01 08:48:43.587964</td>
 <td>-3463.92</td>
 <td>-75.66</td>
 <td>249900</td>
@@ -649,7 +1047,7 @@ We end up with the following table for property ownership:</p>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">357</td>
 <td>358</td>
-<td>2054-12-01 20:03:45.953475</td>
+<td>2055-03-01 08:48:43.587964</td>
 <td>-3482.68</td>
 <td>-56.90</td>
 <td>250600</td>
@@ -662,7 +1060,7 @@ We end up with the following table for property ownership:</p>
 <tr class="even">
 <td data-quarto-table-cell-role="th">358</td>
 <td>359</td>
-<td>2055-01-01 20:03:45.953475</td>
+<td>2055-04-01 08:48:43.587964</td>
 <td>-3501.54</td>
 <td>-38.04</td>
 <td>251300</td>
@@ -675,7 +1073,7 @@ We end up with the following table for property ownership:</p>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">359</td>
 <td>360</td>
-<td>2055-02-01 20:03:45.953475</td>
+<td>2055-05-01 08:48:43.587964</td>
 <td>-3520.51</td>
 <td>-19.07</td>
 <td>252000</td>
@@ -696,66 +1094,66 @@ We end up with the following table for property ownership:</p>
 <section id="rental-table" class="level3">
 <h3 class="anchored" data-anchor-id="rental-table">Rental Table</h3>
 <p>This one is a but more simple, only examining the total rent you’ve paid in a given month and simulated stock returns at that point.</p>
-<div id="a98ec289" class="cell" data-execution_count="1283">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Rental Table</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>df_rent <span class="op">=</span> pd.DataFrame()</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>df_rent[<span class="st">"Period"</span>] <span class="op">=</span>  pd.Series(<span class="bu">range</span>(<span class="dv">12</span><span class="op">*</span><span class="dv">30</span>)) <span class="op">+</span> <span class="dv">1</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>df_rent[<span class="st">"Date"</span>] <span class="op">=</span> pd.date_range(start<span class="op">=</span>datetime.today(),</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>                           periods<span class="op">=</span><span class="dv">12</span><span class="op">*</span><span class="dv">30</span>,</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>                           freq<span class="op">=</span><span class="st">'MS'</span>,</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>                           name<span class="op">=</span><span class="st">"Date"</span>)</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>df_rent[<span class="st">"DownPayment_Invested"</span>] <span class="op">=</span>  stock_performance <span class="op">*</span> down_payment</span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>df_rent[<span class="st">"Rent_Paid"</span>] <span class="op">=</span> rent <span class="op">*</span> <span class="fl">1.02</span><span class="op">**</span>(df_rent[<span class="st">"Period"</span>].add(<span class="dv">1</span>) <span class="op">%</span> <span class="dv">12</span> <span class="op">==</span> <span class="dv">0</span>).cumsum()</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>monthly_savings <span class="op">=</span> df_own[[<span class="st">"Principal_Paid"</span>, <span class="st">"Interest_Paid"</span>]].<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>).multiply(<span class="op">-</span><span class="dv">1</span>).add(hoa) <span class="op">-</span> df_rent[<span class="st">"Rent_Paid"</span>]</span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>df_rent[<span class="st">"Total_Rent_Paid"</span>] <span class="op">=</span> df_rent[<span class="st">"Rent_Paid"</span>].cumsum()</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>df_rent[<span class="st">"Rent_Profit"</span>] <span class="op">=</span> df_rent[<span class="st">"DownPayment_Invested"</span>] <span class="op">-</span> df_rent[<span class="st">"Total_Rent_Paid"</span>] <span class="op">+</span> monthly_savings.cumsum()</span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>df_rent <span class="op">=</span> <span class="bu">round</span>(df_rent, <span class="dv">2</span>)</span></code></pre></div>
+<div id="a98ec289" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Rental Table</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>df_rent <span class="op">=</span> pd.DataFrame()</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>df_rent[<span class="st">"Period"</span>] <span class="op">=</span>  pd.Series(<span class="bu">range</span>(<span class="dv">12</span><span class="op">*</span><span class="dv">30</span>)) <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>df_rent[<span class="st">"Date"</span>] <span class="op">=</span> pd.date_range(start<span class="op">=</span>datetime.today(),</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>                           periods<span class="op">=</span><span class="dv">12</span><span class="op">*</span><span class="dv">30</span>,</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>                           freq<span class="op">=</span><span class="st">'MS'</span>,</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>                           name<span class="op">=</span><span class="st">"Date"</span>)</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>df_rent[<span class="st">"DownPayment_Invested"</span>] <span class="op">=</span>  stock_performance <span class="op">*</span> down_payment</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>df_rent[<span class="st">"Rent_Paid"</span>] <span class="op">=</span> rent <span class="op">*</span> <span class="fl">1.02</span><span class="op">**</span>(df_rent[<span class="st">"Period"</span>].add(<span class="dv">1</span>) <span class="op">%</span> <span class="dv">12</span> <span class="op">==</span> <span class="dv">0</span>).cumsum()</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>monthly_savings <span class="op">=</span> df_own[[<span class="st">"Principal_Paid"</span>, <span class="st">"Interest_Paid"</span>]].<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>).multiply(<span class="op">-</span><span class="dv">1</span>).add(hoa) <span class="op">-</span> df_rent[<span class="st">"Rent_Paid"</span>]</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>df_rent[<span class="st">"Total_Rent_Paid"</span>] <span class="op">=</span> df_rent[<span class="st">"Rent_Paid"</span>].cumsum()</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>df_rent[<span class="st">"Rent_Profit"</span>] <span class="op">=</span> df_rent[<span class="st">"DownPayment_Invested"</span>] <span class="op">-</span> df_rent[<span class="st">"Total_Rent_Paid"</span>] <span class="op">+</span> monthly_savings.cumsum()</span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>df_rent <span class="op">=</span> <span class="bu">round</span>(df_rent, <span class="dv">2</span>)</span></code></pre></div>
 </div>
 </section>
 </section>
 <section id="results" class="level2">
 <h2 class="anchored" data-anchor-id="results">Results</h2>
 <p>At this point, I’ll merge the ownership and rental tables and plot out what happened in this simulation</p>
-<div id="af291d06" class="cell" data-execution_count="1284">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>merged <span class="op">=</span> pd.merge(df_own, df_rent, on<span class="op">=</span><span class="st">"Period"</span>)</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>merged <span class="op">=</span> merged.melt(value_vars <span class="op">=</span> [<span class="st">"Rent_Profit"</span>, <span class="st">"Own_Profit"</span>], id_vars<span class="op">=</span><span class="st">'Period'</span>)</span></code></pre></div>
+<div id="af291d06" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>merged <span class="op">=</span> pd.merge(df_own, df_rent, on<span class="op">=</span><span class="st">"Period"</span>)</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>merged <span class="op">=</span> merged.melt(value_vars <span class="op">=</span> [<span class="st">"Rent_Profit"</span>, <span class="st">"Own_Profit"</span>], id_vars<span class="op">=</span><span class="st">'Period'</span>)</span></code></pre></div>
 </div>
-<div id="d9a07596" class="cell" data-execution_count="1285">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">6</span>))</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Wealth Outcomes for Owning vs. Renting a 2b1br Apt"</span>)</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>sns.lineplot(data<span class="op">=</span>merged, x<span class="op">=</span><span class="st">"Period"</span>, y<span class="op">=</span><span class="st">"value"</span>, hue<span class="op">=</span><span class="st">"variable"</span>)</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">350</span>, <span class="dv">12</span>):</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> x <span class="op">==</span> <span class="dv">0</span>:</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>        plt.axvline(x, color<span class="op">=</span><span class="st">"grey"</span>, linestyle<span class="op">=</span><span class="st">":"</span>, alpha<span class="op">=</span><span class="dv">1</span>, label<span class="op">=</span><span class="st">"Year"</span>)</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>        plt.axvline(x, color<span class="op">=</span><span class="st">"grey"</span>, linestyle<span class="op">=</span><span class="st">":"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    plt.text(x<span class="op">+</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">100000</span>, <span class="bu">str</span>(<span class="bu">int</span>(x<span class="op">/</span><span class="dv">12</span>)), alpha<span class="op">=</span><span class="fl">0.8</span>)</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>plt.axhline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">"red"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, alpha<span class="op">=</span><span class="fl">0.5</span>, label<span class="op">=</span><span class="st">"Zero"</span>)</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>sns.despine()</span></code></pre></div>
+<div id="d9a07596" class="cell" data-execution_count="37">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">6</span>))</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Wealth Outcomes for Owning vs. Renting a 2b1br Apt"</span>)</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>sns.lineplot(data<span class="op">=</span>merged, x<span class="op">=</span><span class="st">"Period"</span>, y<span class="op">=</span><span class="st">"value"</span>, hue<span class="op">=</span><span class="st">"variable"</span>)</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a><span class="co"># for x in range(0, 350, 12):</span></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a><span class="co">#     if x == 0:</span></span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a><span class="co">#         plt.axvline(x, color="grey", linestyle=":", alpha=1, label="Year")</span></span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a><span class="co">#     else:</span></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a><span class="co">#         plt.axvline(x, color="grey", linestyle=":", alpha=0.7)</span></span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a><span class="co">#     plt.text(x+1, -100000, str(int(x/12)), alpha=0.8)</span></span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>plt.axhline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">"red"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, alpha<span class="op">=</span><span class="fl">0.5</span>, label<span class="op">=</span><span class="st">"Zero"</span>)</span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a>sns.despine()</span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-18-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-37-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
 <p>We can quickly see that ownership will clearly build more wealth in the medium and long run:</p>
-<div id="ae8f248e" class="cell" data-execution_count="1286">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>years <span class="op">=</span> <span class="dv">5</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Owner after </span><span class="sc">{</span>years<span class="sc">}</span><span class="ss"> years:"</span>, df_own.loc[<span class="dv">12</span><span class="op">*</span>years<span class="op">-</span><span class="dv">1</span>, <span class="st">"Own_Profit"</span>])</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Renter after </span><span class="sc">{</span>years<span class="sc">}</span><span class="ss"> years:"</span>, df_rent.loc[<span class="dv">12</span><span class="op">*</span>years<span class="op">-</span><span class="dv">1</span>, <span class="st">"Rent_Profit"</span>])</span></code></pre></div>
+<div id="ae8f248e" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>years <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Owner after </span><span class="sc">{</span>years<span class="sc">}</span><span class="ss"> years:"</span>, df_own.loc[<span class="dv">12</span><span class="op">*</span>years<span class="op">-</span><span class="dv">1</span>, <span class="st">"Own_Profit"</span>])</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Renter after </span><span class="sc">{</span>years<span class="sc">}</span><span class="ss"> years:"</span>, df_rent.loc[<span class="dv">12</span><span class="op">*</span>years<span class="op">-</span><span class="dv">1</span>, <span class="st">"Rent_Profit"</span>])</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Owner after 5 years: 243148.71
 Renter after 5 years: 135926.53</code></pre>
 </div>
 </div>
 <p>However, we can see that, in the unlikely case that the home is sold within the first year or so, the wealth of the renter and the owner are very similar, likely due to the owner contending with buying/selling fees:</p>
-<div id="360d55e9" class="cell" data-execution_count="1287">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>years <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Owner after </span><span class="sc">{</span>years<span class="sc">}</span><span class="ss"> years:"</span>, df_own.loc[<span class="dv">12</span><span class="op">*</span>years<span class="op">-</span><span class="dv">1</span>, <span class="st">"Own_Profit"</span>])</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Renter after </span><span class="sc">{</span>years<span class="sc">}</span><span class="ss"> years:"</span>, df_rent.loc[<span class="dv">12</span><span class="op">*</span>years<span class="op">-</span><span class="dv">1</span>, <span class="st">"Rent_Profit"</span>])</span></code></pre></div>
+<div id="360d55e9" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>years <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Owner after </span><span class="sc">{</span>years<span class="sc">}</span><span class="ss"> years:"</span>, df_own.loc[<span class="dv">12</span><span class="op">*</span>years<span class="op">-</span><span class="dv">1</span>, <span class="st">"Own_Profit"</span>])</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Renter after </span><span class="sc">{</span>years<span class="sc">}</span><span class="ss"> years:"</span>, df_rent.loc[<span class="dv">12</span><span class="op">*</span>years<span class="op">-</span><span class="dv">1</span>, <span class="st">"Rent_Profit"</span>])</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Owner after 1 years: 115891.0
 Renter after 1 years: 135331.15</code></pre>
