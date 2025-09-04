@@ -19,7 +19,7 @@ about:
       text: Email
       href: mailto:peteramerkhanian@berkeley.edu
 ---
-<p style="font-weight: 650; color: #4d4d4d">Researcher @ UC Office of the President    
+<p style="font-weight: 650; color: #4d4d4d">Data & Policy @ UC Office of the President    
 UC Berkeley MPP '23, BA '16
 </p>
 <hr>

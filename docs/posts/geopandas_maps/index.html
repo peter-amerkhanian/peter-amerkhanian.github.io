@@ -230,11 +230,11 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
     <li><a href="#census-shapes-with-tigrispygris" id="toc-census-shapes-with-tigrispygris" class="nav-link" data-scroll-target="#census-shapes-with-tigrispygris">Census shapes with <code>tigris</code>/<code>pygris</code></a></li>
     <li><a href="#dealing-with-coordinate-reference-systems" id="toc-dealing-with-coordinate-reference-systems" class="nav-link" data-scroll-target="#dealing-with-coordinate-reference-systems">Dealing with Coordinate Reference Systems</a></li>
     </ul></li>
-    <li><a href="#exercise-1-point-plot" id="toc-exercise-1-point-plot" class="nav-link" data-scroll-target="#exercise-1-point-plot">Exercise 1: Point Plot</a></li>
-    <li><a href="#exercise-2-county-choropleth" id="toc-exercise-2-county-choropleth" class="nav-link" data-scroll-target="#exercise-2-county-choropleth">Exercise 2: County Choropleth</a></li>
-    <li><a href="#exercise-3-region-choropleth" id="toc-exercise-3-region-choropleth" class="nav-link" data-scroll-target="#exercise-3-region-choropleth">Exercise 3: Region Choropleth</a></li>
-    <li><a href="#exercise-4-heatmaps" id="toc-exercise-4-heatmaps" class="nav-link" data-scroll-target="#exercise-4-heatmaps">Exercise 4: Heatmaps</a></li>
-    <li><a href="#exercise-5-refining-land" id="toc-exercise-5-refining-land" class="nav-link" data-scroll-target="#exercise-5-refining-land">Exercise 5: Refining Land</a></li>
+    <li><a href="#exercise-1-point-plot-pros-and-cons" id="toc-exercise-1-point-plot-pros-and-cons" class="nav-link" data-scroll-target="#exercise-1-point-plot-pros-and-cons">Exercise 1: Point Plot Pros and Cons</a></li>
+    <li><a href="#exercise-2-county-choropleths" id="toc-exercise-2-county-choropleths" class="nav-link" data-scroll-target="#exercise-2-county-choropleths">Exercise 2: County Choropleths</a></li>
+    <li><a href="#exercise-3-a-region-choropleth" id="toc-exercise-3-a-region-choropleth" class="nav-link" data-scroll-target="#exercise-3-a-region-choropleth">Exercise 3: A Region Choropleth</a></li>
+    <li><a href="#exercise-4-heatmaps-and-projected-crs" id="toc-exercise-4-heatmaps-and-projected-crs" class="nav-link" data-scroll-target="#exercise-4-heatmaps-and-projected-crs">Exercise 4: Heatmaps and Projected CRS</a></li>
+    <li><a href="#exercise-5-refining-land-and-sea" id="toc-exercise-5-refining-land-and-sea" class="nav-link" data-scroll-target="#exercise-5-refining-land-and-sea">Exercise 5: Refining Land and Sea</a></li>
     </ul>
     <div class="quarto-alternate-formats">
     <ul><li>
@@ -264,7 +264,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
   }
 });
 </script>
-<div id="826d8159" class="cell" data-execution_count="1">
+<div id="826d8159" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>Import Statements</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
@@ -291,7 +291,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tqdm <span class="im">import</span> tqdm</span></code></pre></div>
 </details>
 </div>
-<p>One of my favorite applications of Python is geospatial analysis. Python happens to have an amazing collection of GIS libraries that seem capable of doing almost any geospatial task I can imagine, from basic plots to spatial statistics to remote sensing and more. I’m writing this blog post to give myself a brief overview of how I currently use several of those libraries for <strong>“thematic mapping”</strong> – plotting distributions of data across space <span class="citation" data-cites="tennekes_tmap_2018">(<a href="#ref-tennekes_tmap_2018" role="doc-biblioref">Tennekes 2018</a>)</span>. My main goal here is that I will have somewhere to go for boilerplate code/tutorials for myself, but hopefully an external reader gets some value out of it too.</p>
+<p>One of my favorite applications of Python is geospatial analysis. Python happens to have an amazing collection of GIS libraries that seem capable of doing almost any geospatial task I can imagine, from <a href="https://geopandas.org/en/stable/docs/user_guide/mapping.html">basic plots</a> to <a href="https://pysal.org/">spatial statistics</a> to <a href="https://geowombat.readthedocs.io/en/latest/">remote sensing</a> and more. I’m writing this blog post to give myself a brief overview of how I currently use several of those libraries for <strong>“thematic mapping”</strong> – plotting distributions of data across space <span class="citation" data-cites="tennekes_tmap_2018">(<a href="#ref-tennekes_tmap_2018" role="doc-biblioref">Tennekes 2018</a>)</span>. My main goal here is that I will have somewhere to go for boilerplate code/tutorials for myself, but hopefully an external reader gets some value out of it too.</p>
 <p>I’ll cover the following:</p>
 <ul>
 <li>Some examples of Spatial Data: GTFS transit data, U.S. Census shape files, and dealing with Coordinate Reference Systems across different datasets.</li>
@@ -323,7 +323,7 @@ Motivating Question
 <p>I will be using open data from CalTrans’ <a href="https://github.com/cal-itp/data-analyses/blob/main/high_quality_transit_areas/README.md">High Quality Transit Areas Analysis</a>. While that analysis is focused on defining high quality transit areas, they make their intermediary transit-stop dataset and high quality transit-stop datasets available to the public. Thanks, CalTrans!</p>
 <p>The data that CalTrans are using are derived from “General Transit Feed Specification,” or, GTFS data. GTFS is a standardized data format that public transit agencies use to describe fixed-route transit services. It was initially developed in 2005 to provide support for public transit route planning in Google Maps <span class="citation" data-cites="barbeau_many_2015">(<a href="#ref-barbeau_many_2015" role="doc-biblioref">Barbeau and Antrim 2015</a>)</span>. The specific standards of GTFS are all documented at <a href="https://gtfs.org/getting-started/what-is-GTFS/">gtfs.org</a> and its complete history and many use cases are given an excellent overview in the previously cited <span class="citation" data-cites="barbeau_many_2015">(<a href="#ref-barbeau_many_2015" role="doc-biblioref">Barbeau and Antrim 2015</a>)</span> paper.</p>
 <p>I’ll retrieve the CalTrans transit-stop data via parallel API requests (see the folded code for the details). This code should theoretically work with any ArcGIS Rest API.</p>
-<div id="ac231b05" class="cell" data-execution_count="2">
+<div id="ac231b05" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>Code for parallel API calls: <code>paginate_api</code></summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fetch_gdf(url, offset, chunksize):</span>
@@ -370,16 +370,16 @@ Motivating Question
 <span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> full_gdf</span></code></pre></div>
 </details>
 </div>
-<div id="44decc28" class="cell" data-execution_count="3">
+<div id="44decc28" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rest_api <span class="op">=</span> <span class="st">"https://caltrans-gis.dot.ca.gov/arcgis/rest/"</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>all_stops <span class="op">=</span> <span class="st">"services/CHrailroad/CA_Transit_Stops/FeatureServer/0/query"</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>gdf_all <span class="op">=</span> paginate_api(rest_api <span class="op">+</span> all_stops)</span></code></pre></div>
 </div>
 <p>The resulting dataset contains each public transit stop in California, with various pieces of information about that stop.</p>
-<div id="cbb716c9" class="cell" data-execution_count="4">
+<div id="cbb716c9" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>gdf_all[[<span class="st">'district_name'</span>, <span class="st">'agency'</span>, <span class="st">'stop_id'</span>, <span class="st">'n_routes'</span>,</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>         <span class="st">'stop_name'</span>, <span class="st">'n_arrivals'</span>, <span class="st">'geometry'</span>]].head()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
+<div class="cell-output cell-output-display" data-execution_count="12">
 <div>
 
 
@@ -399,53 +399,53 @@ Motivating Question
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>12 - Orange County</td>
-<td>Orange County Transportation Authority</td>
-<td>2231</td>
+<td>07 - Los Angeles / Ventura</td>
+<td>City of Inglewood</td>
+<td>3878454</td>
 <td>1</td>
-<td>CHAPMAN-NELSON</td>
-<td>38</td>
-<td>POINT (-117.94586 33.78852)</td>
+<td>Hillcrest Pharmacy</td>
+<td>6</td>
+<td>POINT (-118.35012 33.96022)</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>12 - Orange County</td>
-<td>Orange County Transportation Authority</td>
-<td>2236</td>
+<td>07 - Los Angeles / Ventura</td>
+<td>City of Inglewood</td>
+<td>3878455</td>
 <td>1</td>
-<td>CHAPMAN-JACALENE</td>
-<td>38</td>
-<td>POINT (-117.92751 33.78868)</td>
+<td>Social Security Office (230 E Spruce Ave)</td>
+<td>6</td>
+<td>POINT (-118.35137 33.95767)</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>12 - Orange County</td>
-<td>Orange County Transportation Authority</td>
-<td>2237</td>
+<td>07 - Los Angeles / Ventura</td>
+<td>City of Inglewood</td>
+<td>3878456</td>
 <td>1</td>
-<td>CHAPMAN-WEST</td>
-<td>38</td>
-<td>POINT (-117.923 33.78866)</td>
+<td>Arbor Vitae / LaBrea</td>
+<td>6</td>
+<td>POINT (-118.35194 33.95264)</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>12 - Orange County</td>
-<td>Orange County Transportation Authority</td>
-<td>2242</td>
-<td>2</td>
-<td>CHAPMAN-JETTY</td>
-<td>89</td>
-<td>POINT (-117.90073 33.78878)</td>
+<td>07 - Los Angeles / Ventura</td>
+<td>City of Inglewood</td>
+<td>3878457</td>
+<td>1</td>
+<td>Hardy / Myrtle (Centinela Hospital)</td>
+<td>6</td>
+<td>POINT (-118.34874 33.94905)</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>12 - Orange County</td>
-<td>Orange County Transportation Authority</td>
-<td>2243</td>
+<td>07 - Los Angeles / Ventura</td>
+<td>City of Inglewood</td>
+<td>3878458</td>
 <td>1</td>
-<td>CHAPMAN-HASTER</td>
-<td>37</td>
-<td>POINT (-117.90669 33.78898)</td>
+<td>Osage Senior Apartments</td>
+<td>6</td>
+<td>POINT (-118.34566 33.95134)</td>
 </tr>
 </tbody>
 </table>
@@ -454,15 +454,15 @@ Motivating Question
 </div>
 </div>
 <p>I noticed that a lot of geographic points that have a public transit stop are counted several times, perhaps to reflect different routes. I’m only interested in analyzing the distribution of unique physical transit stops without consideration of stop characteristics, so I drop duplicates based on geometry to get a unique geographic point for each transit stop.</p>
-<div id="eea0e43b" class="cell" data-execution_count="5">
+<div id="eea0e43b" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>gdf_all <span class="op">=</span> gdf_all.drop_duplicates(subset<span class="op">=</span><span class="st">'geometry'</span>)</span></code></pre></div>
 </div>
 <p>I always like to do quick quality checks on geospatial data via calls to <code>geopandas</code>’s <a href="https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoDataFrame.explore.html"><code>.explore()</code> method</a>, which produces interactive plots in one line of code. I’ll look at the stops at San Pablo Ave. and Dwight Way in Berkeley, CA just to make sure everything looks as expected.</p>
-<div id="5a5b27cf" class="cell" data-class-output="map" data-execution_count="82">
+<div id="5a5b27cf" class="cell" data-class-output="map" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>gdf_all[gdf_all[<span class="st">'stop_name'</span>] <span class="op">==</span> <span class="st">'San Pablo Av &amp; Dwight Way'</span>].explore(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    style_kwds<span class="op">=</span><span class="bu">dict</span>(fillOpacity<span class="op">=</span><span class="fl">0.7</span>, radius<span class="op">=</span><span class="dv">12</span>, color<span class="op">=</span><span class="st">'red'</span>), zoom_start<span class="op">=</span><span class="dv">17</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="82">
+<div class="cell-output cell-output-display" data-execution_count="14">
 <div style="width:100%;"><div style="position:relative;width:100%;height:0;padding-bottom:60%;"><span style="color:#565656">Make this Notebook Trusted to load map: File -&gt; Trust Notebook</span><iframe srcdoc="<!DOCTYPE html>
 <html>
 <head>
@@ -482,7 +482,7 @@ Motivating Question
             <meta name=&quot;viewport&quot; content=&quot;width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; />
             <style>
-                #map_cfa9b2590d9f2eb9ac3a1d2b12de39c4 {
+                #map_534a12ac38d2a22e97053c0230a1a79a {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -535,14 +535,14 @@ Motivating Question
 <body>
     
     
-            <div class=&quot;folium-map&quot; id=&quot;map_cfa9b2590d9f2eb9ac3a1d2b12de39c4&quot; ></div>
+            <div class=&quot;folium-map&quot; id=&quot;map_534a12ac38d2a22e97053c0230a1a79a&quot; ></div>
         
 </body>
 <script>
     
     
-            var map_cfa9b2590d9f2eb9ac3a1d2b12de39c4 = L.map(
-                &quot;map_cfa9b2590d9f2eb9ac3a1d2b12de39c4&quot;,
+            var map_534a12ac38d2a22e97053c0230a1a79a = L.map(
+                &quot;map_534a12ac38d2a22e97053c0230a1a79a&quot;,
                 {
                     center: [37.86113000021032, -122.28956450025885],
                     crs: L.CRS.EPSG3857,
@@ -554,13 +554,13 @@ Motivating Question
 
                 }
             );
-            L.control.scale().addTo(map_cfa9b2590d9f2eb9ac3a1d2b12de39c4);
+            L.control.scale().addTo(map_534a12ac38d2a22e97053c0230a1a79a);
 
             
 
         
     
-            var tile_layer_aee1afd3bbe2ad7ce6cec0c8a94f951f = L.tileLayer(
+            var tile_layer_fc34df1e1b7f2b97d7fd04439ecb32af = L.tileLayer(
                 &quot;https://tile.openstreetmap.org/{z}/{x}/{y}.png&quot;,
                 {
   &quot;minZoom&quot;: 0,
@@ -577,22 +577,22 @@ Motivating Question
             );
         
     
-            tile_layer_aee1afd3bbe2ad7ce6cec0c8a94f951f.addTo(map_cfa9b2590d9f2eb9ac3a1d2b12de39c4);
+            tile_layer_fc34df1e1b7f2b97d7fd04439ecb32af.addTo(map_534a12ac38d2a22e97053c0230a1a79a);
         
     
-        function geo_json_cbfb2ece1e3c944629d22512d6a0a980_styler(feature) {
+        function geo_json_c554b4d6436ac649fae82b58bd63d7e3_styler(feature) {
             switch(feature.id) {
                 default:
                     return {&quot;color&quot;: &quot;red&quot;, &quot;fillOpacity&quot;: 0.7, &quot;radius&quot;: 12, &quot;weight&quot;: 2};
             }
         }
-        function geo_json_cbfb2ece1e3c944629d22512d6a0a980_highlighter(feature) {
+        function geo_json_c554b4d6436ac649fae82b58bd63d7e3_highlighter(feature) {
             switch(feature.id) {
                 default:
                     return {&quot;fillOpacity&quot;: 0.75};
             }
         }
-        function geo_json_cbfb2ece1e3c944629d22512d6a0a980_pointToLayer(feature, latlng) {
+        function geo_json_c554b4d6436ac649fae82b58bd63d7e3_pointToLayer(feature, latlng) {
             var opts = {
   &quot;stroke&quot;: true,
   &quot;color&quot;: &quot;#3388ff&quot;,
@@ -610,46 +610,46 @@ Motivating Question
   &quot;radius&quot;: 2,
 };
             
-            let style = geo_json_cbfb2ece1e3c944629d22512d6a0a980_styler(feature)
+            let style = geo_json_c554b4d6436ac649fae82b58bd63d7e3_styler(feature)
             Object.assign(opts, style)
             
             return new L.CircleMarker(latlng, opts)
         }
 
-        function geo_json_cbfb2ece1e3c944629d22512d6a0a980_onEachFeature(feature, layer) {
+        function geo_json_c554b4d6436ac649fae82b58bd63d7e3_onEachFeature(feature, layer) {
 
             layer.on({
                 mouseout: function(e) {
                     if(typeof e.target.setStyle === &quot;function&quot;){
-                            geo_json_cbfb2ece1e3c944629d22512d6a0a980.resetStyle(e.target);
+                            geo_json_c554b4d6436ac649fae82b58bd63d7e3.resetStyle(e.target);
                     }
                 },
                 mouseover: function(e) {
                     if(typeof e.target.setStyle === &quot;function&quot;){
-                        const highlightStyle = geo_json_cbfb2ece1e3c944629d22512d6a0a980_highlighter(e.target.feature)
+                        const highlightStyle = geo_json_c554b4d6436ac649fae82b58bd63d7e3_highlighter(e.target.feature)
                         e.target.setStyle(highlightStyle);
                     }
                 },
             });
         };
-        var geo_json_cbfb2ece1e3c944629d22512d6a0a980 = L.geoJson(null, {
-                onEachFeature: geo_json_cbfb2ece1e3c944629d22512d6a0a980_onEachFeature,
+        var geo_json_c554b4d6436ac649fae82b58bd63d7e3 = L.geoJson(null, {
+                onEachFeature: geo_json_c554b4d6436ac649fae82b58bd63d7e3_onEachFeature,
             
-                style: geo_json_cbfb2ece1e3c944629d22512d6a0a980_styler,
-                pointToLayer: geo_json_cbfb2ece1e3c944629d22512d6a0a980_pointToLayer,
+                style: geo_json_c554b4d6436ac649fae82b58bd63d7e3_styler,
+                pointToLayer: geo_json_c554b4d6436ac649fae82b58bd63d7e3_pointToLayer,
             ...{
 }
         });
 
-        function geo_json_cbfb2ece1e3c944629d22512d6a0a980_add (data) {
-            geo_json_cbfb2ece1e3c944629d22512d6a0a980
+        function geo_json_c554b4d6436ac649fae82b58bd63d7e3_add (data) {
+            geo_json_c554b4d6436ac649fae82b58bd63d7e3
                 .addData(data);
         }
-            geo_json_cbfb2ece1e3c944629d22512d6a0a980_add({&quot;bbox&quot;: [-122.28958300016382, 37.86079400026471, -122.2895460003539, 37.861466000155936], &quot;features&quot;: [{&quot;bbox&quot;: [-122.2895460003539, 37.861466000155936, -122.2895460003539, 37.861466000155936], &quot;geometry&quot;: {&quot;coordinates&quot;: [-122.2895460003539, 37.861466000155936], &quot;type&quot;: &quot;Point&quot;}, &quot;id&quot;: &quot;69776&quot;, &quot;properties&quot;: {&quot;OBJECTID&quot;: 69777, &quot;agency&quot;: &quot;Alameda-Contra Costa Transit District&quot;, &quot;base64_url&quot;: &quot;aHR0cHM6Ly9hcGkuNTExLm9yZy90cmFuc2l0L2RhdGFmZWVkcz9vcGVyYXRvcl9pZD1BQw==&quot;, &quot;district_name&quot;: &quot;04 - Bay Area / Oakland&quot;, &quot;meters_to_ca_state_highway&quot;: 7.7, &quot;n_arrivals&quot;: 143, &quot;n_hours_in_service&quot;: 24, &quot;n_routes&quot;: 4, &quot;org_id&quot;: &quot;recOZgevYf7Jimm9L&quot;, &quot;route_ids_served&quot;: &quot;72, 72M, 72R, 802&quot;, &quot;routetypes&quot;: &quot;3&quot;, &quot;stop_id&quot;: &quot;55880&quot;, &quot;stop_name&quot;: &quot;San Pablo Av \u0026 Dwight Way&quot;}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;bbox&quot;: [-122.28958300016382, 37.86079400026471, -122.28958300016382, 37.86079400026471], &quot;geometry&quot;: {&quot;coordinates&quot;: [-122.28958300016382, 37.86079400026471], &quot;type&quot;: &quot;Point&quot;}, &quot;id&quot;: &quot;69792&quot;, &quot;properties&quot;: {&quot;OBJECTID&quot;: 69793, &quot;agency&quot;: &quot;Alameda-Contra Costa Transit District&quot;, &quot;base64_url&quot;: &quot;aHR0cHM6Ly9hcGkuNTExLm9yZy90cmFuc2l0L2RhdGFmZWVkcz9vcGVyYXRvcl9pZD1BQw==&quot;, &quot;district_name&quot;: &quot;04 - Bay Area / Oakland&quot;, &quot;meters_to_ca_state_highway&quot;: 1.5, &quot;n_arrivals&quot;: 145, &quot;n_hours_in_service&quot;: 24, &quot;n_routes&quot;: 4, &quot;org_id&quot;: &quot;recOZgevYf7Jimm9L&quot;, &quot;route_ids_served&quot;: &quot;72, 72M, 72R, 802&quot;, &quot;routetypes&quot;: &quot;3&quot;, &quot;stop_id&quot;: &quot;57755&quot;, &quot;stop_name&quot;: &quot;San Pablo Av \u0026 Dwight Way&quot;}, &quot;type&quot;: &quot;Feature&quot;}], &quot;type&quot;: &quot;FeatureCollection&quot;});
+            geo_json_c554b4d6436ac649fae82b58bd63d7e3_add({&quot;bbox&quot;: [-122.28958300016382, 37.86079400026471, -122.2895460003539, 37.861466000155936], &quot;features&quot;: [{&quot;bbox&quot;: [-122.2895460003539, 37.861466000155936, -122.2895460003539, 37.861466000155936], &quot;geometry&quot;: {&quot;coordinates&quot;: [-122.2895460003539, 37.861466000155936], &quot;type&quot;: &quot;Point&quot;}, &quot;id&quot;: &quot;69776&quot;, &quot;properties&quot;: {&quot;OBJECTID&quot;: 69777, &quot;agency&quot;: &quot;Alameda-Contra Costa Transit District&quot;, &quot;base64_url&quot;: &quot;aHR0cHM6Ly9hcGkuNTExLm9yZy90cmFuc2l0L2RhdGFmZWVkcz9vcGVyYXRvcl9pZD1BQw==&quot;, &quot;district_name&quot;: &quot;04 - Bay Area / Oakland&quot;, &quot;meters_to_ca_state_highway&quot;: 7.7, &quot;n_arrivals&quot;: 143, &quot;n_hours_in_service&quot;: 24, &quot;n_routes&quot;: 4, &quot;org_id&quot;: &quot;recOZgevYf7Jimm9L&quot;, &quot;route_ids_served&quot;: &quot;72, 72M, 72R, 802&quot;, &quot;routetypes&quot;: &quot;3&quot;, &quot;stop_id&quot;: &quot;55880&quot;, &quot;stop_name&quot;: &quot;San Pablo Av \u0026 Dwight Way&quot;}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;bbox&quot;: [-122.28958300016382, 37.86079400026471, -122.28958300016382, 37.86079400026471], &quot;geometry&quot;: {&quot;coordinates&quot;: [-122.28958300016382, 37.86079400026471], &quot;type&quot;: &quot;Point&quot;}, &quot;id&quot;: &quot;69792&quot;, &quot;properties&quot;: {&quot;OBJECTID&quot;: 69793, &quot;agency&quot;: &quot;Alameda-Contra Costa Transit District&quot;, &quot;base64_url&quot;: &quot;aHR0cHM6Ly9hcGkuNTExLm9yZy90cmFuc2l0L2RhdGFmZWVkcz9vcGVyYXRvcl9pZD1BQw==&quot;, &quot;district_name&quot;: &quot;04 - Bay Area / Oakland&quot;, &quot;meters_to_ca_state_highway&quot;: 1.5, &quot;n_arrivals&quot;: 145, &quot;n_hours_in_service&quot;: 24, &quot;n_routes&quot;: 4, &quot;org_id&quot;: &quot;recOZgevYf7Jimm9L&quot;, &quot;route_ids_served&quot;: &quot;72, 72M, 72R, 802&quot;, &quot;routetypes&quot;: &quot;3&quot;, &quot;stop_id&quot;: &quot;57755&quot;, &quot;stop_name&quot;: &quot;San Pablo Av \u0026 Dwight Way&quot;}, &quot;type&quot;: &quot;Feature&quot;}], &quot;type&quot;: &quot;FeatureCollection&quot;});
 
         
     
-    geo_json_cbfb2ece1e3c944629d22512d6a0a980.bindTooltip(
+    geo_json_c554b4d6436ac649fae82b58bd63d7e3.bindTooltip(
     function(layer){
     let div = L.DomUtil.create('div');
     
@@ -684,7 +684,7 @@ Motivating Question
 });
                      
     
-            geo_json_cbfb2ece1e3c944629d22512d6a0a980.addTo(map_cfa9b2590d9f2eb9ac3a1d2b12de39c4);
+            geo_json_c554b4d6436ac649fae82b58bd63d7e3.addTo(map_534a12ac38d2a22e97053c0230a1a79a);
         
 </script>
 </html>" style="position:absolute;width:100%;height:100%;left:0;top:0;border:none !important;" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen=""></iframe></div></div>
@@ -728,10 +728,10 @@ Census data and Kyle Walker
 </div>
 <p>Census shapefiles are maintained in the Census’ <a href="https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-geodatabase-file.html">TIGER/Line geodatabase</a>, which contains the shapes of basically any administrative or political boundary you could think of within the U.S. One can download files via the census’ <a href="https://www2.census.gov/geo/tiger/">FTP archive</a> (I’ve unfortunately <a href="https://github.com/peter-amerkhanian/sf-schools-simulation/blob/main/build_city.py">written code</a> to do this in the past), but it’s much easier to just use the excellent <a href="https://github.com/walkerke/tigris"><code>tigris</code></a>/<a href="https://walker-data.com/pygris/"><code>pygris</code></a> package that Kyle Walker developed for simplifying access to TIGER/Line shapefiles <span class="citation" data-cites="walker_tigris_2025">(<a href="#ref-walker_tigris_2025" role="doc-biblioref">Walker 2025</a>)</span>.</p>
 <p>Using <code>tigris</code>/<code>pygris</code> is very simple – I just call the <code>states()</code> function<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> for a given year, and it will return the outlines of every state in the U.S. as set in 2024 (note that the boundaries typically do not change for states, but they do change for some smaller geographies). More information about the use of <code>tigris</code> is available in <span class="citation" data-cites="walker_analyzing_2023">(<a href="#ref-walker_analyzing_2023" role="doc-biblioref">Walker 2023, chap. 5</a>)</span>.</p>
-<div id="1f31a346" class="cell" data-execution_count="7">
+<div id="1f31a346" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>state_shapes <span class="op">=</span> pygris.states(cache<span class="op">=</span><span class="va">True</span>, year<span class="op">=</span><span class="dv">2024</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>state_shapes.head(<span class="dv">2</span>)</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="7">
+<div class="cell-output cell-output-display" data-execution_count="15">
 <div>
 
 
@@ -785,11 +785,11 @@ Census data and Kyle Walker
 </div>
 </div>
 <p>Here’s just California:</p>
-<div id="50695242" class="cell" data-execution_count="8">
+<div id="50695242" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>california <span class="op">=</span> state_shapes[state_shapes[<span class="st">"GEOID"</span>] <span class="op">==</span> <span class="st">"06"</span>]</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>california <span class="op">=</span> california.set_index(<span class="st">"NAME"</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>california</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="8">
+<div class="cell-output cell-output-display" data-execution_count="16">
 <div>
 
 
@@ -840,10 +840,10 @@ Census data and Kyle Walker
 </div>
 </div>
 <p>I’ll do the same with <code>counties()</code>, retrieving the boundaries for all of the counties within California (<code>state="06"</code>) in 2024.</p>
-<div id="40d5470c" class="cell" data-execution_count="9">
+<div id="40d5470c" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>county_shapes <span class="op">=</span> pygris.counties(state<span class="op">=</span><span class="st">"06"</span>, year<span class="op">=</span><span class="st">'2024'</span>, cache<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>county_shapes[[<span class="st">'NAMELSAD'</span>, <span class="st">'geometry'</span>]].head()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="9">
+<div class="cell-output cell-output-display" data-execution_count="17">
 <div>
 
 
@@ -888,7 +888,7 @@ Census data and Kyle Walker
 </div>
 </div>
 <p>When we plot them together, it looks like we have the administrative boundaries we wanted.</p>
-<div id="615e6768" class="cell" data-execution_count="10">
+<div id="615e6768" class="cell" data-execution_count="18">
 <details class="code-fold">
 <summary>Plot Code: Counties and States from <code>pygris</code></summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">3</span>))</span>
@@ -910,6 +910,7 @@ Census data and Kyle Walker
 </section>
 <section id="dealing-with-coordinate-reference-systems" class="level3">
 <h3 class="anchored" data-anchor-id="dealing-with-coordinate-reference-systems">Dealing with Coordinate Reference Systems</h3>
+<p><img src="spherical.webp" class="img-fluid"></p>
 <p>Geospatial datasets typically come with a set <strong>coordinate reference system</strong> (CRS), which defines how locations in the real world are represented as coordinates in the data. This may sound trivial, but given the imperfect spherical shape of the earth, defining a usable coordinate reference system is quite complex and systems aren’t one-size-fits-all. There are global CRS, CRS optimized for certain regions, and CRS optimized for distance calculations <span class="citation" data-cites="kennedy_understanding_2000">(<a href="#ref-kennedy_understanding_2000" role="doc-biblioref">Kennedy and Kopp 2000</a>)</span>.</p>
 <p>For reference, here are all of the CRS that I will use in this post:</p>
 <table class="caption-top table">
@@ -954,15 +955,15 @@ Census data and Kyle Walker
 </tr>
 </tbody>
 </table>
-<div id="463437c0" class="cell" data-execution_count="11">
+<div id="463437c0" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>WGS_84 <span class="op">=</span> <span class="st">"EPSG:4326"</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>NAD_CRS <span class="op">=</span> <span class="st">"EPSG:4269"</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>CA_ALBERS_CRS <span class="op">=</span> <span class="st">"EPSG:3310"</span></span></code></pre></div>
 </div>
 <p>The public transit stop data from the CalTrans come in a common and versatile CRS, <a href="https://en.wikipedia.org/wiki/World_Geodetic_System#WGS84">World Geodetic System (WGS) 84</a>, also known as <a href="https://epsg.io/4326?utm_source=chatgpt.com"><code>EPSG:4326</code></a>. Many global or multi-national datasets use <strong>WGS 84</strong>, including the Google Earth service. WGS84 is “geodetic,” meaning that distance is measured in longitudinal/latitudinal degrees. This is problematic for distance measurement and we’ll touch on that more in Exercise 4.</p>
-<div id="f852f5e9" class="cell" data-execution_count="12">
+<div id="f852f5e9" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>gdf_all.crs</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="12">
+<div class="cell-output cell-output-display" data-execution_count="20">
 <pre><code>&lt;Geographic 2D CRS: EPSG:4326&gt;
 Name: WGS 84
 Axis Info [ellipsoidal]:
@@ -977,10 +978,10 @@ Datum: World Geodetic System 1984 ensemble
 </div>
 </div>
 <p>U.S. Census TIGER/Line data typically use <a href="https://en.wikipedia.org/wiki/North_American_Datum">North American Datum (NAD) 83</a>, EPSG code <a href="https://epsg.io/4269"><code>4269</code></a>. <strong>NAD83</strong> is commonly used by U.S. Federal Agencies and, like WGS84, it is “geodetic” and measures distance in degrees. Unlike WGS84, NAD83 is optimized for geographic accuracy within the United States.</p>
-<div id="aacda072" class="cell" data-execution_count="13">
+<div id="aacda072" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> california.crs <span class="op">==</span> county_shapes.crs</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>california.crs</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="13">
+<div class="cell-output cell-output-display" data-execution_count="21">
 <pre><code>&lt;Geographic 2D CRS: EPSG:4269&gt;
 Name: NAD83
 Axis Info [ellipsoidal]:
@@ -995,11 +996,11 @@ Datum: North American Datum 1983
 </div>
 </div>
 <p>When working with multiple datasets, it’s important to ensure that they share the same CRS. In GeoPandas, CRS alignment and conversion are straightforward. I’d like to work in the CRS provided by the U.S. Census – NAD83. I use simple variable assignment in python to bring the stops dataset (currently in WGS84) into NAD83.</p>
-<div id="b1b52167" class="cell" data-execution_count="14">
+<div id="b1b52167" class="cell" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>target_crs <span class="op">=</span> california.crs</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>gdf_all.crs <span class="op">=</span> target_crs</span></code></pre></div>
 </div>
-<div id="328773ff" class="cell" data-execution_count="15">
+<div id="328773ff" class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> gdf_all.crs <span class="op">==</span> california.crs</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gdf_all.crs, <span class="st">"=="</span>, california.crs)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -1007,16 +1008,18 @@ Datum: North American Datum 1983
 </div>
 </div>
 <p>Now that I have both the California shapefile and the public transit stops in the same CRS, I can start to use them together. First, I’ll do a spatial join – I’ll filter the public transit stops down to only those that are within the California shapefile.</p>
-<div id="9d723bbc" class="cell" data-execution_count="16">
+<div id="9d723bbc" class="cell" data-execution_count="24">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>gdf_ca <span class="op">=</span> gdf_all.copy().sjoin(california, how<span class="op">=</span><span class="st">"inner"</span>, predicate<span class="op">=</span><span class="st">"within"</span>)</span></code></pre></div>
 </div>
 <p>With the preliminary data processing complete, I’ll now move into a series of five thematic mapping exercises to examine the distribution of public transit stops.</p>
 </section>
 </section>
-<section id="exercise-1-point-plot" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-1-point-plot">Exercise 1: Point Plot</h2>
+<section id="exercise-1-point-plot-pros-and-cons" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-1-point-plot-pros-and-cons">Exercise 1: Point Plot Pros and Cons</h2>
+<p>Sometimes, a simple point plot – where we simply lay out the raw data as points over a map – is the best thematic map for the job. Consider a canonical example</p>
+<p><img src="seaman.png" class="img-fluid" style="width:50.0%"></p>
 <p>As a first exercise, I’ll make of the simplest thematic map – I’ll just plot all of the public transit stops as points over the California shapefile.</p>
-<div id="5d8db0cf" class="cell" data-execution_count="17">
+<div id="5d8db0cf" class="cell" data-execution_count="25">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">4</span>, <span class="dv">5</span>))</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> california.crs <span class="op">==</span> gdf_ca.crs</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>california.plot(ax<span class="op">=</span>ax, edgecolor<span class="op">=</span><span class="st">"grey"</span>, facecolor<span class="op">=</span><span class="st">"none"</span>,</span>
@@ -1056,17 +1059,17 @@ Motivating Question
 </div>
 <p>I’d like to go deeper and explore how aggregating stops into larger geographies helps pick out different trends.</p>
 </section>
-<section id="exercise-2-county-choropleth" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-2-county-choropleth">Exercise 2: County Choropleth</h2>
+<section id="exercise-2-county-choropleths" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-2-county-choropleths">Exercise 2: County Choropleths</h2>
 <p>One very common geospatial data product is the choropleth map. Choropleth maps communicate how the density of some data or else another quantity that describes that data varies across administrative units, like countries, states, provinces, etc. The data are grouped into the administrative units, and the aggregate value for each unit is depicted in the map via color intensity/hue/saturation <span class="citation" data-cites="tennekes_tmap_2018">(<a href="#ref-tennekes_tmap_2018" role="doc-biblioref">Tennekes 2018</a>)</span>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<figcaption>Charles Dupin’s 1826 choropleth, <span class="citation" data-cites="charles_dupin_francais_1826">(<a href="#ref-charles_dupin_francais_1826" role="doc-biblioref">Charles Dupin 1826</a>)</span>, depicting the availability of basic education in France is believed to be the earliest known choropleth map <span class="citation" data-cites="friendly_milestones_2000">(<a href="#ref-friendly_milestones_2000" role="doc-biblioref">Friendly 2000</a>)</span></figcaption>
+<figcaption>Charles Dupin’s 1826 choropleth, <span class="citation" data-cites="charles_dupin_carte_1826">(<a href="#ref-charles_dupin_carte_1826" role="doc-biblioref">Charles Dupin 1826</a>)</span>, depicting the availability of basic education in France is believed to be the earliest known choropleth map <span class="citation" data-cites="friendly_milestones_2000">(<a href="#ref-friendly_milestones_2000" role="doc-biblioref">Friendly 2000</a>)</span></figcaption>
 <p><img src="choropleth.jpg" class="img-fluid figure-img" style="width:50.0%"></p>
 </figure>
 </div>
 <p>We are going to build a choropleth showing how many public transit stops there are in each county in California. In preparation, I’ll get some general plotting functions set up.</p>
-<div id="d6e0068a" class="cell" data-execution_count="18">
+<div id="d6e0068a" class="cell" data-execution_count="26">
 <details class="code-fold">
 <summary>Some custom plotting code/functions: <code>build_cmap</code>, <code>number_suffix_formatter</code></summary>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>plt.rcParams[<span class="st">"font.family"</span>] <span class="op">=</span> <span class="st">"Arial"</span></span>
@@ -1139,7 +1142,7 @@ Motivating Question
 </details>
 </div>
 <p>The first step of making our choropleth is going to be aggregating the public transit stops (<code>Point</code> data) within counties (<code>Polygon</code> data). Here’s an abstract representation of the problem – we want to count the “Inside Points” for each county shape.</p>
-<div id="b0a95efa" class="cell" data-execution_count="19">
+<div id="b0a95efa" class="cell" data-execution_count="27">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -1150,7 +1153,7 @@ Motivating Question
 </div>
 </div>
 <p>Here’s a custom <code>points_in_polygon()</code> function that will count up the number of points from one gdf, <code>point_gdf</code> that are within the shape from another gdf, <code>polygon_gdf</code>. There’s an optional weight variable that I won’t be using.</p>
-<div id="da413080" class="cell" data-execution_count="20">
+<div id="da413080" class="cell" data-execution_count="28">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> points_in_polygon(</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    point_gdf: gpd.GeoDataFrame,</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    polygon_gdf: gpd.GeoDataFrame,</span>
@@ -1173,10 +1176,10 @@ Motivating Question
 <span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span></code></pre></div>
 </div>
 <p>You can see that the logic is based on spatially merging the points with the polygons based on whether points fall “within” polygons, then I group by the polygon identifier and count up how many points there are within each. When we run that with the transit stops and counties, we get the following, where NaN represents a county having no public transit stops.</p>
-<div id="e48ed409" class="cell" data-execution_count="21">
+<div id="e48ed409" class="cell" data-execution_count="29">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>county_agg <span class="op">=</span> points_in_polygon(gdf_all, county_shapes, group_var<span class="op">=</span><span class="st">"NAME"</span>)</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>county_agg[[<span class="st">'NAME'</span>, <span class="st">'count'</span>]].head()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="21">
+<div class="cell-output cell-output-display" data-execution_count="29">
 <div>
 
 
@@ -1221,7 +1224,7 @@ Motivating Question
 </div>
 </div>
 <p>With that aggregated data, I can now make a choropleth of transit stops across counties. Before making the final plot, I’ll define various stylings for the map in the following folded code block. I often like to define parameters for <code>geopandas</code> plots in dictionaries so that I can reuse styles across different plots.</p>
-<div id="318ac889" class="cell" data-execution_count="22">
+<div id="318ac889" class="cell" data-execution_count="30">
 <details class="code-fold">
 <summary>Plot Styling: <code>new_cmap</code>, <code>missing_fill_kws</code>, <code>borders_kws</code>, <code>data_fill_kws</code></summary>
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Legend</span></span>
@@ -1242,7 +1245,7 @@ Motivating Question
 </details>
 </div>
 <p>You can pass the style dictionaries directly into the plotting functions as keyword arguments, which you can see below with <code>**missing_fill_kws</code>, <code>**borders_kws</code>, and <code>**data_fill_kws</code>.</p>
-<div id="62189676" class="cell" data-execution_count="23">
+<div id="62189676" class="cell" data-execution_count="31">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">4</span>, <span class="dv">6</span>))</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>county_agg <span class="op">=</span> points_in_polygon(gdf_all, county_shapes, group_var<span class="op">=</span><span class="st">"NAME"</span>)</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>county_agg.plot(</span>
@@ -1267,11 +1270,11 @@ Motivating Question
 </div>
 <p>Looks like Los Angeles has a lot of public transit stops.</p>
 </section>
-<section id="exercise-3-region-choropleth" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-3-region-choropleth">Exercise 3: Region Choropleth</h2>
+<section id="exercise-3-a-region-choropleth" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-3-a-region-choropleth">Exercise 3: A Region Choropleth</h2>
 <p>To provide additional perspective, we’re going to make another choropleth using a different geographic unit. I’d like to get a look at how stop availability differs across larger regions, such as the San Francisco Bay Area, Los Angeles, the Central Valley, etc. I don’t have a regions dataset, but I do have a counties dataset and regions are typically made up of counties, so this will be an opportunity to try combining smaller geographies into larger, custom geographies.</p>
 <p>In the following folded code chunk I’ll define a mapping of counties to regions based on <a href="https://census.ca.gov/regions/">regions defined for 2020 Census outreach in California</a>:</p>
-<div id="6e85e041" class="cell" data-execution_count="24">
+<div id="6e85e041" class="cell" data-execution_count="32">
 <details class="code-fold">
 <summary>California County → Region Mappings, <code>county_to_region</code></summary>
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># https://census.ca.gov/regions/</span></span>
@@ -1338,10 +1341,10 @@ Motivating Question
 </details>
 </div>
 <p>Now that I have the mappings dictionary, I can map those onto the county names in my dataset:</p>
-<div id="cd98a093" class="cell" data-execution_count="25">
+<div id="cd98a093" class="cell" data-execution_count="33">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>county_shapes[<span class="st">"region"</span>] <span class="op">=</span> county_shapes[<span class="st">"NAME"</span>].<span class="bu">map</span>(county_to_region)</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>county_shapes[[<span class="st">"NAME"</span>, <span class="st">"region"</span>]].head(<span class="dv">4</span>)</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="25">
+<div class="cell-output cell-output-display" data-execution_count="33">
 <div>
 
 
@@ -1381,7 +1384,7 @@ Motivating Question
 </div>
 </div>
 <p>I want to combine the county shapes up into larger, parent region shapes. This spatial aggregation operation is called a <a href="https://geopandas.org/en/stable/docs/user_guide/aggregation_with_dissolve.html"><code>dissolve()</code> in geopandas</a>. Here’s an abstract representation of what <code>dissolve()</code> does:</p>
-<div id="8408f772" class="cell" data-execution_count="26">
+<div id="8408f772" class="cell" data-execution_count="34">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -1392,11 +1395,11 @@ Motivating Question
 </div>
 </div>
 <p>Here we will create a new gdf, <code>regions</code>, with the results of dissolving the counties up into regions.</p>
-<div id="beda6efb" class="cell" data-execution_count="27">
+<div id="beda6efb" class="cell" data-execution_count="35">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>regions <span class="op">=</span> county_shapes.dissolve(by<span class="op">=</span><span class="st">"region"</span>)</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> county_shapes.crs <span class="op">==</span> regions.crs</span></code></pre></div>
 </div>
-<div id="e4b47b51" class="cell" data-execution_count="28">
+<div id="e4b47b51" class="cell" data-execution_count="36">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -1408,7 +1411,7 @@ Motivating Question
 </div>
 <p>One benefit of moving up to a larger geographic unit is that there will be more space on the map for labels. Labeling all 58 counties in California is generally not feasible without using creative acronyms or else altering the county shapes, but regions lend themselves to labeling, albeit with a few tweaks to the labels.</p>
 <p>Long strings are generally difficult to fit on maps, so as a first step I will add newlines to every region label at the midpoint of the text:</p>
-<div id="f7cdfa3f" class="cell" data-execution_count="29">
+<div id="f7cdfa3f" class="cell" data-execution_count="37">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> split_name_middle(name: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    parts <span class="op">=</span> name.replace(<span class="st">"-"</span>, <span class="st">" "</span>).split()</span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(parts) <span class="op">&lt;=</span> <span class="dv">1</span>:</span>
@@ -1416,7 +1419,7 @@ Motivating Question
 <span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    mid <span class="op">=</span> <span class="bu">len</span>(parts) <span class="op">//</span> <span class="dv">2</span></span>
 <span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">" "</span>.join(parts[:mid]) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span> <span class="op">+</span> <span class="st">" "</span>.join(parts[mid:])</span></code></pre></div>
 </div>
-<div id="619c2579" class="cell" data-execution_count="30">
+<div id="619c2579" class="cell" data-execution_count="38">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(split_name_middle(<span class="st">'San Francisco Bay Area'</span>))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>San Francisco
@@ -1424,109 +1427,133 @@ Bay Area</code></pre>
 </div>
 </div>
 <p>Next, I’ll create a function to label each region polygon. The labels will be placed at the centroids of each region by default, but the function also allows for the user to pass a list of labels that need to be “adjusted” – moved away from their region for spacing purposes. I utilize <a href="https://github.com/Phlya/adjustText">the <code>adjustText</code> python library</a>, a great tool for this purpose.</p>
-<div id="fe392b09" class="cell" data-execution_count="31">
+<div id="fe392b09" class="cell" data-execution_count="103">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> label_polygon(</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    gdf: gpd.GeoDataFrame,</span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    ax,</span>
 <span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    column: <span class="bu">str</span>,</span>
 <span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    adjust_list: <span class="bu">list</span> <span class="op">=</span> [],</span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    adjust_kws<span class="op">=</span>{},</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    adjust_kws<span class="op">=</span>{<span class="st">"avoid_self"</span>: <span class="va">True</span>},</span>
 <span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    text_kws<span class="op">=</span>{},</span>
 <span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    texts <span class="op">=</span> []</span>
-<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _, row <span class="kw">in</span> gdf.iterrows():</span>
-<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> row[<span class="st">"geometry"</span>].is_empty <span class="kw">or</span> row[<span class="st">"geometry"</span>].centroid.is_empty:</span>
-<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
-<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>        point <span class="op">=</span> row[<span class="st">"geometry"</span>].centroid</span>
-<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>        x, y <span class="op">=</span> point.x, point.y</span>
-<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> row[column] <span class="kw">in</span> adjust_list:</span>
-<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>            texts.append(</span>
-<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>                ax.text(x, y, split_name_middle(row[column]), <span class="op">**</span>text_kws))</span>
-<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>            ax.text(x, y, split_name_middle(row[column]), <span class="op">**</span>text_kws)</span>
-<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>    adjust_text(texts, ax<span class="op">=</span>ax, <span class="op">**</span>adjust_kws)</span></code></pre></div>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> adjust_kws.get(<span class="st">'arrowprops'</span>):</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>        adjust_kws[<span class="st">'arrowprops'</span>] <span class="op">=</span> {</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>            <span class="st">"arrowstyle"</span>: <span class="st">"-"</span>,</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"color"</span>: <span class="st">"black"</span>,</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"lw"</span>: <span class="dv">1</span>,</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">"connectionstyle"</span>: <span class="st">"arc3,rad=0.1"</span></span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>    texts <span class="op">=</span> []</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _, row <span class="kw">in</span> gdf.iterrows():</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> row[<span class="st">"geometry"</span>].is_empty <span class="kw">or</span> row[<span class="st">"geometry"</span>].centroid.is_empty:</span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>        point <span class="op">=</span> row[<span class="st">"geometry"</span>].centroid</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>        x, y <span class="op">=</span> point.x, point.y</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> row[column] <span class="kw">in</span> adjust_list:</span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>            texts.append(</span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>                ax.text(x, y, split_name_middle(row[column]), <span class="op">**</span>text_kws))</span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>            ax.text(x, y, split_name_middle(row[column]), <span class="op">**</span>text_kws)</span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>    adjust_text(texts, ax<span class="op">=</span>ax, <span class="op">**</span>adjust_kws)</span></code></pre></div>
 </div>
-<p>With those helper-functions defined, I’ll proceed to define the styling for the plot, including styles for the adjusted text.</p>
-<div id="78ae2010" class="cell" data-execution_count="32">
-<details class="code-fold">
-<summary>Plot Styling: <code>new_cmap</code>, <code>borders_kws</code>, <code>data_fill_kws</code>, <code>missing_fill_kws</code>, <code>legend_cbar_kws</code>,<code>adjust_kws</code>, <code>text_kws</code></summary>
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>new_cmap <span class="op">=</span> build_cmap(<span class="st">"coolwarm_r"</span>, start<span class="op">=</span><span class="fl">0.1</span>, end<span class="op">=</span><span class="fl">0.9</span>)</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>borders_kws <span class="op">=</span> {<span class="st">"edgecolor"</span>: <span class="st">"grey"</span>, <span class="st">"linewidth"</span>: <span class="fl">0.3</span>}</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>data_fill_kws <span class="op">=</span> {<span class="st">"alpha"</span>: <span class="fl">0.7</span>, <span class="st">"cmap"</span>: new_cmap}</span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>missing_fill_kws <span class="op">=</span> {<span class="st">"hatch"</span>: <span class="st">"////"</span>, <span class="st">"facecolor"</span>: <span class="st">"none"</span>}</span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>legend_cbar_kws <span class="op">=</span> {</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"format"</span>: FuncFormatter(number_suffix_formatter),</span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"shrink"</span>: <span class="fl">0.7</span>,</span>
-<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"label"</span>: <span class="st">"Number of Public Transit Stops"</span>,</span>
-<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"location"</span>: <span class="st">"top"</span>,</span>
-<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"pad"</span>: <span class="fl">0.001</span>,</span>
-<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>adjust_kws <span class="op">=</span> {</span>
-<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"avoid_self"</span>: <span class="va">True</span>,</span>
-<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"expand"</span>: (<span class="dv">7</span>, <span class="dv">3</span>),</span>
-<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"arrowprops"</span>: {</span>
-<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"arrowstyle"</span>: <span class="st">"-"</span>,</span>
-<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"color"</span>: <span class="st">"black"</span>,</span>
-<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"lw"</span>: <span class="dv">1</span>,</span>
-<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"connectionstyle"</span>: <span class="st">"arc3,rad=0.1"</span>,</span>
-<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a>text_kws <span class="op">=</span> {</span>
-<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"fontsize"</span>: <span class="dv">7</span>,</span>
-<span id="cb33-24"><a href="#cb33-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">"ha"</span>: <span class="st">"center"</span>,</span>
-<span id="cb33-25"><a href="#cb33-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"va"</span>: <span class="st">"center"</span>,</span>
-<span id="cb33-26"><a href="#cb33-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">"color"</span>: <span class="st">"black"</span>,</span>
-<span id="cb33-27"><a href="#cb33-27" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-</details>
+<div id="43374ec8" class="cell" data-execution_count="106">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">4</span>, <span class="dv">4</span>))</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>subset <span class="op">=</span> regions.loc[[<span class="st">'North Coast'</span>], :]</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>subset.plot(ax<span class="op">=</span>ax)</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>label_polygon(subset.reset_index(), ax, column<span class="op">=</span><span class="st">'region'</span>, adjust_list<span class="op">=</span>[<span class="st">'North Coast'</span>], adjust_kws<span class="op">=</span>{<span class="st">"expand"</span>: (<span class="dv">12</span>, <span class="dv">2</span>)})</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>ax.set_axis_off()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>d</code></pre>
 </div>
-<p>And now the plot – straightforward code from here.</p>
-<div id="df97f12a" class="cell" data-execution_count="33">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">4</span>, <span class="dv">6</span>))</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>arrivals_in_regions <span class="op">=</span> points_in_polygon(</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    gdf_all,</span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    regions.reset_index(),</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    group_var<span class="op">=</span><span class="st">"region"</span>,</span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    weight_var<span class="op">=</span><span class="st">"n_arrivals"</span>,</span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>arrivals_in_regions.plot(</span>
-<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>    column<span class="op">=</span><span class="st">"n_arrivals_sum"</span>,</span>
-<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>ax,</span>
-<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>data_fill_kws,</span>
-<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>borders_kws,</span>
-<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>    legend_kwds<span class="op">=</span>legend_cbar_kws</span>
-<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>label_polygon(</span>
-<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>    arrivals_in_regions,</span>
-<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>    ax,</span>
-<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"region"</span>,</span>
-<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>    adjust_list<span class="op">=</span>[<span class="st">"San Francisco Bay Area"</span>, <span class="st">"Orange County"</span>, <span class="st">"North Coast"</span>],</span>
-<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>    adjust_kws<span class="op">=</span>adjust_kws,</span>
-<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>    text_kws<span class="op">=</span>text_kws,</span>
-<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>ax.axis(<span class="st">"off"</span>)</span>
-<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-34-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-33-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>With those helper-functions defined, I’ll proceed to define the styling for the plot, including styles for the adjusted text.</p>
+<div id="78ae2010" class="cell" data-execution_count="42">
+<details class="code-fold">
+<summary>Plot Styling: <code>new_cmap</code>, <code>borders_kws</code>, <code>data_fill_kws</code>, <code>missing_fill_kws</code>, <code>legend_cbar_kws</code>,<code>adjust_kws</code>, <code>text_kws</code></summary>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>new_cmap <span class="op">=</span> build_cmap(<span class="st">"coolwarm_r"</span>, start<span class="op">=</span><span class="fl">0.1</span>, end<span class="op">=</span><span class="fl">0.9</span>)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>borders_kws <span class="op">=</span> {<span class="st">"edgecolor"</span>: <span class="st">"grey"</span>, <span class="st">"linewidth"</span>: <span class="fl">0.3</span>}</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>data_fill_kws <span class="op">=</span> {<span class="st">"alpha"</span>: <span class="fl">0.7</span>, <span class="st">"cmap"</span>: new_cmap}</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>missing_fill_kws <span class="op">=</span> {<span class="st">"hatch"</span>: <span class="st">"////"</span>, <span class="st">"facecolor"</span>: <span class="st">"none"</span>}</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>legend_cbar_kws <span class="op">=</span> {</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"format"</span>: FuncFormatter(number_suffix_formatter),</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"shrink"</span>: <span class="fl">0.7</span>,</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"label"</span>: <span class="st">"Number of Public Transit Stops"</span>,</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"location"</span>: <span class="st">"top"</span>,</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"pad"</span>: <span class="fl">0.001</span>,</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>adjust_kws <span class="op">=</span> {</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"avoid_self"</span>: <span class="va">True</span>,</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"expand"</span>: (<span class="dv">7</span>, <span class="dv">3</span>),</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"arrowprops"</span>: {</span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"arrowstyle"</span>: <span class="st">"-"</span>,</span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"color"</span>: <span class="st">"black"</span>,</span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"lw"</span>: <span class="dv">1</span>,</span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"connectionstyle"</span>: <span class="st">"arc3,rad=0.1"</span>,</span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a>text_kws <span class="op">=</span> {</span>
+<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"fontsize"</span>: <span class="dv">7</span>,</span>
+<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">"ha"</span>: <span class="st">"center"</span>,</span>
+<span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"va"</span>: <span class="st">"center"</span>,</span>
+<span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">"color"</span>: <span class="st">"black"</span>,</span>
+<span id="cb35-27"><a href="#cb35-27" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+</details>
+</div>
+<p>And now the plot – straightforward code from here.</p>
+<div id="df97f12a" class="cell" data-execution_count="43">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">4</span>, <span class="dv">6</span>))</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>arrivals_in_regions <span class="op">=</span> points_in_polygon(</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    gdf_all,</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    regions.reset_index(),</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    group_var<span class="op">=</span><span class="st">"region"</span>,</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>    weight_var<span class="op">=</span><span class="st">"n_arrivals"</span>,</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>arrivals_in_regions.plot(</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>    column<span class="op">=</span><span class="st">"n_arrivals_sum"</span>,</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>ax,</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>data_fill_kws,</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>borders_kws,</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>    legend_kwds<span class="op">=</span>legend_cbar_kws</span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>label_polygon(</span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>    arrivals_in_regions,</span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>    ax,</span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"region"</span>,</span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>    adjust_list<span class="op">=</span>[<span class="st">"San Francisco Bay Area"</span>, <span class="st">"Orange County"</span>, <span class="st">"North Coast"</span>],</span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>    adjust_kws<span class="op">=</span>adjust_kws,</span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>    text_kws<span class="op">=</span>text_kws,</span>
+<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-24"><a href="#cb36-24" aria-hidden="true" tabindex="-1"></a>ax.axis(<span class="st">"off"</span>)</span>
+<span id="cb36-25"><a href="#cb36-25" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-35-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
 <p>Interesting perspective from this one, where the takeaway seems to be that the Los Angeles and San Francisco Bay Area regions have many more transit stops than the rest of the state. Like the previous county map, this shows that L.A. is far above the rest of the state in terms of raw count of stops within its borders.</p>
 </section>
-<section id="exercise-4-heatmaps" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-4-heatmaps">Exercise 4: Heatmaps</h2>
+<section id="exercise-4-heatmaps-and-projected-crs" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-4-heatmaps-and-projected-crs">Exercise 4: Heatmaps and Projected CRS</h2>
 <blockquote class="blockquote">
 <p>[…] heat maps may also visualize data over a geographic region. However, unlike choropleth maps, heat maps show the proportion of a variable over an arbitrary, but usually small grid size, independent of geographic boundaries.</p>
 </blockquote>
 <p>https://en.wikipedia.org/wiki/Ecological_fallacy</p>
 <p>https://en.wikipedia.org/wiki/Heat_map#Choropleth_maps_versus_heat_maps</p>
 <p>We are going to explicitly define the size of these cells that break space up into a grid – e.g.&nbsp;square 20 kilometer cells. That means that we are going to be calculating distances across space, and that means a refresher on the appropriate use of Coordinate Reference Systems! Our stops dataset and the county/state shape data we are using are currently in <strong>NAD83</strong>, which is a geodetic CRS that uses latitude and longitude coordinates to locate positions <span class="citation" data-cites="kennedy_understanding_2000">(<a href="#ref-kennedy_understanding_2000" role="doc-biblioref">Kennedy and Kopp 2000</a>)</span>.</p>
-<div id="745d60f5" class="cell" data-execution_count="34">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>gdf_ca.crs.coordinate_system</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="34">
+<div id="745d60f5" class="cell" data-execution_count="44">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>gdf_ca.crs.coordinate_system</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="44">
 <pre><code>CS[ellipsoidal,2],
     AXIS["geodetic latitude (Lat)",north,
         ORDER[1],
@@ -1543,12 +1570,12 @@ Bay Area</code></pre>
 <p>Since degrees of latitude and longitude don’t have a standard length, you can’t measure distances or areas accurately or display the data easily on a flat map or computer screen.</p>
 </blockquote>
 <p>When we try any distance calculations on a gdf in a geodetic CRS, we get a warning in <code>geopandas</code>.</p>
-<div id="1c3a0fab" class="cell" data-execution_count="35">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> warnings.catch_warnings(record<span class="op">=</span><span class="va">True</span>) <span class="im">as</span> w:</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># try calculating length</span></span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    california.length</span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># clean up warning message</span></span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="bu">str</span>(w[<span class="dv">0</span>].message).replace(<span class="st">". "</span>, <span class="st">".</span><span class="ch">\n</span><span class="st">"</span>))</span></code></pre></div>
+<div id="1c3a0fab" class="cell" data-execution_count="45">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> warnings.catch_warnings(record<span class="op">=</span><span class="va">True</span>) <span class="im">as</span> w:</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># try calculating length</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    california.length</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># clean up warning message</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="bu">str</span>(w[<span class="dv">0</span>].message).replace(<span class="st">". "</span>, <span class="st">".</span><span class="ch">\n</span><span class="st">"</span>))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Geometry is in a geographic CRS.
 Results from 'length' are likely incorrect.
@@ -1557,12 +1584,12 @@ Use 'GeoSeries.to_crs()' to re-project geometries to a projected CRS before this
 </div>
 </div>
 <p>As the <code>geopandas</code> warning above suggests, we can address this warning by re-projecting the data into a <strong>projected CRS</strong> that explicitly measures location in meters.</p>
-<div id="c60cd006" class="cell" data-execution_count="36">
+<div id="c60cd006" class="cell" data-execution_count="46">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <figcaption>Comparison of geographic versus projected coordinate systems (image by author).</figcaption>
-<p><img src="index_files/figure-html/cell-37-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-38-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1572,14 +1599,14 @@ Use 'GeoSeries.to_crs()' to re-project geometries to a projected CRS before this
 <p>A spheroid can’t be flattened to a plane any easier than a piece of orange peel can be flattened—it will rip. Representing the earth’s surface in two dimensions causes distortion in the shape, area, distance, or direction of the data.</p>
 </blockquote>
 <p>Cartographers have developed a whole world of different 3D to 2D <strong>map projections</strong> designed with specific uses and geographies in mind to minimize distortion <span class="citation" data-cites="kennedy_understanding_2000">(<a href="#ref-kennedy_understanding_2000" role="doc-biblioref">Kennedy and Kopp 2000</a>)</span>. Here we will use California Albers (also known as Teale Albers), a map projection optimal for distance calculations within California <span class="citation" data-cites="patterson_california_2022">(<a href="#ref-patterson_california_2022" role="doc-biblioref">Patterson 2022</a>)</span>.</p>
-<div id="58db9cb0" class="cell" data-execution_count="37">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>gdf_ca_proj <span class="op">=</span> gdf_ca.to_crs(CA_ALBERS_CRS)</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>california_proj <span class="op">=</span> california.to_crs(CA_ALBERS_CRS)</span></code></pre></div>
+<div id="58db9cb0" class="cell" data-execution_count="47">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>gdf_ca_proj <span class="op">=</span> gdf_ca.to_crs(CA_ALBERS_CRS)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>california_proj <span class="op">=</span> california.to_crs(CA_ALBERS_CRS)</span></code></pre></div>
 </div>
 <p>Now the length unit is meters.</p>
-<div id="114df72d" class="cell" data-execution_count="38">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>california_proj.crs.coordinate_system</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="38">
+<div id="114df72d" class="cell" data-execution_count="48">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>california_proj.crs.coordinate_system</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="48">
 <pre><code>CS[Cartesian,2],
     AXIS["easting (X)",east,
         ORDER[1],
@@ -1593,217 +1620,217 @@ Use 'GeoSeries.to_crs()' to re-project geometries to a projected CRS before this
 </div>
 <p>Now that we can measure distance accurately, lets make the heatmap. I have folded code below that I use to make my plots, but it has some complexities that are beyond the scope of the actual task so I’ll also walk through the basics of making a heatmap here.</p>
 <p>I start with defining the corner coordinates of the point data that I want to make into a heatmap.</p>
-<div id="fd084e15" class="cell" data-execution_count="39">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>minx, miny, maxx, maxy <span class="op">=</span> gdf_ca_proj.total_bounds</span></code></pre></div>
+<div id="fd084e15" class="cell" data-execution_count="49">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>minx, miny, maxx, maxy <span class="op">=</span> gdf_ca_proj.total_bounds</span></code></pre></div>
 </div>
 <p>I use those coordinates to make a box that bounds the point data.</p>
-<div id="00cebf69" class="cell" data-execution_count="79">
+<div id="00cebf69" class="cell" data-execution_count="50">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <figcaption>Defining the point data’s bounding box</figcaption>
-<p><img src="index_files/figure-html/cell-41-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-42-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
 <p>Next I construct a grid within that box.</p>
-<div id="1d99ff15" class="cell" data-execution_count="41">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>cell_size <span class="op">=</span> <span class="dv">50_000</span></span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>x_bins <span class="op">=</span> np.arange(minx, maxx <span class="op">+</span> cell_size, cell_size)</span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>y_bins <span class="op">=</span> np.arange(miny, maxy <span class="op">+</span> cell_size, cell_size)</span></code></pre></div>
+<div id="1d99ff15" class="cell" data-execution_count="51">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>cell_size <span class="op">=</span> <span class="dv">50_000</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>x_bins <span class="op">=</span> np.arange(minx, maxx <span class="op">+</span> cell_size, cell_size)</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>y_bins <span class="op">=</span> np.arange(miny, maxy <span class="op">+</span> cell_size, cell_size)</span></code></pre></div>
 </div>
 <p>We’ll use the grid squares the same way that we used county and regional boundaries in the choropleth maps – we will aggregate the point data up into their parent polygons as show here (this only is a random sample of 500 stops):</p>
-<div id="c4d189b7" class="cell" data-execution_count="80">
+<div id="c4d189b7" class="cell" data-execution_count="52">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <figcaption>Dividing space into a grid</figcaption>
-<p><img src="index_files/figure-html/cell-43-output-1.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Unlike with the choropleth maps, I’ll accomplish this aggregation task using a canned function, <code>np.histogram2d</code>, that aggregates point data into a grid. Here’s a simple plot of the results using <code>plt.imshow()</code>.</p>
-<div id="886a18fc" class="cell" data-execution_count="81">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> gdf_ca_proj.geometry.x.values</span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> gdf_ca_proj.geometry.y.values</span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>hist, _, _ <span class="op">=</span> np.histogram2d(</span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>        x, y, bins<span class="op">=</span>[x_bins, y_bins]</span>
-<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">3</span>))</span>
-<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">'? units'</span>, ylabel<span class="op">=</span><span class="st">'? units'</span>)</span>
-<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>ax.imshow(hist.T, origin<span class="op">=</span><span class="st">'lower'</span>, cmap<span class="op">=</span><span class="st">'Reds'</span>)<span class="op">;</span></span></code></pre></div>
-<div class="cell-output cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<figcaption>A rough heatmap</figcaption>
 <p><img src="index_files/figure-html/cell-44-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>Note by the units of this plot that we’ve lost the CRS context for this data. In my folded code below, I show how to maintain the CRS and the meter units, but it’s a little more involved, so I write the heatmap code into two reusable functions.</p>
-<div id="6b14e4c0" class="cell" data-execution_count="44">
+<p>Unlike with the choropleth maps, I’ll accomplish this aggregation task using a canned function, <code>np.histogram2d</code>, that aggregates point data into a grid. Here’s a simple plot of the results using <code>plt.imshow()</code>.</p>
+<div id="886a18fc" class="cell" data-execution_count="53">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> gdf_ca_proj.geometry.x.values</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> gdf_ca_proj.geometry.y.values</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>hist, _, _ <span class="op">=</span> np.histogram2d(</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>        x, y, bins<span class="op">=</span>[x_bins, y_bins]</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">3</span>))</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">'? units'</span>, ylabel<span class="op">=</span><span class="st">'? units'</span>)</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>ax.imshow(hist.T, origin<span class="op">=</span><span class="st">'lower'</span>, cmap<span class="op">=</span><span class="st">'Reds'</span>)<span class="op">;</span></span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<figcaption>A rough heatmap</figcaption>
+<p><img src="index_files/figure-html/cell-45-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Note by the units of this plot that we’ve lost the context of the coordinate reference system for this data. In my folded code below, I show how to maintain the CRS and the meter units, but it’s a little more involved and I divide it into two functions for re-usability:</p>
+<div id="6b14e4c0" class="cell" data-execution_count="54">
 <details class="code-fold">
 <summary>Geospatial Histogram Functions: <code>histogram_to_geodataframe</code> and <code>geospatial_histogram</code></summary>
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> histogram_to_geodataframe(hist, x_edges, y_edges, crs<span class="op">=</span><span class="va">None</span>) <span class="op">-&gt;</span> gpd.GeoDataFrame:</span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Convert a 2D histogram and bin edges into a GeoDataFrame of grid cells with counts.</span></span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters:</span></span>
-<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
-<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a><span class="co">    hist : 2D numpy array</span></span>
-<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a><span class="co">        The histogram values (as returned by geospatial_histogram, already transposed).</span></span>
-<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a><span class="co">    x_edges : 1D numpy array</span></span>
-<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a><span class="co">        Bin edges along the x-axis.</span></span>
-<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a><span class="co">    y_edges : 1D numpy array</span></span>
-<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a><span class="co">        Bin edges along the y-axis.</span></span>
-<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a><span class="co">    crs : any (optional)</span></span>
-<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a><span class="co">        Coordinate reference system for the GeoDataFrame.</span></span>
-<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
-<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
-<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a><span class="co">    gdf : GeoDataFrame</span></span>
-<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a><span class="co">        A GeoDataFrame with one polygon per grid cell, with a 'count' column.</span></span>
-<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a>    rows, cols <span class="op">=</span> hist.shape</span>
-<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a>    polygons <span class="op">=</span> []</span>
-<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a>    counts <span class="op">=</span> []</span>
-<span id="cb45-24"><a href="#cb45-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-25"><a href="#cb45-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(rows):</span>
-<span id="cb45-26"><a href="#cb45-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(cols):</span>
-<span id="cb45-27"><a href="#cb45-27" aria-hidden="true" tabindex="-1"></a>            count <span class="op">=</span> hist[i, j]</span>
-<span id="cb45-28"><a href="#cb45-28" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> count <span class="op">==</span> <span class="dv">0</span>:</span>
-<span id="cb45-29"><a href="#cb45-29" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span>  <span class="co"># Skip empty cells for efficiency</span></span>
-<span id="cb45-30"><a href="#cb45-30" aria-hidden="true" tabindex="-1"></a>            x0 <span class="op">=</span> x_edges[j]</span>
-<span id="cb45-31"><a href="#cb45-31" aria-hidden="true" tabindex="-1"></a>            x1 <span class="op">=</span> x_edges[j <span class="op">+</span> <span class="dv">1</span>]</span>
-<span id="cb45-32"><a href="#cb45-32" aria-hidden="true" tabindex="-1"></a>            y0 <span class="op">=</span> y_edges[i]</span>
-<span id="cb45-33"><a href="#cb45-33" aria-hidden="true" tabindex="-1"></a>            y1 <span class="op">=</span> y_edges[i <span class="op">+</span> <span class="dv">1</span>]</span>
-<span id="cb45-34"><a href="#cb45-34" aria-hidden="true" tabindex="-1"></a>            polygons.append(box(x0, y0, x1, y1))</span>
-<span id="cb45-35"><a href="#cb45-35" aria-hidden="true" tabindex="-1"></a>            counts.append(count)</span>
-<span id="cb45-36"><a href="#cb45-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-37"><a href="#cb45-37" aria-hidden="true" tabindex="-1"></a>    gdf <span class="op">=</span> gpd.GeoDataFrame({<span class="st">"count"</span>: counts, <span class="st">"geometry"</span>: polygons}, crs<span class="op">=</span>crs)</span>
-<span id="cb45-38"><a href="#cb45-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> gdf</span>
-<span id="cb45-39"><a href="#cb45-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-40"><a href="#cb45-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-41"><a href="#cb45-41" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> geospatial_histogram(gdf: gpd.GeoDataFrame, cell_size: <span class="bu">float</span>, bounds<span class="op">=</span><span class="va">None</span>, weights<span class="op">=</span><span class="va">None</span>) <span class="op">-&gt;</span> gpd.GeoDataFrame:</span>
-<span id="cb45-42"><a href="#cb45-42" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb45-43"><a href="#cb45-43" aria-hidden="true" tabindex="-1"></a><span class="co">    Create a 2D geospatial histogram (raster grid of counts) from a GeoDataFrame of points.</span></span>
-<span id="cb45-44"><a href="#cb45-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-45"><a href="#cb45-45" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters:</span></span>
-<span id="cb45-46"><a href="#cb45-46" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
-<span id="cb45-47"><a href="#cb45-47" aria-hidden="true" tabindex="-1"></a><span class="co">    gdf : GeoDataFrame</span></span>
-<span id="cb45-48"><a href="#cb45-48" aria-hidden="true" tabindex="-1"></a><span class="co">        Must contain Point geometries in a projected CRS (e.g. meters).</span></span>
-<span id="cb45-49"><a href="#cb45-49" aria-hidden="true" tabindex="-1"></a><span class="co">    cell_size : float</span></span>
-<span id="cb45-50"><a href="#cb45-50" aria-hidden="true" tabindex="-1"></a><span class="co">        Width and height of grid cells (in CRS units, e.g. meters).</span></span>
-<span id="cb45-51"><a href="#cb45-51" aria-hidden="true" tabindex="-1"></a><span class="co">    bounds : tuple or None</span></span>
-<span id="cb45-52"><a href="#cb45-52" aria-hidden="true" tabindex="-1"></a><span class="co">        Optional (minx, miny, maxx, maxy). If None, computed from gdf.bounds.</span></span>
-<span id="cb45-53"><a href="#cb45-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-54"><a href="#cb45-54" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
-<span id="cb45-55"><a href="#cb45-55" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
-<span id="cb45-56"><a href="#cb45-56" aria-hidden="true" tabindex="-1"></a><span class="co">    hist : 2D numpy array</span></span>
-<span id="cb45-57"><a href="#cb45-57" aria-hidden="true" tabindex="-1"></a><span class="co">        Histogram counts of points per grid cell.</span></span>
-<span id="cb45-58"><a href="#cb45-58" aria-hidden="true" tabindex="-1"></a><span class="co">    (Optional) x_edges, y_edges : 1D numpy arrays</span></span>
-<span id="cb45-59"><a href="#cb45-59" aria-hidden="true" tabindex="-1"></a><span class="co">        Bin edges in x and y directions.</span></span>
-<span id="cb45-60"><a href="#cb45-60" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb45-61"><a href="#cb45-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> gdf.crs.is_projected, <span class="st">"CRS must be projected first, e.g. `gdf.set_crs()`"</span></span>
-<span id="cb45-62"><a href="#cb45-62" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> gdf.empty:</span>
-<span id="cb45-63"><a href="#cb45-63" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Input GeoDataFrame is empty."</span>)</span>
-<span id="cb45-64"><a href="#cb45-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> gdf.geometry.geom_type.isin([<span class="st">"Point"</span>]).<span class="bu">all</span>():</span>
-<span id="cb45-65"><a href="#cb45-65" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"All geometries must be Points."</span>)</span>
-<span id="cb45-66"><a href="#cb45-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-67"><a href="#cb45-67" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> gdf.geometry.x.values</span>
-<span id="cb45-68"><a href="#cb45-68" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> gdf.geometry.y.values</span>
-<span id="cb45-69"><a href="#cb45-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-70"><a href="#cb45-70" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> weights <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb45-71"><a href="#cb45-71" aria-hidden="true" tabindex="-1"></a>        weights <span class="op">=</span> np.asarray(gdf[weights])</span>
-<span id="cb45-72"><a href="#cb45-72" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(weights) <span class="op">!=</span> <span class="bu">len</span>(gdf):</span>
-<span id="cb45-73"><a href="#cb45-73" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Length of weights must match number of points in gdf."</span>)</span>
-<span id="cb45-74"><a href="#cb45-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-75"><a href="#cb45-75" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> bounds <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb45-76"><a href="#cb45-76" aria-hidden="true" tabindex="-1"></a>        minx, miny, maxx, maxy <span class="op">=</span> gdf.total_bounds</span>
-<span id="cb45-77"><a href="#cb45-77" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb45-78"><a href="#cb45-78" aria-hidden="true" tabindex="-1"></a>        minx, miny, maxx, maxy <span class="op">=</span> bounds</span>
-<span id="cb45-79"><a href="#cb45-79" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Define bin edges</span></span>
-<span id="cb45-80"><a href="#cb45-80" aria-hidden="true" tabindex="-1"></a>    x_bins <span class="op">=</span> np.arange(minx, maxx <span class="op">+</span> cell_size, cell_size)</span>
-<span id="cb45-81"><a href="#cb45-81" aria-hidden="true" tabindex="-1"></a>    y_bins <span class="op">=</span> np.arange(miny, maxy <span class="op">+</span> cell_size, cell_size)</span>
-<span id="cb45-82"><a href="#cb45-82" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Compute histogram</span></span>
-<span id="cb45-83"><a href="#cb45-83" aria-hidden="true" tabindex="-1"></a>    hist, x_edges, y_edges <span class="op">=</span> np.histogram2d(</span>
-<span id="cb45-84"><a href="#cb45-84" aria-hidden="true" tabindex="-1"></a>        x, y, bins<span class="op">=</span>[x_bins, y_bins], weights<span class="op">=</span>weights</span>
-<span id="cb45-85"><a href="#cb45-85" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb45-86"><a href="#cb45-86" aria-hidden="true" tabindex="-1"></a>    <span class="co"># histogram2d returns shape (len(x_bins)-1, len(y_bins)-1) with axes (x, y)</span></span>
-<span id="cb45-87"><a href="#cb45-87" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Transpose so that rows = y, columns = x (like image/raster orientation)</span></span>
-<span id="cb45-88"><a href="#cb45-88" aria-hidden="true" tabindex="-1"></a>    hist <span class="op">=</span> hist.T</span>
-<span id="cb45-89"><a href="#cb45-89" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> histogram_to_geodataframe(hist, x_edges, y_edges, crs<span class="op">=</span>gdf.crs)</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> histogram_to_geodataframe(hist, x_edges, y_edges, crs<span class="op">=</span><span class="va">None</span>) <span class="op">-&gt;</span> gpd.GeoDataFrame:</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Convert a 2D histogram and bin edges into a GeoDataFrame of grid cells with counts.</span></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters:</span></span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a><span class="co">    hist : 2D numpy array</span></span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a><span class="co">        The histogram values (as returned by geospatial_histogram, already transposed).</span></span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a><span class="co">    x_edges : 1D numpy array</span></span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a><span class="co">        Bin edges along the x-axis.</span></span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a><span class="co">    y_edges : 1D numpy array</span></span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a><span class="co">        Bin edges along the y-axis.</span></span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a><span class="co">    crs : any (optional)</span></span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a><span class="co">        Coordinate reference system for the GeoDataFrame.</span></span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
+<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a><span class="co">    gdf : GeoDataFrame</span></span>
+<span id="cb47-19"><a href="#cb47-19" aria-hidden="true" tabindex="-1"></a><span class="co">        A GeoDataFrame with one polygon per grid cell, with a 'count' column.</span></span>
+<span id="cb47-20"><a href="#cb47-20" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb47-21"><a href="#cb47-21" aria-hidden="true" tabindex="-1"></a>    rows, cols <span class="op">=</span> hist.shape</span>
+<span id="cb47-22"><a href="#cb47-22" aria-hidden="true" tabindex="-1"></a>    polygons <span class="op">=</span> []</span>
+<span id="cb47-23"><a href="#cb47-23" aria-hidden="true" tabindex="-1"></a>    counts <span class="op">=</span> []</span>
+<span id="cb47-24"><a href="#cb47-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-25"><a href="#cb47-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(rows):</span>
+<span id="cb47-26"><a href="#cb47-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(cols):</span>
+<span id="cb47-27"><a href="#cb47-27" aria-hidden="true" tabindex="-1"></a>            count <span class="op">=</span> hist[i, j]</span>
+<span id="cb47-28"><a href="#cb47-28" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> count <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb47-29"><a href="#cb47-29" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span>  <span class="co"># Skip empty cells for efficiency</span></span>
+<span id="cb47-30"><a href="#cb47-30" aria-hidden="true" tabindex="-1"></a>            x0 <span class="op">=</span> x_edges[j]</span>
+<span id="cb47-31"><a href="#cb47-31" aria-hidden="true" tabindex="-1"></a>            x1 <span class="op">=</span> x_edges[j <span class="op">+</span> <span class="dv">1</span>]</span>
+<span id="cb47-32"><a href="#cb47-32" aria-hidden="true" tabindex="-1"></a>            y0 <span class="op">=</span> y_edges[i]</span>
+<span id="cb47-33"><a href="#cb47-33" aria-hidden="true" tabindex="-1"></a>            y1 <span class="op">=</span> y_edges[i <span class="op">+</span> <span class="dv">1</span>]</span>
+<span id="cb47-34"><a href="#cb47-34" aria-hidden="true" tabindex="-1"></a>            polygons.append(box(x0, y0, x1, y1))</span>
+<span id="cb47-35"><a href="#cb47-35" aria-hidden="true" tabindex="-1"></a>            counts.append(count)</span>
+<span id="cb47-36"><a href="#cb47-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-37"><a href="#cb47-37" aria-hidden="true" tabindex="-1"></a>    gdf <span class="op">=</span> gpd.GeoDataFrame({<span class="st">"count"</span>: counts, <span class="st">"geometry"</span>: polygons}, crs<span class="op">=</span>crs)</span>
+<span id="cb47-38"><a href="#cb47-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> gdf</span>
+<span id="cb47-39"><a href="#cb47-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-40"><a href="#cb47-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-41"><a href="#cb47-41" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> geospatial_histogram(gdf: gpd.GeoDataFrame, cell_size: <span class="bu">float</span>, bounds<span class="op">=</span><span class="va">None</span>, weights<span class="op">=</span><span class="va">None</span>) <span class="op">-&gt;</span> gpd.GeoDataFrame:</span>
+<span id="cb47-42"><a href="#cb47-42" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb47-43"><a href="#cb47-43" aria-hidden="true" tabindex="-1"></a><span class="co">    Create a 2D geospatial histogram (raster grid of counts) from a GeoDataFrame of points.</span></span>
+<span id="cb47-44"><a href="#cb47-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-45"><a href="#cb47-45" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters:</span></span>
+<span id="cb47-46"><a href="#cb47-46" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
+<span id="cb47-47"><a href="#cb47-47" aria-hidden="true" tabindex="-1"></a><span class="co">    gdf : GeoDataFrame</span></span>
+<span id="cb47-48"><a href="#cb47-48" aria-hidden="true" tabindex="-1"></a><span class="co">        Must contain Point geometries in a projected CRS (e.g. meters).</span></span>
+<span id="cb47-49"><a href="#cb47-49" aria-hidden="true" tabindex="-1"></a><span class="co">    cell_size : float</span></span>
+<span id="cb47-50"><a href="#cb47-50" aria-hidden="true" tabindex="-1"></a><span class="co">        Width and height of grid cells (in CRS units, e.g. meters).</span></span>
+<span id="cb47-51"><a href="#cb47-51" aria-hidden="true" tabindex="-1"></a><span class="co">    bounds : tuple or None</span></span>
+<span id="cb47-52"><a href="#cb47-52" aria-hidden="true" tabindex="-1"></a><span class="co">        Optional (minx, miny, maxx, maxy). If None, computed from gdf.bounds.</span></span>
+<span id="cb47-53"><a href="#cb47-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-54"><a href="#cb47-54" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb47-55"><a href="#cb47-55" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
+<span id="cb47-56"><a href="#cb47-56" aria-hidden="true" tabindex="-1"></a><span class="co">    hist : 2D numpy array</span></span>
+<span id="cb47-57"><a href="#cb47-57" aria-hidden="true" tabindex="-1"></a><span class="co">        Histogram counts of points per grid cell.</span></span>
+<span id="cb47-58"><a href="#cb47-58" aria-hidden="true" tabindex="-1"></a><span class="co">    (Optional) x_edges, y_edges : 1D numpy arrays</span></span>
+<span id="cb47-59"><a href="#cb47-59" aria-hidden="true" tabindex="-1"></a><span class="co">        Bin edges in x and y directions.</span></span>
+<span id="cb47-60"><a href="#cb47-60" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb47-61"><a href="#cb47-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> gdf.crs.is_projected, <span class="st">"CRS must be projected first, e.g. `gdf.set_crs()`"</span></span>
+<span id="cb47-62"><a href="#cb47-62" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> gdf.empty:</span>
+<span id="cb47-63"><a href="#cb47-63" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Input GeoDataFrame is empty."</span>)</span>
+<span id="cb47-64"><a href="#cb47-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> gdf.geometry.geom_type.isin([<span class="st">"Point"</span>]).<span class="bu">all</span>():</span>
+<span id="cb47-65"><a href="#cb47-65" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"All geometries must be Points."</span>)</span>
+<span id="cb47-66"><a href="#cb47-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-67"><a href="#cb47-67" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> gdf.geometry.x.values</span>
+<span id="cb47-68"><a href="#cb47-68" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> gdf.geometry.y.values</span>
+<span id="cb47-69"><a href="#cb47-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-70"><a href="#cb47-70" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> weights <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb47-71"><a href="#cb47-71" aria-hidden="true" tabindex="-1"></a>        weights <span class="op">=</span> np.asarray(gdf[weights])</span>
+<span id="cb47-72"><a href="#cb47-72" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(weights) <span class="op">!=</span> <span class="bu">len</span>(gdf):</span>
+<span id="cb47-73"><a href="#cb47-73" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Length of weights must match number of points in gdf."</span>)</span>
+<span id="cb47-74"><a href="#cb47-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-75"><a href="#cb47-75" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> bounds <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb47-76"><a href="#cb47-76" aria-hidden="true" tabindex="-1"></a>        minx, miny, maxx, maxy <span class="op">=</span> gdf.total_bounds</span>
+<span id="cb47-77"><a href="#cb47-77" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb47-78"><a href="#cb47-78" aria-hidden="true" tabindex="-1"></a>        minx, miny, maxx, maxy <span class="op">=</span> bounds</span>
+<span id="cb47-79"><a href="#cb47-79" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Define bin edges</span></span>
+<span id="cb47-80"><a href="#cb47-80" aria-hidden="true" tabindex="-1"></a>    x_bins <span class="op">=</span> np.arange(minx, maxx <span class="op">+</span> cell_size, cell_size)</span>
+<span id="cb47-81"><a href="#cb47-81" aria-hidden="true" tabindex="-1"></a>    y_bins <span class="op">=</span> np.arange(miny, maxy <span class="op">+</span> cell_size, cell_size)</span>
+<span id="cb47-82"><a href="#cb47-82" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Compute histogram</span></span>
+<span id="cb47-83"><a href="#cb47-83" aria-hidden="true" tabindex="-1"></a>    hist, x_edges, y_edges <span class="op">=</span> np.histogram2d(</span>
+<span id="cb47-84"><a href="#cb47-84" aria-hidden="true" tabindex="-1"></a>        x, y, bins<span class="op">=</span>[x_bins, y_bins], weights<span class="op">=</span>weights</span>
+<span id="cb47-85"><a href="#cb47-85" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb47-86"><a href="#cb47-86" aria-hidden="true" tabindex="-1"></a>    <span class="co"># histogram2d returns shape (len(x_bins)-1, len(y_bins)-1) with axes (x, y)</span></span>
+<span id="cb47-87"><a href="#cb47-87" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Transpose so that rows = y, columns = x (like image/raster orientation)</span></span>
+<span id="cb47-88"><a href="#cb47-88" aria-hidden="true" tabindex="-1"></a>    hist <span class="op">=</span> hist.T</span>
+<span id="cb47-89"><a href="#cb47-89" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> histogram_to_geodataframe(hist, x_edges, y_edges, crs<span class="op">=</span>gdf.crs)</span></code></pre></div>
 </details>
 </div>
 <p>With those two functions written, I’ll build my production heatmap. Here are the stylings:</p>
-<div id="fa4eac60" class="cell" data-execution_count="45">
+<div id="fa4eac60" class="cell" data-execution_count="55">
 <details class="code-fold">
 <summary>Plot Styling: <code>legend_cbar_kws</code>, <code>square_patch</code>, <code>borders_kws</code></summary>
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>new_cmap <span class="op">=</span> build_cmap(<span class="st">"YlOrRd"</span>, start<span class="op">=</span><span class="dv">0</span>, end<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>legend_cbar_kws <span class="op">=</span> {</span>
-<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"format"</span>: FuncFormatter(number_suffix_formatter),</span>
-<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"shrink"</span>: <span class="fl">0.8</span>,</span>
-<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"label"</span>: <span class="st">"Number of Public Transit Stops"</span>,</span>
-<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"location"</span>: <span class="st">"top"</span>,</span>
-<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"pad"</span>: <span class="fl">0.001</span>,</span>
-<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>data_fill_kws <span class="op">=</span> {<span class="st">"alpha"</span>: <span class="dv">1</span>, <span class="st">"cmap"</span>: new_cmap}</span>
-<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>square_patch <span class="op">=</span> mpatches.Rectangle(</span>
-<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">0</span>, <span class="dv">0</span>), <span class="dv">10</span>, <span class="dv">10</span>, facecolor<span class="op">=</span>new_cmap.get_under(), edgecolor<span class="op">=</span><span class="st">"grey"</span>, linewidth<span class="op">=</span><span class="fl">0.8</span></span>
-<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>borders_kws <span class="op">=</span> {<span class="st">"edgecolor"</span>: <span class="st">"grey"</span>, <span class="st">"linewidth"</span>: <span class="fl">0.1</span>}</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>new_cmap <span class="op">=</span> build_cmap(<span class="st">"YlOrRd"</span>, start<span class="op">=</span><span class="dv">0</span>, end<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>legend_cbar_kws <span class="op">=</span> {</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"format"</span>: FuncFormatter(number_suffix_formatter),</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"shrink"</span>: <span class="fl">0.8</span>,</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"label"</span>: <span class="st">"Number of Public Transit Stops"</span>,</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"location"</span>: <span class="st">"top"</span>,</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"pad"</span>: <span class="fl">0.001</span>,</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>data_fill_kws <span class="op">=</span> {<span class="st">"alpha"</span>: <span class="dv">1</span>, <span class="st">"cmap"</span>: new_cmap}</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>square_patch <span class="op">=</span> mpatches.Rectangle(</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">0</span>, <span class="dv">0</span>), <span class="dv">10</span>, <span class="dv">10</span>, facecolor<span class="op">=</span>new_cmap.get_under(), edgecolor<span class="op">=</span><span class="st">"grey"</span>, linewidth<span class="op">=</span><span class="fl">0.8</span></span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>borders_kws <span class="op">=</span> {<span class="st">"edgecolor"</span>: <span class="st">"grey"</span>, <span class="st">"linewidth"</span>: <span class="fl">0.1</span>}</span></code></pre></div>
 </details>
 </div>
 <p>Here I’ll use my custom <code>geospatial_histogram</code> function to make the raser grid for the heatmap. I’ll double check that all the CRS are right.</p>
-<div id="e694d818" class="cell" data-execution_count="46">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>cell_size <span class="op">=</span> <span class="dv">20_000</span></span>
-<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>arrivals_hist <span class="op">=</span> geospatial_histogram(</span>
-<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>    gdf_ca_proj, weights<span class="op">=</span><span class="va">None</span>, cell_size<span class="op">=</span>cell_size</span>
-<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> gdf_ca_proj.crs <span class="op">==</span> california_proj.crs</span>
-<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> arrivals_hist.crs <span class="op">==</span> california_proj.crs</span></code></pre></div>
+<div id="e694d818" class="cell" data-execution_count="56">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>cell_size <span class="op">=</span> <span class="dv">20_000</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>arrivals_hist <span class="op">=</span> geospatial_histogram(</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>    gdf_ca_proj, weights<span class="op">=</span><span class="va">None</span>, cell_size<span class="op">=</span>cell_size</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> gdf_ca_proj.crs <span class="op">==</span> california_proj.crs</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> arrivals_hist.crs <span class="op">==</span> california_proj.crs</span></code></pre></div>
 </div>
 <p>And finally I’ll plot my final product, a heatmap of public transit stops in the state.</p>
-<div id="f12b1a7d" class="cell" data-execution_count="47">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">4</span>, <span class="dv">6</span>))</span>
-<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>california_proj.plot(</span>
-<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>ax, edgecolor<span class="op">=</span><span class="st">"grey"</span>, facecolor<span class="op">=</span><span class="st">"none"</span>, linewidth<span class="op">=</span><span class="dv">1</span>, alpha<span class="op">=</span><span class="fl">0.5</span></span>
-<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>arrivals_hist.plot(</span>
-<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>    column<span class="op">=</span><span class="st">"count"</span>,</span>
-<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>ax,</span>
-<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>data_fill_kws,</span>
-<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>borders_kws,</span>
-<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>    zorder<span class="op">=-</span><span class="dv">1</span>,</span>
-<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>    legend_kwds<span class="op">=</span>legend_cbar_kws,</span>
-<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>ax.legend(</span>
-<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>    handles<span class="op">=</span>[square_patch],</span>
-<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a>    labels<span class="op">=</span>[<span class="vs">rf"</span><span class="sc">{</span><span class="bu">int</span>(cell_size<span class="op">/</span><span class="dv">1000</span>)<span class="sc">}</span><span class="vs">$\times$</span><span class="sc">{</span><span class="bu">int</span>(cell_size<span class="op">/</span><span class="dv">1000</span>)<span class="sc">}</span><span class="vs">km Grid Area"</span>],</span>
-<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a>    loc<span class="op">=</span><span class="st">"upper right"</span>,</span>
-<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>    frameon<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>    fontsize<span class="op">=</span><span class="dv">9</span>,</span>
-<span id="cb48-20"><a href="#cb48-20" aria-hidden="true" tabindex="-1"></a>    handlelength<span class="op">=</span><span class="fl">1.0</span>,</span>
-<span id="cb48-21"><a href="#cb48-21" aria-hidden="true" tabindex="-1"></a>    handleheight<span class="op">=</span><span class="fl">1.25</span>,</span>
-<span id="cb48-22"><a href="#cb48-22" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb48-23"><a href="#cb48-23" aria-hidden="true" tabindex="-1"></a>ax.axis(<span class="st">"off"</span>)</span>
-<span id="cb48-24"><a href="#cb48-24" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code></pre></div>
+<div id="f12b1a7d" class="cell" data-execution_count="57">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">4</span>, <span class="dv">6</span>))</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>california_proj.plot(</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>ax, edgecolor<span class="op">=</span><span class="st">"grey"</span>, facecolor<span class="op">=</span><span class="st">"none"</span>, linewidth<span class="op">=</span><span class="dv">1</span>, alpha<span class="op">=</span><span class="fl">0.5</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>arrivals_hist.plot(</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>    column<span class="op">=</span><span class="st">"count"</span>,</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>ax,</span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>data_fill_kws,</span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>borders_kws,</span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>    zorder<span class="op">=-</span><span class="dv">1</span>,</span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb50-12"><a href="#cb50-12" aria-hidden="true" tabindex="-1"></a>    legend_kwds<span class="op">=</span>legend_cbar_kws,</span>
+<span id="cb50-13"><a href="#cb50-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb50-14"><a href="#cb50-14" aria-hidden="true" tabindex="-1"></a>ax.legend(</span>
+<span id="cb50-15"><a href="#cb50-15" aria-hidden="true" tabindex="-1"></a>    handles<span class="op">=</span>[square_patch],</span>
+<span id="cb50-16"><a href="#cb50-16" aria-hidden="true" tabindex="-1"></a>    labels<span class="op">=</span>[<span class="vs">rf"</span><span class="sc">{</span><span class="bu">int</span>(cell_size<span class="op">/</span><span class="dv">1000</span>)<span class="sc">}</span><span class="vs">$\times$</span><span class="sc">{</span><span class="bu">int</span>(cell_size<span class="op">/</span><span class="dv">1000</span>)<span class="sc">}</span><span class="vs">km Grid Area"</span>],</span>
+<span id="cb50-17"><a href="#cb50-17" aria-hidden="true" tabindex="-1"></a>    loc<span class="op">=</span><span class="st">"upper right"</span>,</span>
+<span id="cb50-18"><a href="#cb50-18" aria-hidden="true" tabindex="-1"></a>    frameon<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb50-19"><a href="#cb50-19" aria-hidden="true" tabindex="-1"></a>    fontsize<span class="op">=</span><span class="dv">9</span>,</span>
+<span id="cb50-20"><a href="#cb50-20" aria-hidden="true" tabindex="-1"></a>    handlelength<span class="op">=</span><span class="fl">1.0</span>,</span>
+<span id="cb50-21"><a href="#cb50-21" aria-hidden="true" tabindex="-1"></a>    handleheight<span class="op">=</span><span class="fl">1.25</span>,</span>
+<span id="cb50-22"><a href="#cb50-22" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb50-23"><a href="#cb50-23" aria-hidden="true" tabindex="-1"></a>ax.axis(<span class="st">"off"</span>)</span>
+<span id="cb50-24"><a href="#cb50-24" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-48-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-49-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
 <p>Like the two choropleths above, this map highlights that there are a lot of public transit stops in Los Angeles. However, by using smaller geographic units that aren’t tied to administrative boundaries, we can also see other public transit hot spots. For example, we can see that the core Bay Area, around downtown San Francisco and downtown Oakland, is a transit hot spot that is distinct from another hotspot in Downtown San Jose to the South.</p>
 </section>
-<section id="exercise-5-refining-land" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-5-refining-land">Exercise 5: Refining Land</h2>
+<section id="exercise-5-refining-land-and-sea" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-5-refining-land-and-sea">Exercise 5: Refining Land and Sea</h2>
 <p>Now we will try an exercise where we zoom from the state level into a specific region. Since we are operating at a more fine-grained geographical level, I’ll also switch to CalTrans’ <a href="https://gis.data.ca.gov/datasets/f6c30480f0e84be699383192c099a6a4_0/about">“High Quality Transit Stops”</a> dataset, slightly more sparse point data that only include stops with headways of 20 minutes or less.</p>
 <p>Here’s a new, region specific question:</p>
 <div class="callout callout-style-default callout-tip callout-titled" title="New Motivating Question">
@@ -1820,29 +1847,29 @@ New Motivating Question
 </div>
 </div>
 <p>I’ll start with paginating the CalTrans’ API and retrieving the stop data.</p>
-<div id="989cc612" class="cell" data-execution_count="48">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>hq_stops <span class="op">=</span> <span class="st">"services/CHrailroad/CA_HQ_Transit_Stops/FeatureServer/0/query"</span></span>
-<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>gdf_hq <span class="op">=</span> paginate_api(rest_api <span class="op">+</span> hq_stops)</span></code></pre></div>
+<div id="989cc612" class="cell" data-execution_count="58">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>hq_stops <span class="op">=</span> <span class="st">"services/CHrailroad/CA_HQ_Transit_Stops/FeatureServer/0/query"</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>gdf_hq <span class="op">=</span> paginate_api(rest_api <span class="op">+</span> hq_stops)</span></code></pre></div>
 </div>
 <p>With this dataset, I’ll need to make sure to filter out stops that are planned for the future. I also isolate the data down to unique, high quality, major stops.</p>
-<div id="1d94aece" class="cell" data-execution_count="49">
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>gdf_hq <span class="op">=</span> gdf_hq[<span class="op">~</span>gdf_hq[<span class="st">'hqta_details'</span>].<span class="bu">str</span>.contains(<span class="st">'planned'</span>)]</span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>gdf_hq <span class="op">=</span> gdf_hq[gdf_hq[<span class="st">'hqta_type'</span>].<span class="bu">str</span>.contains(<span class="st">'major_stop'</span>)]</span>
-<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>gdf_hq <span class="op">=</span> gdf_hq.drop_duplicates(subset<span class="op">=</span><span class="st">'geometry'</span>)</span></code></pre></div>
+<div id="1d94aece" class="cell" data-execution_count="59">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>gdf_hq <span class="op">=</span> gdf_hq[<span class="op">~</span>gdf_hq[<span class="st">'hqta_details'</span>].<span class="bu">str</span>.contains(<span class="st">'planned'</span>)]</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>gdf_hq <span class="op">=</span> gdf_hq[gdf_hq[<span class="st">'hqta_type'</span>].<span class="bu">str</span>.contains(<span class="st">'major_stop'</span>)]</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>gdf_hq <span class="op">=</span> gdf_hq.drop_duplicates(subset<span class="op">=</span><span class="st">'geometry'</span>)</span></code></pre></div>
 </div>
 <p>We can see that there are far fewer high quality stops than total stops.</p>
-<div id="4a3c84e1" class="cell" data-execution_count="50">
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Total Public Transit Stops:"</span>, gdf_all.shape[<span class="dv">0</span>])</span>
-<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"High Quality Public Transit Stops:"</span>, gdf_hq.shape[<span class="dv">0</span>])</span></code></pre></div>
+<div id="4a3c84e1" class="cell" data-execution_count="60">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Total Public Transit Stops:"</span>, gdf_all.shape[<span class="dv">0</span>])</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"High Quality Public Transit Stops:"</span>, gdf_hq.shape[<span class="dv">0</span>])</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Total Public Transit Stops: 88526
 High Quality Public Transit Stops: 15416</code></pre>
 </div>
 </div>
 <p>These data do look fairly similar to the total stops data, though.</p>
-<div id="26bdec25" class="cell" data-execution_count="51">
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>gdf_hq[[<span class="st">'hqta_type'</span>, <span class="st">'stop_id'</span>, <span class="st">'hqta_details'</span>,<span class="st">'avg_trips_per_peak_hr'</span>, <span class="st">'geometry'</span>]].head()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="51">
+<div id="26bdec25" class="cell" data-execution_count="61">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>gdf_hq[[<span class="st">'hqta_type'</span>, <span class="st">'stop_id'</span>, <span class="st">'hqta_details'</span>,<span class="st">'avg_trips_per_peak_hr'</span>, <span class="st">'geometry'</span>]].head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="61">
 <div>
 
 
@@ -1859,44 +1886,44 @@ High Quality Public Transit Stops: 15416</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">0</td>
-<td>major_stop_bus</td>
-<td>15703</td>
-<td>intersection_2_bus_routes_same_operator</td>
-<td>3</td>
-<td>POINT (-122.42876 37.71982)</td>
+<td data-quarto-table-cell-role="th">2805</td>
+<td>major_stop_brt</td>
+<td>52404</td>
+<td>major_stop_brt_single_operator</td>
+<td>6</td>
+<td>POINT (-122.15757 37.72538)</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>major_stop_bus</td>
-<td>15704</td>
-<td>intersection_2_bus_routes_same_operator</td>
-<td>3</td>
-<td>POINT (-122.44485 37.76751)</td>
+<td data-quarto-table-cell-role="th">2806</td>
+<td>major_stop_brt</td>
+<td>52405</td>
+<td>major_stop_brt_single_operator</td>
+<td>4</td>
+<td>POINT (-122.15792 37.72544)</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>major_stop_bus</td>
-<td>15705</td>
-<td>intersection_2_bus_routes_same_operator</td>
-<td>4</td>
-<td>POINT (-122.44655 37.77558)</td>
+<td data-quarto-table-cell-role="th">2807</td>
+<td>major_stop_brt</td>
+<td>52414</td>
+<td>major_stop_brt_single_operator</td>
+<td>6</td>
+<td>POINT (-122.15834 37.72813)</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>major_stop_bus</td>
-<td>15706</td>
-<td>intersection_2_bus_routes_same_operator</td>
+<td data-quarto-table-cell-role="th">2808</td>
+<td>major_stop_brt</td>
+<td>52415</td>
+<td>major_stop_brt_single_operator</td>
 <td>4</td>
-<td>POINT (-122.44636 37.77571)</td>
+<td>POINT (-122.1588 37.72844)</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>major_stop_bus</td>
-<td>15709</td>
-<td>intersection_2_bus_routes_same_operator</td>
-<td>4</td>
-<td>POINT (-122.44736 37.78216)</td>
+<td data-quarto-table-cell-role="th">2809</td>
+<td>major_stop_brt</td>
+<td>52426</td>
+<td>major_stop_brt_single_operator</td>
+<td>6</td>
+<td>POINT (-122.16086 37.73151)</td>
 </tr>
 </tbody>
 </table>
@@ -1905,20 +1932,20 @@ High Quality Public Transit Stops: 15416</code></pre>
 </div>
 </div>
 <p>I’ll proceed to set this point data’s CRS to match that of the regions data – the shapefile for California’s regions. This will facilitate doing a spatial merge where I isolate the high quality stops that are within the San Francisco Bay Area Region. I’ll do the same spatial merge to isolate the shapes of the Bay Area’s counties.</p>
-<div id="dc39677b" class="cell" data-execution_count="52">
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>gdf_hq.crs <span class="op">=</span> regions.crs</span>
-<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> gdf_hq.crs <span class="op">==</span> regions.crs</span>
-<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>gdf_bay_hq <span class="op">=</span> gdf_hq.copy()[gdf_hq.geometry.within(regions.loc[<span class="st">"San Francisco Bay Area"</span>].geometry)]</span>
-<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>sf_bay_county_shapes <span class="op">=</span> county_shapes.copy()[county_shapes[<span class="st">"region"</span>] <span class="op">==</span> <span class="st">"San Francisco Bay Area"</span>]</span></code></pre></div>
+<div id="dc39677b" class="cell" data-execution_count="62">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>gdf_hq.crs <span class="op">=</span> regions.crs</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> gdf_hq.crs <span class="op">==</span> regions.crs</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>gdf_bay_hq <span class="op">=</span> gdf_hq.copy()[gdf_hq.geometry.within(regions.loc[<span class="st">"San Francisco Bay Area"</span>].geometry)]</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>sf_bay_county_shapes <span class="op">=</span> county_shapes.copy()[county_shapes[<span class="st">"region"</span>] <span class="op">==</span> <span class="st">"San Francisco Bay Area"</span>]</span></code></pre></div>
 </div>
 <p>Now lets try to make a plot looking at the distribution of high quality stops in the Bay Area, with the stops plotted over the Bay Area counties.</p>
 <p>One immediate issue that arises when making a plot of the San Francisco Bay Area using county shapefiles is that the <a href="https://en.wikipedia.org/wiki/Farallon_Islands#Geography">Farallon Islands</a> are technically part of the administrative boundaries of San Francisco county. You can see the islands on the far left in the following plot of the Bay Area counties.</p>
-<div id="6fe903e3" class="cell" data-execution_count="53">
-<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>sf_bay_county_shapes.plot(facecolor<span class="op">=</span><span class="st">"none"</span>)<span class="op">;</span></span></code></pre></div>
+<div id="6fe903e3" class="cell" data-execution_count="63">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>sf_bay_county_shapes.plot(facecolor<span class="op">=</span><span class="st">"none"</span>)<span class="op">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-54-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-55-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1926,35 +1953,35 @@ High Quality Public Transit Stops: 15416</code></pre>
 <p>Including the islands in an analysis focused on the human population of the Bay Area and the availability of public transit doesn’t seem appropriate, so we want to find a data-driven way to remove that land mass.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<figcaption>Here’s a picture of the Farallon Islands, <span class="citation" data-cites="roletto_english_2005">(<a href="#ref-roletto_english_2005" role="doc-biblioref">Roletto 2005</a>)</span> – I don’t see public transit stops.</figcaption>
+<figcaption>Here’s a picture of the Farallon Islands, <span class="citation" data-cites="roletto_english_2005">(<a href="#ref-roletto_english_2005" role="doc-biblioref"><strong>roletto_english_2005?</strong></a>)</span> – I don’t see public transit stops.</figcaption>
 <p><img src="View_from_Mirounga_Bay.jpg" class="img-fluid figure-img" style="width:50.0%"></p>
 </figure>
 </div>
 <p>The answer starts with an “explosion” – we can use the <a href="https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoDataFrame.explode.html"><code>.explode()</code> method</a> from <code>geopandas</code> to break any multi-part geometries (in this case the multi-part polygon of San Francisco County with some pieces that are non-contiguous) into individual geometries.</p>
-<div id="a6fd0290" class="cell" data-execution_count="54">
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>exploded_shapes <span class="op">=</span> (</span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>    sf_bay_county_shapes</span>
-<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>    .explode(index_parts<span class="op">=</span><span class="va">True</span>, ignore_index<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>    .reset_index(names<span class="op">=</span><span class="st">'shape_index'</span>)</span>
-<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Check retention of crs</span></span>
-<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> sf_bay_county_shapes.crs <span class="op">==</span> exploded_shapes.crs</span>
-<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Pre-explosion shape"</span>, sf_bay_county_shapes.shape)</span>
-<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Post-explosion shape"</span>, exploded_shapes.shape)</span></code></pre></div>
+<div id="a6fd0290" class="cell" data-execution_count="64">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>exploded_shapes <span class="op">=</span> (</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>    sf_bay_county_shapes</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>    .explode(index_parts<span class="op">=</span><span class="va">True</span>, ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>    .reset_index(names<span class="op">=</span><span class="st">'shape_index'</span>)</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Check retention of crs</span></span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> sf_bay_county_shapes.crs <span class="op">==</span> exploded_shapes.crs</span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Pre-explosion shape"</span>, sf_bay_county_shapes.shape)</span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Post-explosion shape"</span>, exploded_shapes.shape)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Pre-explosion shape (7, 20)
 Post-explosion shape (8, 21)</code></pre>
 </div>
 </div>
 <p>We can see that, following the explosion, our dataframe has one new geometry – the Farallon Islands. Now we will bring back our <code>points_in_polygon</code> function so that we can count how many high quality public transit stops are in each of the geometries.</p>
-<div id="13e5fbab" class="cell" data-execution_count="55">
-<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>exploded_shapes <span class="op">=</span> points_in_polygon(gdf_bay_hq, exploded_shapes, <span class="st">"shape_index"</span>)</span>
-<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> exploded_shapes.crs <span class="op">==</span> sf_bay_county_shapes.crs</span></code></pre></div>
+<div id="13e5fbab" class="cell" data-execution_count="65">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>exploded_shapes <span class="op">=</span> points_in_polygon(gdf_bay_hq, exploded_shapes, <span class="st">"shape_index"</span>)</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> exploded_shapes.crs <span class="op">==</span> sf_bay_county_shapes.crs</span></code></pre></div>
 </div>
 <p>We can see that one of these doesn’t have any stops. It’s still called “San Francisco,” but this is the Farallon Islands geometry, which, since they are unpopulated islands, doesn’t contain any transit stops.</p>
-<div id="d2f1f92a" class="cell" data-execution_count="56">
-<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>exploded_shapes[[<span class="st">'NAME'</span>, <span class="st">'count'</span>]].head(<span class="dv">3</span>)</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="56">
+<div id="d2f1f92a" class="cell" data-execution_count="66">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>exploded_shapes[[<span class="st">'NAME'</span>, <span class="st">'count'</span>]].head(<span class="dv">3</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="66">
 <div>
 
 
@@ -1989,13 +2016,13 @@ Post-explosion shape (8, 21)</code></pre>
 </div>
 </div>
 <p>We’ll use that as a filtering condition to remove the islands from the dataset, and we arrive at a clean dataset of the populated geometries of the Bay Area counties.</p>
-<div id="3bf2b026" class="cell" data-execution_count="57">
-<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>sf_bay_county_shapes <span class="op">=</span> exploded_shapes[exploded_shapes[<span class="st">'count'</span>] <span class="op">&gt;</span> <span class="dv">0</span>]</span>
-<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>sf_bay_county_shapes.plot(facecolor<span class="op">=</span><span class="st">"none"</span>)<span class="op">;</span></span></code></pre></div>
+<div id="3bf2b026" class="cell" data-execution_count="67">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>sf_bay_county_shapes <span class="op">=</span> exploded_shapes[exploded_shapes[<span class="st">'count'</span>] <span class="op">&gt;</span> <span class="dv">0</span>]</span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>sf_bay_county_shapes.plot(facecolor<span class="op">=</span><span class="st">"none"</span>)<span class="op">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-58-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-59-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -2003,30 +2030,30 @@ Post-explosion shape (8, 21)</code></pre>
 <p>Let’s continue refining this. The San Francisco Bay Area is known for being a bay, as in, there is a large body of water at the center of it. This map doesn’t reflect that yet and that’s problematic for plotting the distribution of transit stops in the area. We may see large swaths of map with no stops and assume that it’s a transit desert, when in fact it’s just a body of water.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<figcaption>This aerial photo of the Bay Area, <span class="citation" data-cites="tobin_english_2018">(<a href="#ref-tobin_english_2018" role="doc-biblioref">Tobin 2018</a>)</span>, makes clear how much of the region is water</figcaption>
+<figcaption>This aerial photo of the Bay Area, <span class="citation" data-cites="tobin_english_2018">(<a href="#ref-tobin_english_2018" role="doc-biblioref"><strong>tobin_english_2018?</strong></a>)</span>, makes clear how much of the region is water</figcaption>
 <p><img src="bay_panorama.jpg" class="img-fluid figure-img" style="width:50.0%"></p>
 </figure>
 </div>
 <p>The bodies of water that make up the bay are all part of administrative boundaries of counties, so to include the bay, we will need to break out the geometries for water within each county. This sounds hard, and again, in the past I have <a href="https://github.com/peter-amerkhanian/sf-schools-simulation/blob/b8b956180289e079bef43d15808066eb01f2fa6c/build_city.py#L50C1-L59C29">written custom code to accomplish this</a>, but it’s now incredibly easy using the <code>tigris</code>/<code>pygris</code> package and its useful <code>erase_water()</code> function.</p>
-<div id="59acbbaf" class="cell" data-execution_count="58">
-<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>bay_area_no_water <span class="op">=</span> pygris.utils.erase_water(</span>
-<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>    sf_bay_county_shapes,</span>
-<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>    year<span class="op">=</span><span class="dv">2024</span>,</span>
-<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>    cache<span class="op">=</span><span class="va">True</span></span>
-<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> bay_area_no_water.crs <span class="op">==</span> sf_bay_county_shapes.crs</span></code></pre></div>
+<div id="59acbbaf" class="cell" data-execution_count="68">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>bay_area_no_water <span class="op">=</span> pygris.utils.erase_water(</span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>    sf_bay_county_shapes,</span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>    year<span class="op">=</span><span class="dv">2024</span>,</span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>    cache<span class="op">=</span><span class="va">True</span></span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> bay_area_no_water.crs <span class="op">==</span> sf_bay_county_shapes.crs</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>HTTP download failed, trying FTP as fallback...
 Downloading cb_2024_us_county_500k.zip from Census FTP...</code></pre>
 </div>
 </div>
 <p>After using the census’ 2024 water boundaries to remove water from the county shapes, we arrive at the following map.</p>
-<div id="c020eb21" class="cell" data-execution_count="59">
-<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>bay_area_no_water.plot(facecolor<span class="op">=</span><span class="st">"none"</span>)<span class="op">;</span></span></code></pre></div>
+<div id="c020eb21" class="cell" data-execution_count="69">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>bay_area_no_water.plot(facecolor<span class="op">=</span><span class="st">"none"</span>)<span class="op">;</span></span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-60-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-61-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -2034,90 +2061,90 @@ Downloading cb_2024_us_county_500k.zip from Census FTP...</code></pre>
 <p>Now that looks like the Bay Area!<br>
 With that base map, I’ll now layer over a heatmap showing the distribution of high quality public transit stops in the Bay Area.</p>
 <p>Here I’ll handle the necessary CRS manipulation for working with distances (I again use California Albers), then I aggregate the stop data into 5 kilometer square cells to create the raster grid for the heatmap.</p>
-<div id="53674928" class="cell" data-execution_count="61">
-<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Change all data to CA Albers CRS</span></span>
-<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>gdf_bay_proj <span class="op">=</span> gdf_bay_hq.to_crs(CA_ALBERS_CRS)</span>
-<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>bay_area_no_water_proj <span class="op">=</span> bay_area_no_water.to_crs(CA_ALBERS_CRS)</span>
-<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>sf_bay_county_shapes_proj <span class="op">=</span> sf_bay_county_shapes.to_crs(CA_ALBERS_CRS)</span>
-<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> gdf_bay_proj.crs <span class="op">==</span> bay_area_no_water_proj.crs</span>
-<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the raster grid</span></span>
-<span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a>cell_size <span class="op">=</span> <span class="dv">5_000</span></span>
-<span id="cb64-8"><a href="#cb64-8" aria-hidden="true" tabindex="-1"></a>bay_arrivals_hist <span class="op">=</span> geospatial_histogram(</span>
-<span id="cb64-9"><a href="#cb64-9" aria-hidden="true" tabindex="-1"></a>    gdf_bay_proj, weights<span class="op">=</span><span class="va">None</span>, cell_size<span class="op">=</span>cell_size</span>
-<span id="cb64-10"><a href="#cb64-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb64-11"><a href="#cb64-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> bay_arrivals_hist.crs <span class="op">==</span> bay_area_no_water_proj.crs</span></code></pre></div>
+<div id="53674928" class="cell" data-execution_count="71">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Change all data to CA Albers CRS</span></span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>gdf_bay_proj <span class="op">=</span> gdf_bay_hq.to_crs(CA_ALBERS_CRS)</span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>bay_area_no_water_proj <span class="op">=</span> bay_area_no_water.to_crs(CA_ALBERS_CRS)</span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>sf_bay_county_shapes_proj <span class="op">=</span> sf_bay_county_shapes.to_crs(CA_ALBERS_CRS)</span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> gdf_bay_proj.crs <span class="op">==</span> bay_area_no_water_proj.crs</span>
+<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the raster grid</span></span>
+<span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a>cell_size <span class="op">=</span> <span class="dv">5_000</span></span>
+<span id="cb66-8"><a href="#cb66-8" aria-hidden="true" tabindex="-1"></a>bay_arrivals_hist <span class="op">=</span> geospatial_histogram(</span>
+<span id="cb66-9"><a href="#cb66-9" aria-hidden="true" tabindex="-1"></a>    gdf_bay_proj, weights<span class="op">=</span><span class="va">None</span>, cell_size<span class="op">=</span>cell_size</span>
+<span id="cb66-10"><a href="#cb66-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb66-11"><a href="#cb66-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> bay_arrivals_hist.crs <span class="op">==</span> bay_area_no_water_proj.crs</span></code></pre></div>
 </div>
 <p>Next I’ll get all of the styling for the plot defined in dictionaries.</p>
-<div id="fd0c5816" class="cell" data-execution_count="63">
+<div id="fd0c5816" class="cell" data-execution_count="73">
 <details class="code-fold">
 <summary>Plot Styling: <code>legend_cbar_kws</code>, <code>data_fill_kws</code>, <code>adjust_kws</code>, <code>text_kws</code>, <code>square_patch</code>, <code>legend_kws</code></summary>
-<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>legend_cbar_kws <span class="op">=</span> {</span>
-<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"format"</span>: FuncFormatter(number_suffix_formatter),</span>
-<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"shrink"</span>: <span class="fl">0.8</span>,</span>
-<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"label"</span>: <span class="st">"Number of High Quality Public Transit Stops"</span>,</span>
-<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"location"</span>: <span class="st">"top"</span>,</span>
-<span id="cb65-6"><a href="#cb65-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"pad"</span>: <span class="fl">0.001</span>,</span>
-<span id="cb65-7"><a href="#cb65-7" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb65-8"><a href="#cb65-8" aria-hidden="true" tabindex="-1"></a>adjust_kws <span class="op">=</span> {</span>
-<span id="cb65-9"><a href="#cb65-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"avoid_self"</span>: <span class="va">True</span>,</span>
-<span id="cb65-10"><a href="#cb65-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"expand"</span>: (<span class="dv">7</span>, <span class="dv">3</span>),</span>
-<span id="cb65-11"><a href="#cb65-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"arrowprops"</span>: {</span>
-<span id="cb65-12"><a href="#cb65-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"arrowstyle"</span>: <span class="st">"-&gt;"</span>,</span>
-<span id="cb65-13"><a href="#cb65-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">"color"</span>: <span class="st">"black"</span>,</span>
-<span id="cb65-14"><a href="#cb65-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"lw"</span>: <span class="dv">1</span>,</span>
-<span id="cb65-15"><a href="#cb65-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"connectionstyle"</span>: <span class="st">"arc3,rad=0.01"</span>,</span>
-<span id="cb65-16"><a href="#cb65-16" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb65-17"><a href="#cb65-17" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb65-18"><a href="#cb65-18" aria-hidden="true" tabindex="-1"></a>data_fill_kws <span class="op">=</span> {<span class="st">"alpha"</span>: <span class="fl">.75</span>, <span class="st">"cmap"</span>: new_cmap}</span>
-<span id="cb65-19"><a href="#cb65-19" aria-hidden="true" tabindex="-1"></a>text_kws <span class="op">=</span> {<span class="st">"fontsize"</span>: <span class="dv">8</span>, <span class="st">"ha"</span>: <span class="st">"center"</span>, <span class="st">"va"</span>: <span class="st">"center"</span>, <span class="st">"color"</span>: <span class="st">"black"</span>}</span>
-<span id="cb65-20"><a href="#cb65-20" aria-hidden="true" tabindex="-1"></a>square_patch <span class="op">=</span> mpatches.Rectangle(</span>
-<span id="cb65-21"><a href="#cb65-21" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">0</span>, <span class="dv">0</span>), <span class="dv">10</span>, <span class="dv">10</span>, facecolor<span class="op">=</span>new_cmap.get_under(), edgecolor<span class="op">=</span><span class="st">"grey"</span>, linewidth<span class="op">=</span><span class="fl">0.8</span></span>
-<span id="cb65-22"><a href="#cb65-22" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb65-23"><a href="#cb65-23" aria-hidden="true" tabindex="-1"></a>legend_kws <span class="op">=</span> {</span>
-<span id="cb65-24"><a href="#cb65-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">'handles'</span>: [square_patch],</span>
-<span id="cb65-25"><a href="#cb65-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">'labels'</span>: [<span class="vs">rf"</span><span class="sc">{</span><span class="bu">int</span>(cell_size<span class="op">/</span><span class="dv">1000</span>)<span class="sc">}</span><span class="vs">$\times$</span><span class="sc">{</span><span class="bu">int</span>(cell_size<span class="op">/</span><span class="dv">1000</span>)<span class="sc">}</span><span class="vs">km Grid Area"</span>],</span>
-<span id="cb65-26"><a href="#cb65-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">'loc'</span>: <span class="st">"upper left"</span>,</span>
-<span id="cb65-27"><a href="#cb65-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">'frameon'</span>: <span class="va">False</span>,</span>
-<span id="cb65-28"><a href="#cb65-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">'fontsize'</span>: <span class="dv">9</span>,</span>
-<span id="cb65-29"><a href="#cb65-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">'handlelength'</span>: <span class="fl">1.5</span>,</span>
-<span id="cb65-30"><a href="#cb65-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">'handleheight'</span>: <span class="dv">2</span>,</span>
-<span id="cb65-31"><a href="#cb65-31" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>legend_cbar_kws <span class="op">=</span> {</span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"format"</span>: FuncFormatter(number_suffix_formatter),</span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"shrink"</span>: <span class="fl">0.8</span>,</span>
+<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"label"</span>: <span class="st">"Number of High Quality Public Transit Stops"</span>,</span>
+<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"location"</span>: <span class="st">"top"</span>,</span>
+<span id="cb67-6"><a href="#cb67-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"pad"</span>: <span class="fl">0.001</span>,</span>
+<span id="cb67-7"><a href="#cb67-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb67-8"><a href="#cb67-8" aria-hidden="true" tabindex="-1"></a>adjust_kws <span class="op">=</span> {</span>
+<span id="cb67-9"><a href="#cb67-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"avoid_self"</span>: <span class="va">True</span>,</span>
+<span id="cb67-10"><a href="#cb67-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"expand"</span>: (<span class="dv">7</span>, <span class="dv">3</span>),</span>
+<span id="cb67-11"><a href="#cb67-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"arrowprops"</span>: {</span>
+<span id="cb67-12"><a href="#cb67-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"arrowstyle"</span>: <span class="st">"-&gt;"</span>,</span>
+<span id="cb67-13"><a href="#cb67-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">"color"</span>: <span class="st">"black"</span>,</span>
+<span id="cb67-14"><a href="#cb67-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"lw"</span>: <span class="dv">1</span>,</span>
+<span id="cb67-15"><a href="#cb67-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"connectionstyle"</span>: <span class="st">"arc3,rad=0.01"</span>,</span>
+<span id="cb67-16"><a href="#cb67-16" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb67-17"><a href="#cb67-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb67-18"><a href="#cb67-18" aria-hidden="true" tabindex="-1"></a>data_fill_kws <span class="op">=</span> {<span class="st">"alpha"</span>: <span class="fl">.75</span>, <span class="st">"cmap"</span>: new_cmap}</span>
+<span id="cb67-19"><a href="#cb67-19" aria-hidden="true" tabindex="-1"></a>text_kws <span class="op">=</span> {<span class="st">"fontsize"</span>: <span class="dv">8</span>, <span class="st">"ha"</span>: <span class="st">"center"</span>, <span class="st">"va"</span>: <span class="st">"center"</span>, <span class="st">"color"</span>: <span class="st">"black"</span>}</span>
+<span id="cb67-20"><a href="#cb67-20" aria-hidden="true" tabindex="-1"></a>square_patch <span class="op">=</span> mpatches.Rectangle(</span>
+<span id="cb67-21"><a href="#cb67-21" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">0</span>, <span class="dv">0</span>), <span class="dv">10</span>, <span class="dv">10</span>, facecolor<span class="op">=</span>new_cmap.get_under(), edgecolor<span class="op">=</span><span class="st">"grey"</span>, linewidth<span class="op">=</span><span class="fl">0.8</span></span>
+<span id="cb67-22"><a href="#cb67-22" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb67-23"><a href="#cb67-23" aria-hidden="true" tabindex="-1"></a>legend_kws <span class="op">=</span> {</span>
+<span id="cb67-24"><a href="#cb67-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">'handles'</span>: [square_patch],</span>
+<span id="cb67-25"><a href="#cb67-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">'labels'</span>: [<span class="vs">rf"</span><span class="sc">{</span><span class="bu">int</span>(cell_size<span class="op">/</span><span class="dv">1000</span>)<span class="sc">}</span><span class="vs">$\times$</span><span class="sc">{</span><span class="bu">int</span>(cell_size<span class="op">/</span><span class="dv">1000</span>)<span class="sc">}</span><span class="vs">km Grid Area"</span>],</span>
+<span id="cb67-26"><a href="#cb67-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">'loc'</span>: <span class="st">"upper left"</span>,</span>
+<span id="cb67-27"><a href="#cb67-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">'frameon'</span>: <span class="va">False</span>,</span>
+<span id="cb67-28"><a href="#cb67-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">'fontsize'</span>: <span class="dv">9</span>,</span>
+<span id="cb67-29"><a href="#cb67-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">'handlelength'</span>: <span class="fl">1.5</span>,</span>
+<span id="cb67-30"><a href="#cb67-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">'handleheight'</span>: <span class="dv">2</span>,</span>
+<span id="cb67-31"><a href="#cb67-31" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 </details>
 </div>
 <p>Last, I’ll plot the final product, a heatmap of high quality public transit stops in the Bay Area layered over a base map of all land in the region.</p>
-<div id="4aadbe39" class="cell" data-execution_count="64">
-<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">4</span>, <span class="dv">6</span>))</span>
-<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>bay_arrivals_hist.plot(</span>
-<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>    column<span class="op">=</span><span class="st">"count"</span>,</span>
-<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>ax,</span>
-<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>data_fill_kws,</span>
-<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>borders_kws,</span>
-<span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a>    vmax<span class="op">=</span><span class="dv">500</span>,</span>
-<span id="cb66-8"><a href="#cb66-8" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb66-9"><a href="#cb66-9" aria-hidden="true" tabindex="-1"></a>    legend_kwds<span class="op">=</span>legend_cbar_kws,</span>
-<span id="cb66-10"><a href="#cb66-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb66-11"><a href="#cb66-11" aria-hidden="true" tabindex="-1"></a>sf_bay_county_shapes_proj.plot(</span>
-<span id="cb66-12"><a href="#cb66-12" aria-hidden="true" tabindex="-1"></a>    edgecolor<span class="op">=</span><span class="st">"black"</span>, facecolor<span class="op">=</span><span class="st">"none"</span>, linewidth<span class="op">=</span><span class="dv">1</span>, alpha<span class="op">=</span><span class="fl">.7</span>,</span>
-<span id="cb66-13"><a href="#cb66-13" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>ax</span>
-<span id="cb66-14"><a href="#cb66-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb66-15"><a href="#cb66-15" aria-hidden="true" tabindex="-1"></a>bay_area_no_water_proj.plot(</span>
-<span id="cb66-16"><a href="#cb66-16" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>ax, edgecolor<span class="op">=</span><span class="st">"black"</span>, facecolor<span class="op">=</span><span class="st">"grey"</span>, linewidth<span class="op">=</span><span class="dv">1</span>, alpha<span class="op">=</span><span class="fl">0.3</span>, zorder<span class="op">=-</span><span class="dv">1</span></span>
-<span id="cb66-17"><a href="#cb66-17" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb66-18"><a href="#cb66-18" aria-hidden="true" tabindex="-1"></a>label_polygon(</span>
-<span id="cb66-19"><a href="#cb66-19" aria-hidden="true" tabindex="-1"></a>    bay_area_no_water_proj,</span>
-<span id="cb66-20"><a href="#cb66-20" aria-hidden="true" tabindex="-1"></a>    ax,</span>
-<span id="cb66-21"><a href="#cb66-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"NAME"</span>,</span>
-<span id="cb66-22"><a href="#cb66-22" aria-hidden="true" tabindex="-1"></a>    adjust_list<span class="op">=</span>[<span class="st">"San Francisco"</span>],</span>
-<span id="cb66-23"><a href="#cb66-23" aria-hidden="true" tabindex="-1"></a>    adjust_kws<span class="op">=</span>adjust_kws,</span>
-<span id="cb66-24"><a href="#cb66-24" aria-hidden="true" tabindex="-1"></a>    text_kws<span class="op">=</span>text_kws,</span>
-<span id="cb66-25"><a href="#cb66-25" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb66-26"><a href="#cb66-26" aria-hidden="true" tabindex="-1"></a>ax.legend(<span class="op">**</span>legend_kws)</span>
-<span id="cb66-27"><a href="#cb66-27" aria-hidden="true" tabindex="-1"></a>ax.axis(<span class="st">"off"</span>)</span>
-<span id="cb66-28"><a href="#cb66-28" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code></pre></div>
+<div id="4aadbe39" class="cell" data-execution_count="74">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">4</span>, <span class="dv">6</span>))</span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>bay_arrivals_hist.plot(</span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>    column<span class="op">=</span><span class="st">"count"</span>,</span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>ax,</span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>data_fill_kws,</span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>borders_kws,</span>
+<span id="cb68-7"><a href="#cb68-7" aria-hidden="true" tabindex="-1"></a>    vmax<span class="op">=</span><span class="dv">500</span>,</span>
+<span id="cb68-8"><a href="#cb68-8" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb68-9"><a href="#cb68-9" aria-hidden="true" tabindex="-1"></a>    legend_kwds<span class="op">=</span>legend_cbar_kws,</span>
+<span id="cb68-10"><a href="#cb68-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb68-11"><a href="#cb68-11" aria-hidden="true" tabindex="-1"></a>sf_bay_county_shapes_proj.plot(</span>
+<span id="cb68-12"><a href="#cb68-12" aria-hidden="true" tabindex="-1"></a>    edgecolor<span class="op">=</span><span class="st">"black"</span>, facecolor<span class="op">=</span><span class="st">"none"</span>, linewidth<span class="op">=</span><span class="dv">1</span>, alpha<span class="op">=</span><span class="fl">.7</span>,</span>
+<span id="cb68-13"><a href="#cb68-13" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>ax</span>
+<span id="cb68-14"><a href="#cb68-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb68-15"><a href="#cb68-15" aria-hidden="true" tabindex="-1"></a>bay_area_no_water_proj.plot(</span>
+<span id="cb68-16"><a href="#cb68-16" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>ax, edgecolor<span class="op">=</span><span class="st">"black"</span>, facecolor<span class="op">=</span><span class="st">"grey"</span>, linewidth<span class="op">=</span><span class="dv">1</span>, alpha<span class="op">=</span><span class="fl">0.3</span>, zorder<span class="op">=-</span><span class="dv">1</span></span>
+<span id="cb68-17"><a href="#cb68-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb68-18"><a href="#cb68-18" aria-hidden="true" tabindex="-1"></a>label_polygon(</span>
+<span id="cb68-19"><a href="#cb68-19" aria-hidden="true" tabindex="-1"></a>    bay_area_no_water_proj,</span>
+<span id="cb68-20"><a href="#cb68-20" aria-hidden="true" tabindex="-1"></a>    ax,</span>
+<span id="cb68-21"><a href="#cb68-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"NAME"</span>,</span>
+<span id="cb68-22"><a href="#cb68-22" aria-hidden="true" tabindex="-1"></a>    adjust_list<span class="op">=</span>[<span class="st">"San Francisco"</span>],</span>
+<span id="cb68-23"><a href="#cb68-23" aria-hidden="true" tabindex="-1"></a>    adjust_kws<span class="op">=</span>adjust_kws,</span>
+<span id="cb68-24"><a href="#cb68-24" aria-hidden="true" tabindex="-1"></a>    text_kws<span class="op">=</span>text_kws,</span>
+<span id="cb68-25"><a href="#cb68-25" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb68-26"><a href="#cb68-26" aria-hidden="true" tabindex="-1"></a>ax.legend(<span class="op">**</span>legend_kws)</span>
+<span id="cb68-27"><a href="#cb68-27" aria-hidden="true" tabindex="-1"></a>ax.axis(<span class="st">"off"</span>)</span>
+<span id="cb68-28"><a href="#cb68-28" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-65-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-66-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -2132,8 +2159,8 @@ With that base map, I’ll now layer over a heatmap showing the distribution of 
 <div id="ref-barbeau_many_2015" class="csl-entry" role="listitem">
 Barbeau, Sean J., and Aaron Antrim. 2015. <span>“The <span>Many</span> <span>Uses</span> of <span>GTFS</span> <span>Data</span> – <span>Opening</span> the <span>Door</span> to <span>Transit</span> and <span>Multimodal</span> <span>Applications</span>.”</span> In <em>2015 <span>Florida</span> <span>Public</span> <span>Transportation</span> <span>Association</span> <span>Annual</span> <span>Training</span> and <span>Conference</span></em>. Daytona Beach, Florida. <a href="https://www.locationaware.usf.edu/wp-content/uploads/2010/02/The-Many-Uses-of-GTFS-Data-%E2%80%93-ITS-America-submission-abbreviated.pdf">https://www.locationaware.usf.edu/wp-content/uploads/2010/02/The-Many-Uses-of-GTFS-Data-%E2%80%93-ITS-America-submission-abbreviated.pdf</a>.
 </div>
-<div id="ref-charles_dupin_francais_1826" class="csl-entry" role="listitem">
-Charles Dupin. 1826. <span>“Français&nbsp;: <span>Carte</span> Figurative de l’instruction Populaire de La <span>France</span>, Par <span>Charles</span> <span>Dupin</span>, 1826.”</span> <a href="https://commons.wikimedia.org/wiki/File:Carte_figurative_de_l%27instruction_populaire_de_la_France.jpg">https://commons.wikimedia.org/wiki/File:Carte_figurative_de_l%27instruction_populaire_de_la_France.jpg</a>.
+<div id="ref-charles_dupin_carte_1826" class="csl-entry" role="listitem">
+Charles Dupin. 1826. <span>“Carte Figurative de l’instruction Populaire de La <span>France</span>, Par <span>Charles</span> <span>Dupin</span>, 1826.”</span> <a href="https://commons.wikimedia.org/wiki/File:Carte_figurative_de_l%27instruction_populaire_de_la_France.jpg">https://commons.wikimedia.org/wiki/File:Carte_figurative_de_l%27instruction_populaire_de_la_France.jpg</a>.
 </div>
 <div id="ref-friendly_milestones_2000" class="csl-entry" role="listitem">
 Friendly, Michael. 2000. <span>“Milestones in the History of Thematic Cartography, Statistical Graphics, and Data Visualization.”</span> <a href="https://www.usu.edu/math/symanzik/teaching/2009_stat6560/downloads/friendly_milestone.pdf">https://www.usu.edu/math/symanzik/teaching/2009_stat6560/downloads/friendly_milestone.pdf</a>.
@@ -2147,14 +2174,8 @@ Kennedy, Melita, and Steve Kopp. 2000. <em>Understanding <span>Map</span> <span>
 <div id="ref-patterson_california_2022" class="csl-entry" role="listitem">
 Patterson, Will. 2022. <span>“California <span>Department</span> of <span>Fish</span> and <span>Wildlife</span> <span>Projection</span> and <span>Datum</span> <span>Guidelines</span>.”</span> California Department of Fish; Wildlife. <a href="https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=109326">https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=109326</a>.
 </div>
-<div id="ref-roletto_english_2005" class="csl-entry" role="listitem">
-Roletto, Jan. 2005. <span>“English: <span>Photo</span> of the <span>South</span> <span>Farallon</span> <span>Islands</span> (<span>Southeast</span> <span>Farallon</span> <span>Island</span> with <span>Maintop</span> <span>Island</span> in the Foreground) in <span>Farallon</span> <span>Islands</span> <span>National</span> <span>Wildlife</span> <span>Refuge</span>.”</span> <a href="https://commons.wikimedia.org/wiki/File:SE_Farallon_Island.jpg">https://commons.wikimedia.org/wiki/File:SE_Farallon_Island.jpg</a>.
-</div>
 <div id="ref-tennekes_tmap_2018" class="csl-entry" role="listitem">
 Tennekes, Martijn. 2018. <span>“Tmap: <span>Thematic</span> <span>Maps</span> in <span>R</span>.”</span> <em>Journal of Statistical Software</em> 84 (April): 1–39. <a href="https://doi.org/10.18637/jss.v084.i06">https://doi.org/10.18637/jss.v084.i06</a>.
-</div>
-<div id="ref-tobin_english_2018" class="csl-entry" role="listitem">
-Tobin, Mitch. 2018. <span>“English: <span>The</span> <span>San</span> <span>Francisco</span> <span>Peninsula</span> and <span>San</span> <span>Francisco</span> <span>International</span> <span>Airport</span>, from a <span>Denver</span> to <span>Honolulu</span> Flight in 2018.”</span> <a href="https://commons.wikimedia.org/wiki/File:San_Francisco_and_SFO_Aerial_2018.jpg">https://commons.wikimedia.org/wiki/File:San_Francisco_and_SFO_Aerial_2018.jpg</a>.
 </div>
 <div id="ref-walker_analyzing_2023" class="csl-entry" role="listitem">
 Walker, Kyle. 2023. <em>Analyzing <span>US</span> <span>Census</span> <span>Data</span></em>. 1st edition. Boca Raton: Chapman; Hall/CRC. <a href="https://walker-data.com/census-r/">https://walker-data.com/census-r/</a>.
