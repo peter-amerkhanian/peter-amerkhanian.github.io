@@ -224,16 +224,16 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
      
     <ul>
     <li><a href="#question" id="toc-question" class="nav-link active" data-scroll-target="#question">Question</a></li>
-    <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data">Data</a>
+    <li><a href="#exercise-0-building-a-spatial-dataset" id="toc-exercise-0-building-a-spatial-dataset" class="nav-link" data-scroll-target="#exercise-0-building-a-spatial-dataset">Exercise 0: Building a Spatial Dataset</a>
     <ul class="collapse">
     <li><a href="#gtfs-data-from-cal-itp" id="toc-gtfs-data-from-cal-itp" class="nav-link" data-scroll-target="#gtfs-data-from-cal-itp">GTFS Data from Cal ITP</a></li>
     <li><a href="#census-shapes-with-tigrispygris" id="toc-census-shapes-with-tigrispygris" class="nav-link" data-scroll-target="#census-shapes-with-tigrispygris">Census shapes with <code>tigris</code>/<code>pygris</code></a></li>
     <li><a href="#dealing-with-coordinate-reference-systems" id="toc-dealing-with-coordinate-reference-systems" class="nav-link" data-scroll-target="#dealing-with-coordinate-reference-systems">Dealing with Coordinate Reference Systems</a></li>
     </ul></li>
     <li><a href="#exercise-1-point-plot-pros-and-cons" id="toc-exercise-1-point-plot-pros-and-cons" class="nav-link" data-scroll-target="#exercise-1-point-plot-pros-and-cons">Exercise 1: Point Plot Pros and Cons</a></li>
-    <li><a href="#exercise-2-county-choropleths" id="toc-exercise-2-county-choropleths" class="nav-link" data-scroll-target="#exercise-2-county-choropleths">Exercise 2: County Choropleths</a></li>
+    <li><a href="#exercise-2-cool-county-choropleths" id="toc-exercise-2-cool-county-choropleths" class="nav-link" data-scroll-target="#exercise-2-cool-county-choropleths">Exercise 2: Cool County Choropleths</a></li>
     <li><a href="#exercise-3-a-region-choropleth" id="toc-exercise-3-a-region-choropleth" class="nav-link" data-scroll-target="#exercise-3-a-region-choropleth">Exercise 3: A Region Choropleth</a></li>
-    <li><a href="#exercise-4-heatmaps-and-projected-crs" id="toc-exercise-4-heatmaps-and-projected-crs" class="nav-link" data-scroll-target="#exercise-4-heatmaps-and-projected-crs">Exercise 4: Heatmaps and Projected CRS</a></li>
+    <li><a href="#exercise-4-heatmaps-and-the-projected-crs" id="toc-exercise-4-heatmaps-and-the-projected-crs" class="nav-link" data-scroll-target="#exercise-4-heatmaps-and-the-projected-crs">Exercise 4: Heatmaps and the Projected CRS</a></li>
     <li><a href="#exercise-5-refining-land-and-sea" id="toc-exercise-5-refining-land-and-sea" class="nav-link" data-scroll-target="#exercise-5-refining-land-and-sea">Exercise 5: Refining Land and Sea</a></li>
     </ul>
     <div class="quarto-alternate-formats">
@@ -264,7 +264,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
   }
 });
 </script>
-<div id="826d8159" class="cell" data-execution_count="9">
+<div id="826d8159" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Import Statements</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
@@ -278,29 +278,32 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.colors <span class="im">import</span> LinearSegmentedColormap</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.patches <span class="im">import</span> Patch</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> adjustText <span class="im">import</span> adjust_text</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Geopatial</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> shapely.geometry <span class="im">import</span> box</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> contextily <span class="im">as</span> cx</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pygris.utils</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pygris</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> osmnx <span class="im">as</span> ox</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># IO</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> concurrent.futures <span class="im">import</span> ThreadPoolExecutor, as_completed</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tqdm <span class="im">import</span> tqdm</span></code></pre></div>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> util <span class="im">import</span> custom_legend</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Geopatial</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> shapely.geometry <span class="im">import</span> box, Point, Polygon</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> contextily <span class="im">as</span> cx</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pygris.utils</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pygris</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> osmnx <span class="im">as</span> ox</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cartopy.crs <span class="im">as</span> ccrs</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cartopy.feature <span class="im">as</span> cfeature</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co"># IO</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> concurrent.futures <span class="im">import</span> ThreadPoolExecutor, as_completed</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tqdm <span class="im">import</span> tqdm</span></code></pre></div>
 </details>
 </div>
-<p>One of my favorite applications of Python is geospatial analysis. Python happens to have an amazing collection of GIS libraries that seem capable of doing almost any geospatial task I can imagine, from <a href="https://geopandas.org/en/stable/docs/user_guide/mapping.html">basic plots</a> to <a href="https://pysal.org/">spatial statistics</a> to <a href="https://geowombat.readthedocs.io/en/latest/">remote sensing</a> and more. I’m writing this blog post to give myself a brief overview of how I currently use several of those libraries for <strong>“thematic mapping”</strong> – plotting distributions of data across space <span class="citation" data-cites="tennekes_tmap_2018">(<a href="#ref-tennekes_tmap_2018" role="doc-biblioref">Tennekes 2018</a>)</span>. My main goal here is that I will have somewhere to go for boilerplate code/tutorials for myself, but hopefully an external reader gets some value out of it too.</p>
+<p>One of my favorite applications of Python is geospatial analysis. Python happens to have an amazing collection of geospatial libraries that seem capable of doing almost any spatial task I can imagine, from <a href="https://geopandas.org/en/stable/docs/user_guide/mapping.html">basic plots</a> to <a href="https://pysal.org/">spatial statistics</a> to <a href="https://geowombat.readthedocs.io/en/latest/">remote sensing</a> and more. I’m writing this blog post to give myself a brief overview of how I currently use several of those libraries for <strong>“thematic mapping”</strong> – plotting distributions of data across space <span class="citation" data-cites="tennekes_tmap_2018">(<a href="#ref-tennekes_tmap_2018" role="doc-biblioref">Tennekes 2018</a>)</span>. My main goal here is that I will have somewhere to go for boilerplate code/tutorials for myself, but hopefully an external reader gets some value out of it too.</p>
 <p>I’ll cover the following:</p>
 <ul>
 <li>Some examples of Spatial Data: GTFS transit data, U.S. Census shape files, and dealing with Coordinate Reference Systems across different datasets.</li>
 <li>Thematic Maps: I’ll cover plotting distributions across administrative boundaries and raster grids.</li>
-<li>Zooming in and otherwise refining plots in <code>geopandas</code>.</li>
+<li>Along the way I’ll cover some specific issues with spatial data in Python, like zooming in and refining plots in <code>geopandas</code>.</li>
 </ul>
 <section id="question" class="level2">
 <h2 class="anchored" data-anchor-id="question">Question</h2>
-<p>I’ll base this post around a series of five exercises that get at the same basic question:</p>
+<p>I’ll base this post around a series of exercises that get at the same basic question:</p>
 <div class="callout callout-style-default callout-tip callout-titled" title="Motivating Question">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -314,16 +317,16 @@ Motivating Question
 <p>How does the distribution of public transit stops in California vary by geography?</p>
 </div>
 </div>
-<p>In the exercises, I’ll make maps that investigate the distribution at various geographic levels and in subregions within California.</p>
+<p>In the exercises, I’ll make spatial datasets and maps that investigate the distribution of public transit stops at various geographic levels and in subregions within California.</p>
 </section>
-<section id="data" class="level2">
-<h2 class="anchored" data-anchor-id="data">Data</h2>
+<section id="exercise-0-building-a-spatial-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-0-building-a-spatial-dataset">Exercise 0: Building a Spatial Dataset</h2>
 <section id="gtfs-data-from-cal-itp" class="level3">
 <h3 class="anchored" data-anchor-id="gtfs-data-from-cal-itp">GTFS Data from Cal ITP</h3>
-<p>I will be using open data from CalTrans’ <a href="https://github.com/cal-itp/data-analyses/blob/main/high_quality_transit_areas/README.md">High Quality Transit Areas Analysis</a>. While that analysis is focused on defining high quality transit areas, they make their intermediary transit-stop dataset and high quality transit-stop datasets available to the public. Thanks, CalTrans!</p>
-<p>The data that CalTrans are using are derived from “General Transit Feed Specification,” or, GTFS data. GTFS is a standardized data format that public transit agencies use to describe fixed-route transit services. It was initially developed in 2005 to provide support for public transit route planning in Google Maps <span class="citation" data-cites="barbeau_many_2015">(<a href="#ref-barbeau_many_2015" role="doc-biblioref">Barbeau and Antrim 2015</a>)</span>. The specific standards of GTFS are all documented at <a href="https://gtfs.org/getting-started/what-is-GTFS/">gtfs.org</a> and its complete history and many use cases are given an excellent overview in the previously cited <span class="citation" data-cites="barbeau_many_2015">(<a href="#ref-barbeau_many_2015" role="doc-biblioref">Barbeau and Antrim 2015</a>)</span> paper.</p>
+<p>To examine public transit stops, I will be using open data from CalTrans’ <a href="https://github.com/cal-itp/data-analyses/blob/main/high_quality_transit_areas/README.md">High Quality Transit Areas Analysis</a>. That analysis is focused on defining high quality transit areas, but they make their intermediary transit-stop dataset and high quality transit-stop datasets available to the public. Thanks, CalTrans!</p>
+<p>The data that CalTrans are using are derived from “General Transit Feed Specification,” or, GTFS data. GTFS is a standardized data format that public transit agencies use to describe fixed-route transit services. It was initially developed in 2005 to provide support for public transit route planning in Google Maps <span class="citation" data-cites="barbeau_many_2015">(<a href="#ref-barbeau_many_2015" role="doc-biblioref">Barbeau and Antrim 2015</a>)</span>. The specific standards of GTFS are all documented at <a href="https://gtfs.org/getting-started/what-is-GTFS/">gtfs.org</a> and its complete history and many use cases are given an excellent overview in the previously cited <span class="citation" data-cites="barbeau_many_2015">(<a href="#ref-barbeau_many_2015" role="doc-biblioref">Barbeau and Antrim 2015</a>)</span> conference paper.</p>
 <p>I’ll retrieve the CalTrans transit-stop data via parallel API requests (see the folded code for the details). This code should theoretically work with any ArcGIS Rest API.</p>
-<div id="ac231b05" class="cell" data-execution_count="10">
+<div id="ac231b05" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code for parallel API calls: <code>paginate_api</code></summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fetch_gdf(url, offset, chunksize):</span>
@@ -370,16 +373,16 @@ Motivating Question
 <span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> full_gdf</span></code></pre></div>
 </details>
 </div>
-<div id="44decc28" class="cell" data-execution_count="11">
+<div id="44decc28" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rest_api <span class="op">=</span> <span class="st">"https://caltrans-gis.dot.ca.gov/arcgis/rest/"</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>all_stops <span class="op">=</span> <span class="st">"services/CHrailroad/CA_Transit_Stops/FeatureServer/0/query"</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>gdf_all <span class="op">=</span> paginate_api(rest_api <span class="op">+</span> all_stops)</span></code></pre></div>
 </div>
 <p>The resulting dataset contains each public transit stop in California, with various pieces of information about that stop.</p>
-<div id="cbb716c9" class="cell" data-execution_count="12">
+<div id="cbb716c9" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>gdf_all[[<span class="st">'district_name'</span>, <span class="st">'agency'</span>, <span class="st">'stop_id'</span>, <span class="st">'n_routes'</span>,</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>         <span class="st">'stop_name'</span>, <span class="st">'n_arrivals'</span>, <span class="st">'geometry'</span>]].head()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="12">
+<div class="cell-output cell-output-display" data-execution_count="6">
 <div>
 
 
@@ -399,53 +402,53 @@ Motivating Question
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>07 - Los Angeles / Ventura</td>
-<td>City of Inglewood</td>
-<td>3878454</td>
+<td>04 - Bay Area / Oakland</td>
+<td>Central Contra Costa Transit Authority</td>
+<td>831185</td>
 <td>1</td>
-<td>Hillcrest Pharmacy</td>
-<td>6</td>
-<td>POINT (-118.35012 33.96022)</td>
+<td>Moraga Rd and Mt Diablo Blvd</td>
+<td>21</td>
+<td>POINT (-122.11873 37.89112)</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>07 - Los Angeles / Ventura</td>
-<td>City of Inglewood</td>
-<td>3878455</td>
+<td>04 - Bay Area / Oakland</td>
+<td>Central Contra Costa Transit Authority</td>
+<td>831186</td>
 <td>1</td>
-<td>Social Security Office (230 E Spruce Ave)</td>
-<td>6</td>
-<td>POINT (-118.35137 33.95767)</td>
+<td>Moraga Rd and Brook St</td>
+<td>21</td>
+<td>POINT (-122.11836 37.88866)</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>07 - Los Angeles / Ventura</td>
-<td>City of Inglewood</td>
-<td>3878456</td>
+<td>04 - Bay Area / Oakland</td>
+<td>Central Contra Costa Transit Authority</td>
+<td>831187</td>
 <td>1</td>
-<td>Arbor Vitae / LaBrea</td>
-<td>6</td>
-<td>POINT (-118.35194 33.95264)</td>
+<td>Moraga Rd and O'Conner Dr</td>
+<td>21</td>
+<td>POINT (-122.1181 37.88673)</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>07 - Los Angeles / Ventura</td>
-<td>City of Inglewood</td>
-<td>3878457</td>
+<td>04 - Bay Area / Oakland</td>
+<td>Central Contra Costa Transit Authority</td>
+<td>831188</td>
 <td>1</td>
-<td>Hardy / Myrtle (Centinela Hospital)</td>
-<td>6</td>
-<td>POINT (-118.34874 33.94905)</td>
+<td>Moraga Rd and Herman Dr</td>
+<td>21</td>
+<td>POINT (-122.11836 37.8853)</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>07 - Los Angeles / Ventura</td>
-<td>City of Inglewood</td>
-<td>3878458</td>
+<td>04 - Bay Area / Oakland</td>
+<td>Central Contra Costa Transit Authority</td>
+<td>831189</td>
 <td>1</td>
-<td>Osage Senior Apartments</td>
-<td>6</td>
-<td>POINT (-118.34566 33.95134)</td>
+<td>Moraga Rd and Tanglewood Dr</td>
+<td>21</td>
+<td>POINT (-122.11894 37.88329)</td>
 </tr>
 </tbody>
 </table>
@@ -453,16 +456,16 @@ Motivating Question
 </div>
 </div>
 </div>
-<p>I noticed that a lot of geographic points that have a public transit stop are counted several times, perhaps to reflect different routes. I’m only interested in analyzing the distribution of unique physical transit stops without consideration of stop characteristics, so I drop duplicates based on geometry to get a unique geographic point for each transit stop.</p>
-<div id="eea0e43b" class="cell" data-execution_count="13">
+<p>I noticed that a lot of geographic points that have a public transit stop are counted several times (see duplicates in the <code>geometry</code> column), perhaps to reflect different routes. I’m only interested in analyzing the distribution of unique physical transit stops without consideration of number of routes, modes, etc., so I drop duplicates based on <code>geometry</code> to get unique stops.</p>
+<div id="eea0e43b" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>gdf_all <span class="op">=</span> gdf_all.drop_duplicates(subset<span class="op">=</span><span class="st">'geometry'</span>)</span></code></pre></div>
 </div>
 <p>I always like to do quick quality checks on geospatial data via calls to <code>geopandas</code>’s <a href="https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoDataFrame.explore.html"><code>.explore()</code> method</a>, which produces interactive plots in one line of code. I’ll look at the stops at San Pablo Ave. and Dwight Way in Berkeley, CA just to make sure everything looks as expected.</p>
-<div id="5a5b27cf" class="cell" data-class-output="map" data-execution_count="14">
+<div id="5a5b27cf" class="cell" data-class-output="map" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>gdf_all[gdf_all[<span class="st">'stop_name'</span>] <span class="op">==</span> <span class="st">'San Pablo Av &amp; Dwight Way'</span>].explore(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    style_kwds<span class="op">=</span><span class="bu">dict</span>(fillOpacity<span class="op">=</span><span class="fl">0.7</span>, radius<span class="op">=</span><span class="dv">12</span>, color<span class="op">=</span><span class="st">'red'</span>), zoom_start<span class="op">=</span><span class="dv">17</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="14">
+<div class="cell-output cell-output-display" data-execution_count="10">
 <div style="width:100%;"><div style="position:relative;width:100%;height:0;padding-bottom:60%;"><span style="color:#565656">Make this Notebook Trusted to load map: File -&gt; Trust Notebook</span><iframe srcdoc="<!DOCTYPE html>
 <html>
 <head>
@@ -482,7 +485,7 @@ Motivating Question
             <meta name=&quot;viewport&quot; content=&quot;width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; />
             <style>
-                #map_534a12ac38d2a22e97053c0230a1a79a {
+                #map_f32f6bdf678939f187b57abb3c5ef666 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -535,14 +538,14 @@ Motivating Question
 <body>
     
     
-            <div class=&quot;folium-map&quot; id=&quot;map_534a12ac38d2a22e97053c0230a1a79a&quot; ></div>
+            <div class=&quot;folium-map&quot; id=&quot;map_f32f6bdf678939f187b57abb3c5ef666&quot; ></div>
         
 </body>
 <script>
     
     
-            var map_534a12ac38d2a22e97053c0230a1a79a = L.map(
-                &quot;map_534a12ac38d2a22e97053c0230a1a79a&quot;,
+            var map_f32f6bdf678939f187b57abb3c5ef666 = L.map(
+                &quot;map_f32f6bdf678939f187b57abb3c5ef666&quot;,
                 {
                     center: [37.86113000021032, -122.28956450025885],
                     crs: L.CRS.EPSG3857,
@@ -554,13 +557,13 @@ Motivating Question
 
                 }
             );
-            L.control.scale().addTo(map_534a12ac38d2a22e97053c0230a1a79a);
+            L.control.scale().addTo(map_f32f6bdf678939f187b57abb3c5ef666);
 
             
 
         
     
-            var tile_layer_fc34df1e1b7f2b97d7fd04439ecb32af = L.tileLayer(
+            var tile_layer_95407ff267045a38add2d34096d83c9b = L.tileLayer(
                 &quot;https://tile.openstreetmap.org/{z}/{x}/{y}.png&quot;,
                 {
   &quot;minZoom&quot;: 0,
@@ -577,22 +580,22 @@ Motivating Question
             );
         
     
-            tile_layer_fc34df1e1b7f2b97d7fd04439ecb32af.addTo(map_534a12ac38d2a22e97053c0230a1a79a);
+            tile_layer_95407ff267045a38add2d34096d83c9b.addTo(map_f32f6bdf678939f187b57abb3c5ef666);
         
     
-        function geo_json_c554b4d6436ac649fae82b58bd63d7e3_styler(feature) {
+        function geo_json_48708035a7616b99835bbcf8f50709e8_styler(feature) {
             switch(feature.id) {
                 default:
                     return {&quot;color&quot;: &quot;red&quot;, &quot;fillOpacity&quot;: 0.7, &quot;radius&quot;: 12, &quot;weight&quot;: 2};
             }
         }
-        function geo_json_c554b4d6436ac649fae82b58bd63d7e3_highlighter(feature) {
+        function geo_json_48708035a7616b99835bbcf8f50709e8_highlighter(feature) {
             switch(feature.id) {
                 default:
                     return {&quot;fillOpacity&quot;: 0.75};
             }
         }
-        function geo_json_c554b4d6436ac649fae82b58bd63d7e3_pointToLayer(feature, latlng) {
+        function geo_json_48708035a7616b99835bbcf8f50709e8_pointToLayer(feature, latlng) {
             var opts = {
   &quot;stroke&quot;: true,
   &quot;color&quot;: &quot;#3388ff&quot;,
@@ -610,46 +613,46 @@ Motivating Question
   &quot;radius&quot;: 2,
 };
             
-            let style = geo_json_c554b4d6436ac649fae82b58bd63d7e3_styler(feature)
+            let style = geo_json_48708035a7616b99835bbcf8f50709e8_styler(feature)
             Object.assign(opts, style)
             
             return new L.CircleMarker(latlng, opts)
         }
 
-        function geo_json_c554b4d6436ac649fae82b58bd63d7e3_onEachFeature(feature, layer) {
+        function geo_json_48708035a7616b99835bbcf8f50709e8_onEachFeature(feature, layer) {
 
             layer.on({
                 mouseout: function(e) {
                     if(typeof e.target.setStyle === &quot;function&quot;){
-                            geo_json_c554b4d6436ac649fae82b58bd63d7e3.resetStyle(e.target);
+                            geo_json_48708035a7616b99835bbcf8f50709e8.resetStyle(e.target);
                     }
                 },
                 mouseover: function(e) {
                     if(typeof e.target.setStyle === &quot;function&quot;){
-                        const highlightStyle = geo_json_c554b4d6436ac649fae82b58bd63d7e3_highlighter(e.target.feature)
+                        const highlightStyle = geo_json_48708035a7616b99835bbcf8f50709e8_highlighter(e.target.feature)
                         e.target.setStyle(highlightStyle);
                     }
                 },
             });
         };
-        var geo_json_c554b4d6436ac649fae82b58bd63d7e3 = L.geoJson(null, {
-                onEachFeature: geo_json_c554b4d6436ac649fae82b58bd63d7e3_onEachFeature,
+        var geo_json_48708035a7616b99835bbcf8f50709e8 = L.geoJson(null, {
+                onEachFeature: geo_json_48708035a7616b99835bbcf8f50709e8_onEachFeature,
             
-                style: geo_json_c554b4d6436ac649fae82b58bd63d7e3_styler,
-                pointToLayer: geo_json_c554b4d6436ac649fae82b58bd63d7e3_pointToLayer,
+                style: geo_json_48708035a7616b99835bbcf8f50709e8_styler,
+                pointToLayer: geo_json_48708035a7616b99835bbcf8f50709e8_pointToLayer,
             ...{
 }
         });
 
-        function geo_json_c554b4d6436ac649fae82b58bd63d7e3_add (data) {
-            geo_json_c554b4d6436ac649fae82b58bd63d7e3
+        function geo_json_48708035a7616b99835bbcf8f50709e8_add (data) {
+            geo_json_48708035a7616b99835bbcf8f50709e8
                 .addData(data);
         }
-            geo_json_c554b4d6436ac649fae82b58bd63d7e3_add({&quot;bbox&quot;: [-122.28958300016382, 37.86079400026471, -122.2895460003539, 37.861466000155936], &quot;features&quot;: [{&quot;bbox&quot;: [-122.2895460003539, 37.861466000155936, -122.2895460003539, 37.861466000155936], &quot;geometry&quot;: {&quot;coordinates&quot;: [-122.2895460003539, 37.861466000155936], &quot;type&quot;: &quot;Point&quot;}, &quot;id&quot;: &quot;69776&quot;, &quot;properties&quot;: {&quot;OBJECTID&quot;: 69777, &quot;agency&quot;: &quot;Alameda-Contra Costa Transit District&quot;, &quot;base64_url&quot;: &quot;aHR0cHM6Ly9hcGkuNTExLm9yZy90cmFuc2l0L2RhdGFmZWVkcz9vcGVyYXRvcl9pZD1BQw==&quot;, &quot;district_name&quot;: &quot;04 - Bay Area / Oakland&quot;, &quot;meters_to_ca_state_highway&quot;: 7.7, &quot;n_arrivals&quot;: 143, &quot;n_hours_in_service&quot;: 24, &quot;n_routes&quot;: 4, &quot;org_id&quot;: &quot;recOZgevYf7Jimm9L&quot;, &quot;route_ids_served&quot;: &quot;72, 72M, 72R, 802&quot;, &quot;routetypes&quot;: &quot;3&quot;, &quot;stop_id&quot;: &quot;55880&quot;, &quot;stop_name&quot;: &quot;San Pablo Av \u0026 Dwight Way&quot;}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;bbox&quot;: [-122.28958300016382, 37.86079400026471, -122.28958300016382, 37.86079400026471], &quot;geometry&quot;: {&quot;coordinates&quot;: [-122.28958300016382, 37.86079400026471], &quot;type&quot;: &quot;Point&quot;}, &quot;id&quot;: &quot;69792&quot;, &quot;properties&quot;: {&quot;OBJECTID&quot;: 69793, &quot;agency&quot;: &quot;Alameda-Contra Costa Transit District&quot;, &quot;base64_url&quot;: &quot;aHR0cHM6Ly9hcGkuNTExLm9yZy90cmFuc2l0L2RhdGFmZWVkcz9vcGVyYXRvcl9pZD1BQw==&quot;, &quot;district_name&quot;: &quot;04 - Bay Area / Oakland&quot;, &quot;meters_to_ca_state_highway&quot;: 1.5, &quot;n_arrivals&quot;: 145, &quot;n_hours_in_service&quot;: 24, &quot;n_routes&quot;: 4, &quot;org_id&quot;: &quot;recOZgevYf7Jimm9L&quot;, &quot;route_ids_served&quot;: &quot;72, 72M, 72R, 802&quot;, &quot;routetypes&quot;: &quot;3&quot;, &quot;stop_id&quot;: &quot;57755&quot;, &quot;stop_name&quot;: &quot;San Pablo Av \u0026 Dwight Way&quot;}, &quot;type&quot;: &quot;Feature&quot;}], &quot;type&quot;: &quot;FeatureCollection&quot;});
+            geo_json_48708035a7616b99835bbcf8f50709e8_add({&quot;bbox&quot;: [-122.28958300016382, 37.86079400026471, -122.2895460003539, 37.861466000155936], &quot;features&quot;: [{&quot;bbox&quot;: [-122.2895460003539, 37.861466000155936, -122.2895460003539, 37.861466000155936], &quot;geometry&quot;: {&quot;coordinates&quot;: [-122.2895460003539, 37.861466000155936], &quot;type&quot;: &quot;Point&quot;}, &quot;id&quot;: &quot;81776&quot;, &quot;properties&quot;: {&quot;OBJECTID&quot;: 69777, &quot;agency&quot;: &quot;Alameda-Contra Costa Transit District&quot;, &quot;base64_url&quot;: &quot;aHR0cHM6Ly9hcGkuNTExLm9yZy90cmFuc2l0L2RhdGFmZWVkcz9vcGVyYXRvcl9pZD1BQw==&quot;, &quot;district_name&quot;: &quot;04 - Bay Area / Oakland&quot;, &quot;meters_to_ca_state_highway&quot;: 7.7, &quot;n_arrivals&quot;: 143, &quot;n_hours_in_service&quot;: 24, &quot;n_routes&quot;: 4, &quot;org_id&quot;: &quot;recOZgevYf7Jimm9L&quot;, &quot;route_ids_served&quot;: &quot;72, 72M, 72R, 802&quot;, &quot;routetypes&quot;: &quot;3&quot;, &quot;stop_id&quot;: &quot;55880&quot;, &quot;stop_name&quot;: &quot;San Pablo Av \u0026 Dwight Way&quot;}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;bbox&quot;: [-122.28958300016382, 37.86079400026471, -122.28958300016382, 37.86079400026471], &quot;geometry&quot;: {&quot;coordinates&quot;: [-122.28958300016382, 37.86079400026471], &quot;type&quot;: &quot;Point&quot;}, &quot;id&quot;: &quot;81792&quot;, &quot;properties&quot;: {&quot;OBJECTID&quot;: 69793, &quot;agency&quot;: &quot;Alameda-Contra Costa Transit District&quot;, &quot;base64_url&quot;: &quot;aHR0cHM6Ly9hcGkuNTExLm9yZy90cmFuc2l0L2RhdGFmZWVkcz9vcGVyYXRvcl9pZD1BQw==&quot;, &quot;district_name&quot;: &quot;04 - Bay Area / Oakland&quot;, &quot;meters_to_ca_state_highway&quot;: 1.5, &quot;n_arrivals&quot;: 145, &quot;n_hours_in_service&quot;: 24, &quot;n_routes&quot;: 4, &quot;org_id&quot;: &quot;recOZgevYf7Jimm9L&quot;, &quot;route_ids_served&quot;: &quot;72, 72M, 72R, 802&quot;, &quot;routetypes&quot;: &quot;3&quot;, &quot;stop_id&quot;: &quot;57755&quot;, &quot;stop_name&quot;: &quot;San Pablo Av \u0026 Dwight Way&quot;}, &quot;type&quot;: &quot;Feature&quot;}], &quot;type&quot;: &quot;FeatureCollection&quot;});
 
         
     
-    geo_json_c554b4d6436ac649fae82b58bd63d7e3.bindTooltip(
+    geo_json_48708035a7616b99835bbcf8f50709e8.bindTooltip(
     function(layer){
     let div = L.DomUtil.create('div');
     
@@ -684,7 +687,7 @@ Motivating Question
 });
                      
     
-            geo_json_c554b4d6436ac649fae82b58bd63d7e3.addTo(map_534a12ac38d2a22e97053c0230a1a79a);
+            geo_json_48708035a7616b99835bbcf8f50709e8.addTo(map_f32f6bdf678939f187b57abb3c5ef666);
         
 </script>
 </html>" style="position:absolute;width:100%;height:100%;left:0;top:0;border:none !important;" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen=""></iframe></div></div>
@@ -704,30 +707,30 @@ Motivating Question
 <p>How does the distribution of public transit stops in California vary by geography?</p>
 </div>
 </div>
-<p>We now have public transit stop data, but to answer this question we also need to be able to place those stops within geographies, defined broadly. For that, I’ll go to the census’ shapefile database.</p>
+<p>We now have public transit stop data, but to answer this question we also need to be able to place those stops within <strong>geographies</strong>. For that, I’ll go to the Census’ shapefile database.</p>
 </section>
 <section id="census-shapes-with-tigrispygris" class="level3">
 <h3 class="anchored" data-anchor-id="census-shapes-with-tigrispygris">Census shapes with <code>tigris</code>/<code>pygris</code></h3>
 <p>In my experience it’s rare that Census data are <strong>not</strong> essential to doing geospatial analysis within the U.S. I’m making plots of transit stops within California, so I will want the administrative boundaries of California and its counties to contextualize those stops. That means I need <a href="https://en.wikipedia.org/wiki/Shapefile">shapefiles</a> for states and counties, which the Census maintains.</p>
-<div class="callout callout-style-default callout-note callout-titled" title="Census data and Kyle Walker">
+<div class="callout callout-style-default callout-note callout-titled" title="Census data via Kyle Walker">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Census data and Kyle Walker
+Census data via Kyle Walker
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
 <div id="callout-3" class="callout-3-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>The universe of Census data – shapefiles and survey data – is large and confusing. Thankfully, a few extremely generous organizations and individuals have undertaken the herculean task of developing open source tools and documentation to make census data easy. I’ve blogged elsewhere about <a href="https://www.ipums.org/">IPUMS</a> and <a href="https://mcdc.missouri.edu/applications/geocorr.html">Geocorr</a>, but here I’m going to highlight some of the work of <a href="https://walker-data.com/">Kyle Walker</a>.</p>
-<p>Whenever I need a reference on aggregate Census data or mapping, I turn to <a href="https://walker-data.com/census-r/">“Analyzing U.S. Census Data” by Kyle Walker</a>, <span class="citation" data-cites="walker_analyzing_2023">(<a href="#ref-walker_analyzing_2023" role="doc-biblioref">Walker 2023</a>)</span>. The book and accompanying geospatial libraries are written for R users, but almost all of the material applies directly in python, and the author has created python ports or else blog posts with python code that cover much of the material. In practice his libraries are so good that when there isn’t a direct python port for one of his R packages (e.g.&nbsp;tidycensus), I take the trouble of using R just for that package.</p>
+<p>The universe of Census data – shapefiles and survey data – is large and confusing. Thankfully, a few extremely generous organizations and individuals actively develop open source tools and documentation to make census data easy. I’ve blogged elsewhere about <a href="https://www.ipums.org/">IPUMS</a> and <a href="https://mcdc.missouri.edu/applications/geocorr.html">Geocorr</a>, but here I’m going to highlight some of the work of <a href="https://walker-data.com/">Kyle Walker</a>.</p>
+<p>Whenever I need a reference on aggregate Census data or mapping, I turn to <a href="https://walker-data.com/census-r/">“Analyzing U.S. Census Data” by Kyle Walker</a>, <span class="citation" data-cites="walker_analyzing_2023">(<a href="#ref-walker_analyzing_2023" role="doc-biblioref">Walker 2023</a>)</span>. The book and accompanying geospatial libraries are written for R users, but almost all of the material applies directly in python, and the author has created python ports or else blog posts with python code that cover much of the material. In practice, his libraries are so good that when there isn’t a direct python port for one of his R packages (e.g.&nbsp;tidycensus), I take the trouble of using R just for that package.</p>
 </div>
 </div>
 </div>
-<p>Census shapefiles are maintained in the Census’ <a href="https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-geodatabase-file.html">TIGER/Line geodatabase</a>, which contains the shapes of basically any administrative or political boundary you could think of within the U.S. One can download files via the census’ <a href="https://www2.census.gov/geo/tiger/">FTP archive</a> (I’ve unfortunately <a href="https://github.com/peter-amerkhanian/sf-schools-simulation/blob/main/build_city.py">written code</a> to do this in the past), but it’s much easier to just use the excellent <a href="https://github.com/walkerke/tigris"><code>tigris</code></a>/<a href="https://walker-data.com/pygris/"><code>pygris</code></a> package that Kyle Walker developed for simplifying access to TIGER/Line shapefiles <span class="citation" data-cites="walker_tigris_2025">(<a href="#ref-walker_tigris_2025" role="doc-biblioref">Walker 2025</a>)</span>.</p>
-<p>Using <code>tigris</code>/<code>pygris</code> is very simple – I just call the <code>states()</code> function<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> for a given year, and it will return the outlines of every state in the U.S. as set in 2024 (note that the boundaries typically do not change for states, but they do change for some smaller geographies). More information about the use of <code>tigris</code> is available in <span class="citation" data-cites="walker_analyzing_2023">(<a href="#ref-walker_analyzing_2023" role="doc-biblioref">Walker 2023, chap. 5</a>)</span>.</p>
+<p>Census shapefiles are maintained in the Census’ <a href="https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-geodatabase-file.html">TIGER/Line geodatabase</a>, which contains the shapes of basically any administrative or political boundary you could think of within the U.S. One can download files via the Census’ <a href="https://www2.census.gov/geo/tiger/">FTP archive</a> (I’ve unfortunately <a href="https://github.com/peter-amerkhanian/sf-schools-simulation/blob/main/build_city.py">written code</a> to do this in the past), but it’s much easier to just use the excellent <a href="https://github.com/walkerke/tigris"><code>tigris</code></a>/<a href="https://walker-data.com/pygris/"><code>pygris</code></a> package that Kyle Walker developed for simplifying access to TIGER/Line shapefiles <span class="citation" data-cites="walker_tigris_2025">(<a href="#ref-walker_tigris_2025" role="doc-biblioref">Walker 2025</a>)</span>.</p>
+<p>Using <code>tigris</code>/<code>pygris</code> is very simple – I just call the <code>states()</code> function<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> for a given year, and it will return the outlines of every state in the U.S. as set in 2024. More information about the use of <code>tigris</code> is available in <span class="citation" data-cites="walker_analyzing_2023">(<a href="#ref-walker_analyzing_2023" role="doc-biblioref">Walker 2023, chap. 5</a>)</span>.</p>
 <div id="1f31a346" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>state_shapes <span class="op">=</span> pygris.states(cache<span class="op">=</span><span class="va">True</span>, year<span class="op">=</span><span class="dv">2024</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>state_shapes.head(<span class="dv">2</span>)</span></code></pre></div>
@@ -1016,9 +1019,15 @@ Datum: North American Datum 1983
 </section>
 <section id="exercise-1-point-plot-pros-and-cons" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-1-point-plot-pros-and-cons">Exercise 1: Point Plot Pros and Cons</h2>
-<p>Sometimes, a simple point plot – where we simply lay out the raw data as points over a map – is the best thematic map for the job. Consider a canonical example</p>
-<p><img src="seaman.png" class="img-fluid" style="width:50.0%"></p>
-<p>As a first exercise, I’ll make of the simplest thematic map – I’ll just plot all of the public transit stops as points over the California shapefile.</p>
+<p>Sometimes, a simple point plot – where we simply lay out the raw data as points over a map – is the best thematic map for the job. Consider a canonical example, Valentine Seaman’s map of a yellow fever epidemic in New York City in 1795 <span class="citation" data-cites="seaman_inquiry_1798">(<a href="#ref-seaman_inquiry_1798" role="doc-biblioref">Seaman 1798</a>)</span>. This is thought to be the first use of a point plot to visualize a distribution of disease cases <span class="citation" data-cites="friendly_milestones_2000">(<a href="#ref-friendly_milestones_2000" role="doc-biblioref">Friendly 2000</a>)</span>. Each numbered, black dot (these can be a little tough to pick out) represents a case of yellow fever, and the clustering of x’s denote local waste sites.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<figcaption>A section of <span class="citation" data-cites="seaman_inquiry_1798">(<a href="#ref-seaman_inquiry_1798" role="doc-biblioref">Seaman 1798</a>)</span>, a canonical early thematic map</figcaption>
+<p><img src="seaman.png" class="img-fluid figure-img" style="width:50.0%"></p>
+</figure>
+</div>
+<p>Seaman used this map to accurately establish correlation between waste sites and yellow fever cases, finding that the distribution of disease cases tended to cluster around waste sites (though he didn’t identify that this was because mosquitoes bred in still water in those waste sites). The simple point plot worked well because the data were relatively sparse and the clustering of points was visually obvious.</p>
+<p>Lets see if we can get any useful information out of a simple point plot of our transit data. I’ll just plot all of the public transit stops as points over the California shapefile.</p>
 <div id="5d8db0cf" class="cell" data-execution_count="25">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">4</span>, <span class="dv">5</span>))</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> california.crs <span class="op">==</span> gdf_ca.crs</span>
@@ -1050,17 +1059,17 @@ Motivating Question
 </div>
 </div>
 <p>One can pick out the basic pattern that urban California has a lot of transit stops and rural California doesn’t, but point plots like this can be difficult to use when you have very dense clusters of points on top of or else very close to each other. The more fine grained distribution of the points is completely obscured.</p>
-<p>We typically solve this issue by <strong>aggregating</strong> the data into larger units then visualizing the aggregates of points rather than individual points. This sounds abstract, so consider a concrete example – Jon Snow’s famous 1854 map of cholera cases in London.</p>
+<p>We typically solve this issue by <strong>aggregating</strong> the data into larger units then visualizing the aggregates of points rather than individual points. This sounds abstract, so consider a concrete example via another canonical early data visualization– Jon Snow’s 1854 map of cholera cases in London.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<figcaption>Zooming in on a section of <span class="citation" data-cites="john_snow_mode_1854">(<a href="#ref-john_snow_mode_1854" role="doc-biblioref">John Snow 1854</a>)</span>, we see the author used stacked rectangular bars to aggregate cholera cases to single addresses</figcaption>
+<figcaption>A section of <span class="citation" data-cites="john_snow_mode_1854">(<a href="#ref-john_snow_mode_1854" role="doc-biblioref">John Snow 1854</a>)</span>, where the author used stacked rectangular bars to aggregate cholera cases to single addresses around water pumps</figcaption>
 <p><img src="snow_zoom.png" class="img-fluid figure-img" style="width:75.0%"></p>
 </figure>
 </div>
 <p>I’d like to go deeper and explore how aggregating stops into larger geographies helps pick out different trends.</p>
 </section>
-<section id="exercise-2-county-choropleths" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-2-county-choropleths">Exercise 2: County Choropleths</h2>
+<section id="exercise-2-cool-county-choropleths" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-2-cool-county-choropleths">Exercise 2: Cool County Choropleths</h2>
 <p>One very common geospatial data product is the choropleth map. Choropleth maps communicate how the density of some data or else another quantity that describes that data varies across administrative units, like countries, states, provinces, etc. The data are grouped into the administrative units, and the aggregate value for each unit is depicted in the map via color intensity/hue/saturation <span class="citation" data-cites="tennekes_tmap_2018">(<a href="#ref-tennekes_tmap_2018" role="doc-biblioref">Tennekes 2018</a>)</span>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -1142,7 +1151,7 @@ Motivating Question
 </details>
 </div>
 <p>The first step of making our choropleth is going to be aggregating the public transit stops (<code>Point</code> data) within counties (<code>Polygon</code> data). Here’s an abstract representation of the problem – we want to count the “Inside Points” for each county shape.</p>
-<div id="b0a95efa" class="cell" data-execution_count="27">
+<div id="b0a95efa" class="cell">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -1384,7 +1393,7 @@ Motivating Question
 </div>
 </div>
 <p>I want to combine the county shapes up into larger, parent region shapes. This spatial aggregation operation is called a <a href="https://geopandas.org/en/stable/docs/user_guide/aggregation_with_dissolve.html"><code>dissolve()</code> in geopandas</a>. Here’s an abstract representation of what <code>dissolve()</code> does:</p>
-<div id="8408f772" class="cell" data-execution_count="34">
+<div id="8408f772" class="cell">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -1543,8 +1552,8 @@ Bay Area</code></pre>
 </div>
 <p>Interesting perspective from this one, where the takeaway seems to be that the Los Angeles and San Francisco Bay Area regions have many more transit stops than the rest of the state. Like the previous county map, this shows that L.A. is far above the rest of the state in terms of raw count of stops within its borders.</p>
 </section>
-<section id="exercise-4-heatmaps-and-projected-crs" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-4-heatmaps-and-projected-crs">Exercise 4: Heatmaps and Projected CRS</h2>
+<section id="exercise-4-heatmaps-and-the-projected-crs" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-4-heatmaps-and-the-projected-crs">Exercise 4: Heatmaps and the Projected CRS</h2>
 <blockquote class="blockquote">
 <p>[…] heat maps may also visualize data over a geographic region. However, unlike choropleth maps, heat maps show the proportion of a variable over an arbitrary, but usually small grid size, independent of geographic boundaries.</p>
 </blockquote>
@@ -1584,7 +1593,7 @@ Use 'GeoSeries.to_crs()' to re-project geometries to a projected CRS before this
 </div>
 </div>
 <p>As the <code>geopandas</code> warning above suggests, we can address this warning by re-projecting the data into a <strong>projected CRS</strong> that explicitly measures location in meters.</p>
-<div id="c60cd006" class="cell" data-execution_count="46">
+<div id="c60cd006" class="cell">
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -1953,7 +1962,7 @@ High Quality Public Transit Stops: 15416</code></pre>
 <p>Including the islands in an analysis focused on the human population of the Bay Area and the availability of public transit doesn’t seem appropriate, so we want to find a data-driven way to remove that land mass.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<figcaption>Here’s a picture of the Farallon Islands, <span class="citation" data-cites="roletto_english_2005">(<a href="#ref-roletto_english_2005" role="doc-biblioref"><strong>roletto_english_2005?</strong></a>)</span> – I don’t see public transit stops.</figcaption>
+<figcaption>Here’s a picture of the Farallon Islands, <span class="citation" data-cites="roletto_photo_2005">(<a href="#ref-roletto_photo_2005" role="doc-biblioref">Roletto 2005</a>)</span> – I don’t see public transit stops.</figcaption>
 <p><img src="View_from_Mirounga_Bay.jpg" class="img-fluid figure-img" style="width:50.0%"></p>
 </figure>
 </div>
@@ -2030,7 +2039,7 @@ Post-explosion shape (8, 21)</code></pre>
 <p>Let’s continue refining this. The San Francisco Bay Area is known for being a bay, as in, there is a large body of water at the center of it. This map doesn’t reflect that yet and that’s problematic for plotting the distribution of transit stops in the area. We may see large swaths of map with no stops and assume that it’s a transit desert, when in fact it’s just a body of water.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<figcaption>This aerial photo of the Bay Area, <span class="citation" data-cites="tobin_english_2018">(<a href="#ref-tobin_english_2018" role="doc-biblioref"><strong>tobin_english_2018?</strong></a>)</span>, makes clear how much of the region is water</figcaption>
+<figcaption>This aerial photo of the Bay Area, <span class="citation" data-cites="tobin_san_2018">(<a href="#ref-tobin_san_2018" role="doc-biblioref">Tobin 2018</a>)</span>, makes clear how much of the region is water</figcaption>
 <p><img src="bay_panorama.jpg" class="img-fluid figure-img" style="width:50.0%"></p>
 </figure>
 </div>
@@ -2174,8 +2183,17 @@ Kennedy, Melita, and Steve Kopp. 2000. <em>Understanding <span>Map</span> <span>
 <div id="ref-patterson_california_2022" class="csl-entry" role="listitem">
 Patterson, Will. 2022. <span>“California <span>Department</span> of <span>Fish</span> and <span>Wildlife</span> <span>Projection</span> and <span>Datum</span> <span>Guidelines</span>.”</span> California Department of Fish; Wildlife. <a href="https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=109326">https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=109326</a>.
 </div>
+<div id="ref-roletto_photo_2005" class="csl-entry" role="listitem">
+Roletto, Jan. 2005. <span>“Photo of the <span>South</span> <span>Farallon</span> <span>Islands</span> (<span>Southeast</span> <span>Farallon</span> <span>Island</span> with <span>Maintop</span> <span>Island</span> in the Foreground) in <span>Farallon</span> <span>Islands</span> <span>National</span> <span>Wildlife</span> <span>Refuge</span>.”</span> <a href="https://commons.wikimedia.org/wiki/File:SE_Farallon_Island.jpg">https://commons.wikimedia.org/wiki/File:SE_Farallon_Island.jpg</a>.
+</div>
+<div id="ref-seaman_inquiry_1798" class="csl-entry" role="listitem">
+Seaman, Valentine. 1798. <span>“An Inquiry into the Cause of the Prevalence of the Yellow Fever in <span>New</span>-<span>York</span>.”</span> <a href="https://commons.wikimedia.org/wiki/File:Valentine_Seaman%27s_map_of_yellow_fever_epidemic_in_New_York_City_(Plate_2_of_2).jpg">https://commons.wikimedia.org/wiki/File:Valentine_Seaman%27s_map_of_yellow_fever_epidemic_in_New_York_City_(Plate_2_of_2).jpg</a>.
+</div>
 <div id="ref-tennekes_tmap_2018" class="csl-entry" role="listitem">
 Tennekes, Martijn. 2018. <span>“Tmap: <span>Thematic</span> <span>Maps</span> in <span>R</span>.”</span> <em>Journal of Statistical Software</em> 84 (April): 1–39. <a href="https://doi.org/10.18637/jss.v084.i06">https://doi.org/10.18637/jss.v084.i06</a>.
+</div>
+<div id="ref-tobin_san_2018" class="csl-entry" role="listitem">
+Tobin, Mitch. 2018. <span>“The <span>San</span> <span>Francisco</span> <span>Peninsula</span> and <span>San</span> <span>Francisco</span> <span>International</span> <span>Airport</span>, from a <span>Denver</span> to <span>Honolulu</span> Flight in 2018.”</span> <a href="https://commons.wikimedia.org/wiki/File:San_Francisco_and_SFO_Aerial_2018.jpg">https://commons.wikimedia.org/wiki/File:San_Francisco_and_SFO_Aerial_2018.jpg</a>.
 </div>
 <div id="ref-walker_analyzing_2023" class="csl-entry" role="listitem">
 Walker, Kyle. 2023. <em>Analyzing <span>US</span> <span>Census</span> <span>Data</span></em>. 1st edition. Boca Raton: Chapman; Hall/CRC. <a href="https://walker-data.com/census-r/">https://walker-data.com/census-r/</a>.
