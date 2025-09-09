@@ -113,6 +113,9 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </script>
+<script src="../../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
@@ -390,17 +393,66 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </ul></li>
 </ul></li>
 </ul>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+    A[Date] --&gt; B[Highway]
+    B --&gt; C[Car&lt;br/&gt;license plate]
+    C --&gt; D[Trip&lt;br/&gt;each row]
+    D --&gt; E[Accident Flag]
+    
+    A1[Multiple highways&lt;br/&gt;per date] -.-&gt; B
+    B1[Multiple cars&lt;br/&gt;per highway] -.-&gt; C
+    C1[Multiple trips&lt;br/&gt;per car] -.-&gt; D
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
 <p>I’ll look at a few key SQL methods using these data.</p>
 </section>
 </section>
 <section id="aggregating-with-group-by" class="level2">
 <h2 class="anchored" data-anchor-id="aggregating-with-group-by">Aggregating with <code>GROUP BY</code></h2>
-<p>Let’s say we were interested in counting total trips and total accidents for each highway on each day. This is a group aggregation task, where we want to calculate summary statistics (two counts) for subsets of the data grouped by one or more columns. In SQL this is done using the <code>GROUP BY</code> clause and an aggregation function (<code>COUNT</code> and <code>SUM</code> in this case). Equivalent <code>pandas</code> code is available via the navbar. In this case, I like the SQL and <code>pandas</code> syntax about equally.</p>
+<p>Let’s say we were interested in counting total trips and total accidents for each highway on each day. This is a group aggregation task, where we want to calculate summary statistics (two counts) for subsets of the data grouped by one or more columns. In SQL this is done using the <code>GROUP BY</code> clause and an aggregation function (<code>COUNT</code> and <code>SUM</code> in this case).</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+A[(row: 1k&lt;br&gt;col: 4)] --select --&gt; B[Date]
+A --select --&gt; C[Highway]
+A--select --&gt; P[Accident&lt;br&gt;Flag]
+    B --&gt; E[Group&lt;br&gt;By]
+    C --&gt; E
+    subgraph sql ["SQL Operations"]
+    E --&gt; M[Agg-&lt;br&gt;regate]
+    M --&gt; F["Count rows&lt;br/&gt;COUNT(*)"]
+    M --&gt; G["Count accidents&lt;br/&gt;SUM(accident_flag)"]
+    end
+    P --&gt; M
+    F --&gt; Q[(row: 3 X 2&lt;br&gt;col: 4)]
+    G --&gt; Q
+
+
+style sql fill:none
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>Equivalent <code>pandas</code> code is available via the navbar. In this case, I like the SQL and <code>pandas</code> syntax about equally.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">SQL</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false"><code>pandas</code></a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
-<div id="cell-18" class="cell" data-execution_count="394">
+<div id="cell-19" class="cell" data-execution_count="394">
 <div class="cell-output cell-output-display cell-output-markdown">
 <div class="sourceCode" id="cb8"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">SELECT</span></span>
 <span id="cb8-2"><a href="#cb8-2"></a>  highway,</span>
@@ -481,7 +533,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </div>
 </div>
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
-<div id="cell-20" class="cell" data-execution_count="395">
+<div id="cell-21" class="cell" data-execution_count="395">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1"></a>(</span>
 <span id="cb9-2"><a href="#cb9-2"></a>    accidents</span>
 <span id="cb9-3"><a href="#cb9-3"></a>    .groupby([<span class="st">'highway'</span>, <span class="st">'trip_date'</span>], as_index<span class="op">=</span><span class="va">False</span>)</span>
@@ -561,12 +613,43 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </section>
 <section id="aggregating-with-partition-by" class="level2">
 <h2 class="anchored" data-anchor-id="aggregating-with-partition-by">Aggregating with <code>PARTITION BY</code></h2>
-<p>The Partition is an odd cousin of the Group that I became aware of only recently. In essence, it accomplishes the same thing as <code>GROUP BY</code>, but it doesn’t compress the data or otherwise change granularity. Instead, it returns a dataframe with a group’s aggregate result replicated at every row where that group exists. I can express this more clearly via example.</p>
+<p>The Partition is an odd cousin of the Group that I became aware of only recently. In essence, it accomplishes the same thing as <code>GROUP BY</code>, but it doesn’t compress the data or otherwise change granularity. Instead, it returns a dataframe with a group’s aggregate result replicated at every row where that group exists.</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+A[(row: 1k &lt;br&gt;col: 4)] --select --&gt; B[Date]
+A --select --&gt; C[Highway]
+A--select --&gt; P[Accident&lt;br&gt;Flag]
+A==select ==&gt; J["`**License**&lt;br&gt;**Plate**`"]
+    B --&gt; E["`**Partition**&lt;br&gt;**By**`"]
+    C --&gt; E
+    subgraph sql ["SQL Operations"]
+    E --&gt; M[Agg-&lt;br&gt;regate]
+    M --&gt; F["Count rows&lt;br/&gt;COUNT(*)"]
+    M --&gt; G["Count accidents&lt;br/&gt;SUM(accident_flag)"]
+    end
+    P --&gt; M
+    F --&gt; Q[("`**row: 1k** &lt;br&gt;**col: 5**`")]
+    G --&gt; Q
+    J ==&gt; Q
+
+
+style sql fill:none
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>I can express this more clearly via example.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">SQL</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false"><code>pandas</code></a></li></ul>
 <div class="tab-content">
 <div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
-<div id="cell-25" class="cell" data-execution_count="396">
+<div id="cell-26" class="cell" data-execution_count="396">
 <div class="cell-output cell-output-display cell-output-markdown">
 <div class="sourceCode" id="cb10"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">SELECT</span></span>
 <span id="cb10-2"><a href="#cb10-2"></a>    <span class="op">*</span>,</span>
@@ -691,7 +774,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </div>
 </div>
 <div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
-<div id="cell-27" class="cell" data-execution_count="397">
+<div id="cell-28" class="cell" data-execution_count="397">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a>(</span>
 <span id="cb11-2"><a href="#cb11-2"></a>    accidents</span>
 <span id="cb11-3"><a href="#cb11-3"></a>    .assign(n_accidents_date_highway<span class="op">=</span></span>
@@ -827,7 +910,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">Full Query</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Step 1</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false">Step 2</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-4" role="tab" aria-controls="tabset-3-4" aria-selected="false">Step 3</a></li></ul>
 <div class="tab-content">
 <div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
-<div id="cell-34" class="cell" data-execution_count="398">
+<div id="cell-35" class="cell" data-execution_count="398">
 <div class="cell-output cell-output-display cell-output-markdown">
 <div class="sourceCode" id="cb12"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">WITH</span> grouped_table <span class="kw">as</span> (</span>
 <span id="cb12-2"><a href="#cb12-2"></a>  <span class="kw">SELECT</span></span>
@@ -931,7 +1014,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </div>
 <div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
 <p>We start with the same basic grouped table, where each row is a unique highway-date combination with its total trips and total accidents.</p>
-<div id="cell-36" class="cell" data-execution_count="399">
+<div id="cell-37" class="cell" data-execution_count="399">
 <div class="cell-output cell-output-display cell-output-markdown">
 <div class="sourceCode" id="cb13"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">WITH</span> grouped_table <span class="kw">as</span> (</span>
 <span id="cb13-2"><a href="#cb13-2"></a>  <span class="kw">SELECT</span></span>
@@ -1013,7 +1096,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </div>
 <div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
 <p>We proceed to use <code>PARTITION BY</code> statements on that grouped table, finding the average and standard deviation across dates for each highway.</p>
-<div id="cell-38" class="cell" data-execution_count="400">
+<div id="cell-39" class="cell" data-execution_count="400">
 <div class="cell-output cell-output-display cell-output-markdown">
 <div class="sourceCode" id="cb14"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1"></a><span class="kw">WITH</span> partitions_table <span class="kw">as</span> (</span>
 <span id="cb14-2"><a href="#cb14-2"></a>  <span class="kw">SELECT</span></span>
@@ -1104,7 +1187,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </div>
 <div id="tabset-3-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-4-tab">
 <p>Finally, we can write a straightforward select statement that gets our desired final columns out of <code>partitions_table</code>.</p>
-<div id="cell-40" class="cell" data-execution_count="401">
+<div id="cell-41" class="cell" data-execution_count="401">
 <div class="cell-output cell-output-display cell-output-markdown">
 <div class="sourceCode" id="cb15"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1"></a><span class="kw">SELECT</span></span>
 <span id="cb15-2"><a href="#cb15-2"></a>  highway,</span>
@@ -1202,7 +1285,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <p>When the DISTINCT clause is provided, only distinct values are considered in the computation of the aggregate. This is typically used in combination with the count aggregate to get the number of distinct elements; but it can be used together with any aggregate function in the system.<br>
 – <a href="https://duckdb.org/docs/sql/functions/aggregates.html#distinct-clause-in-aggregate-functions">DuckDB Documentation</a></p>
 </blockquote>
-<div id="cell-44" class="cell" data-outputid="810ef9ee-7566-42e8-bfba-74e6c11154e6" data-execution_count="402">
+<div id="cell-45" class="cell" data-outputid="810ef9ee-7566-42e8-bfba-74e6c11154e6" data-execution_count="402">
 <div class="cell-output cell-output-display cell-output-markdown">
 <div class="sourceCode" id="cb16"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">SELECT</span></span>
 <span id="cb16-2"><a href="#cb16-2"></a>  highway,</span>
@@ -1323,7 +1406,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">Full Query</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">Step 1</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-3" role="tab" aria-controls="tabset-4-3" aria-selected="false">Step 2</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-4" role="tab" aria-controls="tabset-4-4" aria-selected="false">Step 3</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-5" role="tab" aria-controls="tabset-4-5" aria-selected="false">Step 4</a></li></ul>
 <div class="tab-content">
 <div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
-<div id="cell-47" class="cell" data-execution_count="403">
+<div id="cell-48" class="cell" data-execution_count="403">
 <div class="cell-output cell-output-display cell-output-markdown">
 <div class="sourceCode" id="cb17"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1"></a><span class="kw">WITH</span> car_table <span class="kw">as</span> (<span class="kw">SELECT</span></span>
 <span id="cb17-2"><a href="#cb17-2"></a>  license_plate,</span>
@@ -1455,7 +1538,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </div>
 <div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
 <p>Create an accident flag at the car/day/highway level. Note the use of <a href="https://duckdb.org/docs/sql/expressions/case.html"><code>CASE WHEN</code></a>.</p>
-<div id="cell-49" class="cell" data-execution_count="404">
+<div id="cell-50" class="cell" data-execution_count="404">
 <div class="cell-output cell-output-display cell-output-markdown">
 <div class="sourceCode" id="cb18"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1"></a><span class="kw">WITH</span> car_table <span class="kw">as</span> (<span class="kw">SELECT</span></span>
 <span id="cb18-2"><a href="#cb18-2"></a>  license_plate,</span>
@@ -1573,7 +1656,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </div>
 <div id="tabset-4-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-3-tab">
 <p>Aggregate cars.</p>
-<div id="cell-51" class="cell" data-execution_count="405">
+<div id="cell-52" class="cell" data-execution_count="405">
 <div class="cell-output cell-output-display cell-output-markdown">
 <div class="sourceCode" id="cb19"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1"></a><span class="kw">WITH</span> cars_w_accident_count <span class="kw">as</span> (<span class="kw">SELECT</span> </span>
 <span id="cb19-2"><a href="#cb19-2"></a>  highway,</span>
@@ -1653,7 +1736,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </div>
 <div id="tabset-4-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-4-tab">
 <p>Aggregate trips (this is a table we’ve already created once before).</p>
-<div id="cell-53" class="cell" data-execution_count="406">
+<div id="cell-54" class="cell" data-execution_count="406">
 <div class="cell-output cell-output-display cell-output-markdown">
 <div class="sourceCode" id="cb20"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">WITH</span> accident_count <span class="kw">as</span> (<span class="kw">SELECT</span></span>
 <span id="cb20-2"><a href="#cb20-2"></a>  highway,</span>
@@ -1736,7 +1819,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </div>
 <div id="tabset-4-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-5-tab">
 <p>Merge the trip and car aggregates.</p>
-<div id="cell-55" class="cell" data-execution_count="407">
+<div id="cell-56" class="cell" data-execution_count="407">
 <div class="cell-output cell-output-display cell-output-markdown">
 <div class="sourceCode" id="cb21"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb21-1"><a href="#cb21-1"></a><span class="kw">SELECT</span></span>
 <span id="cb21-2"><a href="#cb21-2"></a>a.highway,</span>
@@ -1847,7 +1930,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <li>aggregate trips with <code>COUNT(*)</code> and <code>SUM</code></li>
 </ul></li>
 </ol>
-<div id="cell-58" class="cell" data-outputid="44f66b53-cbb8-4255-d3b8-56895c729531" data-execution_count="408">
+<div id="cell-59" class="cell" data-outputid="44f66b53-cbb8-4255-d3b8-56895c729531" data-execution_count="408">
 <div class="cell-output cell-output-display cell-output-markdown">
 <div class="sourceCode" id="cb22"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1"></a><span class="kw">SELECT</span></span>
 <span id="cb22-2"><a href="#cb22-2"></a>    highway,</span>
