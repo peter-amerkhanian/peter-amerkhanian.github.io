@@ -15,6 +15,26 @@ div.quarto-post .metadata {
     width: 100% !important;
     height: 100% !important;
 } */
+:root {
+  --mermaid-font-family: var(--bs-body-font-family, "Source Sans Pro", sans-serif);
+  --mermaid-font-size: var(--bs-body-font-size, 1rem);
+  --mermaid-line-height: var(--bs-body-line-height, 1.5);
+}
+
+.mermaid {
+  font-family: var(--mermaid-font-family) !important;
+  font-size: var(--mermaid-font-size) !important;
+  line-height: var(--mermaid-line-height) !important;
+  color: var(--bs-body-color, inherit);
+}
+
+/* Force text inside SVGs to match body styles */
+.mermaid svg text {
+  font-family: var(--mermaid-font-family) !important;
+  font-size: var(--mermaid-font-size) !important;
+  line-height: var(--mermaid-line-height) !important;
+  fill: var(--bs-body-color, currentColor) !important;
+}
 
 .img-fluid {
     max-width: 100%;
