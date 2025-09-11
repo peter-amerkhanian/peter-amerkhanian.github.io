@@ -403,7 +403,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <p></p><figure class="figure"><p></p>
 <div>
 <pre class="mermaid mermaid-js">flowchart LR
-A[(row: 1k&lt;br&gt;col: 4)] --select --&gt; B[Date]
+A[(row:&lt;br&gt;1k&lt;br&gt;col:&lt;br&gt;4)] --select --&gt; B[Date]
 A --select --&gt; C[Highway]
 A--select --&gt; P[Accident&lt;br&gt;Flag]
     B --&gt; E[Group&lt;br&gt;By]
@@ -414,7 +414,7 @@ A--select --&gt; P[Accident&lt;br&gt;Flag]
     M --&gt; G["Count accidents&lt;br/&gt;SUM(accident_flag)"]
     end
     P --&gt; M
-    F --&gt; Q[(row: 3 X 2&lt;br&gt;col: 4)]
+    F --&gt; Q[("row: &lt;br&gt;n(highway) X n(date)&lt;br&gt;col:&lt;br&gt;4")]
     G --&gt; Q
 
 
@@ -599,7 +599,7 @@ style sql fill:none
 <p></p><figure class="figure"><p></p>
 <div>
 <pre class="mermaid mermaid-js">flowchart LR
-A[(row: 1k &lt;br&gt;col: 4)] --select --&gt; B[Date]
+A[(row:&lt;br&gt;1k &lt;br&gt;col:&lt;br&gt;4)] --select --&gt; B[Date]
 A --select --&gt; C[Highway]
 A--select --&gt; P[Accident&lt;br&gt;Flag]
 A==select ==&gt; J["`**License**&lt;br&gt;**Plate**`"]
@@ -611,7 +611,7 @@ A==select ==&gt; J["`**License**&lt;br&gt;**Plate**`"]
     M --&gt; G["Count accidents&lt;br/&gt;SUM(accident_flag)"]
     end
     P --&gt; M
-    F --&gt; Q[("`**row: 1k** &lt;br&gt;col: 5`")]
+    F --&gt; Q[("`**row:&lt;br&gt;1k** &lt;br&gt;col:&lt;br&gt;5`")]
     G --&gt; Q
     J ==&gt; Q
 
@@ -619,7 +619,7 @@ A==select ==&gt; J["`**License**&lt;br&gt;**Plate**`"]
 style sql fill:none
 </pre>
 </div>
-<p></p><figcaption> A diagram of PARTITION BY``</figcaption> </figure><p></p>
+<p></p><figcaption> A diagram of PARTITION BY</figcaption> </figure><p></p>
 </div>
 </div>
 </div>
