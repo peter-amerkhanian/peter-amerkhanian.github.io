@@ -8,7 +8,7 @@
 
 <meta name="author" content="Peter Amerkhanian">
 <meta name="dcterms.date" content="2024-11-20">
-<meta name="description" content="Using DuckDB to look at some GROUP BY and PARTITION BY statements in SQL.">
+<meta name="description" content="An overview of GROUP BY and PARTITION BY statements in SQL.">
 
 <title>Grouping Problems with SQL – Peter Amerkhanian</title>
 <style>
@@ -150,7 +150,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../projects.html"> 
-<span class="menu-text">Professional</span></a>
+<span class="menu-text">Projects</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -166,7 +166,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
       <h1 class="title">Grouping Problems with SQL</h1>
                   <div>
         <div class="description">
-          Using DuckDB to look at some <code>GROUP BY</code> and <code>PARTITION BY</code> statements in SQL.
+          An overview of <code>GROUP BY</code> and <code>PARTITION BY</code> statements in SQL.
         </div>
       </div>
                           <div class="quarto-categories">
@@ -211,8 +211,8 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
     </ul></li>
     <li><a href="#aggregating-with-group-by" id="toc-aggregating-with-group-by" class="nav-link" data-scroll-target="#aggregating-with-group-by">Aggregating with <code>GROUP BY</code></a></li>
     <li><a href="#aggregating-with-partition-by" id="toc-aggregating-with-partition-by" class="nav-link" data-scroll-target="#aggregating-with-partition-by">Aggregating with <code>PARTITION BY</code></a></li>
-    <li><a href="#complex-query-1-z-scores-for-data-quality-checks" id="toc-complex-query-1-z-scores-for-data-quality-checks" class="nav-link" data-scroll-target="#complex-query-1-z-scores-for-data-quality-checks">Complex Query 1: Z-Scores for Data Quality Checks</a></li>
-    <li><a href="#multiple-aggregations-in-one-table" id="toc-multiple-aggregations-in-one-table" class="nav-link" data-scroll-target="#multiple-aggregations-in-one-table">Multiple aggregations in one table</a></li>
+    <li><a href="#complex-query-1-conditional-z-scores" id="toc-complex-query-1-conditional-z-scores" class="nav-link" data-scroll-target="#complex-query-1-conditional-z-scores">Complex Query 1: Conditional Z-Scores</a></li>
+    <li><a href="#complex-query-2-multi-level-aggregation" id="toc-complex-query-2-multi-level-aggregation" class="nav-link" data-scroll-target="#complex-query-2-multi-level-aggregation">Complex Query 2: Multi-level Aggregation</a></li>
     </ul>
     <div class="quarto-alternate-formats">
     <ul><li>
@@ -244,7 +244,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 
 
 </script>
-<div id="cell-1" class="cell" data-execution_count="40">
+<div id="cell-1" class="cell" data-execution_count="117">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> duckdb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -259,13 +259,13 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </ul>
 <p>This post is also an opportunity to overview how I display <strong>and</strong> run SQL code with syntax highlighting in Quarto – a nontrivial task as it turns out!</p>
 <p>To start, I’ll synthesize a simple dataset that examines car accidents on the Interstate 280 and 580 highways in the Bay Area. I’ll go over the specifics later, but for now just note that this is a standard <code>pandas</code> dataframe stored in local memory as <code>accidents</code>. It contains data on cars’ trips on the two highways, and a flag denoting whether the trip was associated with an accident or not.</p>
-<div id="cell-5" class="cell" data-outputid="01d013e7-0cf6-41d6-f422-7e2e9478ee2c" data-execution_count="42">
+<div id="cell-5" class="cell" data-outputid="01d013e7-0cf6-41d6-f422-7e2e9478ee2c" data-execution_count="119">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">1000</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> {</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"license_plate"</span>: [<span class="ss">f"</span><span class="sc">{</span>random<span class="sc">.</span>randint(<span class="dv">90000</span>, <span class="dv">90099</span>)<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n)],</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"highway"</span>: [random.choice([<span class="st">"I280"</span>, <span class="st">"I580"</span>]) <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n)],</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"trip_date"</span>: [<span class="ss">f"2024-11-</span><span class="sc">{</span>random<span class="sc">.</span>randint(<span class="dv">8</span>, <span class="dv">15</span>)<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n)],</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"trip_date"</span>: [<span class="ss">f"2024-11-</span><span class="sc">{</span>random<span class="sc">.</span>randint(<span class="dv">12</span>, <span class="dv">15</span>)<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n)],</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"accident_flag"</span>: np.random.binomial(<span class="dv">1</span>, <span class="fl">.05</span>, n),</span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>accidents <span class="op">=</span> pd.DataFrame(data)</span>
@@ -276,25 +276,25 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <h2 class="anchored" data-anchor-id="connecting-to-a-pandas-data-frame-in-duckdb">Connecting to a <code>pandas</code> data frame in <code>duckdb</code></h2>
 <p>The data I simulated are quite small, so using SQL isn’t going to be very practically useful. However, I find that it’s helpful to play with small SQL databases like this to build general comfort with the language and to get a better intuition of how operations will play out when I’m are working at scale.</p>
 <p>I’m going to use the <a href="https://duckdb.org/"><code>duckdb</code> database system</a> to directly query the <code>pandas</code> data frame I have in local memory (Note that <code>duckdb</code> can also directly query <a href="https://duckdb.org/docs/api/python/overview.html#data-input">parquet files, csv files, and more</a>).</p>
-<div id="cell-7" class="cell" data-execution_count="43">
+<div id="cell-7" class="cell" data-execution_count="120">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>duckdb.sql(<span class="st">"SELECT * FROM accidents LIMIT 5;"</span>)</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="43">
+<div class="cell-output cell-output-display" data-execution_count="120">
 <pre><code>┌───────────────┬─────────┬────────────┬───────────────┐
 │ license_plate │ highway │ trip_date  │ accident_flag │
 │    varchar    │ varchar │  varchar   │     int32     │
 ├───────────────┼─────────┼────────────┼───────────────┤
-│ 90067         │ I580    │ 2024-11-14 │             1 │
-│ 90033         │ I580    │ 2024-11-9  │             1 │
-│ 90096         │ I280    │ 2024-11-14 │             0 │
-│ 90070         │ I280    │ 2024-11-9  │             0 │
-│ 90079         │ I580    │ 2024-11-15 │             0 │
+│ 90073         │ I280    │ 2024-11-13 │             0 │
+│ 90017         │ I280    │ 2024-11-15 │             1 │
+│ 90067         │ I580    │ 2024-11-12 │             0 │
+│ 90093         │ I580    │ 2024-11-15 │             0 │
+│ 90000         │ I280    │ 2024-11-12 │             0 │
 └───────────────┴─────────┴────────────┴───────────────┘</code></pre>
 </div>
 </div>
 <section id="executing-and-displaying-sql-in-quarto" class="level3">
 <h3 class="anchored" data-anchor-id="executing-and-displaying-sql-in-quarto">Executing and displaying SQL in Quarto</h3>
 <p>The fact that <code>duckdb</code> can directly query data in memory is great, but two issues arise – the SQL code doesn’t have any syntax highlighting, and it would be preferable if the output were a data frame rather than plain text. I’ll create a wrapper function, <code>run_query</code> that solves these issues:</p>
-<div id="cell-10" class="cell" data-execution_count="44">
+<div id="cell-10" class="cell" data-execution_count="121">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_query(sql_str: <span class="bu">str</span>) <span class="op">-&gt;</span> pd.DataFrame:</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  display(Markdown(<span class="st">"```sql</span><span class="ch">\n</span><span class="st">"</span> <span class="op">+</span> sql_str.strip(<span class="st">"</span><span class="ch">\n</span><span class="st">"</span>) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">```"</span>))</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> duckdb.sql(sql_str).df()</span></code></pre></div>
@@ -311,12 +311,13 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <li><code>duckdb.sql(sql_str).df()</code> returns the results of the SQL query as a <code>pd.DataFrame</code> object rather than the text-table rendered above.</li>
 </ol>
 <p>For the rest of the post, I will use that function, within cells with the setting <code>echo: false</code> to carry out my SQL queries. Thus, you won’t see the python function, just a code chunk of the SQL query code and the query result. Here’s an example query, looking at the first five rows of <code>accidents</code>:</p>
-<div id="cell-13" class="cell" data-execution_count="45">
+<div id="cell-13" class="cell" data-execution_count="122">
 <div class="cell-output cell-output-display cell-output-markdown">
-<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> accidents</span>
-<span id="cb7-2"><a href="#cb7-2"></a><span class="kw">LIMIT</span> <span class="dv">5</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1"></a><span class="co">--sql</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> accidents</span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="kw">LIMIT</span> <span class="dv">5</span>;</span></code></pre></div>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="45">
+<div class="cell-output cell-output-display" data-execution_count="122">
 <div>
 
 
@@ -333,37 +334,37 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>90067</td>
-<td>I580</td>
-<td>2024-11-14</td>
-<td>1</td>
+<td>90073</td>
+<td>I280</td>
+<td>2024-11-13</td>
+<td>0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>90033</td>
-<td>I580</td>
-<td>2024-11-9</td>
+<td>90017</td>
+<td>I280</td>
+<td>2024-11-15</td>
 <td>1</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>90096</td>
-<td>I280</td>
-<td>2024-11-14</td>
+<td>90067</td>
+<td>I580</td>
+<td>2024-11-12</td>
 <td>0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>90070</td>
-<td>I280</td>
-<td>2024-11-9</td>
+<td>90093</td>
+<td>I580</td>
+<td>2024-11-15</td>
 <td>0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>90079</td>
-<td>I580</td>
-<td>2024-11-15</td>
+<td>90000</td>
+<td>I280</td>
+<td>2024-11-12</td>
 <td>0</td>
 </tr>
 </tbody>
@@ -511,23 +512,24 @@ style sql fill:none
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">SQL</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Equivalent <code>pandas</code> code</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
-<div id="cell-24" class="cell" data-execution_count="46">
+<div id="cell-24" class="cell" data-execution_count="123">
 <div class="cell-output cell-output-display cell-output-markdown">
-<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">SELECT</span></span>
-<span id="cb8-2"><a href="#cb8-2"></a>  highway,</span>
-<span id="cb8-3"><a href="#cb8-3"></a>  trip_date,</span>
-<span id="cb8-4"><a href="#cb8-4"></a>  <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">as</span> n_trips,</span>
-<span id="cb8-5"><a href="#cb8-5"></a>  <span class="fu">SUM</span>(accident_flag) <span class="kw">as</span> n_accidents</span>
-<span id="cb8-6"><a href="#cb8-6"></a><span class="kw">FROM</span></span>
-<span id="cb8-7"><a href="#cb8-7"></a>  accidents</span>
-<span id="cb8-8"><a href="#cb8-8"></a><span class="kw">GROUP</span> <span class="kw">BY</span></span>
-<span id="cb8-9"><a href="#cb8-9"></a>  highway,</span>
-<span id="cb8-10"><a href="#cb8-10"></a>  trip_date</span>
-<span id="cb8-11"><a href="#cb8-11"></a><span class="kw">ORDER</span> <span class="kw">BY</span></span>
-<span id="cb8-12"><a href="#cb8-12"></a>  highway,</span>
-<span id="cb8-13"><a href="#cb8-13"></a>  trip_date</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1"></a><span class="co">--sql</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="kw">SELECT</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a>  highway,</span>
+<span id="cb8-4"><a href="#cb8-4"></a>  trip_date,</span>
+<span id="cb8-5"><a href="#cb8-5"></a>  <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">as</span> n_trips,</span>
+<span id="cb8-6"><a href="#cb8-6"></a>  <span class="fu">SUM</span>(accident_flag) <span class="kw">as</span> n_accidents</span>
+<span id="cb8-7"><a href="#cb8-7"></a><span class="kw">FROM</span></span>
+<span id="cb8-8"><a href="#cb8-8"></a>  accidents</span>
+<span id="cb8-9"><a href="#cb8-9"></a><span class="kw">GROUP</span> <span class="kw">BY</span></span>
+<span id="cb8-10"><a href="#cb8-10"></a>  highway,</span>
+<span id="cb8-11"><a href="#cb8-11"></a>  trip_date</span>
+<span id="cb8-12"><a href="#cb8-12"></a><span class="kw">ORDER</span> <span class="kw">BY</span></span>
+<span id="cb8-13"><a href="#cb8-13"></a>  highway,</span>
+<span id="cb8-14"><a href="#cb8-14"></a>  trip_date</span></code></pre></div>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="46">
+<div class="cell-output cell-output-display" data-execution_count="123">
 <div>
 
 
@@ -545,114 +547,58 @@ style sql fill:none
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
 <td>I280</td>
-<td>2024-11-10</td>
-<td>53</td>
-<td>2.0</td>
+<td>2024-11-12</td>
+<td>135</td>
+<td>7.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
 <td>I280</td>
-<td>2024-11-11</td>
-<td>81</td>
-<td>3.0</td>
+<td>2024-11-13</td>
+<td>123</td>
+<td>1.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>I280</td>
-<td>2024-11-12</td>
-<td>55</td>
-<td>3.0</td>
+<td>2024-11-14</td>
+<td>119</td>
+<td>6.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
 <td>I280</td>
-<td>2024-11-13</td>
-<td>56</td>
-<td>3.0</td>
+<td>2024-11-15</td>
+<td>142</td>
+<td>7.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>I280</td>
-<td>2024-11-14</td>
-<td>56</td>
-<td>0.0</td>
+<td>I580</td>
+<td>2024-11-12</td>
+<td>125</td>
+<td>6.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
-<td>I280</td>
-<td>2024-11-15</td>
-<td>76</td>
+<td>I580</td>
+<td>2024-11-13</td>
+<td>120</td>
 <td>2.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">6</td>
-<td>I280</td>
-<td>2024-11-8</td>
-<td>63</td>
-<td>1.0</td>
+<td>I580</td>
+<td>2024-11-14</td>
+<td>115</td>
+<td>61.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">7</td>
-<td>I280</td>
-<td>2024-11-9</td>
-<td>74</td>
-<td>5.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">8</td>
-<td>I580</td>
-<td>2024-11-10</td>
-<td>65</td>
-<td>3.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">9</td>
-<td>I580</td>
-<td>2024-11-11</td>
-<td>66</td>
-<td>3.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">10</td>
-<td>I580</td>
-<td>2024-11-12</td>
-<td>64</td>
-<td>5.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">11</td>
-<td>I580</td>
-<td>2024-11-13</td>
-<td>61</td>
-<td>1.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">12</td>
-<td>I580</td>
-<td>2024-11-14</td>
-<td>52</td>
-<td>26.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">13</td>
 <td>I580</td>
 <td>2024-11-15</td>
-<td>67</td>
-<td>3.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">14</td>
-<td>I580</td>
-<td>2024-11-8</td>
-<td>44</td>
-<td>3.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">15</td>
-<td>I580</td>
-<td>2024-11-9</td>
-<td>67</td>
-<td>5.0</td>
+<td>121</td>
+<td>9.0</td>
 </tr>
 </tbody>
 </table>
@@ -662,7 +608,7 @@ style sql fill:none
 </div>
 </div>
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
-<div id="cell-26" class="cell" data-execution_count="47">
+<div id="cell-26" class="cell" data-execution_count="124">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1"></a>(</span>
 <span id="cb9-2"><a href="#cb9-2"></a>    accidents</span>
 <span id="cb9-3"><a href="#cb9-3"></a>    .groupby([<span class="st">'highway'</span>, <span class="st">'trip_date'</span>], as_index<span class="op">=</span><span class="va">False</span>)</span>
@@ -672,7 +618,7 @@ style sql fill:none
 <span id="cb9-7"><a href="#cb9-7"></a>    )</span>
 <span id="cb9-8"><a href="#cb9-8"></a>    .sort_values(by<span class="op">=</span>[<span class="st">'highway'</span>, <span class="st">'trip_date'</span>])</span>
 <span id="cb9-9"><a href="#cb9-9"></a>)</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="47">
+<div class="cell-output cell-output-display" data-execution_count="124">
 <div>
 
 
@@ -690,114 +636,58 @@ style sql fill:none
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
 <td>I280</td>
-<td>2024-11-10</td>
-<td>53</td>
-<td>2</td>
+<td>2024-11-12</td>
+<td>135</td>
+<td>7</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
 <td>I280</td>
-<td>2024-11-11</td>
-<td>81</td>
-<td>3</td>
+<td>2024-11-13</td>
+<td>123</td>
+<td>1</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>I280</td>
-<td>2024-11-12</td>
-<td>55</td>
-<td>3</td>
+<td>2024-11-14</td>
+<td>119</td>
+<td>6</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
 <td>I280</td>
-<td>2024-11-13</td>
-<td>56</td>
-<td>3</td>
+<td>2024-11-15</td>
+<td>142</td>
+<td>7</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>I280</td>
-<td>2024-11-14</td>
-<td>56</td>
-<td>0</td>
+<td>I580</td>
+<td>2024-11-12</td>
+<td>125</td>
+<td>6</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
-<td>I280</td>
-<td>2024-11-15</td>
-<td>76</td>
+<td>I580</td>
+<td>2024-11-13</td>
+<td>120</td>
 <td>2</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">6</td>
-<td>I280</td>
-<td>2024-11-8</td>
-<td>63</td>
-<td>1</td>
+<td>I580</td>
+<td>2024-11-14</td>
+<td>115</td>
+<td>61</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">7</td>
-<td>I280</td>
-<td>2024-11-9</td>
-<td>74</td>
-<td>5</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">8</td>
-<td>I580</td>
-<td>2024-11-10</td>
-<td>65</td>
-<td>3</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">9</td>
-<td>I580</td>
-<td>2024-11-11</td>
-<td>66</td>
-<td>3</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">10</td>
-<td>I580</td>
-<td>2024-11-12</td>
-<td>64</td>
-<td>5</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">11</td>
-<td>I580</td>
-<td>2024-11-13</td>
-<td>61</td>
-<td>1</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">12</td>
-<td>I580</td>
-<td>2024-11-14</td>
-<td>52</td>
-<td>26</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">13</td>
 <td>I580</td>
 <td>2024-11-15</td>
-<td>67</td>
-<td>3</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">14</td>
-<td>I580</td>
-<td>2024-11-8</td>
-<td>44</td>
-<td>3</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">15</td>
-<td>I580</td>
-<td>2024-11-9</td>
-<td>67</td>
-<td>5</td>
+<td>121</td>
+<td>9</td>
 </tr>
 </tbody>
 </table>
@@ -893,19 +783,23 @@ style sql fill:none
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">SQL</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Equivalent <code>pandas</code> code</a></li></ul>
 <div class="tab-content">
 <div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
-<div id="cell-34" class="cell" data-execution_count="48">
+<div id="cell-34" class="cell" data-execution_count="125">
 <div class="cell-output cell-output-display cell-output-markdown">
-<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">SELECT</span></span>
-<span id="cb10-2"><a href="#cb10-2"></a>    <span class="op">*</span>,</span>
-<span id="cb10-3"><a href="#cb10-3"></a>    <span class="fu">SUM</span>(accident_flag)</span>
-<span id="cb10-4"><a href="#cb10-4"></a>        <span class="kw">OVER</span> (<span class="kw">PARTITION</span> <span class="kw">BY</span> highway, trip_date)</span>
-<span id="cb10-5"><a href="#cb10-5"></a>    <span class="kw">as</span> n_accidents_date_highway</span>
-<span id="cb10-6"><a href="#cb10-6"></a><span class="kw">FROM</span> accidents</span>
-<span id="cb10-7"><a href="#cb10-7"></a><span class="kw">ORDER</span> <span class="kw">BY</span></span>
-<span id="cb10-8"><a href="#cb10-8"></a>  highway,</span>
-<span id="cb10-9"><a href="#cb10-9"></a>  trip_date;</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1"></a><span class="co">--sql</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="kw">SELECT</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a>  <span class="op">*</span>,</span>
+<span id="cb10-4"><a href="#cb10-4"></a>  <span class="fu">SUM</span>(accident_flag) <span class="kw">OVER</span> (</span>
+<span id="cb10-5"><a href="#cb10-5"></a>    <span class="kw">PARTITION</span> <span class="kw">BY</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a>      highway,</span>
+<span id="cb10-7"><a href="#cb10-7"></a>      trip_date</span>
+<span id="cb10-8"><a href="#cb10-8"></a>  ) <span class="kw">as</span> n_accidents_date_highway</span>
+<span id="cb10-9"><a href="#cb10-9"></a><span class="kw">FROM</span></span>
+<span id="cb10-10"><a href="#cb10-10"></a>  accidents</span>
+<span id="cb10-11"><a href="#cb10-11"></a><span class="kw">ORDER</span> <span class="kw">BY</span></span>
+<span id="cb10-12"><a href="#cb10-12"></a>  highway,</span>
+<span id="cb10-13"><a href="#cb10-13"></a>  trip_date;</span></code></pre></div>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="48">
+<div class="cell-output cell-output-display" data-execution_count="125">
 <div>
 
 
@@ -923,43 +817,43 @@ style sql fill:none
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>90027</td>
+<td>90023</td>
 <td>I280</td>
-<td>2024-11-10</td>
+<td>2024-11-12</td>
 <td>0</td>
-<td>2.0</td>
+<td>7.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>90029</td>
+<td>90055</td>
 <td>I280</td>
-<td>2024-11-10</td>
+<td>2024-11-12</td>
 <td>0</td>
-<td>2.0</td>
+<td>7.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>90032</td>
+<td>90014</td>
 <td>I280</td>
-<td>2024-11-10</td>
+<td>2024-11-12</td>
 <td>0</td>
-<td>2.0</td>
+<td>7.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>90077</td>
+<td>90057</td>
 <td>I280</td>
-<td>2024-11-10</td>
-<td>0</td>
-<td>2.0</td>
+<td>2024-11-12</td>
+<td>1</td>
+<td>7.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>90033</td>
+<td>90055</td>
 <td>I280</td>
-<td>2024-11-10</td>
+<td>2024-11-12</td>
 <td>0</td>
-<td>2.0</td>
+<td>7.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">...</td>
@@ -971,43 +865,43 @@ style sql fill:none
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">995</td>
-<td>90033</td>
+<td>90018</td>
 <td>I580</td>
-<td>2024-11-9</td>
-<td>1</td>
-<td>5.0</td>
+<td>2024-11-15</td>
+<td>0</td>
+<td>9.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">996</td>
-<td>90085</td>
+<td>90061</td>
 <td>I580</td>
-<td>2024-11-9</td>
+<td>2024-11-15</td>
 <td>0</td>
-<td>5.0</td>
+<td>9.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">997</td>
-<td>90067</td>
+<td>90021</td>
 <td>I580</td>
-<td>2024-11-9</td>
-<td>1</td>
-<td>5.0</td>
+<td>2024-11-15</td>
+<td>0</td>
+<td>9.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">998</td>
-<td>90066</td>
+<td>90061</td>
 <td>I580</td>
-<td>2024-11-9</td>
+<td>2024-11-15</td>
 <td>0</td>
-<td>5.0</td>
+<td>9.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">999</td>
-<td>90017</td>
+<td>90060</td>
 <td>I580</td>
-<td>2024-11-9</td>
+<td>2024-11-15</td>
 <td>0</td>
-<td>5.0</td>
+<td>9.0</td>
 </tr>
 </tbody>
 </table>
@@ -1018,7 +912,7 @@ style sql fill:none
 </div>
 </div>
 <div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
-<div id="cell-36" class="cell" data-execution_count="49">
+<div id="cell-36" class="cell" data-execution_count="126">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a>(</span>
 <span id="cb11-2"><a href="#cb11-2"></a>    accidents</span>
 <span id="cb11-3"><a href="#cb11-3"></a>    .assign(n_accidents_date_highway<span class="op">=</span></span>
@@ -1028,7 +922,7 @@ style sql fill:none
 <span id="cb11-7"><a href="#cb11-7"></a>    )</span>
 <span id="cb11-8"><a href="#cb11-8"></a>    .sort_values(by<span class="op">=</span>[<span class="st">'highway'</span>, <span class="st">'trip_date'</span>])</span>
 <span id="cb11-9"><a href="#cb11-9"></a>)</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="49">
+<div class="cell-output cell-output-display" data-execution_count="126">
 <div>
 
 
@@ -1045,44 +939,44 @@ style sql fill:none
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">17</td>
-<td>90027</td>
+<td data-quarto-table-cell-role="th">4</td>
+<td>90000</td>
 <td>I280</td>
-<td>2024-11-10</td>
+<td>2024-11-12</td>
 <td>0</td>
-<td>2</td>
+<td>7</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">18</td>
-<td>90068</td>
+<td data-quarto-table-cell-role="th">10</td>
+<td>90047</td>
 <td>I280</td>
-<td>2024-11-10</td>
+<td>2024-11-12</td>
 <td>0</td>
-<td>2</td>
+<td>7</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">36</td>
-<td>90032</td>
+<td data-quarto-table-cell-role="th">13</td>
+<td>90006</td>
 <td>I280</td>
-<td>2024-11-10</td>
+<td>2024-11-12</td>
 <td>0</td>
-<td>2</td>
+<td>7</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">63</td>
-<td>90084</td>
+<td data-quarto-table-cell-role="th">14</td>
+<td>90061</td>
 <td>I280</td>
-<td>2024-11-10</td>
+<td>2024-11-12</td>
 <td>0</td>
-<td>2</td>
+<td>7</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">70</td>
-<td>90033</td>
+<td data-quarto-table-cell-role="th">15</td>
+<td>90062</td>
 <td>I280</td>
-<td>2024-11-10</td>
+<td>2024-11-12</td>
 <td>0</td>
-<td>2</td>
+<td>7</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">...</td>
@@ -1093,44 +987,44 @@ style sql fill:none
 <td>...</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">929</td>
-<td>90071</td>
-<td>I580</td>
-<td>2024-11-9</td>
-<td>0</td>
-<td>5</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">935</td>
+<td data-quarto-table-cell-role="th">966</td>
 <td>90084</td>
 <td>I580</td>
-<td>2024-11-9</td>
+<td>2024-11-15</td>
 <td>0</td>
-<td>5</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">943</td>
-<td>90094</td>
-<td>I580</td>
-<td>2024-11-9</td>
-<td>0</td>
-<td>5</td>
+<td>9</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">952</td>
-<td>90049</td>
+<td data-quarto-table-cell-role="th">971</td>
+<td>90002</td>
 <td>I580</td>
-<td>2024-11-9</td>
+<td>2024-11-15</td>
 <td>0</td>
-<td>5</td>
+<td>9</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">968</td>
-<td>90037</td>
+<td data-quarto-table-cell-role="th">973</td>
+<td>90018</td>
 <td>I580</td>
-<td>2024-11-9</td>
+<td>2024-11-15</td>
 <td>0</td>
-<td>5</td>
+<td>9</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">985</td>
+<td>90061</td>
+<td>I580</td>
+<td>2024-11-15</td>
+<td>0</td>
+<td>9</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">995</td>
+<td>90078</td>
+<td>I580</td>
+<td>2024-11-15</td>
+<td>0</td>
+<td>9</td>
 </tr>
 </tbody>
 </table>
@@ -1145,16 +1039,16 @@ style sql fill:none
 <p>Note in the output that the number of accidents on I280 on 11/15/2024 is the same as it was in the grouped output above, but it repeats for every row from highway I280 on 11/15/2024 in the partitioned version. The <code>pandas</code> implementation for this task, available via the navbar, relies on the combination of <code>groupby()</code> and <code>transform()</code>, which I find unintuitive.</p>
 <p>Thus, <code>PARTITION BY</code> preserves the long format of the data, while still allowing for the creation of aggregate columns. This can be useful behavior, though can introduce some confusion, since we now have a column of group-level results in a data frame that is not compressed to the group level. I try to use column naming to make that clear, but it’s a little difficult.</p>
 </section>
-<section id="complex-query-1-z-scores-for-data-quality-checks" class="level2">
-<h2 class="anchored" data-anchor-id="complex-query-1-z-scores-for-data-quality-checks">Complex Query 1: Z-Scores for Data Quality Checks</h2>
+<section id="complex-query-1-conditional-z-scores" class="level2">
+<h2 class="anchored" data-anchor-id="complex-query-1-conditional-z-scores">Complex Query 1: Conditional Z-Scores</h2>
 <p>Now let’s use <code>GROUP BY</code> and <code>PARTITION BY</code> together in a complex query.</p>
-<p>Suppose we want to know the number of accidents on each highway each day, but we also want to have some information about whether that number of accidents is typical for that highway, or if it’s a potential outlier and/or data error. We can use the <a href="https://en.wikipedia.org/wiki/Standard_score">z-score</a> to measure the position of an accident count within the highway’s historical distribution, but computing both the count of accidents at the highway-date level, then computing z-scores per highway is complicated.</p>
+<p>Suppose we want to know the number of accidents on each highway each day, but we also want to have some information about whether that number of accidents is typical for that highway, or if it’s a potential outlier and/or data error. We can use the <a href="https://en.wikipedia.org/wiki/Standard_score">z-score</a>, conditional on highway, to measure the position of an accident count within the highway’s historical distribution. This is a sort of complex query that will require group and partition-style operations.</p>
 <p>In SQL, complex queries like this often involve Common Table Expressions (<a href="https://duckdb.org/docs/sql/query_syntax/with.html">CTEs</a>). I find working with CTEs more than a little difficult because it’s hard to determine what each CTE outputs. Below, I show a full query that uses both <code>GROUP BY</code> and <code>PARTITION BY</code> to complete my task. I also include a navigation bar that allows one to see what each of the three intermediary select statements output, thus expressing the query as a series of smaller queries and making the CTE content more transparent.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">Full Query</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Step 1</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false">Step 2</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-4" role="tab" aria-controls="tabset-3-4" aria-selected="false">Step 3</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-5" role="tab" aria-controls="tabset-3-5" aria-selected="false">Equivalent <code>pandas</code> code</a></li></ul>
 <div class="tab-content">
 <div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
-<div id="cell-43" class="cell" data-execution_count="67">
+<div id="cell-43" class="cell" data-execution_count="127">
 <div class="cell-output cell-output-display cell-output-markdown">
 <div class="sourceCode" id="cb12"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1"></a><span class="co">--sql</span></span>
 <span id="cb12-2"><a href="#cb12-2"></a><span class="kw">WITH</span></span>
@@ -1197,7 +1091,7 @@ style sql fill:none
 <span id="cb12-39"><a href="#cb12-39"></a><span class="kw">Limit</span></span>
 <span id="cb12-40"><a href="#cb12-40"></a>  <span class="dv">5</span>;</span></code></pre></div>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="67">
+<div class="cell-output cell-output-display" data-execution_count="127">
 <div>
 
 
@@ -1217,41 +1111,41 @@ style sql fill:none
 <td data-quarto-table-cell-role="th">0</td>
 <td>I580</td>
 <td>2024-11-14</td>
-<td>52</td>
-<td>26.0</td>
-<td>2.612885</td>
+<td>115</td>
+<td>61.0</td>
+<td>1.722822</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
 <td>I280</td>
-<td>2024-11-9</td>
-<td>74</td>
-<td>5.0</td>
-<td>1.863449</td>
+<td>2024-11-15</td>
+<td>142</td>
+<td>7.0</td>
+<td>0.703526</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>I280</td>
 <td>2024-11-12</td>
-<td>55</td>
-<td>3.0</td>
-<td>0.443678</td>
+<td>135</td>
+<td>7.0</td>
+<td>0.703526</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
 <td>I280</td>
-<td>2024-11-11</td>
-<td>81</td>
-<td>3.0</td>
-<td>0.443678</td>
+<td>2024-11-14</td>
+<td>119</td>
+<td>6.0</td>
+<td>0.301511</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>I280</td>
-<td>2024-11-13</td>
-<td>56</td>
-<td>3.0</td>
-<td>0.443678</td>
+<td>I580</td>
+<td>2024-11-15</td>
+<td>121</td>
+<td>9.0</td>
+<td>-0.435895</td>
 </tr>
 </tbody>
 </table>
@@ -1262,23 +1156,28 @@ style sql fill:none
 </div>
 <div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
 <p>We start with the same basic grouped table, where each row is a unique highway-date combination with its total trips and total accidents.</p>
-<div id="cell-45" class="cell">
+<div id="cell-45" class="cell" data-execution_count="128">
 <div class="cell-output cell-output-display cell-output-markdown">
-<div class="sourceCode" id="cb13"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">WITH</span> grouped_table <span class="kw">as</span> (</span>
-<span id="cb13-2"><a href="#cb13-2"></a>  <span class="kw">SELECT</span></span>
-<span id="cb13-3"><a href="#cb13-3"></a>    highway,</span>
-<span id="cb13-4"><a href="#cb13-4"></a>    trip_date,</span>
-<span id="cb13-5"><a href="#cb13-5"></a>    <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">as</span> n_trips,</span>
-<span id="cb13-6"><a href="#cb13-6"></a>    <span class="fu">SUM</span>(accident_flag) <span class="kw">as</span> n_accidents </span>
-<span id="cb13-7"><a href="#cb13-7"></a>  <span class="kw">FROM</span></span>
-<span id="cb13-8"><a href="#cb13-8"></a>    accidents </span>
-<span id="cb13-9"><a href="#cb13-9"></a>  <span class="kw">GROUP</span> <span class="kw">BY</span></span>
-<span id="cb13-10"><a href="#cb13-10"></a>    highway,</span>
-<span id="cb13-11"><a href="#cb13-11"></a>    trip_date</span>
-<span id="cb13-12"><a href="#cb13-12"></a>)</span>
-<span id="cb13-13"><a href="#cb13-13"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> grouped_table</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1"></a><span class="co">--sql</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="kw">WITH</span></span>
+<span id="cb13-3"><a href="#cb13-3"></a>  grouped_table <span class="kw">as</span> (</span>
+<span id="cb13-4"><a href="#cb13-4"></a>    <span class="kw">SELECT</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a>      highway,</span>
+<span id="cb13-6"><a href="#cb13-6"></a>      trip_date,</span>
+<span id="cb13-7"><a href="#cb13-7"></a>      <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">as</span> n_trips,</span>
+<span id="cb13-8"><a href="#cb13-8"></a>      <span class="fu">SUM</span>(accident_flag) <span class="kw">as</span> n_accidents</span>
+<span id="cb13-9"><a href="#cb13-9"></a>    <span class="kw">FROM</span></span>
+<span id="cb13-10"><a href="#cb13-10"></a>      accidents</span>
+<span id="cb13-11"><a href="#cb13-11"></a>    <span class="kw">GROUP</span> <span class="kw">BY</span></span>
+<span id="cb13-12"><a href="#cb13-12"></a>      highway,</span>
+<span id="cb13-13"><a href="#cb13-13"></a>      trip_date</span>
+<span id="cb13-14"><a href="#cb13-14"></a>  )</span>
+<span id="cb13-15"><a href="#cb13-15"></a><span class="kw">SELECT</span></span>
+<span id="cb13-16"><a href="#cb13-16"></a>  <span class="op">*</span></span>
+<span id="cb13-17"><a href="#cb13-17"></a><span class="kw">FROM</span></span>
+<span id="cb13-18"><a href="#cb13-18"></a>  grouped_table</span></code></pre></div>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="51">
+<div class="cell-output cell-output-display" data-execution_count="128">
 <div>
 
 
@@ -1297,113 +1196,57 @@ style sql fill:none
 <td data-quarto-table-cell-role="th">0</td>
 <td>I280</td>
 <td>2024-11-12</td>
-<td>55</td>
-<td>3.0</td>
+<td>135</td>
+<td>7.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
 <td>I580</td>
-<td>2024-11-9</td>
-<td>67</td>
-<td>5.0</td>
+<td>2024-11-14</td>
+<td>115</td>
+<td>61.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>I280</td>
 <td>2024-11-15</td>
-<td>76</td>
-<td>2.0</td>
+<td>142</td>
+<td>7.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
 <td>I580</td>
 <td>2024-11-13</td>
-<td>61</td>
-<td>1.0</td>
+<td>120</td>
+<td>2.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
 <td>I580</td>
 <td>2024-11-12</td>
-<td>64</td>
-<td>5.0</td>
+<td>125</td>
+<td>6.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
-<td>I580</td>
-<td>2024-11-10</td>
-<td>65</td>
-<td>3.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">6</td>
 <td>I280</td>
-<td>2024-11-10</td>
-<td>53</td>
-<td>2.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">7</td>
-<td>I580</td>
-<td>2024-11-14</td>
-<td>52</td>
-<td>26.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">8</td>
-<td>I280</td>
-<td>2024-11-11</td>
-<td>81</td>
-<td>3.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">9</td>
-<td>I580</td>
-<td>2024-11-8</td>
-<td>44</td>
-<td>3.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">10</td>
-<td>I280</td>
-<td>2024-11-14</td>
-<td>56</td>
-<td>0.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">11</td>
-<td>I280</td>
-<td>2024-11-8</td>
-<td>63</td>
+<td>2024-11-13</td>
+<td>123</td>
 <td>1.0</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">12</td>
-<td>I580</td>
-<td>2024-11-11</td>
-<td>66</td>
-<td>3.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">13</td>
-<td>I280</td>
-<td>2024-11-9</td>
-<td>74</td>
-<td>5.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">14</td>
+<td data-quarto-table-cell-role="th">6</td>
 <td>I580</td>
 <td>2024-11-15</td>
-<td>67</td>
-<td>3.0</td>
+<td>121</td>
+<td>9.0</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">15</td>
+<td data-quarto-table-cell-role="th">7</td>
 <td>I280</td>
-<td>2024-11-13</td>
-<td>56</td>
-<td>3.0</td>
+<td>2024-11-14</td>
+<td>119</td>
+<td>6.0</td>
 </tr>
 </tbody>
 </table>
@@ -1414,18 +1257,30 @@ style sql fill:none
 </div>
 <div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
 <p>We proceed to use <code>PARTITION BY</code> statements on that grouped table, finding the average and standard deviation across dates for each highway.</p>
-<div id="cell-47" class="cell">
+<div id="cell-47" class="cell" data-execution_count="129">
 <div class="cell-output cell-output-display cell-output-markdown">
-<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1"></a><span class="kw">WITH</span> partitions_table <span class="kw">as</span> (</span>
-<span id="cb14-2"><a href="#cb14-2"></a>  <span class="kw">SELECT</span></span>
-<span id="cb14-3"><a href="#cb14-3"></a>    <span class="op">*</span>,</span>
-<span id="cb14-4"><a href="#cb14-4"></a>    <span class="fu">AVG</span>(n_accidents) <span class="kw">OVER</span> (<span class="kw">PARTITION</span> <span class="kw">BY</span> highway) <span class="kw">as</span> highway_average,</span>
-<span id="cb14-5"><a href="#cb14-5"></a>    <span class="fu">STDDEV_POP</span>(n_accidents) <span class="kw">OVER</span> (<span class="kw">PARTITION</span> <span class="kw">BY</span> highway) <span class="kw">as</span> highway_std,</span>
-<span id="cb14-6"><a href="#cb14-6"></a>  <span class="kw">FROM</span> grouped_table</span>
-<span id="cb14-7"><a href="#cb14-7"></a>)</span>
-<span id="cb14-8"><a href="#cb14-8"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> partitions_table;</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1"></a><span class="co">--sql</span></span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="kw">WITH</span></span>
+<span id="cb14-3"><a href="#cb14-3"></a>  partitions_table <span class="kw">as</span> (</span>
+<span id="cb14-4"><a href="#cb14-4"></a>    <span class="kw">SELECT</span></span>
+<span id="cb14-5"><a href="#cb14-5"></a>      <span class="op">*</span>,</span>
+<span id="cb14-6"><a href="#cb14-6"></a>      <span class="fu">AVG</span>(n_accidents) <span class="kw">OVER</span> (</span>
+<span id="cb14-7"><a href="#cb14-7"></a>        <span class="kw">PARTITION</span> <span class="kw">BY</span></span>
+<span id="cb14-8"><a href="#cb14-8"></a>          highway</span>
+<span id="cb14-9"><a href="#cb14-9"></a>      ) <span class="kw">as</span> highway_average,</span>
+<span id="cb14-10"><a href="#cb14-10"></a>      <span class="fu">STDDEV_POP</span>(n_accidents) <span class="kw">OVER</span> (</span>
+<span id="cb14-11"><a href="#cb14-11"></a>        <span class="kw">PARTITION</span> <span class="kw">BY</span></span>
+<span id="cb14-12"><a href="#cb14-12"></a>          highway</span>
+<span id="cb14-13"><a href="#cb14-13"></a>      ) <span class="kw">as</span> highway_std,</span>
+<span id="cb14-14"><a href="#cb14-14"></a>    <span class="kw">FROM</span></span>
+<span id="cb14-15"><a href="#cb14-15"></a>      grouped_table</span>
+<span id="cb14-16"><a href="#cb14-16"></a>  )</span>
+<span id="cb14-17"><a href="#cb14-17"></a><span class="kw">SELECT</span></span>
+<span id="cb14-18"><a href="#cb14-18"></a>  <span class="op">*</span></span>
+<span id="cb14-19"><a href="#cb14-19"></a><span class="kw">FROM</span></span>
+<span id="cb14-20"><a href="#cb14-20"></a>  partitions_table;</span></code></pre></div>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="52">
+<div class="cell-output cell-output-display" data-execution_count="129">
 <div>
 
 
@@ -1446,145 +1301,73 @@ style sql fill:none
 <td data-quarto-table-cell-role="th">0</td>
 <td>I280</td>
 <td>2024-11-12</td>
-<td>55</td>
-<td>3.0</td>
-<td>2.375</td>
-<td>1.408678</td>
+<td>135</td>
+<td>7.0</td>
+<td>5.25</td>
+<td>2.487469</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
 <td>I280</td>
 <td>2024-11-15</td>
-<td>76</td>
-<td>2.0</td>
-<td>2.375</td>
-<td>1.408678</td>
+<td>142</td>
+<td>7.0</td>
+<td>5.25</td>
+<td>2.487469</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>I280</td>
-<td>2024-11-10</td>
-<td>53</td>
-<td>2.0</td>
-<td>2.375</td>
-<td>1.408678</td>
+<td>2024-11-13</td>
+<td>123</td>
+<td>1.0</td>
+<td>5.25</td>
+<td>2.487469</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
 <td>I280</td>
-<td>2024-11-11</td>
-<td>81</td>
-<td>3.0</td>
-<td>2.375</td>
-<td>1.408678</td>
+<td>2024-11-14</td>
+<td>119</td>
+<td>6.0</td>
+<td>5.25</td>
+<td>2.487469</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>I280</td>
+<td>I580</td>
 <td>2024-11-14</td>
-<td>56</td>
-<td>0.0</td>
-<td>2.375</td>
-<td>1.408678</td>
+<td>115</td>
+<td>61.0</td>
+<td>19.50</td>
+<td>24.088379</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
-<td>I280</td>
-<td>2024-11-8</td>
-<td>63</td>
-<td>1.0</td>
-<td>2.375</td>
-<td>1.408678</td>
+<td>I580</td>
+<td>2024-11-13</td>
+<td>120</td>
+<td>2.0</td>
+<td>19.50</td>
+<td>24.088379</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">6</td>
-<td>I280</td>
-<td>2024-11-9</td>
-<td>74</td>
-<td>5.0</td>
-<td>2.375</td>
-<td>1.408678</td>
+<td>I580</td>
+<td>2024-11-12</td>
+<td>125</td>
+<td>6.0</td>
+<td>19.50</td>
+<td>24.088379</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">7</td>
-<td>I280</td>
-<td>2024-11-13</td>
-<td>56</td>
-<td>3.0</td>
-<td>2.375</td>
-<td>1.408678</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">8</td>
-<td>I580</td>
-<td>2024-11-9</td>
-<td>67</td>
-<td>5.0</td>
-<td>6.125</td>
-<td>7.606535</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">9</td>
-<td>I580</td>
-<td>2024-11-13</td>
-<td>61</td>
-<td>1.0</td>
-<td>6.125</td>
-<td>7.606535</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">10</td>
-<td>I580</td>
-<td>2024-11-12</td>
-<td>64</td>
-<td>5.0</td>
-<td>6.125</td>
-<td>7.606535</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">11</td>
-<td>I580</td>
-<td>2024-11-10</td>
-<td>65</td>
-<td>3.0</td>
-<td>6.125</td>
-<td>7.606535</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">12</td>
-<td>I580</td>
-<td>2024-11-14</td>
-<td>52</td>
-<td>26.0</td>
-<td>6.125</td>
-<td>7.606535</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">13</td>
-<td>I580</td>
-<td>2024-11-8</td>
-<td>44</td>
-<td>3.0</td>
-<td>6.125</td>
-<td>7.606535</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">14</td>
-<td>I580</td>
-<td>2024-11-11</td>
-<td>66</td>
-<td>3.0</td>
-<td>6.125</td>
-<td>7.606535</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">15</td>
 <td>I580</td>
 <td>2024-11-15</td>
-<td>67</td>
-<td>3.0</td>
-<td>6.125</td>
-<td>7.606535</td>
+<td>121</td>
+<td>9.0</td>
+<td>19.50</td>
+<td>24.088379</td>
 </tr>
 </tbody>
 </table>
@@ -1595,17 +1378,23 @@ style sql fill:none
 </div>
 <div id="tabset-3-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-4-tab">
 <p>Finally, we can write a straightforward select statement that gets our desired final columns out of <code>partitions_table</code>.</p>
-<div id="cell-49" class="cell">
+<div id="cell-49" class="cell" data-execution_count="130">
 <div class="cell-output cell-output-display cell-output-markdown">
-<div class="sourceCode" id="cb15"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1"></a><span class="kw">SELECT</span></span>
-<span id="cb15-2"><a href="#cb15-2"></a>  highway,</span>
-<span id="cb15-3"><a href="#cb15-3"></a>  trip_date,</span>
-<span id="cb15-4"><a href="#cb15-4"></a>  n_trips,</span>
-<span id="cb15-5"><a href="#cb15-5"></a>  n_accidents,</span>
-<span id="cb15-6"><a href="#cb15-6"></a>  (n_accidents <span class="op">-</span> highway_average) <span class="op">/</span> highway_std <span class="kw">as</span> highway_z_score</span>
-<span id="cb15-7"><a href="#cb15-7"></a><span class="kw">FROM</span> partitions_table;</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1"></a><span class="co">--sql</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="kw">SELECT</span></span>
+<span id="cb15-3"><a href="#cb15-3"></a>  highway,</span>
+<span id="cb15-4"><a href="#cb15-4"></a>  trip_date,</span>
+<span id="cb15-5"><a href="#cb15-5"></a>  n_trips,</span>
+<span id="cb15-6"><a href="#cb15-6"></a>  n_accidents,</span>
+<span id="cb15-7"><a href="#cb15-7"></a>  (n_accidents <span class="op">-</span> highway_average) <span class="op">/</span> highway_std <span class="kw">as</span> highway_z_score</span>
+<span id="cb15-8"><a href="#cb15-8"></a><span class="kw">FROM</span></span>
+<span id="cb15-9"><a href="#cb15-9"></a>  partitions_table</span>
+<span id="cb15-10"><a href="#cb15-10"></a><span class="kw">order</span> <span class="kw">by</span></span>
+<span id="cb15-11"><a href="#cb15-11"></a>  highway_z_score <span class="kw">DESC</span></span>
+<span id="cb15-12"><a href="#cb15-12"></a><span class="kw">Limit</span></span>
+<span id="cb15-13"><a href="#cb15-13"></a>  <span class="dv">5</span>;</span></code></pre></div>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="53">
+<div class="cell-output cell-output-display" data-execution_count="130">
 <div>
 
 
@@ -1623,131 +1412,43 @@ style sql fill:none
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>I280</td>
-<td>2024-11-12</td>
-<td>55</td>
-<td>3.0</td>
-<td>0.443678</td>
+<td>I580</td>
+<td>2024-11-14</td>
+<td>115</td>
+<td>61.0</td>
+<td>1.722822</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
 <td>I280</td>
-<td>2024-11-15</td>
-<td>76</td>
-<td>2.0</td>
-<td>-0.266207</td>
+<td>2024-11-12</td>
+<td>135</td>
+<td>7.0</td>
+<td>0.703526</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>I280</td>
-<td>2024-11-10</td>
-<td>53</td>
-<td>2.0</td>
-<td>-0.266207</td>
+<td>2024-11-15</td>
+<td>142</td>
+<td>7.0</td>
+<td>0.703526</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
 <td>I280</td>
-<td>2024-11-11</td>
-<td>81</td>
-<td>3.0</td>
-<td>0.443678</td>
+<td>2024-11-14</td>
+<td>119</td>
+<td>6.0</td>
+<td>0.301511</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>I280</td>
-<td>2024-11-14</td>
-<td>56</td>
-<td>0.0</td>
-<td>-1.685977</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">5</td>
-<td>I280</td>
-<td>2024-11-8</td>
-<td>63</td>
-<td>1.0</td>
-<td>-0.976092</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">6</td>
-<td>I280</td>
-<td>2024-11-9</td>
-<td>74</td>
-<td>5.0</td>
-<td>1.863449</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">7</td>
-<td>I280</td>
-<td>2024-11-13</td>
-<td>56</td>
-<td>3.0</td>
-<td>0.443678</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">8</td>
-<td>I580</td>
-<td>2024-11-9</td>
-<td>67</td>
-<td>5.0</td>
-<td>-0.147899</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">9</td>
-<td>I580</td>
-<td>2024-11-13</td>
-<td>61</td>
-<td>1.0</td>
-<td>-0.673763</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">10</td>
-<td>I580</td>
-<td>2024-11-12</td>
-<td>64</td>
-<td>5.0</td>
-<td>-0.147899</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">11</td>
-<td>I580</td>
-<td>2024-11-10</td>
-<td>65</td>
-<td>3.0</td>
-<td>-0.410831</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">12</td>
-<td>I580</td>
-<td>2024-11-14</td>
-<td>52</td>
-<td>26.0</td>
-<td>2.612885</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">13</td>
-<td>I580</td>
-<td>2024-11-8</td>
-<td>44</td>
-<td>3.0</td>
-<td>-0.410831</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">14</td>
-<td>I580</td>
-<td>2024-11-11</td>
-<td>66</td>
-<td>3.0</td>
-<td>-0.410831</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">15</td>
 <td>I580</td>
 <td>2024-11-15</td>
-<td>67</td>
-<td>3.0</td>
-<td>-0.410831</td>
+<td>121</td>
+<td>9.0</td>
+<td>-0.435895</td>
 </tr>
 </tbody>
 </table>
@@ -1757,7 +1458,7 @@ style sql fill:none
 </div>
 </div>
 <div id="tabset-3-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-5-tab">
-<div id="cell-51" class="cell" data-execution_count="54">
+<div id="cell-51" class="cell" data-execution_count="131">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1"></a>grouped_table <span class="op">=</span> (</span>
 <span id="cb16-2"><a href="#cb16-2"></a>    accidents</span>
 <span id="cb16-3"><a href="#cb16-3"></a>    .groupby([<span class="st">'highway'</span>, <span class="st">'trip_date'</span>], as_index<span class="op">=</span><span class="va">False</span>)</span>
@@ -1773,8 +1474,13 @@ style sql fill:none
 <span id="cb16-13"><a href="#cb16-13"></a>    (grouped_table[<span class="st">'n_accidents'</span>] <span class="op">-</span> grouped_table[<span class="st">'highway_average'</span>]) <span class="op">/</span></span>
 <span id="cb16-14"><a href="#cb16-14"></a>    highway_std_pop</span>
 <span id="cb16-15"><a href="#cb16-15"></a>    )</span>
-<span id="cb16-16"><a href="#cb16-16"></a>grouped_table[[<span class="st">'highway'</span>, <span class="st">'trip_date'</span>, <span class="st">'n_trips'</span>, <span class="st">'n_accidents'</span>, <span class="st">'highway_z_score'</span>]]</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="54">
+<span id="cb16-16"><a href="#cb16-16"></a>grouped_table <span class="op">=</span> grouped_table.sort_values(by<span class="op">=</span><span class="st">'highway_z_score'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb16-17"><a href="#cb16-17"></a>grouped_table[[<span class="st">'highway'</span>,</span>
+<span id="cb16-18"><a href="#cb16-18"></a>               <span class="st">'trip_date'</span>,</span>
+<span id="cb16-19"><a href="#cb16-19"></a>               <span class="st">'n_trips'</span>,</span>
+<span id="cb16-20"><a href="#cb16-20"></a>               <span class="st">'n_accidents'</span>,</span>
+<span id="cb16-21"><a href="#cb16-21"></a>               <span class="st">'highway_z_score'</span>]].head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="131">
 <div>
 
 
@@ -1791,132 +1497,44 @@ style sql fill:none
 </thead>
 <tbody>
 <tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>I580</td>
+<td>2024-11-14</td>
+<td>115</td>
+<td>61</td>
+<td>1.722822</td>
+</tr>
+<tr class="even">
 <td data-quarto-table-cell-role="th">0</td>
 <td>I280</td>
-<td>2024-11-10</td>
-<td>53</td>
-<td>2</td>
-<td>-0.266207</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>I280</td>
-<td>2024-11-11</td>
-<td>81</td>
-<td>3</td>
-<td>0.443678</td>
+<td>2024-11-12</td>
+<td>135</td>
+<td>7</td>
+<td>0.703526</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>I280</td>
-<td>2024-11-12</td>
-<td>55</td>
-<td>3</td>
-<td>0.443678</td>
-</tr>
-<tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
 <td>I280</td>
-<td>2024-11-13</td>
-<td>56</td>
-<td>3</td>
-<td>0.443678</td>
+<td>2024-11-15</td>
+<td>142</td>
+<td>7</td>
+<td>0.703526</td>
 </tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2</td>
 <td>I280</td>
 <td>2024-11-14</td>
-<td>56</td>
-<td>0</td>
-<td>-1.685977</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">5</td>
-<td>I280</td>
-<td>2024-11-15</td>
-<td>76</td>
-<td>2</td>
-<td>-0.266207</td>
+<td>119</td>
+<td>6</td>
+<td>0.301511</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">6</td>
-<td>I280</td>
-<td>2024-11-8</td>
-<td>63</td>
-<td>1</td>
-<td>-0.976092</td>
-</tr>
-<tr class="even">
 <td data-quarto-table-cell-role="th">7</td>
-<td>I280</td>
-<td>2024-11-9</td>
-<td>74</td>
-<td>5</td>
-<td>1.863449</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">8</td>
-<td>I580</td>
-<td>2024-11-10</td>
-<td>65</td>
-<td>3</td>
-<td>-0.410831</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">9</td>
-<td>I580</td>
-<td>2024-11-11</td>
-<td>66</td>
-<td>3</td>
-<td>-0.410831</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">10</td>
-<td>I580</td>
-<td>2024-11-12</td>
-<td>64</td>
-<td>5</td>
-<td>-0.147899</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">11</td>
-<td>I580</td>
-<td>2024-11-13</td>
-<td>61</td>
-<td>1</td>
-<td>-0.673763</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">12</td>
-<td>I580</td>
-<td>2024-11-14</td>
-<td>52</td>
-<td>26</td>
-<td>2.612885</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">13</td>
 <td>I580</td>
 <td>2024-11-15</td>
-<td>67</td>
-<td>3</td>
-<td>-0.410831</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">14</td>
-<td>I580</td>
-<td>2024-11-8</td>
-<td>44</td>
-<td>3</td>
-<td>-0.410831</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">15</td>
-<td>I580</td>
-<td>2024-11-9</td>
-<td>67</td>
-<td>5</td>
-<td>-0.147899</td>
+<td>121</td>
+<td>9</td>
+<td>-0.435895</td>
 </tr>
 </tbody>
 </table>
@@ -1928,8 +1546,8 @@ style sql fill:none
 </div>
 </div>
 </section>
-<section id="multiple-aggregations-in-one-table" class="level2">
-<h2 class="anchored" data-anchor-id="multiple-aggregations-in-one-table">Multiple aggregations in one table</h2>
+<section id="complex-query-2-multi-level-aggregation" class="level2">
+<h2 class="anchored" data-anchor-id="complex-query-2-multi-level-aggregation">Complex Query 2: Multi-level Aggregation</h2>
 <p>Let’s say that, in addition to trips that were associated with accidents on highways, we were interested in counting cars that were associated with accidents on highways. This would give us a sense of if some cars are involved in multiple accidents on the same highway in the same day. Thus, we want to know:</p>
 <ol type="1">
 <li>The number of unique cars that traveled on each highway on each day</li>
@@ -1942,19 +1560,20 @@ style sql fill:none
 <p>When the DISTINCT clause is provided, only distinct values are considered in the computation of the aggregate. This is typically used in combination with the count aggregate to get the number of distinct elements; but it can be used together with any aggregate function in the system.<br>
 – <a href="https://duckdb.org/docs/sql/functions/aggregates.html#distinct-clause-in-aggregate-functions">DuckDB Documentation</a></p>
 </blockquote>
-<div id="cell-55" class="cell" data-outputid="810ef9ee-7566-42e8-bfba-74e6c11154e6" data-execution_count="55">
+<div id="cell-55" class="cell" data-outputid="810ef9ee-7566-42e8-bfba-74e6c11154e6" data-execution_count="132">
 <div class="cell-output cell-output-display cell-output-markdown">
-<div class="sourceCode" id="cb17"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1"></a><span class="kw">SELECT</span></span>
-<span id="cb17-2"><a href="#cb17-2"></a>  highway,</span>
-<span id="cb17-3"><a href="#cb17-3"></a>  trip_date,</span>
-<span id="cb17-4"><a href="#cb17-4"></a>  <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> license_plate) <span class="kw">AS</span> n_cars</span>
-<span id="cb17-5"><a href="#cb17-5"></a><span class="kw">FROM</span></span>
-<span id="cb17-6"><a href="#cb17-6"></a>  accidents </span>
-<span id="cb17-7"><a href="#cb17-7"></a><span class="kw">GROUP</span> <span class="kw">BY</span></span>
-<span id="cb17-8"><a href="#cb17-8"></a>  highway,</span>
-<span id="cb17-9"><a href="#cb17-9"></a>  trip_date</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1"></a><span class="co">--sql</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a><span class="kw">SELECT</span></span>
+<span id="cb17-3"><a href="#cb17-3"></a>  highway,</span>
+<span id="cb17-4"><a href="#cb17-4"></a>  trip_date,</span>
+<span id="cb17-5"><a href="#cb17-5"></a>  <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> license_plate) <span class="kw">AS</span> n_cars</span>
+<span id="cb17-6"><a href="#cb17-6"></a><span class="kw">FROM</span></span>
+<span id="cb17-7"><a href="#cb17-7"></a>  accidents</span>
+<span id="cb17-8"><a href="#cb17-8"></a><span class="kw">GROUP</span> <span class="kw">BY</span></span>
+<span id="cb17-9"><a href="#cb17-9"></a>  highway,</span>
+<span id="cb17-10"><a href="#cb17-10"></a>  trip_date</span></code></pre></div>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="55">
+<div class="cell-output cell-output-display" data-execution_count="132">
 <div>
 
 
@@ -1970,99 +1589,51 @@ style sql fill:none
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>I580</td>
-<td>2024-11-10</td>
-<td>49</td>
+<td>I280</td>
+<td>2024-11-12</td>
+<td>66</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>I580</td>
+<td>I280</td>
 <td>2024-11-13</td>
-<td>49</td>
+<td>75</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>I580</td>
-<td>2024-11-9</td>
-<td>51</td>
+<td>2024-11-15</td>
+<td>72</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>I280</td>
-<td>2024-11-15</td>
-<td>53</td>
+<td>I580</td>
+<td>2024-11-14</td>
+<td>71</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>I280</td>
-<td>2024-11-8</td>
-<td>44</td>
+<td>I580</td>
+<td>2024-11-12</td>
+<td>68</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
-<td>I280</td>
-<td>2024-11-14</td>
-<td>40</td>
+<td>I580</td>
+<td>2024-11-13</td>
+<td>64</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">6</td>
-<td>I580</td>
-<td>2024-11-11</td>
-<td>47</td>
+<td>I280</td>
+<td>2024-11-15</td>
+<td>77</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">7</td>
 <td>I280</td>
-<td>2024-11-12</td>
-<td>41</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">8</td>
-<td>I580</td>
-<td>2024-11-12</td>
-<td>51</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">9</td>
-<td>I580</td>
-<td>2024-11-15</td>
-<td>55</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">10</td>
-<td>I280</td>
-<td>2024-11-13</td>
-<td>41</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">11</td>
-<td>I280</td>
-<td>2024-11-9</td>
-<td>53</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">12</td>
-<td>I280</td>
-<td>2024-11-11</td>
-<td>56</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">13</td>
-<td>I580</td>
-<td>2024-11-8</td>
-<td>35</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">14</td>
-<td>I580</td>
 <td>2024-11-14</td>
-<td>40</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">15</td>
-<td>I280</td>
-<td>2024-11-10</td>
-<td>36</td>
+<td>69</td>
 </tr>
 </tbody>
 </table>
@@ -2123,59 +1694,68 @@ style sql fill:none
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">Full Query</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">Step 1</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-3" role="tab" aria-controls="tabset-4-3" aria-selected="false">Step 2</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-4" role="tab" aria-controls="tabset-4-4" aria-selected="false">Step 3</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-5" role="tab" aria-controls="tabset-4-5" aria-selected="false">Step 4</a></li></ul>
 <div class="tab-content">
 <div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
-<div id="cell-58" class="cell" data-execution_count="56">
+<div id="cell-58" class="cell" data-execution_count="133">
 <div class="cell-output cell-output-display cell-output-markdown">
-<div class="sourceCode" id="cb18"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1"></a><span class="kw">WITH</span> car_table <span class="kw">as</span> (<span class="kw">SELECT</span></span>
-<span id="cb18-2"><a href="#cb18-2"></a>  license_plate,</span>
-<span id="cb18-3"><a href="#cb18-3"></a>  highway,</span>
-<span id="cb18-4"><a href="#cb18-4"></a>  trip_date,</span>
-<span id="cb18-5"><a href="#cb18-5"></a>  <span class="cf">CASE</span> <span class="cf">WHEN</span> <span class="fu">SUM</span>(accident_flag) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="dv">1</span> <span class="cf">ELSE</span> <span class="dv">0</span> <span class="cf">END</span> <span class="kw">AS</span> car_w_accident</span>
-<span id="cb18-6"><a href="#cb18-6"></a><span class="kw">FROM</span></span>
-<span id="cb18-7"><a href="#cb18-7"></a>  accidents </span>
-<span id="cb18-8"><a href="#cb18-8"></a><span class="kw">GROUP</span> <span class="kw">BY</span></span>
-<span id="cb18-9"><a href="#cb18-9"></a>  license_plate,</span>
-<span id="cb18-10"><a href="#cb18-10"></a>  highway,</span>
-<span id="cb18-11"><a href="#cb18-11"></a>  trip_date</span>
-<span id="cb18-12"><a href="#cb18-12"></a>),</span>
-<span id="cb18-13"><a href="#cb18-13"></a></span>
-<span id="cb18-14"><a href="#cb18-14"></a>cars_w_accident_count <span class="kw">as</span> (<span class="kw">SELECT</span> </span>
-<span id="cb18-15"><a href="#cb18-15"></a>  highway,</span>
-<span id="cb18-16"><a href="#cb18-16"></a>  trip_date,</span>
-<span id="cb18-17"><a href="#cb18-17"></a>  <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> license_plate) <span class="kw">as</span> n_cars,</span>
-<span id="cb18-18"><a href="#cb18-18"></a>  <span class="fu">SUM</span>(car_w_accident) <span class="kw">as</span> n_cars_w_accident</span>
-<span id="cb18-19"><a href="#cb18-19"></a><span class="kw">FROM</span></span>
-<span id="cb18-20"><a href="#cb18-20"></a>  car_table</span>
-<span id="cb18-21"><a href="#cb18-21"></a><span class="kw">GROUP</span> <span class="kw">BY</span></span>
-<span id="cb18-22"><a href="#cb18-22"></a>  highway,</span>
-<span id="cb18-23"><a href="#cb18-23"></a>  trip_date),</span>
-<span id="cb18-24"><a href="#cb18-24"></a></span>
-<span id="cb18-25"><a href="#cb18-25"></a>accident_count <span class="kw">as</span> (<span class="kw">SELECT</span></span>
-<span id="cb18-26"><a href="#cb18-26"></a>  highway,</span>
-<span id="cb18-27"><a href="#cb18-27"></a>  trip_date,</span>
-<span id="cb18-28"><a href="#cb18-28"></a>  <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">as</span> n_trips,</span>
-<span id="cb18-29"><a href="#cb18-29"></a>  <span class="fu">SUM</span>(accident_flag) <span class="kw">as</span> n_accidents</span>
-<span id="cb18-30"><a href="#cb18-30"></a><span class="kw">FROM</span></span>
-<span id="cb18-31"><a href="#cb18-31"></a>  accidents </span>
-<span id="cb18-32"><a href="#cb18-32"></a><span class="kw">GROUP</span> <span class="kw">BY</span></span>
-<span id="cb18-33"><a href="#cb18-33"></a>  highway,</span>
-<span id="cb18-34"><a href="#cb18-34"></a>  trip_date</span>
-<span id="cb18-35"><a href="#cb18-35"></a><span class="kw">ORDER</span> <span class="kw">BY</span></span>
-<span id="cb18-36"><a href="#cb18-36"></a>  highway,</span>
-<span id="cb18-37"><a href="#cb18-37"></a>  trip_date)</span>
-<span id="cb18-38"><a href="#cb18-38"></a></span>
-<span id="cb18-39"><a href="#cb18-39"></a><span class="kw">SELECT</span></span>
-<span id="cb18-40"><a href="#cb18-40"></a>a.highway,</span>
-<span id="cb18-41"><a href="#cb18-41"></a>a.trip_date,</span>
-<span id="cb18-42"><a href="#cb18-42"></a>a.n_trips,</span>
-<span id="cb18-43"><a href="#cb18-43"></a>a.n_accidents,</span>
-<span id="cb18-44"><a href="#cb18-44"></a>b.n_cars,</span>
-<span id="cb18-45"><a href="#cb18-45"></a>b.n_cars_w_accident</span>
-<span id="cb18-46"><a href="#cb18-46"></a><span class="kw">FROM</span> </span>
-<span id="cb18-47"><a href="#cb18-47"></a>  accident_count a</span>
-<span id="cb18-48"><a href="#cb18-48"></a>  <span class="kw">JOIN</span> cars_w_accident_count b</span>
-<span id="cb18-49"><a href="#cb18-49"></a>    <span class="kw">ON</span> (a.highway <span class="op">=</span> b.highway <span class="kw">AND</span> a.trip_date <span class="op">=</span> b.trip_date)</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1"></a><span class="co">--sql</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a><span class="kw">WITH</span></span>
+<span id="cb18-3"><a href="#cb18-3"></a>  car_table <span class="kw">as</span> (</span>
+<span id="cb18-4"><a href="#cb18-4"></a>    <span class="kw">SELECT</span></span>
+<span id="cb18-5"><a href="#cb18-5"></a>      license_plate,</span>
+<span id="cb18-6"><a href="#cb18-6"></a>      highway,</span>
+<span id="cb18-7"><a href="#cb18-7"></a>      trip_date,</span>
+<span id="cb18-8"><a href="#cb18-8"></a>      <span class="cf">CASE</span></span>
+<span id="cb18-9"><a href="#cb18-9"></a>        <span class="cf">WHEN</span> <span class="fu">SUM</span>(accident_flag) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="dv">1</span></span>
+<span id="cb18-10"><a href="#cb18-10"></a>        <span class="cf">ELSE</span> <span class="dv">0</span></span>
+<span id="cb18-11"><a href="#cb18-11"></a>      <span class="cf">END</span> <span class="kw">AS</span> car_w_accident</span>
+<span id="cb18-12"><a href="#cb18-12"></a>    <span class="kw">FROM</span></span>
+<span id="cb18-13"><a href="#cb18-13"></a>      accidents</span>
+<span id="cb18-14"><a href="#cb18-14"></a>    <span class="kw">GROUP</span> <span class="kw">BY</span></span>
+<span id="cb18-15"><a href="#cb18-15"></a>      license_plate,</span>
+<span id="cb18-16"><a href="#cb18-16"></a>      highway,</span>
+<span id="cb18-17"><a href="#cb18-17"></a>      trip_date</span>
+<span id="cb18-18"><a href="#cb18-18"></a>  ),</span>
+<span id="cb18-19"><a href="#cb18-19"></a>  cars_w_accident_count <span class="kw">as</span> (</span>
+<span id="cb18-20"><a href="#cb18-20"></a>    <span class="kw">SELECT</span></span>
+<span id="cb18-21"><a href="#cb18-21"></a>      highway,</span>
+<span id="cb18-22"><a href="#cb18-22"></a>      trip_date,</span>
+<span id="cb18-23"><a href="#cb18-23"></a>      <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> license_plate) <span class="kw">as</span> n_cars,</span>
+<span id="cb18-24"><a href="#cb18-24"></a>      <span class="fu">SUM</span>(car_w_accident) <span class="kw">as</span> n_cars_w_accident</span>
+<span id="cb18-25"><a href="#cb18-25"></a>    <span class="kw">FROM</span></span>
+<span id="cb18-26"><a href="#cb18-26"></a>      car_table</span>
+<span id="cb18-27"><a href="#cb18-27"></a>    <span class="kw">GROUP</span> <span class="kw">BY</span></span>
+<span id="cb18-28"><a href="#cb18-28"></a>      highway,</span>
+<span id="cb18-29"><a href="#cb18-29"></a>      trip_date</span>
+<span id="cb18-30"><a href="#cb18-30"></a>  ),</span>
+<span id="cb18-31"><a href="#cb18-31"></a>  accident_count <span class="kw">as</span> (</span>
+<span id="cb18-32"><a href="#cb18-32"></a>    <span class="kw">SELECT</span></span>
+<span id="cb18-33"><a href="#cb18-33"></a>      highway,</span>
+<span id="cb18-34"><a href="#cb18-34"></a>      trip_date,</span>
+<span id="cb18-35"><a href="#cb18-35"></a>      <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">as</span> n_trips,</span>
+<span id="cb18-36"><a href="#cb18-36"></a>      <span class="fu">SUM</span>(accident_flag) <span class="kw">as</span> n_accidents</span>
+<span id="cb18-37"><a href="#cb18-37"></a>    <span class="kw">FROM</span></span>
+<span id="cb18-38"><a href="#cb18-38"></a>      accidents</span>
+<span id="cb18-39"><a href="#cb18-39"></a>    <span class="kw">GROUP</span> <span class="kw">BY</span></span>
+<span id="cb18-40"><a href="#cb18-40"></a>      highway,</span>
+<span id="cb18-41"><a href="#cb18-41"></a>      trip_date</span>
+<span id="cb18-42"><a href="#cb18-42"></a>    <span class="kw">ORDER</span> <span class="kw">BY</span></span>
+<span id="cb18-43"><a href="#cb18-43"></a>      highway,</span>
+<span id="cb18-44"><a href="#cb18-44"></a>      trip_date</span>
+<span id="cb18-45"><a href="#cb18-45"></a>  )</span>
+<span id="cb18-46"><a href="#cb18-46"></a><span class="kw">SELECT</span></span>
+<span id="cb18-47"><a href="#cb18-47"></a>  a.highway,</span>
+<span id="cb18-48"><a href="#cb18-48"></a>  a.trip_date,</span>
+<span id="cb18-49"><a href="#cb18-49"></a>  a.n_trips,</span>
+<span id="cb18-50"><a href="#cb18-50"></a>  a.n_accidents,</span>
+<span id="cb18-51"><a href="#cb18-51"></a>  b.n_cars,</span>
+<span id="cb18-52"><a href="#cb18-52"></a>  b.n_cars_w_accident</span>
+<span id="cb18-53"><a href="#cb18-53"></a><span class="kw">FROM</span></span>
+<span id="cb18-54"><a href="#cb18-54"></a>  accident_count a</span>
+<span id="cb18-55"><a href="#cb18-55"></a>  <span class="kw">JOIN</span> cars_w_accident_count b <span class="kw">ON</span> (</span>
+<span id="cb18-56"><a href="#cb18-56"></a>    a.highway <span class="op">=</span> b.highway</span>
+<span id="cb18-57"><a href="#cb18-57"></a>    <span class="kw">AND</span> a.trip_date <span class="op">=</span> b.trip_date</span>
+<span id="cb18-58"><a href="#cb18-58"></a>  )</span></code></pre></div>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="56">
+<div class="cell-output cell-output-display" data-execution_count="133">
 <div>
 
 
@@ -2195,146 +1775,74 @@ style sql fill:none
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
 <td>I280</td>
-<td>2024-11-14</td>
-<td>56</td>
-<td>0.0</td>
-<td>40</td>
-<td>0.0</td>
+<td>2024-11-12</td>
+<td>135</td>
+<td>7.0</td>
+<td>66</td>
+<td>7.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
 <td>I280</td>
-<td>2024-11-15</td>
-<td>76</td>
-<td>2.0</td>
-<td>53</td>
-<td>2.0</td>
+<td>2024-11-13</td>
+<td>123</td>
+<td>1.0</td>
+<td>75</td>
+<td>1.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>I280</td>
-<td>2024-11-8</td>
-<td>63</td>
-<td>1.0</td>
-<td>44</td>
-<td>1.0</td>
+<td>I580</td>
+<td>2024-11-14</td>
+<td>115</td>
+<td>61.0</td>
+<td>71</td>
+<td>45.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>I280</td>
-<td>2024-11-9</td>
-<td>74</td>
-<td>5.0</td>
-<td>53</td>
-<td>5.0</td>
+<td>I580</td>
+<td>2024-11-15</td>
+<td>121</td>
+<td>9.0</td>
+<td>72</td>
+<td>9.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>I280</td>
-<td>2024-11-10</td>
-<td>53</td>
-<td>2.0</td>
-<td>36</td>
-<td>2.0</td>
+<td>I580</td>
+<td>2024-11-12</td>
+<td>125</td>
+<td>6.0</td>
+<td>68</td>
+<td>6.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
-<td>I280</td>
-<td>2024-11-11</td>
-<td>81</td>
-<td>3.0</td>
-<td>56</td>
-<td>3.0</td>
+<td>I580</td>
+<td>2024-11-13</td>
+<td>120</td>
+<td>2.0</td>
+<td>64</td>
+<td>2.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">6</td>
 <td>I280</td>
-<td>2024-11-12</td>
-<td>55</td>
-<td>3.0</td>
-<td>41</td>
-<td>3.0</td>
+<td>2024-11-14</td>
+<td>119</td>
+<td>6.0</td>
+<td>69</td>
+<td>6.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">7</td>
 <td>I280</td>
-<td>2024-11-13</td>
-<td>56</td>
-<td>3.0</td>
-<td>41</td>
-<td>3.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">8</td>
-<td>I580</td>
-<td>2024-11-10</td>
-<td>65</td>
-<td>3.0</td>
-<td>49</td>
-<td>3.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">9</td>
-<td>I580</td>
-<td>2024-11-11</td>
-<td>66</td>
-<td>3.0</td>
-<td>47</td>
-<td>3.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">10</td>
-<td>I580</td>
-<td>2024-11-12</td>
-<td>64</td>
-<td>5.0</td>
-<td>51</td>
-<td>5.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">11</td>
-<td>I580</td>
-<td>2024-11-13</td>
-<td>61</td>
-<td>1.0</td>
-<td>49</td>
-<td>1.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">12</td>
-<td>I580</td>
-<td>2024-11-14</td>
-<td>52</td>
-<td>26.0</td>
-<td>40</td>
-<td>25.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">13</td>
-<td>I580</td>
 <td>2024-11-15</td>
-<td>67</td>
-<td>3.0</td>
-<td>55</td>
-<td>3.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">14</td>
-<td>I580</td>
-<td>2024-11-8</td>
-<td>44</td>
-<td>3.0</td>
-<td>35</td>
-<td>3.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">15</td>
-<td>I580</td>
-<td>2024-11-9</td>
-<td>67</td>
-<td>5.0</td>
-<td>51</td>
-<td>5.0</td>
+<td>142</td>
+<td>7.0</td>
+<td>77</td>
+<td>6.0</td>
 </tr>
 </tbody>
 </table>
@@ -2345,23 +1853,32 @@ style sql fill:none
 </div>
 <div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
 <p>Create an accident flag at the car/day/highway level. Note the use of <a href="https://duckdb.org/docs/sql/expressions/case.html"><code>CASE WHEN</code></a>.</p>
-<div id="cell-60" class="cell" data-execution_count="57">
+<div id="cell-60" class="cell" data-execution_count="134">
 <div class="cell-output cell-output-display cell-output-markdown">
-<div class="sourceCode" id="cb19"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1"></a><span class="kw">WITH</span> car_table <span class="kw">as</span> (<span class="kw">SELECT</span></span>
-<span id="cb19-2"><a href="#cb19-2"></a>  license_plate,</span>
-<span id="cb19-3"><a href="#cb19-3"></a>  highway,</span>
-<span id="cb19-4"><a href="#cb19-4"></a>  trip_date,</span>
-<span id="cb19-5"><a href="#cb19-5"></a>  <span class="cf">CASE</span> <span class="cf">WHEN</span> <span class="fu">SUM</span>(accident_flag) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="dv">1</span> <span class="cf">ELSE</span> <span class="dv">0</span> <span class="cf">END</span> <span class="kw">AS</span> car_w_accident</span>
-<span id="cb19-6"><a href="#cb19-6"></a><span class="kw">FROM</span></span>
-<span id="cb19-7"><a href="#cb19-7"></a>  accidents </span>
-<span id="cb19-8"><a href="#cb19-8"></a><span class="kw">GROUP</span> <span class="kw">BY</span></span>
-<span id="cb19-9"><a href="#cb19-9"></a>  license_plate,</span>
-<span id="cb19-10"><a href="#cb19-10"></a>  highway,</span>
-<span id="cb19-11"><a href="#cb19-11"></a>  trip_date</span>
-<span id="cb19-12"><a href="#cb19-12"></a>)</span>
-<span id="cb19-13"><a href="#cb19-13"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> car_table  </span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1"></a><span class="co">--sql</span></span>
+<span id="cb19-2"><a href="#cb19-2"></a><span class="kw">WITH</span></span>
+<span id="cb19-3"><a href="#cb19-3"></a>  car_table <span class="kw">as</span> (</span>
+<span id="cb19-4"><a href="#cb19-4"></a>    <span class="kw">SELECT</span></span>
+<span id="cb19-5"><a href="#cb19-5"></a>      license_plate,</span>
+<span id="cb19-6"><a href="#cb19-6"></a>      highway,</span>
+<span id="cb19-7"><a href="#cb19-7"></a>      trip_date,</span>
+<span id="cb19-8"><a href="#cb19-8"></a>      <span class="cf">CASE</span></span>
+<span id="cb19-9"><a href="#cb19-9"></a>        <span class="cf">WHEN</span> <span class="fu">SUM</span>(accident_flag) <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">THEN</span> <span class="dv">1</span></span>
+<span id="cb19-10"><a href="#cb19-10"></a>        <span class="cf">ELSE</span> <span class="dv">0</span></span>
+<span id="cb19-11"><a href="#cb19-11"></a>      <span class="cf">END</span> <span class="kw">AS</span> car_w_accident</span>
+<span id="cb19-12"><a href="#cb19-12"></a>    <span class="kw">FROM</span></span>
+<span id="cb19-13"><a href="#cb19-13"></a>      accidents</span>
+<span id="cb19-14"><a href="#cb19-14"></a>    <span class="kw">GROUP</span> <span class="kw">BY</span></span>
+<span id="cb19-15"><a href="#cb19-15"></a>      license_plate,</span>
+<span id="cb19-16"><a href="#cb19-16"></a>      highway,</span>
+<span id="cb19-17"><a href="#cb19-17"></a>      trip_date</span>
+<span id="cb19-18"><a href="#cb19-18"></a>  )</span>
+<span id="cb19-19"><a href="#cb19-19"></a><span class="kw">SELECT</span></span>
+<span id="cb19-20"><a href="#cb19-20"></a>  <span class="op">*</span></span>
+<span id="cb19-21"><a href="#cb19-21"></a><span class="kw">FROM</span></span>
+<span id="cb19-22"><a href="#cb19-22"></a>  car_table  </span></code></pre></div>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="57">
+<div class="cell-output cell-output-display" data-execution_count="134">
 <div>
 
 
@@ -2378,38 +1895,38 @@ style sql fill:none
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>90096</td>
+<td>90073</td>
 <td>I280</td>
-<td>2024-11-14</td>
+<td>2024-11-13</td>
 <td>0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>90091</td>
-<td>I280</td>
-<td>2024-11-8</td>
+<td>90067</td>
+<td>I580</td>
+<td>2024-11-12</td>
 <td>0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>90006</td>
+<td>90000</td>
 <td>I280</td>
-<td>2024-11-15</td>
+<td>2024-11-12</td>
 <td>0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>90083</td>
+<td>90014</td>
 <td>I580</td>
 <td>2024-11-15</td>
-<td>0</td>
+<td>1</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>90013</td>
+<td>90089</td>
 <td>I580</td>
-<td>2024-11-15</td>
-<td>0</td>
+<td>2024-11-14</td>
+<td>1</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">...</td>
@@ -2419,65 +1936,72 @@ style sql fill:none
 <td>...</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">736</td>
-<td>90012</td>
-<td>I580</td>
-<td>2024-11-12</td>
-<td>0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">737</td>
-<td>90043</td>
-<td>I580</td>
-<td>2024-11-14</td>
-<td>1</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">738</td>
-<td>90058</td>
-<td>I580</td>
-<td>2024-11-14</td>
-<td>1</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">739</td>
-<td>90094</td>
-<td>I580</td>
-<td>2024-11-10</td>
-<td>0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">740</td>
-<td>90074</td>
-<td>I580</td>
+<td data-quarto-table-cell-role="th">557</td>
+<td>90099</td>
+<td>I280</td>
 <td>2024-11-13</td>
 <td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">558</td>
+<td>90029</td>
+<td>I280</td>
+<td>2024-11-15</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">559</td>
+<td>90099</td>
+<td>I580</td>
+<td>2024-11-14</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">560</td>
+<td>90002</td>
+<td>I580</td>
+<td>2024-11-15</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">561</td>
+<td>90024</td>
+<td>I580</td>
+<td>2024-11-14</td>
+<td>1</td>
 </tr>
 </tbody>
 </table>
 
-<p>741 rows × 4 columns</p>
+<p>562 rows × 4 columns</p>
 </div>
 </div>
 </div>
 </div>
 <div id="tabset-4-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-3-tab">
 <p>Aggregate cars.</p>
-<div id="cell-62" class="cell" data-execution_count="58">
+<div id="cell-62" class="cell" data-execution_count="135">
 <div class="cell-output cell-output-display cell-output-markdown">
-<div class="sourceCode" id="cb20"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">WITH</span> cars_w_accident_count <span class="kw">as</span> (<span class="kw">SELECT</span> </span>
-<span id="cb20-2"><a href="#cb20-2"></a>  highway,</span>
-<span id="cb20-3"><a href="#cb20-3"></a>  trip_date,</span>
-<span id="cb20-4"><a href="#cb20-4"></a>  <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> license_plate) <span class="kw">as</span> n_cars,</span>
-<span id="cb20-5"><a href="#cb20-5"></a>  <span class="fu">SUM</span>(car_w_accident) <span class="kw">as</span> n_cars_w_accident</span>
-<span id="cb20-6"><a href="#cb20-6"></a><span class="kw">FROM</span></span>
-<span id="cb20-7"><a href="#cb20-7"></a>  car_table</span>
-<span id="cb20-8"><a href="#cb20-8"></a><span class="kw">GROUP</span> <span class="kw">BY</span></span>
-<span id="cb20-9"><a href="#cb20-9"></a>  highway,</span>
-<span id="cb20-10"><a href="#cb20-10"></a>  trip_date)</span>
-<span id="cb20-11"><a href="#cb20-11"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> cars_w_accident_count;</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1"></a><span class="co">--sql</span></span>
+<span id="cb20-2"><a href="#cb20-2"></a><span class="kw">WITH</span></span>
+<span id="cb20-3"><a href="#cb20-3"></a>  cars_w_accident_count <span class="kw">as</span> (</span>
+<span id="cb20-4"><a href="#cb20-4"></a>    <span class="kw">SELECT</span></span>
+<span id="cb20-5"><a href="#cb20-5"></a>      highway,</span>
+<span id="cb20-6"><a href="#cb20-6"></a>      trip_date,</span>
+<span id="cb20-7"><a href="#cb20-7"></a>      <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> license_plate) <span class="kw">as</span> n_cars,</span>
+<span id="cb20-8"><a href="#cb20-8"></a>      <span class="fu">SUM</span>(car_w_accident) <span class="kw">as</span> n_cars_w_accident</span>
+<span id="cb20-9"><a href="#cb20-9"></a>    <span class="kw">FROM</span></span>
+<span id="cb20-10"><a href="#cb20-10"></a>      car_table</span>
+<span id="cb20-11"><a href="#cb20-11"></a>    <span class="kw">GROUP</span> <span class="kw">BY</span></span>
+<span id="cb20-12"><a href="#cb20-12"></a>      highway,</span>
+<span id="cb20-13"><a href="#cb20-13"></a>      trip_date</span>
+<span id="cb20-14"><a href="#cb20-14"></a>  )</span>
+<span id="cb20-15"><a href="#cb20-15"></a><span class="kw">SELECT</span></span>
+<span id="cb20-16"><a href="#cb20-16"></a>  <span class="op">*</span></span>
+<span id="cb20-17"><a href="#cb20-17"></a><span class="kw">FROM</span></span>
+<span id="cb20-18"><a href="#cb20-18"></a>  cars_w_accident_count;</span></code></pre></div>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="58">
+<div class="cell-output cell-output-display" data-execution_count="135">
 <div>
 
 
@@ -2495,114 +2019,58 @@ style sql fill:none
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
 <td>I580</td>
-<td>2024-11-10</td>
-<td>49</td>
-<td>3.0</td>
+<td>2024-11-13</td>
+<td>64</td>
+<td>2.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
 <td>I280</td>
 <td>2024-11-15</td>
-<td>53</td>
-<td>2.0</td>
+<td>77</td>
+<td>6.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>I580</td>
-<td>2024-11-13</td>
-<td>49</td>
-<td>1.0</td>
+<td>2024-11-12</td>
+<td>68</td>
+<td>6.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>I580</td>
-<td>2024-11-9</td>
-<td>51</td>
-<td>5.0</td>
+<td>I280</td>
+<td>2024-11-12</td>
+<td>66</td>
+<td>7.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
 <td>I280</td>
-<td>2024-11-14</td>
-<td>40</td>
-<td>0.0</td>
+<td>2024-11-13</td>
+<td>75</td>
+<td>1.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
-<td>I280</td>
-<td>2024-11-8</td>
-<td>44</td>
-<td>1.0</td>
+<td>I580</td>
+<td>2024-11-15</td>
+<td>72</td>
+<td>9.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">6</td>
 <td>I580</td>
-<td>2024-11-11</td>
-<td>47</td>
-<td>3.0</td>
+<td>2024-11-14</td>
+<td>71</td>
+<td>45.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">7</td>
 <td>I280</td>
-<td>2024-11-11</td>
-<td>56</td>
-<td>3.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">8</td>
-<td>I580</td>
 <td>2024-11-14</td>
-<td>40</td>
-<td>25.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">9</td>
-<td>I580</td>
-<td>2024-11-8</td>
-<td>35</td>
-<td>3.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">10</td>
-<td>I580</td>
-<td>2024-11-12</td>
-<td>51</td>
-<td>5.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">11</td>
-<td>I580</td>
-<td>2024-11-15</td>
-<td>55</td>
-<td>3.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">12</td>
-<td>I280</td>
-<td>2024-11-9</td>
-<td>53</td>
-<td>5.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">13</td>
-<td>I280</td>
-<td>2024-11-13</td>
-<td>41</td>
-<td>3.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">14</td>
-<td>I280</td>
-<td>2024-11-10</td>
-<td>36</td>
-<td>2.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">15</td>
-<td>I280</td>
-<td>2024-11-12</td>
-<td>41</td>
-<td>3.0</td>
+<td>69</td>
+<td>6.0</td>
 </tr>
 </tbody>
 </table>
@@ -2613,24 +2081,31 @@ style sql fill:none
 </div>
 <div id="tabset-4-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-4-tab">
 <p>Aggregate trips (this is a table we’ve already created once before).</p>
-<div id="cell-64" class="cell" data-execution_count="59">
+<div id="cell-64" class="cell" data-execution_count="136">
 <div class="cell-output cell-output-display cell-output-markdown">
-<div class="sourceCode" id="cb21"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb21-1"><a href="#cb21-1"></a><span class="kw">WITH</span> accident_count <span class="kw">as</span> (<span class="kw">SELECT</span></span>
-<span id="cb21-2"><a href="#cb21-2"></a>  highway,</span>
-<span id="cb21-3"><a href="#cb21-3"></a>  trip_date,</span>
-<span id="cb21-4"><a href="#cb21-4"></a>  <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">as</span> n_trips,</span>
-<span id="cb21-5"><a href="#cb21-5"></a>  <span class="fu">SUM</span>(accident_flag) <span class="kw">as</span> n_accidents </span>
-<span id="cb21-6"><a href="#cb21-6"></a><span class="kw">FROM</span></span>
-<span id="cb21-7"><a href="#cb21-7"></a>  accidents </span>
-<span id="cb21-8"><a href="#cb21-8"></a><span class="kw">GROUP</span> <span class="kw">BY</span></span>
-<span id="cb21-9"><a href="#cb21-9"></a>  highway,</span>
-<span id="cb21-10"><a href="#cb21-10"></a>  trip_date</span>
-<span id="cb21-11"><a href="#cb21-11"></a><span class="kw">ORDER</span> <span class="kw">BY</span></span>
-<span id="cb21-12"><a href="#cb21-12"></a>  highway,</span>
-<span id="cb21-13"><a href="#cb21-13"></a>  trip_date)</span>
-<span id="cb21-14"><a href="#cb21-14"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> accident_count;</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb21-1"><a href="#cb21-1"></a><span class="co">--sql</span></span>
+<span id="cb21-2"><a href="#cb21-2"></a><span class="kw">WITH</span></span>
+<span id="cb21-3"><a href="#cb21-3"></a>  accident_count <span class="kw">as</span> (</span>
+<span id="cb21-4"><a href="#cb21-4"></a>    <span class="kw">SELECT</span></span>
+<span id="cb21-5"><a href="#cb21-5"></a>      highway,</span>
+<span id="cb21-6"><a href="#cb21-6"></a>      trip_date,</span>
+<span id="cb21-7"><a href="#cb21-7"></a>      <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">as</span> n_trips,</span>
+<span id="cb21-8"><a href="#cb21-8"></a>      <span class="fu">SUM</span>(accident_flag) <span class="kw">as</span> n_accidents</span>
+<span id="cb21-9"><a href="#cb21-9"></a>    <span class="kw">FROM</span></span>
+<span id="cb21-10"><a href="#cb21-10"></a>      accidents</span>
+<span id="cb21-11"><a href="#cb21-11"></a>    <span class="kw">GROUP</span> <span class="kw">BY</span></span>
+<span id="cb21-12"><a href="#cb21-12"></a>      highway,</span>
+<span id="cb21-13"><a href="#cb21-13"></a>      trip_date</span>
+<span id="cb21-14"><a href="#cb21-14"></a>    <span class="kw">ORDER</span> <span class="kw">BY</span></span>
+<span id="cb21-15"><a href="#cb21-15"></a>      highway,</span>
+<span id="cb21-16"><a href="#cb21-16"></a>      trip_date</span>
+<span id="cb21-17"><a href="#cb21-17"></a>  )</span>
+<span id="cb21-18"><a href="#cb21-18"></a><span class="kw">SELECT</span></span>
+<span id="cb21-19"><a href="#cb21-19"></a>  <span class="op">*</span></span>
+<span id="cb21-20"><a href="#cb21-20"></a><span class="kw">FROM</span></span>
+<span id="cb21-21"><a href="#cb21-21"></a>  accident_count;</span></code></pre></div>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="59">
+<div class="cell-output cell-output-display" data-execution_count="136">
 <div>
 
 
@@ -2648,114 +2123,58 @@ style sql fill:none
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
 <td>I580</td>
-<td>2024-11-10</td>
-<td>49</td>
-<td>3.0</td>
+<td>2024-11-13</td>
+<td>64</td>
+<td>2.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
 <td>I280</td>
 <td>2024-11-15</td>
-<td>53</td>
-<td>2.0</td>
+<td>77</td>
+<td>6.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>I580</td>
-<td>2024-11-13</td>
-<td>49</td>
-<td>1.0</td>
+<td>2024-11-12</td>
+<td>68</td>
+<td>6.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>I580</td>
-<td>2024-11-9</td>
-<td>51</td>
-<td>5.0</td>
+<td>I280</td>
+<td>2024-11-12</td>
+<td>66</td>
+<td>7.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
 <td>I280</td>
-<td>2024-11-14</td>
-<td>40</td>
-<td>0.0</td>
+<td>2024-11-13</td>
+<td>75</td>
+<td>1.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
-<td>I280</td>
-<td>2024-11-8</td>
-<td>44</td>
-<td>1.0</td>
+<td>I580</td>
+<td>2024-11-15</td>
+<td>72</td>
+<td>9.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">6</td>
 <td>I580</td>
-<td>2024-11-11</td>
-<td>47</td>
-<td>3.0</td>
+<td>2024-11-14</td>
+<td>71</td>
+<td>45.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">7</td>
 <td>I280</td>
-<td>2024-11-11</td>
-<td>56</td>
-<td>3.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">8</td>
-<td>I580</td>
 <td>2024-11-14</td>
-<td>40</td>
-<td>25.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">9</td>
-<td>I580</td>
-<td>2024-11-8</td>
-<td>35</td>
-<td>3.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">10</td>
-<td>I580</td>
-<td>2024-11-12</td>
-<td>51</td>
-<td>5.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">11</td>
-<td>I580</td>
-<td>2024-11-15</td>
-<td>55</td>
-<td>3.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">12</td>
-<td>I280</td>
-<td>2024-11-9</td>
-<td>53</td>
-<td>5.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">13</td>
-<td>I280</td>
-<td>2024-11-13</td>
-<td>41</td>
-<td>3.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">14</td>
-<td>I280</td>
-<td>2024-11-10</td>
-<td>36</td>
-<td>2.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">15</td>
-<td>I280</td>
-<td>2024-11-12</td>
-<td>41</td>
-<td>3.0</td>
+<td>69</td>
+<td>6.0</td>
 </tr>
 </tbody>
 </table>
@@ -2766,21 +2185,24 @@ style sql fill:none
 </div>
 <div id="tabset-4-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-5-tab">
 <p>Merge the trip and car aggregates.</p>
-<div id="cell-66" class="cell" data-execution_count="60">
+<div id="cell-66" class="cell" data-execution_count="137">
 <div class="cell-output cell-output-display cell-output-markdown">
-<div class="sourceCode" id="cb22"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1"></a><span class="kw">SELECT</span></span>
-<span id="cb22-2"><a href="#cb22-2"></a>a.highway,</span>
-<span id="cb22-3"><a href="#cb22-3"></a>a.trip_date,</span>
-<span id="cb22-4"><a href="#cb22-4"></a>a.n_accidents,</span>
-<span id="cb22-5"><a href="#cb22-5"></a>a.n_accidents,</span>
-<span id="cb22-6"><a href="#cb22-6"></a>b.n_cars,</span>
-<span id="cb22-7"><a href="#cb22-7"></a>b.n_cars_w_accident</span>
-<span id="cb22-8"><a href="#cb22-8"></a><span class="kw">FROM</span> </span>
-<span id="cb22-9"><a href="#cb22-9"></a>  accident_count a</span>
-<span id="cb22-10"><a href="#cb22-10"></a>  <span class="kw">JOIN</span> cars_w_accident_count b</span>
-<span id="cb22-11"><a href="#cb22-11"></a>    <span class="kw">ON</span> (a.highway <span class="op">=</span> b.highway <span class="kw">AND</span> a.trip_date <span class="op">=</span> b.trip_date)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1"></a><span class="co">--sql</span></span>
+<span id="cb22-2"><a href="#cb22-2"></a><span class="kw">SELECT</span></span>
+<span id="cb22-3"><a href="#cb22-3"></a>  a.highway,</span>
+<span id="cb22-4"><a href="#cb22-4"></a>  a.trip_date,</span>
+<span id="cb22-5"><a href="#cb22-5"></a>  a.n_accidents,</span>
+<span id="cb22-6"><a href="#cb22-6"></a>  a.n_accidents,</span>
+<span id="cb22-7"><a href="#cb22-7"></a>  b.n_cars,</span>
+<span id="cb22-8"><a href="#cb22-8"></a>  b.n_cars_w_accident</span>
+<span id="cb22-9"><a href="#cb22-9"></a><span class="kw">FROM</span></span>
+<span id="cb22-10"><a href="#cb22-10"></a>  accident_count a</span>
+<span id="cb22-11"><a href="#cb22-11"></a>  <span class="kw">JOIN</span> cars_w_accident_count b <span class="kw">ON</span> (</span>
+<span id="cb22-12"><a href="#cb22-12"></a>    a.highway <span class="op">=</span> b.highway</span>
+<span id="cb22-13"><a href="#cb22-13"></a>    <span class="kw">AND</span> a.trip_date <span class="op">=</span> b.trip_date</span>
+<span id="cb22-14"><a href="#cb22-14"></a>  )</span></code></pre></div>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="60">
+<div class="cell-output cell-output-display" data-execution_count="137">
 <div>
 
 
@@ -2800,146 +2222,74 @@ style sql fill:none
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
 <td>I580</td>
-<td>2024-11-10</td>
-<td>3.0</td>
-<td>3.0</td>
-<td>49</td>
-<td>3.0</td>
+<td>2024-11-13</td>
+<td>2.0</td>
+<td>2.0</td>
+<td>64</td>
+<td>2.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
 <td>I280</td>
 <td>2024-11-15</td>
-<td>2.0</td>
-<td>2.0</td>
-<td>53</td>
-<td>2.0</td>
+<td>7.0</td>
+<td>7.0</td>
+<td>77</td>
+<td>6.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>I580</td>
-<td>2024-11-13</td>
-<td>1.0</td>
-<td>1.0</td>
-<td>49</td>
-<td>1.0</td>
+<td>2024-11-12</td>
+<td>6.0</td>
+<td>6.0</td>
+<td>68</td>
+<td>6.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>I580</td>
-<td>2024-11-9</td>
-<td>5.0</td>
-<td>5.0</td>
-<td>51</td>
-<td>5.0</td>
+<td>I280</td>
+<td>2024-11-12</td>
+<td>7.0</td>
+<td>7.0</td>
+<td>66</td>
+<td>7.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
 <td>I280</td>
-<td>2024-11-14</td>
-<td>0.0</td>
-<td>0.0</td>
-<td>40</td>
-<td>0.0</td>
+<td>2024-11-13</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>75</td>
+<td>1.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
-<td>I280</td>
-<td>2024-11-8</td>
-<td>1.0</td>
-<td>1.0</td>
-<td>44</td>
-<td>1.0</td>
+<td>I580</td>
+<td>2024-11-15</td>
+<td>9.0</td>
+<td>9.0</td>
+<td>72</td>
+<td>9.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">6</td>
 <td>I580</td>
-<td>2024-11-11</td>
-<td>3.0</td>
-<td>3.0</td>
-<td>47</td>
-<td>3.0</td>
+<td>2024-11-14</td>
+<td>61.0</td>
+<td>61.0</td>
+<td>71</td>
+<td>45.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">7</td>
 <td>I280</td>
-<td>2024-11-11</td>
-<td>3.0</td>
-<td>3.0</td>
-<td>56</td>
-<td>3.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">8</td>
-<td>I580</td>
 <td>2024-11-14</td>
-<td>26.0</td>
-<td>26.0</td>
-<td>40</td>
-<td>25.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">9</td>
-<td>I580</td>
-<td>2024-11-8</td>
-<td>3.0</td>
-<td>3.0</td>
-<td>35</td>
-<td>3.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">10</td>
-<td>I580</td>
-<td>2024-11-12</td>
-<td>5.0</td>
-<td>5.0</td>
-<td>51</td>
-<td>5.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">11</td>
-<td>I580</td>
-<td>2024-11-15</td>
-<td>3.0</td>
-<td>3.0</td>
-<td>55</td>
-<td>3.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">12</td>
-<td>I280</td>
-<td>2024-11-9</td>
-<td>5.0</td>
-<td>5.0</td>
-<td>53</td>
-<td>5.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">13</td>
-<td>I280</td>
-<td>2024-11-13</td>
-<td>3.0</td>
-<td>3.0</td>
-<td>41</td>
-<td>3.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">14</td>
-<td>I280</td>
-<td>2024-11-10</td>
-<td>2.0</td>
-<td>2.0</td>
-<td>36</td>
-<td>2.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">15</td>
-<td>I280</td>
-<td>2024-11-12</td>
-<td>3.0</td>
-<td>3.0</td>
-<td>41</td>
-<td>3.0</td>
+<td>6.0</td>
+<td>6.0</td>
+<td>69</td>
+<td>6.0</td>
 </tr>
 </tbody>
 </table>
@@ -2967,24 +2317,30 @@ style sql fill:none
 <li>aggregate trips with <code>COUNT(*)</code> and <code>SUM</code></li>
 </ul></li>
 </ol>
-<div id="cell-69" class="cell" data-outputid="44f66b53-cbb8-4255-d3b8-56895c729531" data-execution_count="61">
+<div id="cell-69" class="cell" data-outputid="44f66b53-cbb8-4255-d3b8-56895c729531" data-execution_count="138">
 <div class="cell-output cell-output-display cell-output-markdown">
-<div class="sourceCode" id="cb23"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb23-1"><a href="#cb23-1"></a><span class="kw">SELECT</span></span>
-<span id="cb23-2"><a href="#cb23-2"></a>    highway,</span>
-<span id="cb23-3"><a href="#cb23-3"></a>    trip_date,</span>
-<span id="cb23-4"><a href="#cb23-4"></a>    <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">as</span> n_trips,</span>
-<span id="cb23-5"><a href="#cb23-5"></a>    <span class="fu">SUM</span>(accident_flag) <span class="kw">as</span> n_accidents,</span>
-<span id="cb23-6"><a href="#cb23-6"></a>    <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> license_plate) <span class="kw">AS</span> n_cars,</span>
-<span id="cb23-7"><a href="#cb23-7"></a>    <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span></span>
-<span id="cb23-8"><a href="#cb23-8"></a>        (<span class="cf">CASE</span> <span class="cf">WHEN</span> accident_flag <span class="op">=</span> <span class="dv">1</span> <span class="cf">THEN</span> license_plate <span class="cf">ELSE</span> <span class="kw">NULL</span> <span class="cf">END</span>))</span>
-<span id="cb23-9"><a href="#cb23-9"></a>        <span class="kw">AS</span> n_cars_w_accident</span>
-<span id="cb23-10"><a href="#cb23-10"></a><span class="kw">FROM</span></span>
-<span id="cb23-11"><a href="#cb23-11"></a>  accidents </span>
-<span id="cb23-12"><a href="#cb23-12"></a><span class="kw">GROUP</span> <span class="kw">BY</span></span>
-<span id="cb23-13"><a href="#cb23-13"></a>  highway,</span>
-<span id="cb23-14"><a href="#cb23-14"></a>  trip_date</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode numberSource sql number-lines"><code class="sourceCode sql"><span id="cb23-1"><a href="#cb23-1"></a><span class="co">--sql</span></span>
+<span id="cb23-2"><a href="#cb23-2"></a><span class="kw">SELECT</span></span>
+<span id="cb23-3"><a href="#cb23-3"></a>  highway,</span>
+<span id="cb23-4"><a href="#cb23-4"></a>  trip_date,</span>
+<span id="cb23-5"><a href="#cb23-5"></a>  <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">as</span> n_trips,</span>
+<span id="cb23-6"><a href="#cb23-6"></a>  <span class="fu">SUM</span>(accident_flag) <span class="kw">as</span> n_accidents,</span>
+<span id="cb23-7"><a href="#cb23-7"></a>  <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> license_plate) <span class="kw">AS</span> n_cars,</span>
+<span id="cb23-8"><a href="#cb23-8"></a>  <span class="fu">COUNT</span>(</span>
+<span id="cb23-9"><a href="#cb23-9"></a>    <span class="kw">DISTINCT</span> (</span>
+<span id="cb23-10"><a href="#cb23-10"></a>      <span class="cf">CASE</span></span>
+<span id="cb23-11"><a href="#cb23-11"></a>        <span class="cf">WHEN</span> accident_flag <span class="op">=</span> <span class="dv">1</span> <span class="cf">THEN</span> license_plate</span>
+<span id="cb23-12"><a href="#cb23-12"></a>        <span class="cf">ELSE</span> <span class="kw">NULL</span></span>
+<span id="cb23-13"><a href="#cb23-13"></a>      <span class="cf">END</span></span>
+<span id="cb23-14"><a href="#cb23-14"></a>    )</span>
+<span id="cb23-15"><a href="#cb23-15"></a>  ) <span class="kw">AS</span> n_cars_w_accident</span>
+<span id="cb23-16"><a href="#cb23-16"></a><span class="kw">FROM</span></span>
+<span id="cb23-17"><a href="#cb23-17"></a>  accidents</span>
+<span id="cb23-18"><a href="#cb23-18"></a><span class="kw">GROUP</span> <span class="kw">BY</span></span>
+<span id="cb23-19"><a href="#cb23-19"></a>  highway,</span>
+<span id="cb23-20"><a href="#cb23-20"></a>  trip_date</span></code></pre></div>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="61">
+<div class="cell-output cell-output-display" data-execution_count="138">
 <div>
 
 
@@ -3005,145 +2361,73 @@ style sql fill:none
 <td data-quarto-table-cell-role="th">0</td>
 <td>I280</td>
 <td>2024-11-12</td>
-<td>55</td>
-<td>3.0</td>
-<td>41</td>
-<td>3</td>
+<td>135</td>
+<td>7.0</td>
+<td>66</td>
+<td>7</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>I580</td>
-<td>2024-11-10</td>
-<td>65</td>
-<td>3.0</td>
-<td>49</td>
-<td>3</td>
+<td>I280</td>
+<td>2024-11-15</td>
+<td>142</td>
+<td>7.0</td>
+<td>77</td>
+<td>6</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>I580</td>
-<td>2024-11-12</td>
+<td>2024-11-13</td>
+<td>120</td>
+<td>2.0</td>
 <td>64</td>
-<td>5.0</td>
-<td>51</td>
-<td>5</td>
+<td>2</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
 <td>I580</td>
-<td>2024-11-14</td>
-<td>52</td>
-<td>26.0</td>
-<td>40</td>
-<td>25</td>
+<td>2024-11-12</td>
+<td>125</td>
+<td>6.0</td>
+<td>68</td>
+<td>6</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
 <td>I280</td>
-<td>2024-11-11</td>
-<td>81</td>
-<td>3.0</td>
-<td>56</td>
-<td>3</td>
+<td>2024-11-14</td>
+<td>119</td>
+<td>6.0</td>
+<td>69</td>
+<td>6</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
-<td>I580</td>
-<td>2024-11-8</td>
-<td>44</td>
-<td>3.0</td>
-<td>35</td>
-<td>3</td>
+<td>I280</td>
+<td>2024-11-13</td>
+<td>123</td>
+<td>1.0</td>
+<td>75</td>
+<td>1</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">6</td>
 <td>I580</td>
-<td>2024-11-9</td>
-<td>67</td>
-<td>5.0</td>
-<td>51</td>
-<td>5</td>
+<td>2024-11-15</td>
+<td>121</td>
+<td>9.0</td>
+<td>72</td>
+<td>9</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">7</td>
-<td>I280</td>
-<td>2024-11-15</td>
-<td>76</td>
-<td>2.0</td>
-<td>53</td>
-<td>2</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">8</td>
 <td>I580</td>
-<td>2024-11-13</td>
-<td>61</td>
-<td>1.0</td>
-<td>49</td>
-<td>1</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">9</td>
-<td>I280</td>
 <td>2024-11-14</td>
-<td>56</td>
-<td>0.0</td>
-<td>40</td>
-<td>0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">10</td>
-<td>I280</td>
-<td>2024-11-8</td>
-<td>63</td>
-<td>1.0</td>
-<td>44</td>
-<td>1</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">11</td>
-<td>I580</td>
-<td>2024-11-11</td>
-<td>66</td>
-<td>3.0</td>
-<td>47</td>
-<td>3</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">12</td>
-<td>I280</td>
-<td>2024-11-9</td>
-<td>74</td>
-<td>5.0</td>
-<td>53</td>
-<td>5</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">13</td>
-<td>I580</td>
-<td>2024-11-15</td>
-<td>67</td>
-<td>3.0</td>
-<td>55</td>
-<td>3</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">14</td>
-<td>I280</td>
-<td>2024-11-13</td>
-<td>56</td>
-<td>3.0</td>
-<td>41</td>
-<td>3</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">15</td>
-<td>I280</td>
-<td>2024-11-10</td>
-<td>53</td>
-<td>2.0</td>
-<td>36</td>
-<td>2</td>
+<td>115</td>
+<td>61.0</td>
+<td>71</td>
+<td>45</td>
 </tr>
 </tbody>
 </table>
