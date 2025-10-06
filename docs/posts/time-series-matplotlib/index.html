@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.57">
+<meta name="generator" content="quarto-1.6.40">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -73,10 +73,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-1092c56c6cadf2eb47b1bc8063ab382a.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-5d17cd34d2e348db00e20f83fc65b062.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -147,7 +147,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../projects.html"> 
-<span class="menu-text">Professional</span></a>
+<span class="menu-text">Projects</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -231,6 +231,8 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
     firstHeader.scrollIntoView({ behavior: 'smooth', block: "start", inline: "nearest"}); // Scroll to the first header smoothly
   }
 });
+
+
 </script>
 <p>In my day job I’ve recently been working on visualizing time series data with <code>matplotlib</code>. When I’ve wanted some sort of specific formatting or behavior, I’ve had to wade deep in the library documentation to figure out the code for the things I want to do. That’s fine, but what frustrates me is that in the back of my mind, I’m pretty sure these are all things I’ve actually done before. A few years ago in graduate school I took a course that was heavy on <code>matplotlib</code> plotting, and I spent many hours figuring out bizarre techniques for getting very specific results. Unfortunately I’ve forgotten almost all of that library-specific minutiae.</p>
 <p>This has led me to a new project – I’m creating a personal data science utilities library with modules for <code>matplotlib</code>/<code>seaborn</code>, <code>pandas</code>, <code>geopandas</code>, and <code>scikit-learn</code>, each containing functions that do all the random things I’ve repeatedly built custom code solutions for in the past. The hope is that I don’t need to keep re-learning the same things and can call simple wrapper functions that I’ve written.</p>
@@ -392,7 +394,7 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <th data-quarto-table-cell-role="th">Hour</th>
 <th data-quarto-table-cell-role="th">Riders</th>
 </tr>
-<tr class="odd">
+<tr class="even">
 <th data-quarto-table-cell-role="th">Date</th>
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th"></th>
@@ -1083,7 +1085,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {

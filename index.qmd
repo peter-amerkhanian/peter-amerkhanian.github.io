@@ -19,12 +19,13 @@ about:
       text: Email
       href: mailto:peteramerkhanian@berkeley.edu
 ---
-<p style="font-weight: 650; color: #4d4d4d">Data & Policy @ UC Office of the President    
+<p style="font-weight: 650; color: #4d4d4d">Data Scientist/Policy Analyst    
 UC Berkeley MPP '23, BA '16
 </p>
 <hr>
-I’m a Data Scientist/Policy Analyst working in government. Check out my:      
+Passionate about using data science for good.  
+Check out my:      
 
 - Technical [blog](blog.qmd)
 
-- Professional [reports and software](projects.qmd)
+- Public [reports and software](projects.qmd)

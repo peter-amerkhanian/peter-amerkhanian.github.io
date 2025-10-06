@@ -1,6 +1,6 @@
 ---
-title: "Professional"
-pagetitle: "Professional"
+title: "Projects"
+pagetitle: "Projects"
 title-prefix: "Peter Amerkhanian"
 title-block-banner: true
 format:
@@ -10,7 +10,7 @@ format:
 ---  
 
 
-## Professional Reports, Dashboards, & Software
+## Public Reports, Dashboards, & Software
 
 The following are some of my formal, public-facing projects:
 

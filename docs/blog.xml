@@ -9,7 +9,7 @@
 <link>https://peter-amerkhanian.com/blog.html</link>
 <atom:link href="https://peter-amerkhanian.com/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Peter Amerkhanian&#39;s Blog</description>
-<generator>quarto-1.5.57</generator>
+<generator>quarto-1.6.40</generator>
 <lastBuildDate>Sun, 20 Apr 2025 07:00:00 GMT</lastBuildDate>
 <item>
   <title>Using The Excel Object Model in Python</title>
@@ -37,7 +37,7 @@
   <title>Grouping Problems with SQL</title>
   <dc:creator>Peter Amerkhanian</dc:creator>
   <link>https://peter-amerkhanian.com/posts/sql-count-cases/</link>
-  <description><![CDATA[ Using DuckDB to look at some GROUP BY and PARTITION BY statements in SQL. ]]></description>
+  <description><![CDATA[ An overview of GROUP BY and PARTITION BY statements in SQL. ]]></description>
   <category>SQL</category>
   <category>Data Management</category>
   <guid>https://peter-amerkhanian.com/posts/sql-count-cases/</guid>
@@ -184,17 +184,6 @@
   <guid>https://peter-amerkhanian.com/posts/SIR/</guid>
   <pubDate>Thu, 15 Dec 2022 08:00:00 GMT</pubDate>
   <media:content url="https://peter-amerkhanian.com/posts/SIR/thumbnail.png" medium="image" type="image/png" height="143" width="144"/>
-</item>
-<item>
-  <title>Buy vs. Rent, A Financial Modeling Workflow in Python</title>
-  <dc:creator>Peter Amerkhanian</dc:creator>
-  <link>https://peter-amerkhanian.com/posts/rent-vs-buy/</link>
-  <description><![CDATA[ Using numpy-financial and monte-carlo simulation to evaluate investments. ]]></description>
-  <category>Python</category>
-  <category>Probability</category>
-  <guid>https://peter-amerkhanian.com/posts/rent-vs-buy/</guid>
-  <pubDate>Sat, 06 Aug 2022 07:00:00 GMT</pubDate>
-  <media:content url="https://peter-amerkhanian.com/posts/rent-vs-buy/thumbnail.png" medium="image" type="image/png" height="144" width="144"/>
 </item>
 <item>
   <title>Reliable PDF Scraping with tabula-py</title>
