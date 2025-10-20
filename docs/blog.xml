@@ -78,10 +78,10 @@
   <media:content url="https://peter-amerkhanian.com/posts/multiple-integration/thumbnail.png" medium="image" type="image/png" height="144" width="144"/>
 </item>
 <item>
-  <title>Benchmarking parquet and dask</title>
+  <title>Scaling Local Data Analysis</title>
   <dc:creator>Peter Amerkhanian</dc:creator>
   <link>https://peter-amerkhanian.com/posts/dask-data-io/</link>
-  <description><![CDATA[ Using parquet+dask to efficiently read and manipulate BART’s historical ridership data. ]]></description>
+  <description><![CDATA[ Thoughts on efficient data retrieval, storage, and read-in, with examples using BART ridership data. ]]></description>
   <category>Python</category>
   <category>Data Management</category>
   <guid>https://peter-amerkhanian.com/posts/dask-data-io/</guid>
