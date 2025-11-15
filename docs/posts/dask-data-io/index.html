@@ -8,9 +8,9 @@
 
 <meta name="author" content="Peter Amerkhanian">
 <meta name="dcterms.date" content="2024-04-12">
-<meta name="description" content="Thoughts on efficient data retrieval, storage, and read-in, with examples using BART ridership data.">
+<meta name="description" content="Thoughts on efficient data retrieval, storage, read-in, and analysis with examples using BART ridership data.">
 
-<title>Scaling Local Data Analysis – Peter Amerkhanian</title>
+<title>Scaling Local Data Analytics – Peter Amerkhanian</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -113,6 +113,9 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 </script>
+<script src="../../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
@@ -160,10 +163,10 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <div class="quarto-title-block"><div><h1 class="title">Scaling Local Data Analysis</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
+      <div class="quarto-title-block"><div><h1 class="title">Scaling Local Data Analytics</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
                   <div>
         <div class="description">
-          Thoughts on efficient data retrieval, storage, and read-in, with examples using BART ridership data.
+          Thoughts on efficient data retrieval, storage, read-in, and analysis with examples using BART ridership data.
         </div>
       </div>
                           <div class="quarto-categories">
@@ -199,21 +202,20 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-        <h2 id="toc-title"><a href="#" class="nav-link">Scaling Local Data Analysis</a></h2>
+        <h2 id="toc-title"><a href="#" class="nav-link">Scaling Local Data Analytics</a></h2>
      
     <ul>
-    <li><a href="#threaded-downloading" id="toc-threaded-downloading" class="nav-link active" data-scroll-target="#threaded-downloading">Threaded Downloading</a>
+    <li><a href="#data-retrieval" id="toc-data-retrieval" class="nav-link active" data-scroll-target="#data-retrieval">Data Retrieval</a>
     <ul class="collapse">
     <li><a href="#threading" id="toc-threading" class="nav-link" data-scroll-target="#threading">Threading</a></li>
     <li><a href="#is-threading-worth-it" id="toc-is-threading-worth-it" class="nav-link" data-scroll-target="#is-threading-worth-it">Is threading worth it?</a></li>
-    <li><a href="#why-does-threading-help" id="toc-why-does-threading-help" class="nav-link" data-scroll-target="#why-does-threading-help">Why does threading help?</a></li>
     </ul></li>
-    <li><a href="#column-oriented-data-storage" id="toc-column-oriented-data-storage" class="nav-link" data-scroll-target="#column-oriented-data-storage">Column-Oriented Data Storage</a>
+    <li><a href="#data-storage" id="toc-data-storage" class="nav-link" data-scroll-target="#data-storage">Data Storage</a>
     <ul class="collapse">
     <li><a href="#is-parquet-worth-it" id="toc-is-parquet-worth-it" class="nav-link" data-scroll-target="#is-parquet-worth-it">Is <code>parquet</code> worth it?</a></li>
-    <li><a href="#why-did-parquet-help" id="toc-why-did-parquet-help" class="nav-link" data-scroll-target="#why-did-parquet-help">Why did parquet help?</a></li>
+    <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">Discussion</a></li>
     </ul></li>
-    <li><a href="#beyond-pandas" id="toc-beyond-pandas" class="nav-link" data-scroll-target="#beyond-pandas">Beyond <code>pandas</code></a>
+    <li><a href="#data-analysis" id="toc-data-analysis" class="nav-link" data-scroll-target="#data-analysis">Data Analysis</a>
     <ul class="collapse">
     <li><a href="#are-dask-and-duckdb-worth-it" id="toc-are-dask-and-duckdb-worth-it" class="nav-link" data-scroll-target="#are-dask-and-duckdb-worth-it">Are <code>dask</code> and <code>duckdb</code> worth it?</a></li>
     <li><a href="#some-reflection" id="toc-some-reflection" class="nav-link" data-scroll-target="#some-reflection">Some reflection</a></li>
@@ -249,33 +251,81 @@ gtag('config', 'G-V95HGLKTEB', { 'anonymize_ip': true});
 
 
 </script>
-<p>The following post covers some of my evolving thoughts on efficient laptop-bound data retrieval, storage, and I/O tasks in Python. This post is not at all meant to describe the cutting edge of the efficient Python landscape for local data work– the goal here is to just give an overview of what I’m doing right now to balance efficiency and simplicity in my code.</p>
-<p>I motivate this post with an analysis exercise where I retrieve and store historical data on Bay Area Rapid Transit (BART) ridership at the station/hour level. BART kindly makes such ridership information publicly available on their <a href="https://www.bart.gov/about/reports/ridership">open data portal</a>.</p>
-<p>My end goal is to examine and justify (via benchmarking) the following workflows:</p>
-<ol type="1">
-<li>Threaded downloads – when you need to download a lot of data files, use <code>concurrent.futures</code> to distribute downloads across “threads”.<br>
-<strong>Effect: ~20% decrease in download time</strong> relative to standard for-loop.</li>
-<li>Column-oriented data storage – Use the <a href="https://parquet.apache.org/">apache parquet</a> format to efficiently store tabular data locally.<br>
-<strong>Effect: ~50% reduction in data storage size</strong> relative to <code>.csv</code>.</li>
-<li>Threaded/Parallel Data Read-in – Consider <a href="https://docs.dask.org/en/stable/"><code>dask</code></a> and/or <code>duckdb</code> for efficient data read-in and aggregation options.</li>
-</ol>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
+<p>The following post covers some reflections on working with large<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> data locally in Python. The proliferation of new tools that leverage column-oriented storage, online analytical processing, concurrency, and fast non-Python backends has made working in Python with large data on a laptop easier than ever. However, when there are so many new tools to choose from, it can be difficult to determine which ones are worth using. <strong>Tech-ing up to complex workflows can win you back processing time but often at the cost of making your much code harder to read</strong>. When, why, and how is “efficiency” worth it?</p>
+<p>In this post, I’ll benchmark and discuss a few techniques that make large data management on a laptop a little less painful. This post is not at all meant to describe the cutting edge of the efficient Python landscape for local data work. The goal here is to just give an overview of what I’m considering right now to balance efficiency, simplicity, and <a href="https://peps.python.org/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds"><strong>readability</strong></a>.</p>
+<p>I motivate this post with an exercise – building a data analytics pipeline. I retrieve and store historical data on Bay Area Rapid Transit (BART) ridership at the station/hour level<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> and set up code to regularly update that local dataset and create summary tables. The whole pipeline is mapped out in the following diagram:</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div id="fig-data" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-data-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Exercise data pipeline
+</figcaption>
+<div aria-describedby="fig-data-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div>
+<pre class="mermaid mermaid-js" data-label="fig-data">flowchart LR
+
+    C[("Download files&lt;br&gt;Convert+store for analytics&lt;br&gt;")]
+subgraph one ["One time setup"]
+C
+end
+
+%% Weekly incremental update and analytics
+subgraph weekly ["Weekly data update cycle"]
+    direction LR
+    C --&gt; F[("Re-download newest file")]
+end
+
+subgraph analytics ["Analytics workflow"]
+    F --&gt; H{{"Read-in data&lt;br&gt;Group/Aggregate data&lt;br&gt;Produce summary tables"}}
+end
+
+
+%% Outputs
+F --&gt; Z{{Ad-hoc Analyses}}
+
+style one fill:none
+style weekly fill:none
+style analytics fill:none
+</pre>
 </div>
-<div class="callout-title-container flex-fill">
-Pre-requisites
+</div>
+</figure>
 </div>
 </div>
-<div class="callout-body-container callout-body">
-<ul>
-<li>Intermediate <code>pandas</code>, <code>matplotlib</code> knowledge</li>
-<li>Familiarity with web data retrieval</li>
-</ul>
 </div>
-</div>
-<div id="cell-3" class="cell" data-execution_count="2">
+<p>Different techniques can potentially help at different parts of that pipeline. I examine the following.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Technique</th>
+<th>Description</th>
+<th>Effect</th>
+<th>Caveats</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Threaded downloads</td>
+<td>Use <code>concurrent.futures</code> to distribute multiple file downloads across “threads”.</td>
+<td>One time ~20% decrease in download time relative to standard for-loop.</td>
+<td>One-time benefit likely not be worth it for small projects</td>
+</tr>
+<tr class="even">
+<td>Column-oriented data storage</td>
+<td>Use the <a href="https://parquet.apache.org/">Apache Parquet</a> format to efficiently store tabular data locally.</td>
+<td>One time ~50% reduction in data storage size<br>Repeated ~70% reduction in read-in time and ~80% reduction in groupby/aggregate time relative to <code>.csv</code></td>
+<td>Binary encoding means this is not appropriate for any data that spreadsheet users need access to.</td>
+</tr>
+<tr class="odd">
+<td><code>pandas</code> alternatives with novel computational backends</td>
+<td>Use <a href="https://duckdb.org/">DuckDB</a> to read in and manipulate data.</td>
+<td>Repeated ~94% reduction in groupby/aggregate time relative to <code>pandas</code>.</td>
+<td>Analytics speed up is unbelievable, and DuckDB makes your code even more sustainable by using SQL.</td>
+</tr>
+</tbody>
+</table>
+<div id="cell-4" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> dask.dataframe <span class="im">as</span> dd</span>
@@ -299,13 +349,29 @@ Pre-requisites
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Display</span></span>
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code></pre></div>
 </div>
-<section id="threaded-downloading" class="level2">
-<h2 class="anchored" data-anchor-id="threaded-downloading">Threaded Downloading</h2>
-<p>To start giving an overview of local data analysis techniques, I’ll surely need data. I’m going to retrieve BART’s hourly ridership data – here is the homepage of the BART data portal:</p>
+<section id="data-retrieval" class="level2">
+<h2 class="anchored" data-anchor-id="data-retrieval">Data Retrieval</h2>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Pre-requisites
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>For-loops and basic control flow in Python</li>
+<li>Familiarity with web data retrieval</li>
+</ul>
+</div>
+</div>
+<p>The first thing I need for my example data pipeline is data. I’m going to retrieve BART’s hourly ridership data, accessible via the BART data portal:</p>
 <div id="fig-zero" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-zero-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: BART data portal
+Figure&nbsp;2: BART data portal
 </figcaption>
 <div aria-describedby="fig-zero-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="portal.png" class="img-fluid figure-img" style="width:80.0%">
@@ -313,35 +379,34 @@ Figure&nbsp;1: BART data portal
 </figure>
 </div>
 <p>The specific url for the hourly ridership data is as follows:</p>
-<div id="cell-5" class="cell" data-execution_count="2">
+<div id="cell-6" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">'https://afcweb.bart.gov/ridership/origin-destination/'</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>url</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>'https://afcweb.bart.gov/ridership/origin-destination/'</code></pre>
 </div>
 </div>
-<p>With a page that looks as follows:</p>
+<p>This is a very simple page with direct download links to each year’s ridership data.</p>
 <div id="fig-pointfive" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-pointfive-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Origin-destination pairing data
+Figure&nbsp;3: Origin-destination pairing data
 </figcaption>
 <div aria-describedby="fig-pointfive-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="pairings.png" class="img-fluid figure-img" style="width:80.0%">
 </div>
 </figure>
 </div>
-<p>The end goal will be to iterate through each of those links, downloading the files one by one.</p>
-<p>Toward that goal, I’ll start by setting up a retrieval script using <code>requests</code> and <code>BeautifulSoup</code> to build programmatic access to that page.</p>
-<div id="cell-9" class="cell">
+<p>I want to download all of these files, so I will need to iterate through each of those links, downloading the files one by one. Toward that goal, I’ll start by setting up a retrieval script using <code>requests</code> and <code>BeautifulSoup</code>.</p>
+<div id="cell-10" class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> requests.get(url)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> response.status_code <span class="op">==</span> <span class="dv">200</span>:</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    soup <span class="op">=</span> BeautifulSoup(response.text, <span class="st">'html.parser'</span>)</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Failed to retrieve the webpage"</span>)</span></code></pre></div>
 </div>
-<p>Within the page, my target is the set of .csv.gz (compressed .csv files), each of which contain hourly ridership totals between each station pairing in the BART system. These are all links, thus are in <code>&lt;a&gt; &lt;/a&gt;</code> tags, and have an <code>href</code> that ends in <code>.csv.gz</code>. The following captures links to that specification:</p>
-<div id="cell-11" class="cell" data-execution_count="4">
+<p>Within the page, my target is the set of .csv.gz (compressed .csv files), each of which contain hourly ridership totals between each station pairing in the BART system. These are all links in <code>&lt;a&gt; &lt;/a&gt;</code> HTML tags, and have an <code>href</code> that ends in <code>.csv.gz</code>. The following captures links to that specification:</p>
+<div id="cell-12" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>links <span class="op">=</span> soup.find_all(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">'a'</span>,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    href<span class="op">=</span><span class="kw">lambda</span> x: x <span class="kw">and</span> x.endswith(<span class="st">".csv.gz"</span>)</span>
@@ -352,7 +417,7 @@ Figure&nbsp;2: Origin-destination pairing data
 </div>
 </div>
 <p>I’m specifically interested in the file that each <code>&lt;a&gt;&lt;/a&gt;</code> chunk links to, which is contained in its <code>href</code> tag. I can capture the <code>href</code> for each of these pieces of html as follows</p>
-<div id="cell-13" class="cell" data-execution_count="5">
+<div id="cell-14" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>files <span class="op">=</span> [link.get(<span class="st">'href'</span>) <span class="cf">for</span> link <span class="kw">in</span> links]</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>files[<span class="dv">0</span>]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
@@ -360,7 +425,7 @@ Figure&nbsp;2: Origin-destination pairing data
 </div>
 </div>
 <p>I’ve now captured the filename, which is a relative url. To download this, I’ll need to convert this to a full url, by concatenating the base url to each of the files’ relative urls. This leaves us with direct links that each prompt the download of one year’s worth of hourly trip totals between the station pairings in the system:</p>
-<div id="cell-15" class="cell" data-execution_count="6">
+<div id="cell-16" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>file_urls <span class="op">=</span> [url <span class="op">+</span> f <span class="cf">for</span> f <span class="kw">in</span> files]</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>file_urls</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
@@ -375,7 +440,7 @@ Figure&nbsp;2: Origin-destination pairing data
 </div>
 </div>
 <p>This is our target data. Before proceeding to download all of it for local storage, we’ll profile the sizes of each file and the total download:</p>
-<div id="cell-17" class="cell" data-execution_count="7">
+<div id="cell-18" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>counter <span class="op">=</span> <span class="dv">1</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>total_size <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> f <span class="kw">in</span> file_urls:</span>
@@ -398,14 +463,14 @@ Total size of data: 244.260304 mega-bytes</code></pre>
 </div>
 </div>
 <p>Looks manageable enough. We’ll proceed to download all of this into a folder, <code>data</code>. Since we are storing a semi-large amount of data in <code>data</code>, we will also set up a <code>.gitignore</code> to make sure that it doesn’t end up being tracked in version control.</p>
-<div id="cell-19" class="cell" data-execution_count="8">
+<div id="cell-20" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a .gitignore file</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>gitignore_content <span class="op">=</span> <span class="st">"data/</span><span class="ch">\n</span><span class="st">"</span>  <span class="co"># Content to exclude the "data" folder</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'.gitignore'</span>, <span class="st">'w'</span>) <span class="im">as</span> gitignore_file:</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    gitignore_file.write(gitignore_content)</span></code></pre></div>
 </div>
 <p>To actually download the data, we’ll start by setting up a generic download function:</p>
-<div id="cell-21" class="cell" data-execution_count="9">
+<div id="cell-22" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> download_file(url:<span class="bu">str</span>, filename:<span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Downloads a file from a given URL</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">    and saves it with the specified filename."""</span></span>
@@ -426,7 +491,7 @@ Total size of data: 244.260304 mega-bytes</code></pre>
 </ul></li>
 </ul>
 <p>These conditions should ensure that we don’t waste time and bandwidth re-downloading files that we already have, and that we always have the most up-to-date data for the current year.</p>
-<div id="cell-23" class="cell" data-execution_count="10">
+<div id="cell-24" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> download_bart_file(url: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Downloads BART ridership data file if not</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">    already present or if it's current year data."""</span></span>
@@ -443,11 +508,11 @@ Total size of data: 244.260304 mega-bytes</code></pre>
 </div>
 <section id="threading" class="level3">
 <h3 class="anchored" data-anchor-id="threading">Threading</h3>
-<p>When downloading a series of files via a for-loop, <a href="https://docs.python.org/3/library/threading.html">thread-based parallelism</a> can speed up the process (more on why in a moment). Thread-based parallelism, or, threading, involves breaking a process into smaller units (<a href="https://en.wikipedia.org/wiki/Thread_(computing)">threads</a>) and running them concurrently on shared memory to complete the larger process faster. To implement a a threaded workflow, I’ll use python’s <code>ThreadPoolExecutor</code>, a high-level library that makes it easy to distribute for-loop iterations across threads. I’ll also use <code>tqdm</code> to track the download progress.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
-<div id="cell-25" class="cell">
+<p>When downloading a series of files via a for-loop, <a href="https://docs.python.org/3/library/threading.html">thread-based parallelism</a> can speed up the process (more on why in a moment). Thread-based parallelism, or, threading, involves breaking a process into smaller units (<a href="https://en.wikipedia.org/wiki/Thread_(computing)">threads</a>) and running them concurrently on shared memory to complete the larger process faster. To implement a a threaded workflow, I’ll use python’s <code>ThreadPoolExecutor</code>, a high-level library that makes it easy to distribute for-loop iterations across threads.</p>
+<div id="cell-26" class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> ThreadPoolExecutor(max_workers<span class="op">=</span><span class="dv">10</span>) <span class="im">as</span> executor:</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    futures <span class="op">=</span> [executor.submit(download_bart_file, url) <span class="cf">for</span> url <span class="kw">in</span> file_urls]</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> f <span class="kw">in</span> tqdm(as_completed(futures), total<span class="op">=</span><span class="bu">len</span>(futures)):</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> f <span class="kw">in</span> as_completed(futures):</span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>        f.result()</span></code></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>100%|██████████| 8/8 [00:05&lt;00:00,  1.54it/s]</code></pre>
@@ -457,8 +522,14 @@ Total size of data: 244.260304 mega-bytes</code></pre>
 </section>
 <section id="is-threading-worth-it" class="level3">
 <h3 class="anchored" data-anchor-id="is-threading-worth-it">Is threading worth it?</h3>
-<p>Given the extra effort, it’s worth asking if setting up the multi-threaded download workflow above was worth it. The following code chunk runs a simple comparison of a sequential for-loop approach vs.&nbsp;threaded downloads of the BART data:</p>
-<div id="cell-28" class="cell" data-execution_count="15">
+<p>Given the extra effort, it’s worth asking if setting up the multi-threaded download workflow above was worth it. First, the theoretical answer:</p>
+<p>The task at hand involved downloading files, which is an <a href="https://en.wikipedia.org/wiki/I/O_bound">I/O bound</a> task – much of the execution time is spent waiting for downloads to be completed. Threading allows one to run I/O bound processes “concurrently.” When one “<a href="https://en.wikipedia.org/wiki/Thread_(computing)">thread</a>” is waiting for a download to complete, another thread can download a different file. Note that if the task were instead <a href="https://en.wikipedia.org/wiki/CPU-bound">CPU bound</a> – where most of the execution time is spent on computation – we would see less of or else no threading premium.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
+<blockquote class="blockquote">
+<p>Threads are particularly useful when tasks are I/O bound, such as file operations or making <strong>network requests</strong>, where much of the time is spent waiting for external resources.<br>
+– <a href="https://docs.python.org/3/library/threading.html">Python docs</a></p>
+</blockquote>
+<p>Given the theoretical motivation, let’s run a simple comparison of a sequential for-loop approach vs.&nbsp;threaded downloads of the BART data:</p>
+<div id="cell-29" class="cell" data-execution_count="15">
 <details class="code-fold">
 <summary>Threading Speedup, Single Trial</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add the test results to .gitignore</span></span>
@@ -560,7 +631,7 @@ Threading Speedup: 1.28× faster</code></pre>
 </div>
 </div>
 <p>In that trial, threading is good for a speedup. However, there’s plenty of noise in I/O speeds, particularly when downloading from a remote server that may have some rate-limiting or other automatic interventions affecting requests. For more confidence, we’ll run this benchmark multiple times and look at the distribution of speedups:</p>
-<div id="cell-30" class="cell" data-execution_count="17">
+<div id="cell-31" class="cell" data-execution_count="17">
 <details class="code-fold">
 <summary>Threaded Speedup Experiment</summary>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Config ---</span></span>
@@ -675,7 +746,43 @@ Estimate (50th pct): 0.1987
 CI (2.5th-97.5th pct): [0.1336, 0.2649]</code></pre>
 </div>
 </div>
-<p>So we see a real speedup from threading– about a 20% faster total download time, with a 95% Confidence Interval [13%, 26%]. In terms of raw times, we save almost 1 second on average for this download task. This is very marginal for the onetime download of this dataset, but for larger collections of datasets or repeated downloads, this sort of small improvement makes for a smoother data retrieval experience.</p>
+<p>So across 20 trials we see a real speedup from threading– about <strong>a 20% faster total download time</strong>, with a 95% Confidence Interval [13%, 26%].</p>
+<section id="important-caveats" class="level4">
+<h4 class="anchored" data-anchor-id="important-caveats">Important Caveats</h4>
+<p>Clearly threading is helping, but let’s put that benefit in the context of the whole data retrieval pipeline:</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div id="fig-data" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-data-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Retrieval steps from the data pipeline
+</figcaption>
+<div aria-describedby="fig-data-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div>
+<pre class="mermaid mermaid-js" data-label="fig-data">flowchart LR
+
+    C[("Download files&lt;br&gt;Convert+store for analytics&lt;br&gt;")]
+subgraph one ["One time setup"]
+C
+end
+
+%% Weekly incremental update and analytics
+subgraph weekly ["Weekly data update cycle"]
+    direction LR
+    C --&gt; F[("Re-download newest file")]
+end
+
+style one fill:none
+style weekly fill:none
+</pre>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>Threading helps us download all of the files, <strong>but we only do that once</strong>. Our recurring data update, where we re-download the newest data file at a time will see no benefit from threading because we are only re-downloading one file.</p>
+<p>The 20% one-time improvement in download time is still significant, but for this relatively small task that only amounts to a 1 second speedup at the median:</p>
 <div id="cell-fig-9" class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -694,7 +801,7 @@ CI (2.5th-97.5th pct): [0.1336, 0.2649]</code></pre>
 <div id="fig-9" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-9-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: Time Comparison: threaded vs.&nbsp;un-threaded for-loop downloads
+Figure&nbsp;5: Time Comparison: threaded vs.&nbsp;un-threaded for-loop downloads
 </figcaption>
 <div aria-describedby="fig-9-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="index_files/figure-html/fig-9-output-1.png" class="img-fluid figure-img">
@@ -703,24 +810,100 @@ Figure&nbsp;3: Time Comparison: threaded vs.&nbsp;un-threaded for-loop downloads
 </div>
 </div>
 </div>
+<p>This is benefit is marginal, and it’s introduced a real cost – the code with threading is less readable to other programmers than the simple for-loop. Consider the vanilla for-loop approach:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>Vanilla for-loop data retrieval code</strong></pre>
+</div>
+<div class="sourceCode" id="cb23" data-filename="Vanilla for-loop data retrieval code"><pre class="sourceCode numberSource python number-lines"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1"></a><span class="cf">for</span> url <span class="kw">in</span> file_urls:</span>
+<span id="cb23-2"><a href="#cb23-2"></a>    download_bart_file(url)</span></code></pre></div>
+</div>
+<p>The for-loop and clear variable naming make the code self-explanatory: <em>for each url in the list of file urls, download the file.</em> Now consider the threaded code:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>Threaded data retrieval code</strong></pre>
+</div>
+<div class="sourceCode" id="cb24" data-filename="Threaded data retrieval code"><pre class="sourceCode numberSource python number-lines"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1"></a><span class="cf">with</span> ThreadPoolExecutor(max_workers<span class="op">=</span><span class="dv">10</span>) <span class="im">as</span> executor:</span>
+<span id="cb24-2"><a href="#cb24-2"></a>    futures <span class="op">=</span> [executor.submit(download_bart_file, url) <span class="cf">for</span> url <span class="kw">in</span> file_urls]</span>
+<span id="cb24-3"><a href="#cb24-3"></a>    <span class="cf">for</span> f <span class="kw">in</span> as_completed(futures):</span>
+<span id="cb24-4"><a href="#cb24-4"></a>        f.result()</span></code></pre></div>
+</div>
+<p>Even programmers with extensive exposure to Python may experience difficulty reading this code, which includes elements unique to the <code>concurrent.futures</code> API and a context manager <code>with</code> statement. This cost means people – and yourself in a few months – will spend extra time trying to understand this code that they wouldn’t have spent on the for-loop.</p>
 </section>
-<section id="why-does-threading-help" class="level3">
-<h3 class="anchored" data-anchor-id="why-does-threading-help">Why does threading help?</h3>
-<p>Our positive threading effect is likely due to the fact that the download process is <a href="https://en.wikipedia.org/wiki/I/O_bound">I/O bound</a> – much of the execution time is spent waiting for downloads to be completed. Threading allows us to run I/O bound processes like downloads concurrently. When one thread is waiting for a download to complete, another thread can be actively downloading a different file.</p>
-<blockquote class="blockquote">
-<p>Threads are particularly useful when tasks are I/O bound, such as file operations or making <strong>network requests</strong>, where much of the time is spent waiting for external resources.<br>
-– <a href="https://docs.python.org/3/library/threading.html">Python docs for threading</a></p>
-</blockquote>
-<p>If the process were <a href="https://en.wikipedia.org/wiki/CPU-bound">CPU bound</a> – where most of the execution time is spent on computation – we would see less of or else no threading premium, and if we wanted to speed such a process up we would need to explore true parallel processing (e.g.&nbsp;via <a href="https://docs.python.org/3/library/multiprocessing.html">multiprocessing</a>) rather than threading. That gets much more complicated, as CPU-bound processes often aren’t as obviously divisible as I/O for-loops, and achieving true parallelism in Python requires bypassing the “<a href="https://realpython.com/python-gil/">Global Interpreter Lock</a>” – a topic for another day.</p>
+<section id="conclusion" class="level4">
+<h4 class="anchored" data-anchor-id="conclusion">Conclusion</h4>
+<p>Threading is great for I/O bound tasks like multiple file downloading, but it does make your code less readable. For large download jobs this is likely worth it, but threading may not be appropriate for smaller jobs due to the code complexity costs. <strong>In this example, the 1-2 seconds saved on the download will almost certainly be offset by the extra minutes it will take to read the complex code later</strong>.</p>
+<p>Here’s an informal rating system to compare these techniques:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 20%">
+<col style="width: 32%">
+<col style="width: 29%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Technique</th>
+<th>Speed Benefit (~10 files)</th>
+<th>Speed Benefit (~1k files)</th>
+<th>Readability</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>vanilla for-loop</td>
+<td>⭐⭐</td>
+<td>⭐</td>
+<td>⭐⭐⭐⭐⭐</td>
+</tr>
+<tr class="even">
+<td>threading</td>
+<td>⭐⭐⭐</td>
+<td>⭐⭐⭐⭐⭐</td>
+<td>⭐⭐</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Further reading
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>“Faster Web Scraping” a <a href="https://beckernick.github.io/faster-web-scraping-python/">blog post</a> by Nick Decker</li>
+<li>“Threading” <a href="https://docs.python.org/3/library/threading.html">in the Python docs</a></li>
+<li>“How efficient is threading in Python?” <a href="https://stackoverflow.com/questions/5128072/how-efficient-is-threading-in-python/5128129#5128129">a stackoverflow response</a> by Jesse Cohen</li>
+</ul>
+</div>
+</div>
 </section>
 </section>
-<section id="column-oriented-data-storage" class="level2">
-<h2 class="anchored" data-anchor-id="column-oriented-data-storage">Column-Oriented Data Storage</h2>
-<p>Now we have the data downloaded locally, but how should we permanently store it? I’d like my storage choice to achieve the following two goals:</p>
-<ol type="1">
-<li>minimize the amount of disk space it takes up, and</li>
-<li>minimize read-in time and memory allocation.</li>
-</ol>
+</section>
+<section id="data-storage" class="level2">
+<h2 class="anchored" data-anchor-id="data-storage">Data Storage</h2>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Pre-requisites
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Intermediate <code>pandas</code></li>
+<li>Familiarity with file compression, e.g.&nbsp;<code>.zip</code>, and binary data versus plain text</li>
+</ul>
+</div>
+</div>
+<p>Now we have the data downloaded locally, but how should we permanently store it? We could keep the data in the compressed <code>.csv.gz</code> format that it came in, we could decompress the data and store it as plain <code>.csv</code> files, or we could convert the data to a more efficient, modern format for tabular data storage. Every format has tradeoffs, so I’ll benchmark several options and discuss the pros and cons.</p>
+<p>I’d like my storage choice to minimize the amount of disk space it takes up, and minimize read-in time and memory allocation.</p>
 <p>I’m going to advocate for storing the data in <a href="https://parquet.apache.org/"><code>parquet</code> format</a>, a <strong>column-oriented</strong> data storage format developed by Apache. When we convert to parquet we’ll get two core benefits over <code>.csv</code>-based formats:</p>
 <ol type="1">
 <li><code>parquet</code> makes tabular data files smaller.</li>
@@ -728,10 +911,14 @@ Figure&nbsp;3: Time Comparison: threaded vs.&nbsp;un-threaded for-loop downloads
 </ol>
 <p>But don’t take my word for it – lets benchmark <code>parquet</code> against the original <code>.csv.gz</code> files and an additional <code>.csv</code> conversion.</p>
 <p>To do a batch conversion from <code>.csv.gz</code> into parquet, I’m going to use <code>dask</code>, a python data frame library that allows for “lazily” reading in the full directory of <code>.csv.gz</code> files without having all the data in memory at once (more on <code>dask</code> in the next section).</p>
-<div id="cell-37" class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>all_csv_paths <span class="op">=</span> [<span class="st">"data/"</span> <span class="op">+</span> f <span class="cf">for</span> f <span class="kw">in</span> os.listdir(<span class="st">"data"</span>) <span class="cf">if</span> f.endswith(<span class="st">".gz"</span>)]</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> dd.read_csv(all_csv_paths, blocksize<span class="op">=</span><span class="va">None</span>, compression<span class="op">=</span><span class="st">'gzip'</span>, names<span class="op">=</span>[<span class="st">'Date'</span>, <span class="st">'Hour'</span>, <span class="st">'Start'</span>, <span class="st">'End'</span>, <span class="st">'Riders'</span>])</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>data</span></code></pre></div>
+<div id="cell-42" class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>all_csv_paths <span class="op">=</span> [<span class="st">"data/"</span> <span class="op">+</span> f <span class="cf">for</span> f <span class="kw">in</span> os.listdir(<span class="st">"data"</span>) <span class="cf">if</span> f.endswith(<span class="st">".gz"</span>)]</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> dd.read_csv(</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    all_csv_paths,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    blocksize<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    compression<span class="op">=</span><span class="st">"gzip"</span>,</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    names<span class="op">=</span>[<span class="st">"Date"</span>, <span class="st">"Hour"</span>, <span class="st">"Start"</span>, <span class="st">"End"</span>, <span class="st">"Riders"</span>],</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="13">
 <div><strong>Dask DataFrame Structure:</strong></div>
 
@@ -803,13 +990,13 @@ Figure&nbsp;3: Time Comparison: threaded vs.&nbsp;un-threaded for-loop downloads
 </div>
 <p>…</p>
 <p>Now I’ll establish subdirectories in <code>data</code> for the <code>parquet</code> data and for the <code>csv</code> data, and write out to those folders using <code>dask</code>, with a progress bar to monitor how long this takes (note that these progress bars will not be visible in this document).</p>
-<div id="cell-39" class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">'data/parquet_data'</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">'data/csv_data'</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>pbar <span class="op">=</span> ProgressBar()</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>pbar.register()</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>data.to_parquet(<span class="st">'data/parquet_data'</span>, write_index<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>data.to_csv(<span class="st">'data/csv_data/full_data_*.csv'</span>, index<span class="op">=</span><span class="va">False</span>)</span></code></pre></div>
+<div id="cell-44" class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">'data/parquet_data'</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">'data/csv_data'</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>pbar <span class="op">=</span> ProgressBar()</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>pbar.register()</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>data.to_parquet(<span class="st">'data/parquet_data'</span>, write_index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>data.to_csv(<span class="st">'data/csv_data/full_data_*.csv'</span>, index<span class="op">=</span><span class="va">False</span>)</span></code></pre></div>
 </div>
 <section id="is-parquet-worth-it" class="level3">
 <h3 class="anchored" data-anchor-id="is-parquet-worth-it">Is <code>parquet</code> worth it?</h3>
@@ -817,38 +1004,38 @@ Figure&nbsp;3: Time Comparison: threaded vs.&nbsp;un-threaded for-loop downloads
 <section id="storage" class="level4">
 <h4 class="anchored" data-anchor-id="storage">Storage</h4>
 <p>For comparing storage size, I’ll write a helper function to calculate the total bytes of all the files in a given directory.</p>
-<div id="cell-41" class="cell" data-execution_count="29">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_local_bytes(directory: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">int</span>:</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    contents: <span class="bu">list</span>[<span class="bu">str</span>] <span class="op">=</span> os.listdir(directory)</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    contents_w_path: <span class="bu">list</span>[<span class="bu">str</span>] <span class="op">=</span> [os.path.join(directory, f) <span class="cf">for</span> f <span class="kw">in</span> contents]</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    files_not_folders: <span class="bu">list</span>[<span class="bu">str</span>] <span class="op">=</span> [f <span class="cf">for</span> f <span class="kw">in</span> contents_w_path</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>                         <span class="cf">if</span> os.path.isfile(f)]</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">sum</span>(os.path.getsize(f) <span class="cf">for</span> f <span class="kw">in</span> files_not_folders)</span></code></pre></div>
+<div id="cell-46" class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_local_bytes(directory: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">int</span>:</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    contents: <span class="bu">list</span>[<span class="bu">str</span>] <span class="op">=</span> os.listdir(directory)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    contents_w_path: <span class="bu">list</span>[<span class="bu">str</span>] <span class="op">=</span> [os.path.join(directory, f) <span class="cf">for</span> f <span class="kw">in</span> contents]</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    files_not_folders: <span class="bu">list</span>[<span class="bu">str</span>] <span class="op">=</span> [f <span class="cf">for</span> f <span class="kw">in</span> contents_w_path</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>                         <span class="cf">if</span> os.path.isfile(f)]</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">sum</span>(os.path.getsize(f) <span class="cf">for</span> f <span class="kw">in</span> files_not_folders)</span></code></pre></div>
 </div>
 <p>The results are as follows:</p>
 <div id="cell-fig-1" class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">3</span>))</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="dv">2000</span>)</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">'.csv'</span>: [<span class="bu">round</span>(get_local_bytes(<span class="st">'data/csv_data'</span>)<span class="op">*</span><span class="fl">10e-7</span>, <span class="dv">0</span>)],</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">'.csv.gz'</span>: [<span class="bu">round</span>(get_local_bytes(<span class="st">'data'</span>)<span class="op">*</span><span class="fl">10e-7</span>, <span class="dv">0</span>)],</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">'parquet'</span>: [<span class="bu">round</span>(get_local_bytes(<span class="st">'data/parquet_data'</span>)<span class="op">*</span><span class="fl">10e-7</span>, <span class="dv">0</span>)]</span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    }, index<span class="op">=</span>[<span class="st">'Bart Data Size'</span>]</span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>).T.plot.bar(ax<span class="op">=</span>ax)</span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>ax.bar_label(ax.containers[<span class="dv">0</span>], fmt<span class="op">=</span><span class="st">"</span><span class="sc">%g</span><span class="st"> megabytes"</span>)</span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(ylabel<span class="op">=</span><span class="st">'Megabytes'</span>, xlabel<span class="op">=</span><span class="st">'File Type'</span>)</span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>ax.tick_params(axis<span class="op">=</span><span class="st">'x'</span>, rotation<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>fig.savefig(<span class="st">'fig1.png'</span>, dpi<span class="op">=</span><span class="dv">300</span>)</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">3</span>))</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="dv">2000</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">'.csv'</span>: [<span class="bu">round</span>(get_local_bytes(<span class="st">'data/csv_data'</span>)<span class="op">*</span><span class="fl">10e-7</span>, <span class="dv">0</span>)],</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">'.csv.gz'</span>: [<span class="bu">round</span>(get_local_bytes(<span class="st">'data'</span>)<span class="op">*</span><span class="fl">10e-7</span>, <span class="dv">0</span>)],</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">'parquet'</span>: [<span class="bu">round</span>(get_local_bytes(<span class="st">'data/parquet_data'</span>)<span class="op">*</span><span class="fl">10e-7</span>, <span class="dv">0</span>)]</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    }, index<span class="op">=</span>[<span class="st">'Bart Data Size'</span>]</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>).T.plot.bar(ax<span class="op">=</span>ax)</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>ax.bar_label(ax.containers[<span class="dv">0</span>], fmt<span class="op">=</span><span class="st">"</span><span class="sc">%g</span><span class="st"> megabytes"</span>)</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(ylabel<span class="op">=</span><span class="st">'Megabytes'</span>, xlabel<span class="op">=</span><span class="st">'File Type'</span>)</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>ax.tick_params(axis<span class="op">=</span><span class="st">'x'</span>, rotation<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>fig.savefig(<span class="st">'fig1.png'</span>, dpi<span class="op">=</span><span class="dv">300</span>)</span></code></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div id="fig-1" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4: Storage Comparison: .csv.gz, .csv, .parquet
+Figure&nbsp;6: Storage Comparison: .csv.gz, .csv, .parquet
 </figcaption>
 <div aria-describedby="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="index_files/figure-html/fig-1-output-1.png" class="img-fluid figure-img">
@@ -861,36 +1048,36 @@ Figure&nbsp;4: Storage Comparison: .csv.gz, .csv, .parquet
 </section>
 <section id="read-in" class="level4">
 <h4 class="anchored" data-anchor-id="read-in">Read-in</h4>
-<p>Now, compression is one thing, but compressing a dataset is going to be less useful if it takes a long time to read the data back into memory. So let’s also benchmark read-in times for each of these formats using <code>pandas</code> for read-in.</p>
-<div id="cell-47" class="cell">
+<p>Now, compression is one thing, but compressing a dataset is going to be less useful for our purposes if it slows down data read-in. So, let’s also benchmark read-in times for each of these formats using <code>pandas</code>. Since read-in times can be noisy, I run each read-in multiple times and take the average time for each format.</p>
+<div id="cell-52" class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> files_for(glob_pat: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">str</span>]:</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    files <span class="op">=</span> <span class="bu">sorted</span>(glob.glob(glob_pat))</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> files:</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(<span class="ss">f"No files for pattern: </span><span class="sc">{</span>glob_pat<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> files</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> read_pandas_csv(glob_pat: <span class="bu">str</span>):</span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> glob_pat <span class="op">==</span> <span class="st">"data/*.csv.gz"</span>:</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> pd.concat((pd.read_csv(f, names<span class="op">=</span>[<span class="st">'Date'</span>, <span class="st">'Hour'</span>, <span class="st">'Start'</span>, <span class="st">'End'</span>, <span class="st">'Riders'</span>], low_memory<span class="op">=</span><span class="va">False</span>) <span class="cf">for</span> f <span class="kw">in</span> files_for(glob_pat)), ignore_index<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> pd.concat((pd.read_csv(f, low_memory<span class="op">=</span><span class="va">False</span>) <span class="cf">for</span> f <span class="kw">in</span> files_for(glob_pat)), ignore_index<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">3</span>))</span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> (read_pandas_csv(<span class="st">'results/*.csv'</span>)</span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>      .query(<span class="st">"stage == 'read'"</span>)</span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>      .query(<span class="st">"engine == 'pandas'"</span>)</span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>      .groupby([<span class="st">'engine'</span>, <span class="st">'filetype'</span>])[<span class="st">'seconds'</span>]</span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>      .mean()</span>
-<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>      .sort_values(ascending<span class="op">=</span><span class="va">False</span>))</span>
-<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>df.T.plot.bar(ax<span class="op">=</span>ax)</span>
-<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>ax.bar_label(ax.containers[<span class="dv">0</span>], fmt<span class="op">=</span><span class="st">" </span><span class="sc">%.2f</span><span class="st"> seconds"</span>)</span>
-<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="dv">25</span>)</span>
-<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(ylabel<span class="op">=</span><span class="st">'Seconds'</span>, xlabel<span class="op">=</span><span class="st">'(Package, Storage Method)'</span>)</span>
-<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>ax.tick_params(axis<span class="op">=</span><span class="st">'x'</span>, rotation<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Read-in Performance Comparison'</span>)</span>
-<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> files_for(glob_pat: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">str</span>]:</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    files <span class="op">=</span> <span class="bu">sorted</span>(glob.glob(glob_pat))</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> files:</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(<span class="ss">f"No files for pattern: </span><span class="sc">{</span>glob_pat<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> files</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> read_pandas_csv(glob_pat: <span class="bu">str</span>):</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> glob_pat <span class="op">==</span> <span class="st">"data/*.csv.gz"</span>:</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> pd.concat((pd.read_csv(f, names<span class="op">=</span>[<span class="st">'Date'</span>, <span class="st">'Hour'</span>, <span class="st">'Start'</span>, <span class="st">'End'</span>, <span class="st">'Riders'</span>], low_memory<span class="op">=</span><span class="va">False</span>) <span class="cf">for</span> f <span class="kw">in</span> files_for(glob_pat)), ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> pd.concat((pd.read_csv(f, low_memory<span class="op">=</span><span class="va">False</span>) <span class="cf">for</span> f <span class="kw">in</span> files_for(glob_pat)), ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">3</span>))</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> (read_pandas_csv(<span class="st">'results/*.csv'</span>)</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>      .query(<span class="st">"stage == 'read'"</span>)</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>      .query(<span class="st">"engine == 'pandas'"</span>)</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>      .groupby([<span class="st">'engine'</span>, <span class="st">'filetype'</span>])[<span class="st">'seconds'</span>]</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>      .mean()</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>      .sort_values(ascending<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>df.T.plot.bar(ax<span class="op">=</span>ax)</span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>ax.bar_label(ax.containers[<span class="dv">0</span>], fmt<span class="op">=</span><span class="st">" </span><span class="sc">%.2f</span><span class="st"> seconds"</span>)</span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="dv">25</span>)</span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(ylabel<span class="op">=</span><span class="st">'Seconds'</span>, xlabel<span class="op">=</span><span class="st">'(Package, Storage Method)'</span>)</span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>ax.tick_params(axis<span class="op">=</span><span class="st">'x'</span>, rotation<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Read-in Performance Comparison'</span>)</span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -903,8 +1090,8 @@ Figure&nbsp;4: Storage Comparison: .csv.gz, .csv, .parquet
 </div>
 </section>
 </section>
-<section id="why-did-parquet-help" class="level3">
-<h3 class="anchored" data-anchor-id="why-did-parquet-help">Why did parquet help?</h3>
+<section id="discussion" class="level3">
+<h3 class="anchored" data-anchor-id="discussion">Discussion</h3>
 <p>Parquet files are smaller than <code>.csv.gz</code> (and certainly smaller than uncompressed .csv) because they store data <strong>by column instead of by row</strong> — this is called <em>column-oriented storage</em>. That means all the values from one column (like all the BART station names) are stored together, e.g.&nbsp;<code>[Civic Center, Civic Center, Fruitvale, Fruitvale]</code>, making patterns easier to spot and compress. Both parquet and <code>.csv.gz</code> are compressed formats, but a <code>.csv.gz</code> file, which is row-oriented, mixes all of the features (Date, Hour, Start Station, End Station, Number of Riders) together as text at the row level, e.g.&nbsp;<code>[11/3/2020, Civic Center, Fruitvale, 10]</code>. This mixed data <a href="https://en.wikipedia.org/wiki/Data_orientation#Compressed_size">doesn’t compress as well</a>.</p>
 <p><code>parquet</code> is binary (as opposed to text-based like <code>.csv</code>), so it’s not human-readable.</p>
 <div class="quarto-figure quarto-figure-center">
@@ -917,6 +1104,12 @@ Figure&nbsp;4: Storage Comparison: .csv.gz, .csv, .parquet
 <p>For all its advantages, Parquet is <em>very</em> complicated […]. Up to a certain data size the advantage of CSV is not that it is a better format (it is decidedly, absolutely worse/more ambiguous than Parquet) but the fact that you can write a valid CSV in a couple of lines of anything, and read in a couple of lines of anything.</p>
 </blockquote>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 20%">
+<col style="width: 32%">
+<col style="width: 29%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>Format</th>
@@ -936,13 +1129,13 @@ Figure&nbsp;4: Storage Comparison: .csv.gz, .csv, .parquet
 <td><code>csv.gz</code></td>
 <td>⭐⭐⭐</td>
 <td>⭐</td>
-<td>⭐</td>
+<td>⭐ (compressed)</td>
 </tr>
 <tr class="odd">
 <td><code>parquet</code></td>
 <td>⭐⭐⭐⭐⭐</td>
 <td>⭐⭐⭐⭐⭐</td>
-<td>⭐</td>
+<td>⭐ (compressed)</td>
 </tr>
 </tbody>
 </table>
@@ -964,28 +1157,28 @@ Further reading
 </div>
 </section>
 </section>
-<section id="beyond-pandas" class="level2">
-<h2 class="anchored" data-anchor-id="beyond-pandas">Beyond <code>pandas</code></h2>
+<section id="data-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="data-analysis">Data Analysis</h2>
 <p>Clearly <code>parquet</code> has impressive compression qualities, but we should also evaluate it along the other qualities that have big impacts on day-to-day usage: read-in speed and memory usage. When data read-in is sluggish, iterating on an analysis or otherwise repeatedly running code becomes extremely unenjoyable, and when data is too large for memory many tools, particularly <code>pandas</code>, start to run extremely slowly or else just stop working.</p>
 <p>We can and will benchmark all of those formats just using <code>pandas</code> for read-in, but this is also a good opportunity to introduce two additional, modern tools for efficient data read-in and aggregation: <code>dask</code> and <code>duckdb</code>. These tools leverage concurrency, out of memory processing, and other techniques to speed up data analysis tasks and often far outperform standard <code>pandas</code> workflows.</p>
-<div id="cell-57" class="cell" data-execution_count="82">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>start <span class="op">=</span> time.time()</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> dd.read_parquet(<span class="st">'data/parquet_data'</span>, low_memory<span class="op">=</span><span class="va">False</span>).compute()</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>dask_parquet_end <span class="op">=</span> time.time() <span class="op">-</span> start</span></code></pre></div>
+<div id="cell-62" class="cell" data-execution_count="82">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>start <span class="op">=</span> time.time()</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> dd.read_parquet(<span class="st">'data/parquet_data'</span>, low_memory<span class="op">=</span><span class="va">False</span>).compute()</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>dask_parquet_end <span class="op">=</span> time.time() <span class="op">-</span> start</span></code></pre></div>
 </div>
 <p>Note that I called <code>start = time.time()</code> and <code>dask_parquet_endtime = time.time()</code> to store the time that it takes to complete this task.</p>
 <p>Anyways, we just loaded in fairly large data:</p>
-<div id="cell-60" class="cell" data-execution_count="83">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Rows: </span><span class="sc">{</span>df<span class="sc">.</span>shape[<span class="dv">0</span>] <span class="sc">:,}</span><span class="ss">"</span>)</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Columns:"</span>, df.shape[<span class="dv">1</span>])</span></code></pre></div>
+<div id="cell-65" class="cell" data-execution_count="83">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Rows: </span><span class="sc">{</span>df<span class="sc">.</span>shape[<span class="dv">0</span>] <span class="sc">:,}</span><span class="ss">"</span>)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Columns:"</span>, df.shape[<span class="dv">1</span>])</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 65,576,115
 Columns: 5</code></pre>
 </div>
 </div>
 <p>and this data is now all in memory as a <code>pandas</code> dataframe, ready for typical use.</p>
-<div id="cell-62" class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>df.head()</span></code></pre></div>
+<div id="cell-67" class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>df.head()</span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 
@@ -1049,18 +1242,18 @@ Columns: 5</code></pre>
 </div>
 </div>
 <p>Further, <code>dask</code> completed that read-in task in what seems like a short amount of time:</p>
-<div id="cell-64" class="cell" data-execution_count="84">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">round</span>(dask_parquet_end, <span class="dv">2</span>), <span class="st">"seconds"</span>)</span></code></pre></div>
+<div id="cell-69" class="cell" data-execution_count="84">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">round</span>(dask_parquet_end, <span class="dv">2</span>), <span class="st">"seconds"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>2.24 seconds</code></pre>
 </div>
 </div>
 <p>Indeed, here’s how long <code>pandas</code> takes for the same task:</p>
-<div id="cell-66" class="cell" data-execution_count="88">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>start <span class="op">=</span> time.time()</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_parquet(<span class="st">'data/parquet_data'</span>)</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>pd_parquet_end <span class="op">=</span> time.time() <span class="op">-</span> start</span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">round</span>(pd_parquet_end, <span class="dv">2</span>), <span class="st">"seconds"</span>)</span></code></pre></div>
+<div id="cell-71" class="cell" data-execution_count="88">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>start <span class="op">=</span> time.time()</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_parquet(<span class="st">'data/parquet_data'</span>)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>pd_parquet_end <span class="op">=</span> time.time() <span class="op">-</span> start</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">round</span>(pd_parquet_end, <span class="dv">2</span>), <span class="st">"seconds"</span>)</span></code></pre></div>
 </div>
 <p>As an aside, I highly recommend watching the <a href="https://www.youtube.com/watch?v=wKH0-zs2g_U&amp;t=118s">“Background” section of this talk</a> for some basic information on <code>dask</code> and how it differs from Spark, DuckDB, and <code>polars</code>. The talk also features some comprehensive benchmarks of <code>dask</code> and establishes the core differences between [<code>dask</code> and Spark] in one group, and [<code>polars</code> and DuckDB] in the other.</p>
 <section id="are-dask-and-duckdb-worth-it" class="level3">
@@ -1077,179 +1270,191 @@ Columns: 5</code></pre>
 <li><code>duckdb</code> + <code>.csv</code></li>
 <li><code>duckdb</code> + <code>.csv.gz</code></li>
 </ul>
-<div id="cell-70" class="cell">
+<p>We could compare:</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pandas</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>pd.read_parquet(<span class="st">'data/parquet_data'</span>,</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>                engine<span class="op">=</span><span class="st">"pyarrow"</span>,</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>                columns<span class="op">=</span>[<span class="st">'Date'</span>, <span class="st">'Hour'</span>, <span class="st">'Start'</span>, <span class="st">'End'</span>, <span class="st">'Riders'</span>])</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="co"># dask</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>dask dd.read_parquet(<span class="st">'data/parquet_data'</span>, engine<span class="op">=</span><span class="st">"pyarrow"</span>).compute()</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="co"># duckdb</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>con.sql(<span class="st">"SELECT * FROM read_parquet('data/parquet_data')"</span>).df()</span></code></pre></div>
+<div id="cell-77" class="cell">
 <details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Benchmark pandas vs Dask vs DuckDB on Parquet, CSV, and CSV.gz</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co"># --------------------- config ---------------------</span></span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>PD_PARQUET_GLOB <span class="op">=</span> <span class="st">"data/parquet_data"</span></span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>DB_PARQUET_GLOB <span class="op">=</span> <span class="st">"data/parquet_data/*.parquet"</span></span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>CSV_GLOB     <span class="op">=</span> <span class="st">"data/csv_data/*.csv"</span></span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>CSVGZ_GLOB   <span class="op">=</span> <span class="st">"data/*.csv.gz"</span></span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>GROUP_COL <span class="op">=</span> <span class="st">"Date"</span>     <span class="co"># e.g., "station_id"</span></span>
-<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>AGG_COL   <span class="op">=</span> <span class="st">"Riders"</span>   <span class="co"># e.g., "rides"</span></span>
-<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>AGG_OP    <span class="op">=</span> <span class="st">"sum"</span></span>
-<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>REPEATS <span class="op">=</span> <span class="dv">5</span></span>
-<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>DUCKDB_THREADS <span class="op">=</span> <span class="dv">8</span></span>
-<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a><span class="co"># --------------------------------------------------</span></span>
-<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> timer():</span>
-<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> time.perf_counter()</span>
-<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_and_record(fn, label: <span class="bu">str</span>, filetype: <span class="bu">str</span>, stage: <span class="bu">str</span>, repeats: <span class="bu">int</span>) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">dict</span>]:</span>
-<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Run fn N times and return list of timing records (no global mutation)."""</span></span>
-<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> []</span>
-<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(repeats):</span>
-<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a>        gc.collect()</span>
-<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a>        t0 <span class="op">=</span> timer()</span>
-<span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a>        _ <span class="op">=</span> fn()  <span class="co"># ensure work is executed</span></span>
-<span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a>        dt <span class="op">=</span> timer() <span class="op">-</span> t0</span>
-<span id="cb35-27"><a href="#cb35-27" aria-hidden="true" tabindex="-1"></a>        out.append({</span>
-<span id="cb35-28"><a href="#cb35-28" aria-hidden="true" tabindex="-1"></a>            <span class="st">"engine"</span>: label.split()[<span class="dv">0</span>],</span>
-<span id="cb35-29"><a href="#cb35-29" aria-hidden="true" tabindex="-1"></a>            <span class="st">"operation"</span>: label,</span>
-<span id="cb35-30"><a href="#cb35-30" aria-hidden="true" tabindex="-1"></a>            <span class="st">"filetype"</span>: filetype,</span>
-<span id="cb35-31"><a href="#cb35-31" aria-hidden="true" tabindex="-1"></a>            <span class="st">"stage"</span>: stage,</span>
-<span id="cb35-32"><a href="#cb35-32" aria-hidden="true" tabindex="-1"></a>            <span class="st">"run"</span>: i <span class="op">+</span> <span class="dv">1</span>,</span>
-<span id="cb35-33"><a href="#cb35-33" aria-hidden="true" tabindex="-1"></a>            <span class="st">"seconds"</span>: <span class="bu">float</span>(dt),</span>
-<span id="cb35-34"><a href="#cb35-34" aria-hidden="true" tabindex="-1"></a>        })</span>
-<span id="cb35-35"><a href="#cb35-35" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>label<span class="sc">}</span><span class="ss"> [</span><span class="sc">{</span>filetype<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>stage<span class="sc">}</span><span class="ss">] done."</span>)</span>
-<span id="cb35-36"><a href="#cb35-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out</span>
-<span id="cb35-37"><a href="#cb35-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-38"><a href="#cb35-38" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------- Define workloads ----------</span></span>
-<span id="cb35-39"><a href="#cb35-39" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> read_pandas_parquet():</span>
-<span id="cb35-40"><a href="#cb35-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> pd.read_parquet(PD_PARQUET_GLOB, engine<span class="op">=</span><span class="st">"pyarrow"</span>, columns<span class="op">=</span>[<span class="st">'Date'</span>, <span class="st">'Hour'</span>, <span class="st">'Start'</span>, <span class="st">'End'</span>, <span class="st">'Riders'</span>])</span>
-<span id="cb35-41"><a href="#cb35-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-42"><a href="#cb35-42" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> groupby_pandas_parquet():</span>
-<span id="cb35-43"><a href="#cb35-43" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> read_pandas_parquet()</span>
-<span id="cb35-44"><a href="#cb35-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df.groupby(GROUP_COL)[AGG_COL].agg(AGG_OP)</span>
-<span id="cb35-45"><a href="#cb35-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-46"><a href="#cb35-46" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> groupby_pandas_csv(glob_pat: <span class="bu">str</span>):</span>
-<span id="cb35-47"><a href="#cb35-47" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> read_pandas_csv(glob_pat)</span>
-<span id="cb35-48"><a href="#cb35-48" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df.groupby(GROUP_COL)[AGG_COL].agg(AGG_OP)</span>
-<span id="cb35-49"><a href="#cb35-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-50"><a href="#cb35-50" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> read_dask_parquet():</span>
-<span id="cb35-51"><a href="#cb35-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dd.read_parquet(DB_PARQUET_GLOB, engine<span class="op">=</span><span class="st">"pyarrow"</span>).compute()</span>
-<span id="cb35-52"><a href="#cb35-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-53"><a href="#cb35-53" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> read_dask_csv(glob_pat: <span class="bu">str</span>):</span>
-<span id="cb35-54"><a href="#cb35-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dd.read_csv(glob_pat, assume_missing<span class="op">=</span><span class="va">True</span>, names<span class="op">=</span>[<span class="st">'Date'</span>, <span class="st">'Hour'</span>, <span class="st">'Start'</span>, <span class="st">'End'</span>, <span class="st">'Riders'</span>]).compute()</span>
-<span id="cb35-55"><a href="#cb35-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-56"><a href="#cb35-56" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> groupby_dask_parquet():</span>
-<span id="cb35-57"><a href="#cb35-57" aria-hidden="true" tabindex="-1"></a>    ddf <span class="op">=</span> dd.read_parquet(DB_PARQUET_GLOB, engine<span class="op">=</span><span class="st">"pyarrow"</span>)</span>
-<span id="cb35-58"><a href="#cb35-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ddf.groupby(GROUP_COL)[AGG_COL].agg(AGG_OP).compute()</span>
-<span id="cb35-59"><a href="#cb35-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-60"><a href="#cb35-60" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> groupby_dask_csv(glob_pat: <span class="bu">str</span>):</span>
-<span id="cb35-61"><a href="#cb35-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> glob_pat <span class="op">==</span> CSVGZ_GLOB:</span>
-<span id="cb35-62"><a href="#cb35-62" aria-hidden="true" tabindex="-1"></a>        ddf <span class="op">=</span> dd.read_csv(glob_pat, assume_missing<span class="op">=</span><span class="va">True</span>, names<span class="op">=</span>[<span class="st">'Date'</span>, <span class="st">'Hour'</span>, <span class="st">'Start'</span>, <span class="st">'End'</span>, <span class="st">'Riders'</span>])</span>
-<span id="cb35-63"><a href="#cb35-63" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb35-64"><a href="#cb35-64" aria-hidden="true" tabindex="-1"></a>        ddf <span class="op">=</span> dd.read_csv(glob_pat, assume_missing<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb35-65"><a href="#cb35-65" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ddf.groupby(GROUP_COL)[AGG_COL].agg(AGG_OP).compute()</span>
-<span id="cb35-66"><a href="#cb35-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-67"><a href="#cb35-67" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_duckdb_con(threads: <span class="bu">int</span>):</span>
-<span id="cb35-68"><a href="#cb35-68" aria-hidden="true" tabindex="-1"></a>    con <span class="op">=</span> duckdb.<span class="ex">connect</span>()</span>
-<span id="cb35-69"><a href="#cb35-69" aria-hidden="true" tabindex="-1"></a>    con.execute(<span class="ss">f"PRAGMA threads=</span><span class="sc">{</span>threads<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb35-70"><a href="#cb35-70" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> con</span>
-<span id="cb35-71"><a href="#cb35-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-72"><a href="#cb35-72" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> read_duckdb_parquet(con):</span>
-<span id="cb35-73"><a href="#cb35-73" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> con.sql(<span class="ss">f"SELECT * FROM read_parquet('</span><span class="sc">{</span>DB_PARQUET_GLOB<span class="sc">}</span><span class="ss">')"</span>).df()</span>
-<span id="cb35-74"><a href="#cb35-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-75"><a href="#cb35-75" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> read_duckdb_csv(con, glob_pat: <span class="bu">str</span>):</span>
-<span id="cb35-76"><a href="#cb35-76" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> con.sql(<span class="ss">f"SELECT * FROM read_csv_auto('</span><span class="sc">{</span>glob_pat<span class="sc">}</span><span class="ss">')"</span>).df()</span>
-<span id="cb35-77"><a href="#cb35-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-78"><a href="#cb35-78" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> groupby_duckdb_parquet(con):</span>
-<span id="cb35-79"><a href="#cb35-79" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> con.sql(</span>
-<span id="cb35-80"><a href="#cb35-80" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"SELECT </span><span class="sc">{</span>GROUP_COL<span class="sc">}</span><span class="ss"> AS grp, </span><span class="sc">{</span>AGG_OP<span class="sc">}</span><span class="ss">(</span><span class="sc">{</span>AGG_COL<span class="sc">}</span><span class="ss">) AS agg "</span></span>
-<span id="cb35-81"><a href="#cb35-81" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"FROM read_parquet('</span><span class="sc">{</span>DB_PARQUET_GLOB<span class="sc">}</span><span class="ss">') GROUP BY </span><span class="sc">{</span>GROUP_COL<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb35-82"><a href="#cb35-82" aria-hidden="true" tabindex="-1"></a>    ).df()</span>
-<span id="cb35-83"><a href="#cb35-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-84"><a href="#cb35-84" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> groupby_duckdb_csv(con, glob_pat: <span class="bu">str</span>):</span>
-<span id="cb35-85"><a href="#cb35-85" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> glob_pat <span class="op">==</span> CSVGZ_GLOB:</span>
-<span id="cb35-86"><a href="#cb35-86" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> con.sql(</span>
-<span id="cb35-87"><a href="#cb35-87" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"SELECT </span><span class="sc">{</span>GROUP_COL<span class="sc">}</span><span class="ss"> AS grp, </span><span class="sc">{</span>AGG_OP<span class="sc">}</span><span class="ss">(</span><span class="sc">{</span>AGG_COL<span class="sc">}</span><span class="ss">) AS agg "</span></span>
-<span id="cb35-88"><a href="#cb35-88" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"FROM read_csv_auto('</span><span class="sc">{</span>glob_pat<span class="sc">}</span><span class="ss">', names=['Date', 'Hour', 'Start', 'End', 'Riders'], header=False) GROUP BY </span><span class="sc">{</span>GROUP_COL<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb35-89"><a href="#cb35-89" aria-hidden="true" tabindex="-1"></a>        ).df()</span>
-<span id="cb35-90"><a href="#cb35-90" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb35-91"><a href="#cb35-91" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> con.sql(</span>
-<span id="cb35-92"><a href="#cb35-92" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"SELECT </span><span class="sc">{</span>GROUP_COL<span class="sc">}</span><span class="ss"> AS grp, </span><span class="sc">{</span>AGG_OP<span class="sc">}</span><span class="ss">(</span><span class="sc">{</span>AGG_COL<span class="sc">}</span><span class="ss">) AS agg "</span></span>
-<span id="cb35-93"><a href="#cb35-93" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"FROM read_csv_auto('</span><span class="sc">{</span>glob_pat<span class="sc">}</span><span class="ss">') GROUP BY </span><span class="sc">{</span>GROUP_COL<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb35-94"><a href="#cb35-94" aria-hidden="true" tabindex="-1"></a>        ).df()</span>
-<span id="cb35-95"><a href="#cb35-95" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> save_results(name, results):</span>
-<span id="cb35-96"><a href="#cb35-96" aria-hidden="true" tabindex="-1"></a>    os.makedirs(<span class="st">'results'</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb35-97"><a href="#cb35-97" aria-hidden="true" tabindex="-1"></a>    df_results <span class="op">=</span> pd.DataFrame(results)</span>
-<span id="cb35-98"><a href="#cb35-98" aria-hidden="true" tabindex="-1"></a>    df_results.to_csv(<span class="ss">f"results/</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb35-99"><a href="#cb35-99" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------- Run all ----------</span></span>
-<span id="cb35-100"><a href="#cb35-100" aria-hidden="true" tabindex="-1"></a><span class="co"># Fail fast if no files</span></span>
-<span id="cb35-101"><a href="#cb35-101" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">len</span>(os.listdir(<span class="st">'results'</span>)) <span class="op">==</span> <span class="dv">0</span>:</span>
-<span id="cb35-102"><a href="#cb35-102" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> warnings.catch_warnings():</span>
-<span id="cb35-103"><a href="#cb35-103" aria-hidden="true" tabindex="-1"></a>        warnings.simplefilter(<span class="st">"ignore"</span>)</span>
-<span id="cb35-104"><a href="#cb35-104" aria-hidden="true" tabindex="-1"></a>        con <span class="op">=</span> make_duckdb_con(DUCKDB_THREADS)</span>
-<span id="cb35-105"><a href="#cb35-105" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"=== READ -&gt; pandas/dask/duckdb ==="</span>)</span>
-<span id="cb35-106"><a href="#cb35-106" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"pd_read.csv"</span>):</span>
-<span id="cb35-107"><a href="#cb35-107" aria-hidden="true" tabindex="-1"></a>            pd_read: <span class="bu">list</span>[<span class="bu">dict</span>] <span class="op">=</span> []</span>
-<span id="cb35-108"><a href="#cb35-108" aria-hidden="true" tabindex="-1"></a>            pd_read <span class="op">+=</span> run_and_record(read_pandas_parquet, <span class="st">"pandas"</span>, <span class="st">"parquet"</span>, <span class="st">"read"</span>, REPEATS)</span>
-<span id="cb35-109"><a href="#cb35-109" aria-hidden="true" tabindex="-1"></a>            pd_read <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: read_pandas_csv(CSV_GLOB), <span class="st">"pandas"</span>, <span class="st">"csv"</span>, <span class="st">"read"</span>, REPEATS)</span>
-<span id="cb35-110"><a href="#cb35-110" aria-hidden="true" tabindex="-1"></a>            pd_read <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: read_pandas_csv(CSVGZ_GLOB), <span class="st">"pandas"</span>, <span class="st">"csv.gz"</span>, <span class="st">"read"</span>, REPEATS)</span>
-<span id="cb35-111"><a href="#cb35-111" aria-hidden="true" tabindex="-1"></a>            save_results(<span class="st">'pd_read'</span>, pd_read)</span>
-<span id="cb35-112"><a href="#cb35-112" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"dask_read.csv"</span>):</span>
-<span id="cb35-113"><a href="#cb35-113" aria-hidden="true" tabindex="-1"></a>            dask_read: <span class="bu">list</span>[<span class="bu">dict</span>] <span class="op">=</span> []</span>
-<span id="cb35-114"><a href="#cb35-114" aria-hidden="true" tabindex="-1"></a>            dask_read <span class="op">+=</span> run_and_record(read_dask_parquet, <span class="st">"dask"</span>, <span class="st">"parquet"</span>, <span class="st">"read"</span>, REPEATS)</span>
-<span id="cb35-115"><a href="#cb35-115" aria-hidden="true" tabindex="-1"></a>            dask_read <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: read_dask_csv(CSV_GLOB), <span class="st">"dask"</span>, <span class="st">"csv"</span>, <span class="st">"read"</span>, REPEATS)</span>
-<span id="cb35-116"><a href="#cb35-116" aria-hidden="true" tabindex="-1"></a>            dask_read <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: read_dask_csv(CSVGZ_GLOB), <span class="st">"dask"</span>, <span class="st">"csv.gz"</span>, <span class="st">"read"</span>, REPEATS)</span>
-<span id="cb35-117"><a href="#cb35-117" aria-hidden="true" tabindex="-1"></a>            save_results(<span class="st">'dask_read'</span>, dask_read)</span>
-<span id="cb35-118"><a href="#cb35-118" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"duckdb_read.csv"</span>):</span>
-<span id="cb35-119"><a href="#cb35-119" aria-hidden="true" tabindex="-1"></a>            duckdb_read: <span class="bu">list</span>[<span class="bu">dict</span>] <span class="op">=</span> []</span>
-<span id="cb35-120"><a href="#cb35-120" aria-hidden="true" tabindex="-1"></a>            duckdb_read <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: read_duckdb_parquet(con), <span class="st">"duckdb"</span>, <span class="st">"parquet"</span>, <span class="st">"read"</span>, REPEATS)</span>
-<span id="cb35-121"><a href="#cb35-121" aria-hidden="true" tabindex="-1"></a>            duckdb_read <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: read_duckdb_csv(con, CSV_GLOB), <span class="st">"duckdb"</span>, <span class="st">"csv"</span>, <span class="st">"read"</span>, REPEATS)</span>
-<span id="cb35-122"><a href="#cb35-122" aria-hidden="true" tabindex="-1"></a>            duckdb_read <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: read_duckdb_csv(con, CSVGZ_GLOB), <span class="st">"duckdb"</span>, <span class="st">"csv.gz"</span>, <span class="st">"read"</span>, REPEATS)</span>
-<span id="cb35-123"><a href="#cb35-123" aria-hidden="true" tabindex="-1"></a>            save_results(<span class="st">'duckdb_read'</span>, duckdb_read)</span>
-<span id="cb35-124"><a href="#cb35-124" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== READ -&gt; groupby -&gt; pandas/dask/duckdb ==="</span>)</span>
-<span id="cb35-125"><a href="#cb35-125" aria-hidden="true" tabindex="-1"></a>        pd_gb: <span class="bu">list</span>[<span class="bu">dict</span>] <span class="op">=</span> []</span>
-<span id="cb35-126"><a href="#cb35-126" aria-hidden="true" tabindex="-1"></a>        pd_gb <span class="op">+=</span> run_and_record(groupby_pandas_parquet, <span class="st">"pandas"</span>, <span class="st">"parquet"</span>, <span class="st">"groupby"</span>, REPEATS)</span>
-<span id="cb35-127"><a href="#cb35-127" aria-hidden="true" tabindex="-1"></a>        pd_gb <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: groupby_pandas_csv(CSV_GLOB), <span class="st">"pandas"</span>, <span class="st">"csv"</span>, <span class="st">"groupby"</span>, REPEATS)</span>
-<span id="cb35-128"><a href="#cb35-128" aria-hidden="true" tabindex="-1"></a>        pd_gb <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: groupby_pandas_csv(CSVGZ_GLOB), <span class="st">"pandas"</span>, <span class="st">"csv.gz"</span>, <span class="st">"groupby"</span>, REPEATS)</span>
-<span id="cb35-129"><a href="#cb35-129" aria-hidden="true" tabindex="-1"></a>        save_results(<span class="st">'pd_gb'</span>, pd_gb)</span>
-<span id="cb35-130"><a href="#cb35-130" aria-hidden="true" tabindex="-1"></a>        dask_gb: <span class="bu">list</span>[<span class="bu">dict</span>] <span class="op">=</span> []</span>
-<span id="cb35-131"><a href="#cb35-131" aria-hidden="true" tabindex="-1"></a>        dask_gb <span class="op">+=</span> run_and_record(groupby_dask_parquet, <span class="st">"dask"</span>, <span class="st">"parquet"</span>, <span class="st">"groupby"</span>, REPEATS)</span>
-<span id="cb35-132"><a href="#cb35-132" aria-hidden="true" tabindex="-1"></a>        dask_gb <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: groupby_dask_csv(CSV_GLOB), <span class="st">"dask"</span>, <span class="st">"csv"</span>, <span class="st">"groupby"</span>, REPEATS)</span>
-<span id="cb35-133"><a href="#cb35-133" aria-hidden="true" tabindex="-1"></a>        dask_gb <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: groupby_dask_csv(CSVGZ_GLOB), <span class="st">"dask"</span>, <span class="st">"csv.gz"</span>, <span class="st">"groupby"</span>, REPEATS)</span>
-<span id="cb35-134"><a href="#cb35-134" aria-hidden="true" tabindex="-1"></a>        save_results(<span class="st">'dask_gb'</span>, dask_gb)</span>
-<span id="cb35-135"><a href="#cb35-135" aria-hidden="true" tabindex="-1"></a>        duckdb_gb: <span class="bu">list</span>[<span class="bu">dict</span>] <span class="op">=</span> []</span>
-<span id="cb35-136"><a href="#cb35-136" aria-hidden="true" tabindex="-1"></a>        duckdb_gb <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: groupby_duckdb_parquet(con), <span class="st">"duckdb"</span>, <span class="st">"parquet"</span>, <span class="st">"groupby"</span>, REPEATS)</span>
-<span id="cb35-137"><a href="#cb35-137" aria-hidden="true" tabindex="-1"></a>        duckdb_gb <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: groupby_duckdb_csv(con, CSV_GLOB), <span class="st">"duckdb"</span>, <span class="st">"csv"</span>, <span class="st">"groupby"</span>, REPEATS)</span>
-<span id="cb35-138"><a href="#cb35-138" aria-hidden="true" tabindex="-1"></a>        duckdb_gb <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: groupby_duckdb_csv(con, CSVGZ_GLOB), <span class="st">"duckdb"</span>, <span class="st">"csv.gz"</span>, <span class="st">"groupby"</span>, REPEATS)</span>
-<span id="cb35-139"><a href="#cb35-139" aria-hidden="true" tabindex="-1"></a>        save_results(<span class="st">'duckdb_gb'</span>, duckdb_gb)</span>
-<span id="cb35-140"><a href="#cb35-140" aria-hidden="true" tabindex="-1"></a>        con.close()</span>
-<span id="cb35-141"><a href="#cb35-141" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb35-142"><a href="#cb35-142" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Benchmark results already exist in results/"</span>)</span></code></pre></div>
+<summary>Benchmarking Script</summary>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Benchmark pandas vs Dask vs DuckDB on Parquet, CSV, and CSV.gz</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="co"># --------------------- config ---------------------</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>PD_PARQUET_GLOB <span class="op">=</span> <span class="st">"data/parquet_data"</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>DB_PARQUET_GLOB <span class="op">=</span> <span class="st">"data/parquet_data/*.parquet"</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>CSV_GLOB     <span class="op">=</span> <span class="st">"data/csv_data/*.csv"</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>CSVGZ_GLOB   <span class="op">=</span> <span class="st">"data/*.csv.gz"</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>GROUP_COL <span class="op">=</span> <span class="st">"Date"</span>     <span class="co"># e.g., "station_id"</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>AGG_COL   <span class="op">=</span> <span class="st">"Riders"</span>   <span class="co"># e.g., "rides"</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>AGG_OP    <span class="op">=</span> <span class="st">"sum"</span></span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>REPEATS <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>DUCKDB_THREADS <span class="op">=</span> <span class="dv">8</span></span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a><span class="co"># --------------------------------------------------</span></span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> timer():</span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> time.perf_counter()</span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_and_record(fn, label: <span class="bu">str</span>, filetype: <span class="bu">str</span>, stage: <span class="bu">str</span>, repeats: <span class="bu">int</span>) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">dict</span>]:</span>
+<span id="cb38-20"><a href="#cb38-20" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Run fn N times and return list of timing records (no global mutation)."""</span></span>
+<span id="cb38-21"><a href="#cb38-21" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> []</span>
+<span id="cb38-22"><a href="#cb38-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(repeats):</span>
+<span id="cb38-23"><a href="#cb38-23" aria-hidden="true" tabindex="-1"></a>        gc.collect()</span>
+<span id="cb38-24"><a href="#cb38-24" aria-hidden="true" tabindex="-1"></a>        t0 <span class="op">=</span> timer()</span>
+<span id="cb38-25"><a href="#cb38-25" aria-hidden="true" tabindex="-1"></a>        _ <span class="op">=</span> fn()  <span class="co"># ensure work is executed</span></span>
+<span id="cb38-26"><a href="#cb38-26" aria-hidden="true" tabindex="-1"></a>        dt <span class="op">=</span> timer() <span class="op">-</span> t0</span>
+<span id="cb38-27"><a href="#cb38-27" aria-hidden="true" tabindex="-1"></a>        out.append({</span>
+<span id="cb38-28"><a href="#cb38-28" aria-hidden="true" tabindex="-1"></a>            <span class="st">"engine"</span>: label.split()[<span class="dv">0</span>],</span>
+<span id="cb38-29"><a href="#cb38-29" aria-hidden="true" tabindex="-1"></a>            <span class="st">"operation"</span>: label,</span>
+<span id="cb38-30"><a href="#cb38-30" aria-hidden="true" tabindex="-1"></a>            <span class="st">"filetype"</span>: filetype,</span>
+<span id="cb38-31"><a href="#cb38-31" aria-hidden="true" tabindex="-1"></a>            <span class="st">"stage"</span>: stage,</span>
+<span id="cb38-32"><a href="#cb38-32" aria-hidden="true" tabindex="-1"></a>            <span class="st">"run"</span>: i <span class="op">+</span> <span class="dv">1</span>,</span>
+<span id="cb38-33"><a href="#cb38-33" aria-hidden="true" tabindex="-1"></a>            <span class="st">"seconds"</span>: <span class="bu">float</span>(dt),</span>
+<span id="cb38-34"><a href="#cb38-34" aria-hidden="true" tabindex="-1"></a>        })</span>
+<span id="cb38-35"><a href="#cb38-35" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>label<span class="sc">}</span><span class="ss"> [</span><span class="sc">{</span>filetype<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>stage<span class="sc">}</span><span class="ss">] done."</span>)</span>
+<span id="cb38-36"><a href="#cb38-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out</span>
+<span id="cb38-37"><a href="#cb38-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-38"><a href="#cb38-38" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------- Define workloads ----------</span></span>
+<span id="cb38-39"><a href="#cb38-39" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> read_pandas_parquet():</span>
+<span id="cb38-40"><a href="#cb38-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> pd.read_parquet(PD_PARQUET_GLOB, engine<span class="op">=</span><span class="st">"pyarrow"</span>, columns<span class="op">=</span>[<span class="st">'Date'</span>, <span class="st">'Hour'</span>, <span class="st">'Start'</span>, <span class="st">'End'</span>, <span class="st">'Riders'</span>])</span>
+<span id="cb38-41"><a href="#cb38-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-42"><a href="#cb38-42" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> groupby_pandas_parquet():</span>
+<span id="cb38-43"><a href="#cb38-43" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> read_pandas_parquet()</span>
+<span id="cb38-44"><a href="#cb38-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df.groupby(GROUP_COL)[AGG_COL].agg(AGG_OP)</span>
+<span id="cb38-45"><a href="#cb38-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-46"><a href="#cb38-46" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> groupby_pandas_csv(glob_pat: <span class="bu">str</span>):</span>
+<span id="cb38-47"><a href="#cb38-47" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> read_pandas_csv(glob_pat)</span>
+<span id="cb38-48"><a href="#cb38-48" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df.groupby(GROUP_COL)[AGG_COL].agg(AGG_OP)</span>
+<span id="cb38-49"><a href="#cb38-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-50"><a href="#cb38-50" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> read_dask_parquet():</span>
+<span id="cb38-51"><a href="#cb38-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dd.read_parquet(DB_PARQUET_GLOB, engine<span class="op">=</span><span class="st">"pyarrow"</span>).compute()</span>
+<span id="cb38-52"><a href="#cb38-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-53"><a href="#cb38-53" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> read_dask_csv(glob_pat: <span class="bu">str</span>):</span>
+<span id="cb38-54"><a href="#cb38-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dd.read_csv(glob_pat, assume_missing<span class="op">=</span><span class="va">True</span>, names<span class="op">=</span>[<span class="st">'Date'</span>, <span class="st">'Hour'</span>, <span class="st">'Start'</span>, <span class="st">'End'</span>, <span class="st">'Riders'</span>]).compute()</span>
+<span id="cb38-55"><a href="#cb38-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-56"><a href="#cb38-56" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> groupby_dask_parquet():</span>
+<span id="cb38-57"><a href="#cb38-57" aria-hidden="true" tabindex="-1"></a>    ddf <span class="op">=</span> dd.read_parquet(DB_PARQUET_GLOB, engine<span class="op">=</span><span class="st">"pyarrow"</span>)</span>
+<span id="cb38-58"><a href="#cb38-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ddf.groupby(GROUP_COL)[AGG_COL].agg(AGG_OP).compute()</span>
+<span id="cb38-59"><a href="#cb38-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-60"><a href="#cb38-60" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> groupby_dask_csv(glob_pat: <span class="bu">str</span>):</span>
+<span id="cb38-61"><a href="#cb38-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> glob_pat <span class="op">==</span> CSVGZ_GLOB:</span>
+<span id="cb38-62"><a href="#cb38-62" aria-hidden="true" tabindex="-1"></a>        ddf <span class="op">=</span> dd.read_csv(glob_pat, assume_missing<span class="op">=</span><span class="va">True</span>, names<span class="op">=</span>[<span class="st">'Date'</span>, <span class="st">'Hour'</span>, <span class="st">'Start'</span>, <span class="st">'End'</span>, <span class="st">'Riders'</span>])</span>
+<span id="cb38-63"><a href="#cb38-63" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb38-64"><a href="#cb38-64" aria-hidden="true" tabindex="-1"></a>        ddf <span class="op">=</span> dd.read_csv(glob_pat, assume_missing<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb38-65"><a href="#cb38-65" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ddf.groupby(GROUP_COL)[AGG_COL].agg(AGG_OP).compute()</span>
+<span id="cb38-66"><a href="#cb38-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-67"><a href="#cb38-67" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_duckdb_con(threads: <span class="bu">int</span>):</span>
+<span id="cb38-68"><a href="#cb38-68" aria-hidden="true" tabindex="-1"></a>    con <span class="op">=</span> duckdb.<span class="ex">connect</span>()</span>
+<span id="cb38-69"><a href="#cb38-69" aria-hidden="true" tabindex="-1"></a>    con.execute(<span class="ss">f"PRAGMA threads=</span><span class="sc">{</span>threads<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb38-70"><a href="#cb38-70" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> con</span>
+<span id="cb38-71"><a href="#cb38-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-72"><a href="#cb38-72" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> read_duckdb_parquet(con):</span>
+<span id="cb38-73"><a href="#cb38-73" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> con.sql(<span class="ss">f"SELECT * FROM read_parquet('</span><span class="sc">{</span>DB_PARQUET_GLOB<span class="sc">}</span><span class="ss">')"</span>).df()</span>
+<span id="cb38-74"><a href="#cb38-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-75"><a href="#cb38-75" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> read_duckdb_csv(con, glob_pat: <span class="bu">str</span>):</span>
+<span id="cb38-76"><a href="#cb38-76" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> con.sql(<span class="ss">f"SELECT * FROM read_csv_auto('</span><span class="sc">{</span>glob_pat<span class="sc">}</span><span class="ss">')"</span>).df()</span>
+<span id="cb38-77"><a href="#cb38-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-78"><a href="#cb38-78" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> groupby_duckdb_parquet(con):</span>
+<span id="cb38-79"><a href="#cb38-79" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> con.sql(</span>
+<span id="cb38-80"><a href="#cb38-80" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"SELECT </span><span class="sc">{</span>GROUP_COL<span class="sc">}</span><span class="ss"> AS grp, </span><span class="sc">{</span>AGG_OP<span class="sc">}</span><span class="ss">(</span><span class="sc">{</span>AGG_COL<span class="sc">}</span><span class="ss">) AS agg "</span></span>
+<span id="cb38-81"><a href="#cb38-81" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"FROM read_parquet('</span><span class="sc">{</span>DB_PARQUET_GLOB<span class="sc">}</span><span class="ss">') GROUP BY </span><span class="sc">{</span>GROUP_COL<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb38-82"><a href="#cb38-82" aria-hidden="true" tabindex="-1"></a>    ).df()</span>
+<span id="cb38-83"><a href="#cb38-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-84"><a href="#cb38-84" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> groupby_duckdb_csv(con, glob_pat: <span class="bu">str</span>):</span>
+<span id="cb38-85"><a href="#cb38-85" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> glob_pat <span class="op">==</span> CSVGZ_GLOB:</span>
+<span id="cb38-86"><a href="#cb38-86" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> con.sql(</span>
+<span id="cb38-87"><a href="#cb38-87" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"SELECT </span><span class="sc">{</span>GROUP_COL<span class="sc">}</span><span class="ss"> AS grp, </span><span class="sc">{</span>AGG_OP<span class="sc">}</span><span class="ss">(</span><span class="sc">{</span>AGG_COL<span class="sc">}</span><span class="ss">) AS agg "</span></span>
+<span id="cb38-88"><a href="#cb38-88" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"FROM read_csv_auto('</span><span class="sc">{</span>glob_pat<span class="sc">}</span><span class="ss">', names=['Date', 'Hour', 'Start', 'End', 'Riders'], header=False) GROUP BY </span><span class="sc">{</span>GROUP_COL<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb38-89"><a href="#cb38-89" aria-hidden="true" tabindex="-1"></a>        ).df()</span>
+<span id="cb38-90"><a href="#cb38-90" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb38-91"><a href="#cb38-91" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> con.sql(</span>
+<span id="cb38-92"><a href="#cb38-92" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"SELECT </span><span class="sc">{</span>GROUP_COL<span class="sc">}</span><span class="ss"> AS grp, </span><span class="sc">{</span>AGG_OP<span class="sc">}</span><span class="ss">(</span><span class="sc">{</span>AGG_COL<span class="sc">}</span><span class="ss">) AS agg "</span></span>
+<span id="cb38-93"><a href="#cb38-93" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"FROM read_csv_auto('</span><span class="sc">{</span>glob_pat<span class="sc">}</span><span class="ss">') GROUP BY </span><span class="sc">{</span>GROUP_COL<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb38-94"><a href="#cb38-94" aria-hidden="true" tabindex="-1"></a>        ).df()</span>
+<span id="cb38-95"><a href="#cb38-95" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> save_results(name, results):</span>
+<span id="cb38-96"><a href="#cb38-96" aria-hidden="true" tabindex="-1"></a>    os.makedirs(<span class="st">'results'</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb38-97"><a href="#cb38-97" aria-hidden="true" tabindex="-1"></a>    df_results <span class="op">=</span> pd.DataFrame(results)</span>
+<span id="cb38-98"><a href="#cb38-98" aria-hidden="true" tabindex="-1"></a>    df_results.to_csv(<span class="ss">f"results/</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb38-99"><a href="#cb38-99" aria-hidden="true" tabindex="-1"></a><span class="co"># ---------- Run all ----------</span></span>
+<span id="cb38-100"><a href="#cb38-100" aria-hidden="true" tabindex="-1"></a><span class="co"># Fail fast if no files</span></span>
+<span id="cb38-101"><a href="#cb38-101" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">len</span>(os.listdir(<span class="st">'results'</span>)) <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb38-102"><a href="#cb38-102" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> warnings.catch_warnings():</span>
+<span id="cb38-103"><a href="#cb38-103" aria-hidden="true" tabindex="-1"></a>        warnings.simplefilter(<span class="st">"ignore"</span>)</span>
+<span id="cb38-104"><a href="#cb38-104" aria-hidden="true" tabindex="-1"></a>        con <span class="op">=</span> make_duckdb_con(DUCKDB_THREADS)</span>
+<span id="cb38-105"><a href="#cb38-105" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"=== READ -&gt; pandas/dask/duckdb ==="</span>)</span>
+<span id="cb38-106"><a href="#cb38-106" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"pd_read.csv"</span>):</span>
+<span id="cb38-107"><a href="#cb38-107" aria-hidden="true" tabindex="-1"></a>            pd_read: <span class="bu">list</span>[<span class="bu">dict</span>] <span class="op">=</span> []</span>
+<span id="cb38-108"><a href="#cb38-108" aria-hidden="true" tabindex="-1"></a>            pd_read <span class="op">+=</span> run_and_record(read_pandas_parquet, <span class="st">"pandas"</span>, <span class="st">"parquet"</span>, <span class="st">"read"</span>, REPEATS)</span>
+<span id="cb38-109"><a href="#cb38-109" aria-hidden="true" tabindex="-1"></a>            pd_read <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: read_pandas_csv(CSV_GLOB), <span class="st">"pandas"</span>, <span class="st">"csv"</span>, <span class="st">"read"</span>, REPEATS)</span>
+<span id="cb38-110"><a href="#cb38-110" aria-hidden="true" tabindex="-1"></a>            pd_read <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: read_pandas_csv(CSVGZ_GLOB), <span class="st">"pandas"</span>, <span class="st">"csv.gz"</span>, <span class="st">"read"</span>, REPEATS)</span>
+<span id="cb38-111"><a href="#cb38-111" aria-hidden="true" tabindex="-1"></a>            save_results(<span class="st">'pd_read'</span>, pd_read)</span>
+<span id="cb38-112"><a href="#cb38-112" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"dask_read.csv"</span>):</span>
+<span id="cb38-113"><a href="#cb38-113" aria-hidden="true" tabindex="-1"></a>            dask_read: <span class="bu">list</span>[<span class="bu">dict</span>] <span class="op">=</span> []</span>
+<span id="cb38-114"><a href="#cb38-114" aria-hidden="true" tabindex="-1"></a>            dask_read <span class="op">+=</span> run_and_record(read_dask_parquet, <span class="st">"dask"</span>, <span class="st">"parquet"</span>, <span class="st">"read"</span>, REPEATS)</span>
+<span id="cb38-115"><a href="#cb38-115" aria-hidden="true" tabindex="-1"></a>            dask_read <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: read_dask_csv(CSV_GLOB), <span class="st">"dask"</span>, <span class="st">"csv"</span>, <span class="st">"read"</span>, REPEATS)</span>
+<span id="cb38-116"><a href="#cb38-116" aria-hidden="true" tabindex="-1"></a>            dask_read <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: read_dask_csv(CSVGZ_GLOB), <span class="st">"dask"</span>, <span class="st">"csv.gz"</span>, <span class="st">"read"</span>, REPEATS)</span>
+<span id="cb38-117"><a href="#cb38-117" aria-hidden="true" tabindex="-1"></a>            save_results(<span class="st">'dask_read'</span>, dask_read)</span>
+<span id="cb38-118"><a href="#cb38-118" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">"duckdb_read.csv"</span>):</span>
+<span id="cb38-119"><a href="#cb38-119" aria-hidden="true" tabindex="-1"></a>            duckdb_read: <span class="bu">list</span>[<span class="bu">dict</span>] <span class="op">=</span> []</span>
+<span id="cb38-120"><a href="#cb38-120" aria-hidden="true" tabindex="-1"></a>            duckdb_read <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: read_duckdb_parquet(con), <span class="st">"duckdb"</span>, <span class="st">"parquet"</span>, <span class="st">"read"</span>, REPEATS)</span>
+<span id="cb38-121"><a href="#cb38-121" aria-hidden="true" tabindex="-1"></a>            duckdb_read <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: read_duckdb_csv(con, CSV_GLOB), <span class="st">"duckdb"</span>, <span class="st">"csv"</span>, <span class="st">"read"</span>, REPEATS)</span>
+<span id="cb38-122"><a href="#cb38-122" aria-hidden="true" tabindex="-1"></a>            duckdb_read <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: read_duckdb_csv(con, CSVGZ_GLOB), <span class="st">"duckdb"</span>, <span class="st">"csv.gz"</span>, <span class="st">"read"</span>, REPEATS)</span>
+<span id="cb38-123"><a href="#cb38-123" aria-hidden="true" tabindex="-1"></a>            save_results(<span class="st">'duckdb_read'</span>, duckdb_read)</span>
+<span id="cb38-124"><a href="#cb38-124" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== READ -&gt; groupby -&gt; pandas/dask/duckdb ==="</span>)</span>
+<span id="cb38-125"><a href="#cb38-125" aria-hidden="true" tabindex="-1"></a>        pd_gb: <span class="bu">list</span>[<span class="bu">dict</span>] <span class="op">=</span> []</span>
+<span id="cb38-126"><a href="#cb38-126" aria-hidden="true" tabindex="-1"></a>        pd_gb <span class="op">+=</span> run_and_record(groupby_pandas_parquet, <span class="st">"pandas"</span>, <span class="st">"parquet"</span>, <span class="st">"groupby"</span>, REPEATS)</span>
+<span id="cb38-127"><a href="#cb38-127" aria-hidden="true" tabindex="-1"></a>        pd_gb <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: groupby_pandas_csv(CSV_GLOB), <span class="st">"pandas"</span>, <span class="st">"csv"</span>, <span class="st">"groupby"</span>, REPEATS)</span>
+<span id="cb38-128"><a href="#cb38-128" aria-hidden="true" tabindex="-1"></a>        pd_gb <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: groupby_pandas_csv(CSVGZ_GLOB), <span class="st">"pandas"</span>, <span class="st">"csv.gz"</span>, <span class="st">"groupby"</span>, REPEATS)</span>
+<span id="cb38-129"><a href="#cb38-129" aria-hidden="true" tabindex="-1"></a>        save_results(<span class="st">'pd_gb'</span>, pd_gb)</span>
+<span id="cb38-130"><a href="#cb38-130" aria-hidden="true" tabindex="-1"></a>        dask_gb: <span class="bu">list</span>[<span class="bu">dict</span>] <span class="op">=</span> []</span>
+<span id="cb38-131"><a href="#cb38-131" aria-hidden="true" tabindex="-1"></a>        dask_gb <span class="op">+=</span> run_and_record(groupby_dask_parquet, <span class="st">"dask"</span>, <span class="st">"parquet"</span>, <span class="st">"groupby"</span>, REPEATS)</span>
+<span id="cb38-132"><a href="#cb38-132" aria-hidden="true" tabindex="-1"></a>        dask_gb <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: groupby_dask_csv(CSV_GLOB), <span class="st">"dask"</span>, <span class="st">"csv"</span>, <span class="st">"groupby"</span>, REPEATS)</span>
+<span id="cb38-133"><a href="#cb38-133" aria-hidden="true" tabindex="-1"></a>        dask_gb <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: groupby_dask_csv(CSVGZ_GLOB), <span class="st">"dask"</span>, <span class="st">"csv.gz"</span>, <span class="st">"groupby"</span>, REPEATS)</span>
+<span id="cb38-134"><a href="#cb38-134" aria-hidden="true" tabindex="-1"></a>        save_results(<span class="st">'dask_gb'</span>, dask_gb)</span>
+<span id="cb38-135"><a href="#cb38-135" aria-hidden="true" tabindex="-1"></a>        duckdb_gb: <span class="bu">list</span>[<span class="bu">dict</span>] <span class="op">=</span> []</span>
+<span id="cb38-136"><a href="#cb38-136" aria-hidden="true" tabindex="-1"></a>        duckdb_gb <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: groupby_duckdb_parquet(con), <span class="st">"duckdb"</span>, <span class="st">"parquet"</span>, <span class="st">"groupby"</span>, REPEATS)</span>
+<span id="cb38-137"><a href="#cb38-137" aria-hidden="true" tabindex="-1"></a>        duckdb_gb <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: groupby_duckdb_csv(con, CSV_GLOB), <span class="st">"duckdb"</span>, <span class="st">"csv"</span>, <span class="st">"groupby"</span>, REPEATS)</span>
+<span id="cb38-138"><a href="#cb38-138" aria-hidden="true" tabindex="-1"></a>        duckdb_gb <span class="op">+=</span> run_and_record(<span class="kw">lambda</span>: groupby_duckdb_csv(con, CSVGZ_GLOB), <span class="st">"duckdb"</span>, <span class="st">"csv.gz"</span>, <span class="st">"groupby"</span>, REPEATS)</span>
+<span id="cb38-139"><a href="#cb38-139" aria-hidden="true" tabindex="-1"></a>        save_results(<span class="st">'duckdb_gb'</span>, duckdb_gb)</span>
+<span id="cb38-140"><a href="#cb38-140" aria-hidden="true" tabindex="-1"></a>        con.close()</span>
+<span id="cb38-141"><a href="#cb38-141" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb38-142"><a href="#cb38-142" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Benchmark results already exist in results/"</span>)</span></code></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Benchmark results already exist in results/</code></pre>
 </div>
 </div>
-<div id="cell-71" class="cell" data-execution_count="80">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="dv">4</span>))</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> (read_pandas_csv(<span class="st">'results/*.csv'</span>)</span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>      .query(<span class="st">"stage == 'read'"</span>)</span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>      .groupby([<span class="st">'engine'</span>, <span class="st">'filetype'</span>])[<span class="st">'seconds'</span>]</span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>      .mean()</span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>      .reset_index())</span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>fastest <span class="op">=</span> df.loc[df.groupby(<span class="st">'filetype'</span>)[<span class="st">'seconds'</span>].idxmin()]</span>
-<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>df_sorted <span class="op">=</span> df.sort_values(by<span class="op">=</span><span class="st">'seconds'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> [<span class="st">'tab:gray'</span>] <span class="op">*</span> <span class="bu">len</span>(df_sorted)</span>
-<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, row <span class="kw">in</span> df_sorted.iterrows():</span>
-<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> ((fastest[<span class="st">'engine'</span>] <span class="op">==</span> row[<span class="st">'engine'</span>]) <span class="op">&amp;</span> </span>
-<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>        (fastest[<span class="st">'filetype'</span>] <span class="op">==</span> row[<span class="st">'filetype'</span>])).<span class="bu">any</span>():</span>
-<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>        colors[df_sorted.index.get_loc(i)] <span class="op">=</span> <span class="st">'red'</span></span>
-<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>bars <span class="op">=</span> ax.barh(df_sorted[<span class="st">'engine'</span>] <span class="op">+</span> <span class="st">" ("</span> <span class="op">+</span> df_sorted[<span class="st">'filetype'</span>] <span class="op">+</span> <span class="st">")"</span>, </span>
-<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>               df_sorted[<span class="st">'seconds'</span>], color<span class="op">=</span>colors)</span>
-<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>ax.bar_label(bars, fmt<span class="op">=</span><span class="st">" </span><span class="sc">%.2f</span><span class="st"> seconds"</span>)</span>
-<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">'Seconds'</span>, ylabel<span class="op">=</span><span class="st">'(Package, Storage Method)'</span>, xlim<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">85</span>))</span>
-<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>ax.tick_params(axis<span class="op">=</span><span class="st">'x'</span>, rotation<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Avg. Read-in Performance Comparison'</span>)</span>
-<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code></pre></div>
+<div id="cell-78" class="cell">
+<details class="code-fold">
+<summary>Read-in Benchmark</summary>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="dv">4</span>))</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> (read_pandas_csv(<span class="st">'results/*.csv'</span>)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>      .query(<span class="st">"stage == 'read'"</span>)</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>      .groupby([<span class="st">'engine'</span>, <span class="st">'filetype'</span>])[<span class="st">'seconds'</span>]</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>      .mean()</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>      .reset_index())</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>fastest <span class="op">=</span> df.loc[df.groupby(<span class="st">'filetype'</span>)[<span class="st">'seconds'</span>].idxmin()]</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>df_sorted <span class="op">=</span> df.sort_values(by<span class="op">=</span><span class="st">'seconds'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> [<span class="st">'tab:gray'</span>] <span class="op">*</span> <span class="bu">len</span>(df_sorted)</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, row <span class="kw">in</span> df_sorted.iterrows():</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> ((fastest[<span class="st">'engine'</span>] <span class="op">==</span> row[<span class="st">'engine'</span>]) <span class="op">&amp;</span> </span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>        (fastest[<span class="st">'filetype'</span>] <span class="op">==</span> row[<span class="st">'filetype'</span>])).<span class="bu">any</span>():</span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>        colors[df_sorted.index.get_loc(i)] <span class="op">=</span> <span class="st">'red'</span></span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>bars <span class="op">=</span> ax.barh(df_sorted[<span class="st">'engine'</span>] <span class="op">+</span> <span class="st">" ("</span> <span class="op">+</span> df_sorted[<span class="st">'filetype'</span>] <span class="op">+</span> <span class="st">")"</span>, </span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>               df_sorted[<span class="st">'seconds'</span>], color<span class="op">=</span>colors)</span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>ax.bar_label(bars, fmt<span class="op">=</span><span class="st">" </span><span class="sc">%.2f</span><span class="st"> seconds"</span>)</span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">'Seconds'</span>, ylabel<span class="op">=</span><span class="st">'(Package, Storage Method)'</span>, xlim<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">85</span>))</span>
+<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a>ax.tick_params(axis<span class="op">=</span><span class="st">'x'</span>, rotation<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Avg. Read-in Performance Comparison'</span>)</span>
+<span id="cb40-22"><a href="#cb40-22" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code></pre></div>
+</details>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -1258,29 +1463,32 @@ Columns: 5</code></pre>
 </div>
 </div>
 </div>
-<div id="cell-72" class="cell" data-execution_count="81">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="dv">4</span>))</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> (read_pandas_csv(<span class="st">'results/*.csv'</span>)</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>      .query(<span class="st">"stage == 'groupby'"</span>)</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>      .groupby([<span class="st">'engine'</span>, <span class="st">'filetype'</span>])[<span class="st">'seconds'</span>]</span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>      .mean()</span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>      .reset_index())</span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>fastest <span class="op">=</span> df.loc[df.groupby(<span class="st">'filetype'</span>)[<span class="st">'seconds'</span>].idxmin()]</span>
-<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>df_sorted <span class="op">=</span> df.sort_values(by<span class="op">=</span><span class="st">'seconds'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> [<span class="st">'tab:gray'</span>] <span class="op">*</span> <span class="bu">len</span>(df_sorted)</span>
-<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, row <span class="kw">in</span> df_sorted.iterrows():</span>
-<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> ((fastest[<span class="st">'engine'</span>] <span class="op">==</span> row[<span class="st">'engine'</span>]) <span class="op">&amp;</span> </span>
-<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>        (fastest[<span class="st">'filetype'</span>] <span class="op">==</span> row[<span class="st">'filetype'</span>])).<span class="bu">any</span>():</span>
-<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>        colors[df_sorted.index.get_loc(i)] <span class="op">=</span> <span class="st">'red'</span></span>
-<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>bars <span class="op">=</span> ax.barh(df_sorted[<span class="st">'engine'</span>] <span class="op">+</span> <span class="st">" ("</span> <span class="op">+</span> df_sorted[<span class="st">'filetype'</span>] <span class="op">+</span> <span class="st">")"</span>, </span>
-<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>               df_sorted[<span class="st">'seconds'</span>], color<span class="op">=</span>colors)</span>
-<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>ax.bar_label(bars, fmt<span class="op">=</span><span class="st">" </span><span class="sc">%.2f</span><span class="st"> seconds"</span>)</span>
-<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">'Seconds'</span>, ylabel<span class="op">=</span><span class="st">'(Package, Storage Method)'</span>, xlim<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">85</span>))</span>
-<span id="cb38-20"><a href="#cb38-20" aria-hidden="true" tabindex="-1"></a>ax.tick_params(axis<span class="op">=</span><span class="st">'x'</span>, rotation<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb38-21"><a href="#cb38-21" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Avg. Groupby/Aggregate Performance Comparison'</span>)</span>
-<span id="cb38-22"><a href="#cb38-22" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code></pre></div>
+<div id="cell-79" class="cell">
+<details class="code-fold">
+<summary>Groupby/Aggregate Benchmark</summary>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="dv">4</span>))</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> (read_pandas_csv(<span class="st">'results/*.csv'</span>)</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>      .query(<span class="st">"stage == 'groupby'"</span>)</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>      .groupby([<span class="st">'engine'</span>, <span class="st">'filetype'</span>])[<span class="st">'seconds'</span>]</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>      .mean()</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>      .reset_index())</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>fastest <span class="op">=</span> df.loc[df.groupby(<span class="st">'filetype'</span>)[<span class="st">'seconds'</span>].idxmin()]</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>df_sorted <span class="op">=</span> df.sort_values(by<span class="op">=</span><span class="st">'seconds'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> [<span class="st">'tab:gray'</span>] <span class="op">*</span> <span class="bu">len</span>(df_sorted)</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, row <span class="kw">in</span> df_sorted.iterrows():</span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> ((fastest[<span class="st">'engine'</span>] <span class="op">==</span> row[<span class="st">'engine'</span>]) <span class="op">&amp;</span> </span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>        (fastest[<span class="st">'filetype'</span>] <span class="op">==</span> row[<span class="st">'filetype'</span>])).<span class="bu">any</span>():</span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>        colors[df_sorted.index.get_loc(i)] <span class="op">=</span> <span class="st">'red'</span></span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>bars <span class="op">=</span> ax.barh(df_sorted[<span class="st">'engine'</span>] <span class="op">+</span> <span class="st">" ("</span> <span class="op">+</span> df_sorted[<span class="st">'filetype'</span>] <span class="op">+</span> <span class="st">")"</span>, </span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>               df_sorted[<span class="st">'seconds'</span>], color<span class="op">=</span>colors)</span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>ax.bar_label(bars, fmt<span class="op">=</span><span class="st">" </span><span class="sc">%.2f</span><span class="st"> seconds"</span>)</span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">'Seconds'</span>, ylabel<span class="op">=</span><span class="st">'(Package, Storage Method)'</span>, xlim<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">85</span>))</span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>ax.tick_params(axis<span class="op">=</span><span class="st">'x'</span>, rotation<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Avg. Groupby/Aggregate Performance Comparison'</span>)</span>
+<span id="cb41-22"><a href="#cb41-22" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span></code></pre></div>
+</details>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -1289,10 +1497,6 @@ Columns: 5</code></pre>
 </div>
 </div>
 </div>
-<blockquote class="blockquote">
-<p>But SQL is universal. Your data analyst knows it. Your backend engineer knows it. Your future self will thank you when you come back to this code in six months.<br>
-– https://motherduck.com/blog/python-duckdb-vs-dataframe-libraries/</p>
-</blockquote>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 17%">
@@ -1329,6 +1533,15 @@ Columns: 5</code></pre>
 </tr>
 </tbody>
 </table>
+<p>https://www.robinlinacre.com/recommend_duckdb/</p>
+<p>https://www.robinlinacre.com/recommend_sql/</p>
+<blockquote class="blockquote">
+<p>But SQL is universal. Your data analyst knows it. Your backend engineer knows it. Your future self will thank you when you come back to this code in six months.<br>
+– https://motherduck.com/blog/python-duckdb-vs-dataframe-libraries/</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Code is read more often than it is written. By using SQL, a much wider range of people can read your code, including BI developers, business analysts, data engineers and data scientists.</p>
+</blockquote>
 <p>The benchmarking results highlight clear performance differences across engines and file formats for both the <strong>read</strong> and <strong>groupby</strong> stages. For <strong>groupby operations</strong>, DuckDB is consistently the fastest, especially on Parquet files, where it completes in just <strong>0.44 seconds</strong>, compared to <strong>2.15 seconds</strong> for Dask and <strong>8.76 seconds</strong> for Pandas. DuckDB also outperforms the others on CSV and compressed CSV inputs, showing strong optimization for both raw and columnar formats. In the <strong>read stage</strong>, Dask performs best overall for Parquet files (<strong>2.19 seconds</strong>) and remains competitive on CSV inputs (~10 seconds), indicating efficient parallel I/O. DuckDB’s read performance is solid for CSVs but slower on Parquet (<strong>17.34 seconds</strong>), suggesting its strength lies more in in-memory computation than I/O in this setup. Pandas is the slowest across nearly all cases, reinforcing that it’s less suitable for large-scale or compressed data compared to the more parallel or vectorized architectures of Dask and DuckDB. Overall, DuckDB excels in computational efficiency, Dask in scalable reading, and Pandas lags behind in both.</p>
 <p>Here we simply use the <code>.csv.gz</code> files with <code>dask</code> – does the parallel processing in <code>dask</code> make the conversion from <code>.csv.gz</code> to parquet not worth it?</p>
 </section>
@@ -1346,17 +1559,19 @@ Columns: 5</code></pre>
 <div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1"><p>Note that the total time for the <code>tqdm</code> progress bar will be zero because I’m just re-running the code for demonstration purposes.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>I define <em>large data</em> as datasets with over 10 million rows that fit easily on disk but start to strain memory capacity on most laptops<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>BART kindly makes such ridership information publicly available on their <a href="https://www.bart.gov/about/reports/ridership">open data portal</a><a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>If we wanted to speed that task up we would need to explore true parallel processing (e.g.&nbsp;via <a href="https://docs.python.org/3/library/multiprocessing.html">multiprocessing</a>) rather than threading –a more complicated topic for another day.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{amerkhanian2024,
   author = {Amerkhanian, Peter},
-  title = {Scaling {Local} {Data} {Analysis}},
+  title = {Scaling {Local} {Data} {Analytics}},
   date = {2024-04-12},
   url = {https://peter-amerkhanian.com/posts/dask-data-io/},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-amerkhanian2024" class="csl-entry quarto-appendix-citeas" role="listitem">
-Amerkhanian, Peter. 2024. <span>“Scaling Local Data Analysis.”</span>
+Amerkhanian, Peter. 2024. <span>“Scaling Local Data Analytics.”</span>
 April 12, 2024. <a href="https://peter-amerkhanian.com/posts/dask-data-io/">https://peter-amerkhanian.com/posts/dask-data-io/</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
