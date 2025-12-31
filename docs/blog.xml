@@ -78,10 +78,10 @@
   <media:content url="https://peter-amerkhanian.com/posts/multiple-integration/thumbnail.png" medium="image" type="image/png" height="144" width="144"/>
 </item>
 <item>
-  <title>Scaling Local Data Analytics</title>
+  <title>“Efficient” Local Data Analytics</title>
   <dc:creator>Peter Amerkhanian</dc:creator>
   <link>https://peter-amerkhanian.com/posts/dask-data-io/</link>
-  <description><![CDATA[ Thoughts on efficient data retrieval, storage, read-in, and analysis with examples using BART ridership data. ]]></description>
+  <description><![CDATA[ Thoughts on efficient data retrieval, storage, read-in, and analysis in Python. ]]></description>
   <category>Python</category>
   <category>Data Management</category>
   <guid>https://peter-amerkhanian.com/posts/dask-data-io/</guid>
