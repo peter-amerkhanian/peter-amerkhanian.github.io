@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Check out repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
@@ -22,23 +22,27 @@ jobs:
       - name: Update copyright year in _quarto.yml
         run: |
           python <<'PY'
-          import re
           from pathlib import Path
           from datetime import datetime, timezone
-
+          
           path = Path("_quarto.yml")
-          text = path.read_text()
-
+          lines = path.read_text().splitlines()
           year = str(datetime.now(timezone.utc).year)
+          target = '  page-footer: "Copyright '
+          updated = False
 
-          updated = re.sub(
-              r'(page-footer:\s*"Copyright )\d{4}(, Peter Amerkhanian")',
-              rf'\1{year}\2',
-              text
-          )
+          for i, line in enumerate(lines):
+              if line.startswith(target):
+                  new_line = f'  page-footer: "Copyright {year}, Peter Amerkhanian"'
+                  if line != new_line:
+                      lines[i] = new_line
+                      updated = True
+                  break
+          else:
+              raise SystemExit("page-footer line not found in _quarto.yml")
 
-          if updated != text:
-              path.write_text(updated)
+          if updated:
+              path.write_text("\n".join(lines) + "\n")
               print("Updated _quarto.yml")
           else:
               print("No change needed")
