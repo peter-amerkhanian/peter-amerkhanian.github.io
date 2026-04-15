@@ -19,7 +19,7 @@ website:
     right:
       - blog.qmd
       - projects.qmd
-  page-footer: "Copyright 2024, Peter Amerkhanian"
+  page-footer: "Copyright 2026, Peter Amerkhanian"
 
 format:
   html:
