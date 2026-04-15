@@ -16,40 +16,46 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@v5
 
-      - name: Set up Quarto
-        uses: quarto-dev/quarto-actions/setup@v2
-
-      - name: Update copyright year in _quarto.yml
+      - name: Update copyright year in site files
         run: |
           python <<'PY'
+          import re
           from pathlib import Path
           from datetime import datetime, timezone
           
-          path = Path("_quarto.yml")
-          lines = path.read_text().splitlines()
           year = str(datetime.now(timezone.utc).year)
+          updates = 0
+
+          quarto_path = Path("_quarto.yml")
+          lines = quarto_path.read_text().splitlines()
           target = '  page-footer: "Copyright '
-          updated = False
 
           for i, line in enumerate(lines):
               if line.startswith(target):
                   new_line = f'  page-footer: "Copyright {year}, Peter Amerkhanian"'
                   if line != new_line:
                       lines[i] = new_line
-                      updated = True
+                      quarto_path.write_text("\n".join(lines) + "\n")
+                      updates += 1
+                      print("Updated _quarto.yml")
                   break
           else:
               raise SystemExit("page-footer line not found in _quarto.yml")
 
-          if updated:
-              path.write_text("\n".join(lines) + "\n")
-              print("Updated _quarto.yml")
-          else:
+          html_pattern = re.compile(r"Copyright \d{4}, Peter Amerkhanian")
+          new_footer = f"Copyright {year}, Peter Amerkhanian"
+
+          for html_path in Path("docs").rglob("*.html"):
+              text = html_path.read_text(encoding="utf-8")
+              updated_text = html_pattern.sub(new_footer, text)
+              if updated_text != text:
+                  html_path.write_text(updated_text, encoding="utf-8")
+                  updates += 1
+                  print(f"Updated {html_path}")
+
+          if updates == 0:
               print("No change needed")
           PY
-
-      - name: Render site
-        run: quarto render --no-execute
 
       - name: Commit changes
         run: |
