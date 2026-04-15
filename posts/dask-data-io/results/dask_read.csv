@@ -1,0 +1,16 @@
+engine,operation,filetype,stage,run,seconds
+dask,dask,parquet,read,1,2.9264421999978367
+dask,dask,parquet,read,2,2.90251089999947
+dask,dask,parquet,read,3,3.3848810999988928
+dask,dask,parquet,read,4,3.6194385000017064
+dask,dask,parquet,read,5,3.5556212999981653
+dask,dask,csv,read,1,13.254836500000238
+dask,dask,csv,read,2,13.370036800002708
+dask,dask,csv,read,3,13.812485500002367
+dask,dask,csv,read,4,13.940748000000895
+dask,dask,csv,read,5,14.377332600000955
+dask,dask,csv.gz,read,1,11.551900899998145
+dask,dask,csv.gz,read,2,11.781937200001266
+dask,dask,csv.gz,read,3,11.59432249999736
+dask,dask,csv.gz,read,4,12.242769899999985
+dask,dask,csv.gz,read,5,13.781103199999052

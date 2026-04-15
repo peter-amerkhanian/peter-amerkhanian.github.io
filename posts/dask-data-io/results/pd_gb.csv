@@ -1,0 +1,16 @@
+engine,operation,filetype,stage,run,seconds
+pandas,pandas,parquet,groupby,1,9.535682199999428
+pandas,pandas,parquet,groupby,2,9.377403200000117
+pandas,pandas,parquet,groupby,3,9.226664300000266
+pandas,pandas,parquet,groupby,4,9.074257100000978
+pandas,pandas,parquet,groupby,5,9.343641699997534
+pandas,pandas,csv,groupby,1,23.213420699998096
+pandas,pandas,csv,groupby,2,23.009487800001807
+pandas,pandas,csv,groupby,3,23.26438930000222
+pandas,pandas,csv,groupby,4,22.54106650000176
+pandas,pandas,csv,groupby,5,22.828305900002306
+pandas,pandas,csv.gz,groupby,1,23.661539299999276
+pandas,pandas,csv.gz,groupby,2,23.707903200000146
+pandas,pandas,csv.gz,groupby,3,23.598978899997746
+pandas,pandas,csv.gz,groupby,4,25.854886000000988
+pandas,pandas,csv.gz,groupby,5,23.839767599998595

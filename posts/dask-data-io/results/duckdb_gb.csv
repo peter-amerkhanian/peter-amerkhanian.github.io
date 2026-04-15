@@ -1,0 +1,16 @@
+engine,operation,filetype,stage,run,seconds
+duckdb,duckdb,parquet,groupby,1,0.650891799999954
+duckdb,duckdb,parquet,groupby,2,0.6336092000019562
+duckdb,duckdb,parquet,groupby,3,0.6210958999981813
+duckdb,duckdb,parquet,groupby,4,0.5948926000019128
+duckdb,duckdb,parquet,groupby,5,0.37220239999805926
+duckdb,duckdb,csv,groupby,1,2.5138274999990244
+duckdb,duckdb,csv,groupby,2,2.3454892999980075
+duckdb,duckdb,csv,groupby,3,2.461930100002064
+duckdb,duckdb,csv,groupby,4,3.3058864999984507
+duckdb,duckdb,csv,groupby,5,2.5010894000006374
+duckdb,duckdb,csv.gz,groupby,1,5.872227599997132
+duckdb,duckdb,csv.gz,groupby,2,5.987287300002208
+duckdb,duckdb,csv.gz,groupby,3,5.986638599999424
+duckdb,duckdb,csv.gz,groupby,4,5.756710900001053
+duckdb,duckdb,csv.gz,groupby,5,5.062013800001296
