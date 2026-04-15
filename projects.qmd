@@ -12,7 +12,20 @@ format:
 
 ## Public Reports, Dashboards, & Software
 
-The following are some of my formal, public-facing projects:
+The following are some of my formal, public-facing projects:  
+
+
+<i class="bi bi-newspaper"></i> **A Data-Driven Approach to Detecting Cash Benefit Theft**  
+Monica G. Bobra, Ian Rose, Aeri Shan, Jason Lally, Kimberly Hicks, Esa Eslami, Konrad Franco, Joaquin Carbonell, Batool Hasanzadeh, **Peter Amerkhanian**, J. Steven Raquel, Neelam Joshi, Daniel Rodda, and Brenda Moran (2025)  
+Technical Report for The California Department of Social Services.  
+[Report](https://hub.innovation.ca.gov/data/data-driven-approach-detecting-cash-benefit-theft/index.html){.btn .btn-outline-primary .btn-sm role="button"}
+
+
+**Summary**: We built a predictive model to detect illegal debit card transactions.  
+*Contribution*: Descriptive data visualization, methodology development.  
+Tools: `matplotlib`, `sklearn`, snowflake.
+
+---
 
 <i class="bi bi-file-bar-graph"></i> **Interactive CalWORKs Resource Model**  
 Stephanie Peng, Peter Amerkhanian, Joaquín Carbonell (2024)  
