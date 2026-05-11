@@ -23,9 +23,8 @@ about:
 UC Berkeley MPP '23, BA '16
 </p>
 <hr>
-Passionate about using data science for good.  
 Check out my:      
 
-- Technical [blog](blog.qmd)
+- [Work](projects.qmd) -- professional reports, dashboards, and software I've worked on over the years.
 
-- Public [reports and software](projects.qmd)
+- [Tutorials](blog.qmd) -- walkthroughs and informal notes on topics in data analysis.
