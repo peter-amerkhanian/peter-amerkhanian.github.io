@@ -102,6 +102,20 @@ div.quarto-post .metadata {
     display: none
 }
 
+/* Change navbar display */
+@media (min-width: 992px) {
+nav .nav-item {
+    padding: 0px .01em 0px .01em;
+    font-weight: 550;
+    border: .11em solid white;
+    border-radius: 15px;
+    margin: 0px .2em 0px .2em;
+}
+.navbar-expand-lg .navbar-nav .nav-link {
+    padding: .1rem .1rem .4rem .1rem;
+}
+}
+
 /* Fix thumbnail margins */
 
 div.quarto-post .thumbnail img{
@@ -213,16 +227,16 @@ nav .nav-item {
     }
 }
 
+div.quarto-about-trestles {
+        padding-top: 1em !important;
+    }
+
 @media (max-width: 991.98px) {
     div.quarto-about-trestles .about-entity .about-link {
         font-size: 1.1em;
         padding: 0.25em 0.5em;
         text-align: center;
         border-radius: 6px;
-    }
-
-    div.quarto-about-trestles {
-        padding-top: 1em !important;
     }
 
     

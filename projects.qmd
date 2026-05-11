@@ -1,6 +1,6 @@
 ---
-title: "Projects"
-pagetitle: "Projects"
+title: "Work"
+pagetitle: "Work"
 title-prefix: "Peter Amerkhanian"
 title-block-banner: true
 format:
@@ -16,7 +16,7 @@ The following are some of my formal, public-facing projects:
 
 
 <i class="bi bi-newspaper"></i> **A Data-Driven Approach to Detecting Cash Benefit Theft**  
-Monica G. Bobra, Ian Rose, Aeri Shan, Jason Lally, Kimberly Hicks, Esa Eslami, Konrad Franco, Joaquin Carbonell, Batool Hasanzadeh, **Peter Amerkhanian**, J. Steven Raquel, Neelam Joshi, Daniel Rodda, and Brenda Moran (2025)  
+Monica G. Bobra, Ian Rose, Aeri Shan, Jason Lally, Kimberly Hicks, Esa Eslami, Konrad Franco, Joaquin Carbonell, Batool Hasanzadeh, <u>Peter Amerkhanian</u>, J. Steven Raquel, Neelam Joshi, Daniel Rodda, and Brenda Moran (2025)  
 Technical Report for The California Department of Social Services.  
 [Report](https://hub.innovation.ca.gov/data/data-driven-approach-detecting-cash-benefit-theft/index.html){.btn .btn-outline-primary .btn-sm role="button"}
 
